@@ -40,10 +40,6 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-tasks.named("check").configure {
-    dependsOn(tasks.named("test"))
-}
-
 tasks.withType(Checkstyle) {
     reports {
         xml.required = true
