@@ -1,0 +1,29 @@
+name: develop Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_hash:
+        description: 'commit_hash'
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: DEV
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+
+      - name: Login to NCP Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.NCP_HOST }}
+          username: tenminute
+          key: ${{ secrets.NCP_PRIVATE_KEY }}
+          port: ${{ secrets.NCP_PORT }}
+          script: |
+            echo "${{ secrets.NCP_SECRET_KEY }}" | docker login -u "${{ secrets.NCP_ACCESS_KEY }}" --password-stdin "${{ secrets.NCP_CONTAINER_REGISTRY }}"
+            docker pull ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ github.event.inputs.commit_hash }}
+            docker stop server-spring
+            docker run -d --name server-spring -p 8080:8080 -d server-spring:${{ github.event.inputs.commit_hash }}
