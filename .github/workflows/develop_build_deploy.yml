@@ -1,7 +1,6 @@
 name: develop Build And Deploy
 
 on:
-  pull_request:
   push:
     branches: [ "develop" ]
 
