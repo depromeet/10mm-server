@@ -13,7 +13,7 @@ jobs:
         java-version: [ 17 ]
         distribution: [ 'temurin' ]
     outputs:
-      VERSION: ${{ steps.github-sha-short.outputs.sha }}
+      sha: ${{ steps.github-sha-short.outputs.sha }}
     steps:
       # 기본 체크아웃
       - name: Checkout
