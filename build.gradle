@@ -53,6 +53,7 @@ spotless {
     }
 }
 
+// pre-commit spotless check script
 tasks.register('createSpotlessCheckPreCommitHook') {
     def gitHooksDirectory = new File("$project.rootDir/.git/hooks/")
     if (!gitHooksDirectory.exists()) {
