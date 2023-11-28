@@ -3,6 +3,9 @@ package com.depromeet.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.swagger.v3.core.jackson.ModelResolver;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -45,6 +48,12 @@ public class SwaggerConfig {
 			.title("\"10MM 서버 API문서\"")
 			.description("10MM 서버 API 문서입니다.")
 			.license(license);
+	}
+
+	@Bean
+	public ModelResolver modelResolver(ObjectMapper objectMapper) {
+		// 객체 직렬화
+		return new ModelResolver(objectMapper);
 	}
 
 }
