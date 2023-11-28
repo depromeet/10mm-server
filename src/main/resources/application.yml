@@ -1,0 +1,15 @@
+# Actuator 설정
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+      base-path: /10mm-actuator
+    jmx:
+      exposure:
+        exclude: "*"
+    enabled-by-default: false
+  endpoint:
+    health:
+      enabled: true
