@@ -1,5 +1,8 @@
 package com.depromeet.config;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,15 +16,20 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.security.SecurityScheme.In;
 import io.swagger.v3.oas.models.security.SecurityScheme.Type;
-import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.models.servers.Server;
+import jakarta.servlet.ServletContext;
 
 @Configuration
-@RequiredArgsConstructor
 public class SwaggerConfig {
 
+	@Value("${swagger.version}")
+	private String version;
+
 	@Bean
-	public OpenAPI openAPI() {
+	public OpenAPI openAPI(ServletContext servletContext) {
+		Server server = new Server().url(servletContext.getContextPath());
 		return new OpenAPI()
+			.servers(List.of(server))
 			.components(authSetting())
 			.info(swaggerInfo());
 	}
@@ -44,7 +52,7 @@ public class SwaggerConfig {
 		license.setName("10MM Server Repository");
 
 		return new Info()
-			.version("v0.0.1")
+			.version("v" + version)
 			.title("\"10MM 서버 API문서\"")
 			.description("10MM 서버 API 문서입니다.")
 			.license(license);
