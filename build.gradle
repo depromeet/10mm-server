@@ -42,7 +42,6 @@ tasks.named('test') {
 
 jar.enabled = false
 
-
 spotless {
     java {
         target("**/*.java")
@@ -52,4 +51,25 @@ spotless {
         endWithNewline() // 끝부분 NewLine 처리
         googleJavaFormat().aosp() // google java format
     }
+}
+
+tasks.register('createSpotlessCheckPreCommitHook') {
+    def gitHooksDirectory = new File("$project.rootDir/.git/hooks/")
+    if (!gitHooksDirectory.exists()) {
+        gitHooksDirectory.mkdirs()
+    }
+    new File("$project.rootDir/.git/hooks", "pre-commit").text =
+            """
+            #!/bin/bash
+            echo "Running spotless check"
+            ./gradlew spotlessCheck
+            if [ \$? -eq 0 ]
+            then
+                echo "Spotless check succeed"
+            else
+                echo "Spotless check failed" >&2
+            exit 1
+            fi
+            """
+    "chmod +x .git/hooks/pre-commit".execute()
 }
