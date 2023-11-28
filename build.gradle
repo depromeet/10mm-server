@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.1.5'
     id 'io.spring.dependency-management' version '1.1.3'
     id 'checkstyle'
+    id 'jacoco'
 }
 
 group = 'com.depromeet'
@@ -38,7 +39,89 @@ tasks.named('bootBuildImage') {
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
 }
+
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+def jacocoDir = "$buildDir/reports/"
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        csv.required.set(true)
+        html.destination file(jacocoDir + "jacoco/index.html")
+        xml.destination file(jacocoDir + "jacoco/index.xml")
+        csv.destination file(jacocoDir + "jacoco/index.csv")
+    }
+
+    def QDomains = []
+    for (qPattern in '*.QA'..'*.QZ') { // qPattern = '*.QA', '*.QB', ... '*.QZ'
+        QDomains.add(qPattern + '*')
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, excludes: [
+                            // 측정 안하고 싶은 패턴
+                            "**/*Application*",
+                            "**/*Config*",
+                            "**/*Exception*",
+                            "**/*Request*",
+                            "**/*Response*",
+                            "**/*Dto*",
+                            "**/*Interceptor*",
+                            "**/*Filter*"
+                    ] + QDomains) // Querydsl 관련 제거
+                })
+        )
+    }
+    finalizedBy jacocoTestCoverageVerification
+}
+
+jacocoTestCoverageVerification {
+    // QueryDSL QDomain 제외시키기
+    def QDomains = []
+    // qPattern = "*.QA","*.QB","*.QC", ... "*.QZ"
+    for (qPattern in '*.QA'..'*.QZ') {
+        QDomains.add(qPattern + '*')
+    }
+
+    violationRules {
+        rule {
+            // rule 활성화
+            enabled = true
+
+            // 클래스 단위로 룰 체크
+            element = 'CLASS'
+
+            // 라인 커버리지를 최소 80% 만족
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
+
+            excludes = [
+                    // 측정 안하고 싶은 패턴
+                    "**/*Application*",
+                    "**/*Config*",
+                    "**/*Exception*",
+                    "**/*Request*",
+                    "**/*Response*",
+                    "**/*Dto*",
+                    "**/*Interceptor*",
+                    "**/*Filter*"
+            ] + QDomains
+        }
+    }
+}
+
 
 tasks.withType(Checkstyle) {
     reports {
