@@ -63,6 +63,17 @@ jobs:
           push: true
           tags: ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ steps.github-sha-short.outputs.sha }}
 
+      # 서버로 docker-compose 파일 전송
+      - name: Copy docker-compose.yml to NCP Server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.NCP_HOST }}
+          username: tenminute
+          key: ${{ secrets.NCP_PRIVATE_KEY }}
+          port: ${{ secrets.NCP_PORT }}
+          source: docker-compose.yaml
+          target: /
+
   deploy:
     runs-on: ubuntu-latest
     environment: DEV
