@@ -65,7 +65,7 @@ jobs:
 
       # 서버로 docker-compose 파일 전송
       - name: Copy docker-compose.yml to NCP Server
-        uses: appleboy/scp-action@0.1.4
+        uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.NCP_HOST }}
           username: ${{ secrets.NCP_USERNAME }}
