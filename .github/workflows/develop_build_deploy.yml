@@ -68,7 +68,7 @@ jobs:
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.NCP_HOST }}
-          username: tenminute
+          username: ${{ secrets.NCP_USERNAME }}
           key: ${{ secrets.NCP_PRIVATE_KEY }}
           port: ${{ secrets.NCP_PORT }}
           source: docker-compose.yaml
