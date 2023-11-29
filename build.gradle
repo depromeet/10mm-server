@@ -46,7 +46,25 @@ jacoco {
     toolVersion = "0.8.8"
 }
 
-def jacocoDir = "$buildDir/reports/"
+def jacocoDir = layout.buildDirectory.dir("reports/")
+
+def QDomains = []
+for (qPattern in '*.QA'..'*.QZ') { // qPattern = '*.QA', '*.QB', ... '*.QZ'
+    QDomains.add(qPattern + '*')
+}
+
+def jacocoExcludePatterns = [
+        // 측정 안하고 싶은 패턴
+        "**/*Application*",
+        "**/*Config*",
+        "**/*Exception*",
+        "**/*Request*",
+        "**/*Response*",
+        "**/*Dto*",
+        "**/*Interceptor*",
+        "**/*Filter*",
+        "**/*Resolver*"
+]
 
 jacocoTestReport {
     dependsOn test
@@ -54,31 +72,15 @@ jacocoTestReport {
         html.required.set(true)
         xml.required.set(true)
         csv.required.set(true)
-        html.destination file(jacocoDir + "jacoco/index.html")
-        xml.destination file(jacocoDir + "jacoco/index.xml")
-        csv.destination file(jacocoDir + "jacoco/index.csv")
-    }
-
-    def QDomains = []
-    for (qPattern in '*.QA'..'*.QZ') { // qPattern = '*.QA', '*.QB', ... '*.QZ'
-        QDomains.add(qPattern + '*')
+        html.destination jacocoDir.get().file("jacoco/index.html").asFile
+        xml.destination jacocoDir.get().file("jacoco/index.xml").asFile
+        csv.destination jacocoDir.get().file("jacoco/index.csv").asFile
     }
 
     afterEvaluate {
         classDirectories.setFrom(
                 files(classDirectories.files.collect {
-                    fileTree(dir: it, excludes: [
-                            // 측정 안하고 싶은 패턴
-                            "**/*Application*",
-                            "**/*Config*",
-                            "**/*Exception*",
-                            "**/*Request*",
-                            "**/*Response*",
-                            "**/*Dto*",
-                            "**/*Interceptor*",
-                            "**/*Filter*",
-                            "**/*Resolver*"
-                    ] + QDomains) // Querydsl 관련 제거
+                    fileTree(dir: it, excludes: jacocoExcludePatterns + QDomains) // Querydsl 관련 제거
                 })
         )
     }
@@ -86,12 +88,6 @@ jacocoTestReport {
 }
 
 jacocoTestCoverageVerification {
-    // QueryDSL QDomain 제외시키기
-    def QDomains = []
-    // qPattern = "*.QA","*.QB","*.QC", ... "*.QZ"
-    for (qPattern in '*.QA'..'*.QZ') {
-        QDomains.add(qPattern + '*')
-    }
 
     violationRules {
         rule {
@@ -108,18 +104,7 @@ jacocoTestCoverageVerification {
 //                minimum = 0.80
 //            }
 
-            excludes = [
-                    // 측정 안하고 싶은 패턴
-                    "**/*Application*",
-                    "**/*Config*",
-                    "**/*Exception*",
-                    "**/*Request*",
-                    "**/*Response*",
-                    "**/*Dto*",
-                    "**/*Interceptor*",
-                    "**/*Filter*",
-                    "**/*Resolver*"
-            ] + QDomains
+            excludes = jacocoExcludePatterns + QDomains
         }
     }
 }
