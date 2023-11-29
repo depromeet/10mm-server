@@ -78,6 +78,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: DEV
     needs: build
+    env:
+      NCP_CONTAINER_REGISTRY: ${{ secrets.NCP_CONTAINER_REGISTRY }}
+      NCP_IMAGE_TAG: ${{ needs.build.outputs.sha }}
     steps:
       - name: Login to NCP Server
         uses: appleboy/ssh-action@master
