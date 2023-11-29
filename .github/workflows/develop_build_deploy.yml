@@ -72,7 +72,7 @@ jobs:
           key: ${{ secrets.NCP_PRIVATE_KEY }}
           port: ${{ secrets.NCP_PORT }}
           source: docker-compose.yaml
-          target: /
+          target: /home/tenminute/
 
   deploy:
     runs-on: ubuntu-latest
