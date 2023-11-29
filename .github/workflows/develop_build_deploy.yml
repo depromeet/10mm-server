@@ -83,7 +83,7 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           NCP_CONTAINER_REGISTRY: ${{ secrets.NCP_CONTAINER_REGISTRY }}
-          NCP_IMAGE_TAG: ${{ steps.github-sha-short.outputs.sha }}
+          NCP_IMAGE_TAG: ${{ needs.build.outputs.sha }}
         with:
           host: ${{ secrets.NCP_HOST }}
           username: tenminute
