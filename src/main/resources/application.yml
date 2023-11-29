@@ -13,3 +13,19 @@ management:
   endpoint:
     health:
       enabled: true
+
+swagger:
+  version: 0.0.1
+
+springdoc:
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /swagger-ui
+    disable-swagger-default-url: true
+    display-request-duration: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+    syntax-highlight:
+      theme: none
+    urls-primary-name: 10MM API DOCS
