@@ -94,6 +94,6 @@ jobs:
             echo "${{ secrets.NCP_SECRET_KEY }}" | docker login -u "${{ secrets.NCP_ACCESS_KEY }}" --password-stdin "${{ secrets.NCP_CONTAINER_REGISTRY }}"
             docker pull ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ needs.build.outputs.sha }}
             docker compose -f /home/tenminute/docker-compose.yaml up -d
-            docker system prune -a -f
+            docker image prune -a -f
 #            docker stop server-spring && docker rm server-spring
 #            docker run -d --name server-spring -p 8080:8080 -d ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ needs.build.outputs.sha }}
