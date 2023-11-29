@@ -81,7 +81,7 @@ jobs:
     steps:
       - name: Deploy to NCP Server
         uses: appleboy/ssh-action@master
-        #        env:
+        env:
         #          NCP_CONTAINER_REGISTRY: ${{ secrets.NCP_CONTAINER_REGISTRY }}
         #          NCP_IMAGE_TAG: ${{ needs.build.outputs.sha }}
         with:
