@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.1.5'
     id 'io.spring.dependency-management' version '1.1.3'
     id 'com.diffplug.spotless' version '6.11.0'
+    id 'jacoco'
 }
 
 group = 'com.depromeet'
@@ -40,6 +41,74 @@ tasks.named('bootBuildImage') {
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
+}
+
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+def jacocoDir = layout.buildDirectory.dir("reports/")
+
+def QDomains = []
+for (qPattern in '*.QA'..'*.QZ') { // qPattern = '*.QA', '*.QB', ... '*.QZ'
+    QDomains.add(qPattern + '*')
+}
+
+def jacocoExcludePatterns = [
+        // 측정 안하고 싶은 패턴
+        "**/*Application*",
+        "**/*Config*",
+        "**/*Exception*",
+        "**/*Request*",
+        "**/*Response*",
+        "**/*Dto*",
+        "**/*Interceptor*",
+        "**/*Filter*",
+        "**/*Resolver*"
+]
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        csv.required.set(true)
+        html.destination jacocoDir.get().file("jacoco/index.html").asFile
+        xml.destination jacocoDir.get().file("jacoco/index.xml").asFile
+        csv.destination jacocoDir.get().file("jacoco/index.csv").asFile
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, excludes: jacocoExcludePatterns + QDomains) // Querydsl 관련 제거
+                })
+        )
+    }
+    finalizedBy jacocoTestCoverageVerification
+}
+
+jacocoTestCoverageVerification {
+
+    violationRules {
+        rule {
+            // rule 활성화
+            enabled = true
+
+            // 클래스 단위로 룰 체크
+            element = 'CLASS'
+
+            // 라인 커버리지를 최소 80% 만족
+//            limit {
+//                counter = 'LINE'
+//                value = 'COVEREDRATIO'
+//                minimum = 0.80
+//            }
+
+            excludes = jacocoExcludePatterns + QDomains
+        }
+    }
 }
 
 jar.enabled = false
