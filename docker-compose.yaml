@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  backend:
+    image: ${NCP_CONTAINER_REGISTRY}/server-spring:${NCP_IMAGE_TAG}
+    container_name: server-spring
+    restart: always
+    network_mode: host
+    ports:
+      - "8080:8080"
