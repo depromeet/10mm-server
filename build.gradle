@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.1.5'
     id 'io.spring.dependency-management' version '1.1.3'
+    id 'com.diffplug.spotless' version '6.11.0'
     id 'checkstyle'
     id 'jacoco'
 }
@@ -26,11 +27,13 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('bootBuildImage') {
@@ -109,17 +112,22 @@ jacocoTestCoverageVerification {
     }
 }
 
+jar.enabled = false
 
-tasks.withType(Checkstyle) {
-    reports {
-        xml.required = true
-        html.required = true
+spotless {
+    java {
+        target("**/*.java")
+        importOrder()
+        removeUnusedImports() // 사용하지 않는 import 제거
+        trimTrailingWhitespace() // 공백 제거
+        endWithNewline() // 끝부분 NewLine 처리
+        googleJavaFormat().aosp() // google java format
     }
 }
 
-checkstyle {
-    configFile = file("config/checkstyle/naver-checkstyle-rules.xml")
-    configProperties = ['suppressionFile': file("config/checkstyle/naver-checkstyle-suppressions.xml")]
+// pre-commit spotless check script
+tasks.register('updateGitHooks', Copy) {
+    from './scripts/pre-commit'
+    into './.git/hooks'
 }
-
-jar.enabled = false
+compileJava.dependsOn updateGitHooks
