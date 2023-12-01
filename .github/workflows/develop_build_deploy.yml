@@ -61,20 +61,35 @@ jobs:
           push: true
           tags: ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ steps.github-sha-short.outputs.sha }}
 
-  deploy:
-    runs-on: ubuntu-latest
-    environment: DEV
-    needs: build
-    steps:
-      - name: Login to NCP Server
-        uses: appleboy/ssh-action@master
+      # 서버로 docker-compose 파일 전송
+      - name: Copy docker-compose.yml to NCP Server
+        uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.NCP_HOST }}
           username: tenminute
           key: ${{ secrets.NCP_PRIVATE_KEY }}
           port: ${{ secrets.NCP_PORT }}
+          source: docker-compose.yaml
+          target: /home/tenminute/
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: DEV
+    needs: build
+    steps:
+      - name: Deploy to NCP Server
+        uses: appleboy/ssh-action@master
+        env:
+          NCP_CONTAINER_REGISTRY: ${{ secrets.NCP_CONTAINER_REGISTRY }}
+          NCP_IMAGE_TAG: ${{ needs.build.outputs.sha }}
+        with:
+          host: ${{ secrets.NCP_HOST }}
+          username: tenminute
+          key: ${{ secrets.NCP_PRIVATE_KEY }}
+          port: ${{ secrets.NCP_PORT }}
+          envs: NCP_CONTAINER_REGISTRY,NCP_IMAGE_TAG  # docker-compose.yml 에서 사용할 환경 변수
           script: |
             echo "${{ secrets.NCP_SECRET_KEY }}" | docker login -u "${{ secrets.NCP_ACCESS_KEY }}" --password-stdin "${{ secrets.NCP_CONTAINER_REGISTRY }}"
             docker pull ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ needs.build.outputs.sha }}
-            docker stop server-spring && docker rm server-spring 
-            docker run -d --name server-spring -p 8080:8080 -d ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ needs.build.outputs.sha }}
+            docker compose -f /home/tenminute/docker-compose.yaml up -d
+            docker image prune -a -f
