@@ -4,8 +4,6 @@ plugins {
 
 gradleEnterprise {
     buildScan {
-        def getenv = System.getenv("CI")
-        println "getenv = $getenv"
         publishAlwaysIf(System.getenv("CI") != null)
         termsOfServiceUrl = "https://gradle.com/terms-of-service"
         termsOfServiceAgree = "yes"
