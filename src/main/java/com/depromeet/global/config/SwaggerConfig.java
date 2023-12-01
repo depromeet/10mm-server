@@ -1,4 +1,4 @@
-package com.depromeet.config;
+package com.depromeet.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.core.jackson.ModelResolver;
