@@ -95,3 +95,17 @@ jobs:
             docker pull ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ needs.build.outputs.sha }}
             docker compose -f /home/tenminute/docker-compose.yaml up -d
             docker image prune -a -f
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Send to slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "Gradle Build Scan Report of ${{ github.workflow }}: ${{ steps.gradle.outputs.build-scan-url }}\\n ${{ github.event.head_commit.message }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
