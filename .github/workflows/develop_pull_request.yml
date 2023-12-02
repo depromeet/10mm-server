@@ -38,9 +38,13 @@ jobs:
       - name: LifeCycle check
         run: |
           ./gradlew check
-
-      - name: Build and analyze
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew jacocoTestReport sonar --info
+#      - name: SonarCloud scan
+#        run: ./gradlew test sonar --info --stacktrace --no-daemon
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

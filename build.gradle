@@ -67,17 +67,15 @@ def jacocoExcludePatterns = [
 
 sonar {
     properties {
-        property 'sonar.host.url', 'https://sonarcloud.io'
-        property 'sonar.organization', 'depromeet-1'
         property 'sonar.projectKey', 'depromeet_10mm-server'
-        property 'sources', 'src'
-        property 'language', 'java'
-        property 'sourceEncoding', 'UTF-8'
+        property 'sonar.organization', 'depromeet-1'
+        property 'sonar.host.url', 'https://sonarcloud.io'
+        property 'sonar.sources', 'src'
+        property 'sonar.language', 'Java'
+        property 'sonar.sourceEncoding', 'UTF-8'
         property 'sonar.test.inclusions', '**/*Test.java'
         property 'sonar.java.coveragePlugin', 'jacoco'
-        property 'sonar.exclusions',
-                jacocoExcludePatterns.toString() + ", " + QDomains.toString()
-        property 'sonar.coverage.jacoco.xmlReportPaths', 'build/reports/jacoco/index.xml'
+        property 'sonar.coverage.jacoco.xmlReportPaths', layout.buildDirectory.dir("reports/jacoco/index.xml")
     }
 }
 
