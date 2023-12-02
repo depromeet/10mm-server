@@ -21,6 +21,8 @@ public class CorsConfig implements WebMvcConfigurer {
 			.allowedOriginPatterns(patterns)
 			.allowedHeaders("Authorization", "Content-Type")
 			.exposedHeaders("Set-Cookie")
-			.allowCredentials(true);
+			.allowCredentials(true)
+			// preflight request에 대한 응답을 캐시할 수 있는 시간
+			.maxAge(3600);
 	}
 }
