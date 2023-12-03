@@ -71,8 +71,8 @@ sonar {
         property "sonar.organization", "depromeet-1"
         property "sonar.host.url", "https://sonarcloud.io"
         property 'sonar.test.exclusions', jacocoExcludePatterns.toString()
-//        property 'sonar.java.coveragePlugin', 'jacoco'
-//        property 'sonar.coverage.jacoco.xmlReportPaths', jacocoDir.get().file("jacoco/index.xml").asFile
+        property 'sonar.java.coveragePlugin', 'jacoco'
+        property 'sonar.coverage.jacoco.xmlReportPaths', jacocoDir.get().file("jacoco/index.xml").asFile
     }
 }
 
@@ -86,9 +86,7 @@ jacocoTestReport {
         html.required.set(true)
         xml.required.set(true)
         csv.required.set(true)
-        html.destination jacocoDir.get().file("jacoco/index.html").asFile
         xml.destination jacocoDir.get().file("jacoco/index.xml").asFile
-        csv.destination jacocoDir.get().file("jacoco/index.csv").asFile
     }
 
     afterEvaluate {
