@@ -40,7 +40,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: SonarCloud scan
-        run: ./gradlew test sonar --info --stacktrace --no-daemon
+        run: ./gradlew clean sonar --info --stacktrace --no-daemon
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
