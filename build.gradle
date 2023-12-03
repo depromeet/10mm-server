@@ -70,12 +70,12 @@ sonar {
         property "sonar.projectKey", "depromeet_10mm-server"
         property "sonar.organization", "depromeet-1"
         property "sonar.host.url", "https://sonarcloud.io"
-//        property 'sonar.sources', 'src'
-//        property 'sonar.language', 'java'
-//        property 'sonar.sourceEncoding', 'UTF-8'
-//        property 'sonar.test.inclusions', '**/*Test.java'
-//        property 'sonar.java.coveragePlugin', 'jacoco'
-//        property 'sonar.coverage.jacoco.xmlReportPaths', 'build/reports/jacoco/index.xml'
+        property 'sonar.sources', 'src'
+        property 'sonar.language', 'java'
+        property 'sonar.sourceEncoding', 'UTF-8'
+        property 'sonar.test.inclusions', '**/*Test.java'
+        property 'sonar.java.coveragePlugin', 'jacoco'
+        property 'sonar.coverage.jacoco.xmlReportPaths', jacocoDir.get().file("jacoco/index.xml").asFile
     }
 }
 
