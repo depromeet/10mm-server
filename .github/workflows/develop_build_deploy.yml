@@ -3,8 +3,6 @@ name: develop Build And Deploy
 on:
   push:
     branches: [ "develop" ]
-  pull_request:
-    branches: [ "develop" ]
 
 jobs:
   build:
@@ -16,7 +14,6 @@ jobs:
         distribution: [ 'temurin' ]
     outputs:
       sha: ${{ steps.github-sha-short.outputs.sha }}
-      scan-url: ${{ steps.gradle.outputs.build-scan-url }}
     steps:
       # 기본 체크아웃
       - name: Checkout
@@ -81,7 +78,7 @@ jobs:
         with:
           payload: |
             {
-            "text": "Gradle Build Scan Report of ${{ github.workflow }}: ${{ steps.gradle.outputs.build-scan-url }}\\n ${{ github.event.head_commit.message }}"
+              "text": "Gradle Build Scan Report of ${{ github.workflow }}: ${{ steps.gradle.outputs.build-scan-url }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
