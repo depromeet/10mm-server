@@ -43,6 +43,7 @@ tasks.named('bootBuildImage') {
 tasks.named('test') {
     useJUnitPlatform()
     finalizedBy 'jacocoTestReport'
+    finalizedBy 'sonar'
 }
 
 def jacocoDir = layout.buildDirectory.dir("reports/")
