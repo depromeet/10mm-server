@@ -45,6 +45,10 @@ tasks.named('test') {
     finalizedBy 'jacocoTestReport'
 }
 
+tasks.named('sonar') {
+    dependsOn 'test'
+}
+
 def jacocoDir = layout.buildDirectory.dir("reports/")
 
 def QDomains = []
