@@ -42,10 +42,10 @@ tasks.named('bootBuildImage') {
 
 tasks.named('test') {
     useJUnitPlatform()
-    finalizedBy 'jacocoTestReport'
+    finalizedBy 'sonar'
 }
 
-tasks.named('sonar') {
+tasks.named('jacocoTestReport') {
     dependsOn 'test'
 }
 
