@@ -42,11 +42,7 @@ tasks.named('bootBuildImage') {
 
 tasks.named('test') {
     useJUnitPlatform()
-    finalizedBy 'sonar'
-}
-
-tasks.named('jacocoTestReport') {
-    dependsOn 'test'
+    finalizedBy 'jacocoTestReport'
 }
 
 def jacocoDir = layout.buildDirectory.dir("reports/")
