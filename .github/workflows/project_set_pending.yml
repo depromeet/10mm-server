@@ -79,6 +79,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
+          PENDING_OPTION_ID="${{ env.PENDING_OPTION_ID }}"
+          
           gh api graphql -f query='
             mutation ($project: ID!, $item: ID!, $status_field: ID!, $status_value: String!) {
               updateProjectV2ItemFieldValue(
@@ -93,4 +95,4 @@ jobs:
                   id
                 }
               }
-            }' -f project=$PROJECT_ID -f item=$ITEM_ID -f status_field=$STATUS_FIELD_ID -f status_value="d29d01b8" --silent
+            }' -f project=$PROJECT_ID -f item=$ITEM_ID -f status_field=$STATUS_FIELD_ID -f status_value=$PENDING_OPTION_ID --silent
