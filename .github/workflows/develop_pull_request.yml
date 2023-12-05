@@ -32,21 +32,14 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          sonar.projectKey: depromeet_10mm-server
-          sonar.organization: depromeet-1
-          sonar.host.url: https://sonarcloud.io
-          sonar.coverage.jacoco.xmlReportPaths: 'build/reports/jacoco/index.xml'
           arguments: check
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' }}
+
+      - name: SonarCloud scan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-#      - name: SonarCloud scan
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#        run: ./gradlew sonar --info --stacktrace
+        run: ./gradlew sonar --info --stacktrace
 
       - name: LifeCycle check
         run: |
