@@ -6,7 +6,7 @@ on:
       - opened
 
 jobs:
-  track_pr:
+  set_pending:
     runs-on: ubuntu-latest
     steps:
       # Github App을 사용하여 토큰 생성
