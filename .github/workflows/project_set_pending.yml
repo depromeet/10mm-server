@@ -2,8 +2,8 @@ name: Add New PR to project as pending status
 
 on:
   pull_request:
-#    types:
-#      - opened
+    types:
+      - opened
 
 jobs:
   track_pr:
