@@ -5,7 +5,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class TenminuteApplicationTests {
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {}
 }
