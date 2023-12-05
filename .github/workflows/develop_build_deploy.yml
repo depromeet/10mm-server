@@ -72,6 +72,17 @@ jobs:
           source: docker-compose.yaml
           target: /home/tenminute/
 
+      # 슬랙으로 빌드 스캔 결과 전송
+      - name: Send to slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "Gradle Build Scan Report of ${{ github.workflow }}: ${{ steps.gradle.outputs.build-scan-url }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
   deploy:
     runs-on: ubuntu-latest
     environment: DEV
