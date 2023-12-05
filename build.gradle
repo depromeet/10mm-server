@@ -42,6 +42,7 @@ tasks.named('bootBuildImage') {
 
 tasks.named('test') {
     useJUnitPlatform()
+    dependsOn 'sonar'
     finalizedBy 'jacocoTestReport'
 }
 
