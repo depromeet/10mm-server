@@ -1,4 +1,4 @@
-name: Add PR to project as pending status
+name: Add New PR to project as pending status
 
 on:
   pull_request:
