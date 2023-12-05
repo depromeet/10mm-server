@@ -10,7 +10,7 @@ jobs:
   set_merged:
     runs-on: ubuntu-latest
     permissions:
-      issues: write
+      pull-requests: write
     steps:
       - name: Add 'merged' label to closed PR
         run: gh issue edit "$PR_NUMBER" --add-label "merged"
