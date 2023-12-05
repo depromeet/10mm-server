@@ -2,9 +2,9 @@ name: Add 'merged' label to closed PR
 
 on:
   pull_request:
-    types:
-      - opened
-      - closed
+#    types:
+#      - opened
+#      - closed
 
 jobs:
   set_merged:
