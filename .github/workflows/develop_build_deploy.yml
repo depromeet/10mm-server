@@ -29,13 +29,13 @@ jobs:
           java-version: ${{ matrix.java-version }}
           distribution: ${{ matrix.distribution }}
 
-      # IMAGE_TAG 환경 변수 설정
-      - name: Set up IMAGE_TAG
+      # 이미지 태그 설정
+      - name: Set up image-tag by GITHUB_SHA
         id: image-tag
-        run: echo "value=$(echo ${GITHUB_SHA::7})" >> $GITHUB_ENV
+        run: echo "value=$(echo ${GITHUB_SHA::7})" >> $GITHUB_OUTPUT
 
       - name: Test IMAGE_TAG
-        run: echo ${{ env.IMAGE_TAG }}
+        run: echo ${{ steps.image-tag.outputs.value }}
 
       # Gradlew 실행 허용
       - name: Run chmod to make gradlew executable
@@ -65,7 +65,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ steps.image-tag.outputs.value }}
+          tags: ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ steps.build.outputs.image-tag }}
 
       # 서버로 docker-compose 파일 전송
       - name: Copy docker-compose.yml to NCP Server
@@ -98,7 +98,7 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           NCP_CONTAINER_REGISTRY: ${{ secrets.NCP_CONTAINER_REGISTRY }}
-          NCP_IMAGE_TAG: ${{ needs.build.outputs.image-tag.value }}
+          NCP_IMAGE_TAG: ${{ needs.build.outputs.image-tag }}
         with:
           host: ${{ secrets.NCP_HOST }}
           username: tenminute
