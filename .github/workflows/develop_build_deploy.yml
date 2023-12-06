@@ -29,9 +29,11 @@ jobs:
           distribution: ${{ matrix.distribution }}
 
       # GITHUB SHA Short
-      - name: GitHub SHA Short
-        id: github-sha-short
-        run: echo "::set-output name=sha::$(echo ${GITHUB_SHA} | cut -c1-7)"
+#      - name: GitHub SHA Short
+#        id: github-sha-short
+#        run: echo "::set-output name=sha::$(echo ${GITHUB_SHA} | cut -c1-7)"
+      - name: Add GITHUB_SHORT_SHA env
+        run: echo "GITHUB_SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       # Gradlew 실행 허용
       - name: Run chmod to make gradlew executable
@@ -61,7 +63,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ steps.github-sha-short.outputs.sha }}
+          tags: ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ env.GITHUB_SHORT_SHA }}
 
       # 서버로 docker-compose 파일 전송
       - name: Copy docker-compose.yml to NCP Server
@@ -94,7 +96,7 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           NCP_CONTAINER_REGISTRY: ${{ secrets.NCP_CONTAINER_REGISTRY }}
-          NCP_IMAGE_TAG: ${{ needs.build.outputs.sha }}
+          NCP_IMAGE_TAG: ${{ env.GITHUB_SHORT_SHA }}
         with:
           host: ${{ secrets.NCP_HOST }}
           username: tenminute
@@ -103,6 +105,6 @@ jobs:
           envs: NCP_CONTAINER_REGISTRY,NCP_IMAGE_TAG  # docker-compose.yml 에서 사용할 환경 변수
           script: |
             echo "${{ secrets.NCP_SECRET_KEY }}" | docker login -u "${{ secrets.NCP_ACCESS_KEY }}" --password-stdin "${{ secrets.NCP_CONTAINER_REGISTRY }}"
-            docker pull ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ needs.build.outputs.sha }}
+            docker pull ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ env.GITHUB_SHORT_SHA }}
             docker compose -f /home/tenminute/docker-compose.yaml up -d
             docker image prune -a -f
