@@ -7,7 +7,7 @@ on:
     branches: [ "develop" ]
 
 env:
-  IMAGE_TAG: ${GITHUB_SHA::7}
+  IMAGE_TAG: ${{ echo ${{ github.sha }} | cut -c1-7 }}
 
 jobs:
   build:
