@@ -35,6 +35,9 @@ jobs:
       - name: Add SHORT_SHA env
         run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
+      - name: Test SHORT_SHA env
+        run: echo $SHORT_SHA
+
       # Gradlew 실행 허용
       - name: Run chmod to make gradlew executable
         run: chmod +x ./gradlew
@@ -104,7 +107,7 @@ jobs:
           port: ${{ secrets.NCP_PORT }}
           envs: NCP_CONTAINER_REGISTRY,NCP_IMAGE_TAG  # docker-compose.yml 에서 사용할 환경 변수
           script: |
-            echo ${{ env.NCP_IMAGE_TAG }}
+            echo ${{ env.SHORT_SHA }}
             echo "${{ secrets.NCP_SECRET_KEY }}" | docker login -u "${{ secrets.NCP_ACCESS_KEY }}" --password-stdin "${{ secrets.NCP_CONTAINER_REGISTRY }}"
             docker pull ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ env.NCP_IMAGE_TAG }}
             docker compose -f /home/tenminute/docker-compose.yaml up -d
