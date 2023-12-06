@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ "develop" ]
 
-env:
-  IMAGE_TAG: ${{ echo ${{ github.sha }} | cut -c1-7 }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,8 +14,9 @@ jobs:
       matrix:
         java-version: [ 17 ]
         distribution: [ 'temurin' ]
-#    outputs:
-#      sha: ${{ steps.github-sha-short.outputs.sha }}
+    outputs:
+      # IMAGE_TAG 환경 변수를 다른 Job에서 사용하기 위해 설정
+      image-tag: ${{ steps.image-tag.outputs.value }}
     steps:
       # 기본 체크아웃
       - name: Checkout
@@ -31,10 +29,10 @@ jobs:
           java-version: ${{ matrix.java-version }}
           distribution: ${{ matrix.distribution }}
 
-      # GITHUB SHA Short
-#      - name: GitHub SHA Short
-#        id: github-sha-short
-#        run: echo "::set-output name=sha::$(echo ${GITHUB_SHA} | cut -c1-7)"
+      # IMAGE_TAG 환경 변수 설정
+      - name: Set up IMAGE_TAG
+        id: image-tag
+        run: echo "value=$(echo ${GITHUB_SHA::7})" >> $GITHUB_ENV
 
       - name: Test IMAGE_TAG
         run: echo ${{ env.IMAGE_TAG }}
@@ -67,7 +65,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ env.IMAGE_TAG }}
+          tags: ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ steps.image-tag.outputs.value }}
 
       # 서버로 docker-compose 파일 전송
       - name: Copy docker-compose.yml to NCP Server
@@ -100,7 +98,7 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           NCP_CONTAINER_REGISTRY: ${{ secrets.NCP_CONTAINER_REGISTRY }}
-          NCP_IMAGE_TAG: ${{ env.IMAGE_TAG }}
+          NCP_IMAGE_TAG: ${{ needs.build.outputs.image-tag.value }}
         with:
           host: ${{ secrets.NCP_HOST }}
           username: tenminute
