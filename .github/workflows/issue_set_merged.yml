@@ -1,0 +1,19 @@
+name: Add 'merged' label to closed PR
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  set_merged:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Add 'merged' label to closed PR
+        run: gh issue edit "$PR_NUMBER" --add-label "merged"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
