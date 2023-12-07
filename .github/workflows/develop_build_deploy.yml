@@ -96,7 +96,7 @@ jobs:
           NCP_IMAGE_TAG: ${{ needs.build.outputs.image-tag }}
         with:
           host: ${{ secrets.NCP_HOST }}
-          username: tenminute
+          username: ${{ secrets.NCP_USERNAME }}
           key: ${{ secrets.NCP_PRIVATE_KEY }}
           port: ${{ secrets.NCP_PORT }}
           envs: NCP_CONTAINER_REGISTRY,NCP_IMAGE_TAG  # docker-compose.yml 에서 사용할 환경 변수
