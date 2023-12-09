@@ -13,27 +13,27 @@ import org.springframework.boot.test.context.SpringBootTest;
 class MemberUtilTest {
 
     @Autowired private MemberUtil memberUtil;
-	@Autowired private MemberRepository memberRepository;
+    @Autowired private MemberRepository memberRepository;
 
-	@Test
-	void 이미_회원이_존재하면_임시_회원을_삽입하지_않는다() {
-		// given
-		Member member = Member.createNormalMember(new Profile("testNickname", "testImageUrl"));
-		memberRepository.save(member);
+    @Test
+    void 이미_회원이_존재하면_임시_회원을_삽입하지_않는다() {
+        // given
+        Member member = Member.createNormalMember(new Profile("testNickname", "testImageUrl"));
+        memberRepository.save(member);
 
-		// when
-		memberUtil.getCurrentMember();
+        // when
+        memberUtil.getCurrentMember();
 
-		// then
-		assertEquals(1, memberRepository.count());
-	}
+        // then
+        assertEquals(1, memberRepository.count());
+    }
 
     @Test
     void 현재_로그인한_회원ID는_1이다() {
-		// given & when
-		Member currentMember = memberUtil.getCurrentMember();
+        // given & when
+        Member currentMember = memberUtil.getCurrentMember();
 
-		// then
-		assertEquals(1L, currentMember.getId());
-	}
+        // then
+        assertEquals(1L, currentMember.getId());
+    }
 }
