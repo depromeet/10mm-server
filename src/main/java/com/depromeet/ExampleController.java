@@ -15,6 +15,6 @@ public class ExampleController {
     @Operation(summary = "게시글 생성", description = "API health check")
     @GetMapping("/v1/health-check")
     public ResponseEntity<ErrorResponse> hello() {
-		return ResponseEntity.ok(ErrorResponse.of(HttpStatus.OK, "Hello World!"));
+        return ResponseEntity.ok(ErrorResponse.of(HttpStatus.OK, "Hello World!"));
     }
 }

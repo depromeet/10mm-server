@@ -10,15 +10,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class MemberUtilTest {
 
-	@Autowired
-	private MemberUtil memberUtil;
+    @Autowired private MemberUtil memberUtil;
 
-	@Test
-	void 현재_로그인한_회원ID는_1이다() {
-		// given & when
-		Member currentMember = memberUtil.getCurrentMember();
+    @Test
+    void 현재_로그인한_회원ID는_1이다() {
+        // given & when
+        Member currentMember = memberUtil.getCurrentMember();
 
-		// then
-		assertEquals(1L, currentMember.getId());
-	}
+        // then
+        assertEquals(1L, currentMember.getId());
+    }
 }

@@ -12,24 +12,24 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MemberUtil {
 
-	private final SecurityUtil securityUtil;
-	private final MemberRepository memberRepository;
+    private final SecurityUtil securityUtil;
+    private final MemberRepository memberRepository;
 
-	private void insertMockMemberIfNotExist() {
-		if (memberRepository.count() != 0) {
-			return;
-		}
+    private void insertMockMemberIfNotExist() {
+        if (memberRepository.count() != 0) {
+            return;
+        }
 
-		Member memeber = Member.createNormalMember(
-			new Profile("testNickname", "testImageUrl"));
+        Member memeber = Member.createNormalMember(new Profile("testNickname", "testImageUrl"));
 
-		memberRepository.save(memeber);
-	}
+        memberRepository.save(memeber);
+    }
 
-	public Member getCurrentMember() {
-		insertMockMemberIfNotExist();
+    public Member getCurrentMember() {
+        insertMockMemberIfNotExist();
 
-		return memberRepository.findById(securityUtil.getCurrentMemberId())
-				.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-	}
+        return memberRepository
+                .findById(securityUtil.getCurrentMemberId())
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    }
 }
