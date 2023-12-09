@@ -28,8 +28,6 @@ public class WebSecurityConfig {
                                 .anyRequest()
                                 .authenticated());
 
-        http.userDetailsService(userDetailsService());
-
         return http.build();
     }
 
