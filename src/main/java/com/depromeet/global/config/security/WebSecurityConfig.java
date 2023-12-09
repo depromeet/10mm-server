@@ -21,7 +21,7 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests(
                 authorize ->
                         authorize
-                                .requestMatchers("10mm-actuator/**")
+                                .requestMatchers("/10mm-actuator/**")
                                 .permitAll() // 액추에이터
                                 .requestMatchers("/v1/**")
                                 .permitAll() // 임시로 모든 요청 허용
