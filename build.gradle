@@ -64,10 +64,11 @@ def jacocoExcludePatterns = [
         "**/*Filter*",
         "**/*Resolver*",
         "**/*Entity*",
+        "**/*Error*/**",
         "**/test/**",
         "**/resources/**",
-        "**/*Error*/**",
-        "**/error/**"
+        "**/error/**",
+        "**/config/**"
 ]
 
 sonar {
