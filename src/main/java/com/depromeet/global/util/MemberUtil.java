@@ -15,7 +15,7 @@ public class MemberUtil {
     private final SecurityUtil securityUtil;
     private final MemberRepository memberRepository;
 
-    // TODO: 데이터베이스 연동 및 픽스처 데이터 삽입 이후 삭제
+    // TODO: 데이터베이스 연동 및 픽스쳐 데이터 삽입 이후 삭제
     private void insertMockMemberIfNotExist() {
         if (memberRepository.count() != 0) {
             return;
