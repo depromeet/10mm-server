@@ -3,6 +3,7 @@ package com.depromeet.domain.member.domain;
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +31,7 @@ public class Member extends BaseTimeEntity {
 
     private LocalDateTime lastLoginAt;
 
-    @Builder
+    @Builder(access = AccessLevel.PRIVATE)
     private Member(
             Profile profile,
             MemberStatus status,
