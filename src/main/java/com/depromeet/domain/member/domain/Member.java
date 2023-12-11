@@ -1,14 +1,7 @@
 package com.depromeet.domain.member.domain;
 
 import com.depromeet.domain.common.model.BaseTimeEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 public class Member extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
@@ -51,11 +45,12 @@ public class Member extends BaseTimeEntity {
     }
 
     public static Member createNormalMember(Profile profile) {
-        return new Member(
-                profile,
-                MemberStatus.NORMAL,
-                MemberRole.USER,
-                MemberVisibility.PUBLIC,
-                LocalDateTime.now());
+        return Member.builder()
+                .profile(profile)
+                .status(MemberStatus.NORMAL)
+                .role(MemberRole.USER)
+                .visibility(MemberVisibility.PUBLIC)
+                .lastLoginAt(LocalDateTime.now())
+                .build();
     }
 }
