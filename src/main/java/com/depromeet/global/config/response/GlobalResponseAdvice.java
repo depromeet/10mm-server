@@ -29,7 +29,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice {
                 ((ServletServerHttpResponse) response).getServletResponse();
         int status = servletResponse.getStatus();
         HttpStatus resolve = HttpStatus.resolve(status);
-        if (resolve == null) {
+        if (resolve == null || body instanceof String) {
             return body;
         }
         if (resolve.is2xxSuccessful()) {
