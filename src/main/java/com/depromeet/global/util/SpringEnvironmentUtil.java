@@ -13,8 +13,8 @@ public class SpringEnvironmentUtil {
     private final Environment environment;
 
     public static final String PROD = "prod";
-    public static String DEV = "dev";
-    public static String LOCAL = "local";
+    public static final String DEV = "dev";
+    public static final String LOCAL = "local";
 
     private final List<String> PROD_AND_DEV = List.of(PROD, DEV);
 
