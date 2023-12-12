@@ -2,6 +2,8 @@ package com.depromeet.global.util;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -19,26 +21,25 @@ public class SpringEnvironmentUtil {
     private final List<String> PROD_AND_DEV = List.of(PROD, DEV);
 
     public String getCurrentProfile() {
-        if (isProdProfile()) return PROD;
-        if (isDevProfile()) return DEV;
-        return LOCAL;
+		return getActiveProfiles()
+			.filter(profile -> profile.equals(PROD) || profile.equals(DEV))
+			.findFirst()
+			.orElse(LOCAL);
     }
 
     public Boolean isProdProfile() {
-        String[] activeProfiles = environment.getActiveProfiles();
-        List<String> currentProfile = Arrays.stream(activeProfiles).toList();
-        return currentProfile.contains(PROD);
+        return getActiveProfiles().anyMatch(PROD::equals);
     }
 
     public Boolean isDevProfile() {
-        String[] activeProfiles = environment.getActiveProfiles();
-        List<String> currentProfile = Arrays.stream(activeProfiles).toList();
-        return currentProfile.contains(DEV);
+		return getActiveProfiles().anyMatch(DEV::equals);
     }
 
     public Boolean isProdAndDevProfile() {
-        String[] activeProfiles = environment.getActiveProfiles();
-        List<String> currentProfile = Arrays.stream(activeProfiles).toList();
-        return CollectionUtils.containsAny(PROD_AND_DEV, currentProfile);
+		return getActiveProfiles().anyMatch(PROD_AND_DEV::contains);
     }
+
+	private Stream<String> getActiveProfiles() {
+		return Arrays.stream(environment.getActiveProfiles());
+	}
 }
