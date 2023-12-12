@@ -17,9 +17,9 @@ class SpringEnvironmentUtilTest {
 
     @InjectMocks private SpringEnvironmentUtil springEnvironmentUtil;
 
-	private final String[] PROD_ARRAY = new String[] {PROD};
-	private final String[] DEV_ARRAY = new String[] {DEV};
-	private final String[] LOCAL_ARRAY = new String[] {LOCAL};
+    private final String[] PROD_ARRAY = new String[] {PROD};
+    private final String[] DEV_ARRAY = new String[] {DEV};
+    private final String[] LOCAL_ARRAY = new String[] {LOCAL};
 
     @Test
     void 상용_환경이라면_isProdProfile은_true를_반환한다() {
