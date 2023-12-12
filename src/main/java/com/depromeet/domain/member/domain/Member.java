@@ -45,8 +45,8 @@ public class Member extends BaseTimeEntity {
 
     private LocalDateTime lastLoginAt;
 
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	private final List<Mission> missions = new ArrayList<>();
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private final List<Mission> missions = new ArrayList<>();
 
     @Builder(access = AccessLevel.PRIVATE)
     private Member(

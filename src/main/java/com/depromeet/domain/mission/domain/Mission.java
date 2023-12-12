@@ -2,7 +2,6 @@ package com.depromeet.domain.mission.domain;
 
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.member.domain.Member;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -24,56 +23,55 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Mission extends BaseTimeEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "mission_id")
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "mission_id")
+    private Long id;
 
-	@Column(columnDefinition = "varchar(50) not null COMMENT '미션 이름'")
-	private String name;
+    @Column(columnDefinition = "varchar(50) not null COMMENT '미션 이름'")
+    private String name;
 
-	@Column(columnDefinition = "text not null COMMENT '미션 내용'")
-	@Lob
-	private String content;
+    @Column(columnDefinition = "text not null COMMENT '미션 내용'")
+    @Lob
+    private String content;
 
-	@Enumerated(EnumType.STRING)
-	private MissionCategory category;
+    @Enumerated(EnumType.STRING)
+    private MissionCategory category;
 
-	@Enumerated(EnumType.STRING)
-	private MissionVisibility visibility;
+    @Enumerated(EnumType.STRING)
+    private MissionVisibility visibility;
 
-	@Column(columnDefinition = "smallint(6) not null default 1 COMMENT '미션 정렬값'")
-	private Short sort;
+    @Column(columnDefinition = "smallint(6) not null default 1 COMMENT '미션 정렬값'")
+    private Short sort;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "member_id")
-	private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
-	@Builder(access = AccessLevel.PRIVATE)
-	private Mission(
-		String name,
-		String content,
-		MissionCategory category,
-		MissionVisibility visibility,
-		Short sort,
-		Member member
-	) {
-		this.name = name;
-		this.content = content;
-		this.category = category;
-		this.visibility = visibility;
-		this.sort = sort;
-		this.member = member;
-	}
+    @Builder(access = AccessLevel.PRIVATE)
+    private Mission(
+            String name,
+            String content,
+            MissionCategory category,
+            MissionVisibility visibility,
+            Short sort,
+            Member member) {
+        this.name = name;
+        this.content = content;
+        this.category = category;
+        this.visibility = visibility;
+        this.sort = sort;
+        this.member = member;
+    }
 
-	public static Mission registerPublicMission(String name, String content, Member member) {
-		return Mission.builder()
-			.name(name)
-			.content(content)
-			.category(MissionCategory.ETC)
-			.visibility(MissionVisibility.PUBLIC)
-			.sort((short) 1)
-			.member(member)
-			.build();
-	}
+    public static Mission registerPublicMission(String name, String content, Member member) {
+        return Mission.builder()
+                .name(name)
+                .content(content)
+                .category(MissionCategory.ETC)
+                .visibility(MissionVisibility.PUBLIC)
+                .sort((short) 1)
+                .member(member)
+                .build();
+    }
 }
