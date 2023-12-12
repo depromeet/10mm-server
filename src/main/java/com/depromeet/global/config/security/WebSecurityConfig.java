@@ -1,5 +1,7 @@
 package com.depromeet.global.config.security;
 
+import com.depromeet.global.util.SpringEnvironmentUtil;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,7 +14,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
+@AllArgsConstructor
 public class WebSecurityConfig {
+    private final SpringEnvironmentUtil springEnvironmentUtil;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -37,8 +41,10 @@ public class WebSecurityConfig {
 
         configuration.addAllowedOriginPattern("https://10mm.today");
 
-        // TODO: 운영환경에 따라 허용되는 도메인이 달라지도록 개선
-        configuration.addAllowedOriginPattern("http://localhost:3000");
+        if (!springEnvironmentUtil.isProdProfile()) {
+            configuration.addAllowedOriginPattern("http://localhost:3000");
+            configuration.addAllowedOriginPattern("http://localhost:5173");
+        }
 
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
