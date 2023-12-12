@@ -43,7 +43,6 @@ public class WebSecurityConfig {
 
         if (!springEnvironmentUtil.isProdProfile()) {
             configuration.addAllowedOriginPattern("http://localhost:3000");
-            configuration.addAllowedOriginPattern("http://localhost:5173");
         }
 
         configuration.addAllowedHeader("*");
