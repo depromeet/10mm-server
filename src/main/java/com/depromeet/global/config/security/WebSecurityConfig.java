@@ -2,7 +2,6 @@ package com.depromeet.global.config.security;
 
 import com.depromeet.global.util.SpringEnvironmentUtil;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
