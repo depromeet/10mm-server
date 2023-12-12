@@ -2,6 +2,8 @@ package com.depromeet.domain.mission.domain;
 
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,6 +15,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,6 +52,9 @@ public class Mission extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL)
+    private final List<MissionRecord> missionRecords = new ArrayList<>();
 
     @Builder(access = AccessLevel.PRIVATE)
     private Mission(
