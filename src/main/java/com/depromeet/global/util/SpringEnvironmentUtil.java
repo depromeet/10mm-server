@@ -9,7 +9,7 @@ import org.springframework.util.CollectionUtils;
 
 @Component
 @RequiredArgsConstructor
-public class SpringEnvironmentHelper {
+public class SpringEnvironmentUtil {
     private final Environment environment;
 
     private final String PROD = "prod";

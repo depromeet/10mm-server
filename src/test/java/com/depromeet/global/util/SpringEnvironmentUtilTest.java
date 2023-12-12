@@ -12,10 +12,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.env.Environment;
 
 @ExtendWith(MockitoExtension.class)
-class SpringEnvironmentHelperTest {
+class SpringEnvironmentUtilTest {
     @Mock private Environment environment;
 
-    @InjectMocks private SpringEnvironmentHelper springEnvironmentHelper;
+    @InjectMocks private SpringEnvironmentUtil springEnvironmentUtil;
 
     private final String PROD = "prod";
     private final String DEV = "dev";
@@ -29,7 +29,7 @@ class SpringEnvironmentHelperTest {
 
         // when
         // then
-        assertTrue(springEnvironmentHelper.isProdProfile());
+        assertTrue(springEnvironmentUtil.isProdProfile());
     }
 
     @Test
@@ -40,7 +40,7 @@ class SpringEnvironmentHelperTest {
 
         // when
         // then
-        assertFalse(springEnvironmentHelper.isProdProfile());
+        assertFalse(springEnvironmentUtil.isProdProfile());
     }
 
     @Test
@@ -51,7 +51,7 @@ class SpringEnvironmentHelperTest {
 
         // when
         // then
-        assertTrue(springEnvironmentHelper.isDevProfile());
+        assertTrue(springEnvironmentUtil.isDevProfile());
     }
 
     @Test
@@ -62,7 +62,7 @@ class SpringEnvironmentHelperTest {
 
         // when
         // then
-        assertFalse(springEnvironmentHelper.isDevProfile());
+        assertFalse(springEnvironmentUtil.isDevProfile());
     }
 
     @Test
@@ -73,7 +73,7 @@ class SpringEnvironmentHelperTest {
 
         // when
         // then
-        assertFalse(springEnvironmentHelper.isProdAndDevProfile());
+        assertFalse(springEnvironmentUtil.isProdAndDevProfile());
     }
 
     @Test
@@ -84,7 +84,7 @@ class SpringEnvironmentHelperTest {
 
         // when
         // then
-        assertTrue(springEnvironmentHelper.isProdAndDevProfile());
+        assertTrue(springEnvironmentUtil.isProdAndDevProfile());
     }
 
     @Test
@@ -95,7 +95,7 @@ class SpringEnvironmentHelperTest {
 
         // when
         // then
-        assertEquals(springEnvironmentHelper.getCurrentProfile(), PROD);
+        assertEquals(springEnvironmentUtil.getCurrentProfile(), PROD);
     }
 
     @Test
@@ -106,7 +106,7 @@ class SpringEnvironmentHelperTest {
 
         // when
         // then
-        assertEquals(springEnvironmentHelper.getCurrentProfile(), DEV);
+        assertEquals(springEnvironmentUtil.getCurrentProfile(), DEV);
     }
 
     @Test
@@ -117,6 +117,6 @@ class SpringEnvironmentHelperTest {
 
         // when
         // then
-        assertEquals(springEnvironmentHelper.getCurrentProfile(), LOCAL);
+        assertEquals(springEnvironmentUtil.getCurrentProfile(), LOCAL);
     }
 }
