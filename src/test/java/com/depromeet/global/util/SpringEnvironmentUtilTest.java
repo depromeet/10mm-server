@@ -17,10 +17,14 @@ class SpringEnvironmentUtilTest {
 
     @InjectMocks private SpringEnvironmentUtil springEnvironmentUtil;
 
+	private final String[] PROD_ARRAY = new String[] {PROD};
+	private final String[] DEV_ARRAY = new String[] {DEV};
+	private final String[] LOCAL_ARRAY = new String[] {LOCAL};
+
     @Test
     void 상용_환경이라면_isProdProfile은_true를_반환한다() {
         // given
-        given(environment.getActiveProfiles()).willReturn(new String[] {PROD});
+        given(environment.getActiveProfiles()).willReturn(PROD_ARRAY);
 
         // when
         // then
@@ -30,7 +34,7 @@ class SpringEnvironmentUtilTest {
     @Test
     void 상용_환경이_아니라면_isProdProfile은_false를_반환한다() {
         // given
-        given(environment.getActiveProfiles()).willReturn(new String[] {DEV});
+        given(environment.getActiveProfiles()).willReturn(DEV_ARRAY);
 
         // when
         // then
@@ -40,7 +44,7 @@ class SpringEnvironmentUtilTest {
     @Test
     void 테스트_환경이라면_isDevProfile은_true를_반환한다() {
         // given
-        given(environment.getActiveProfiles()).willReturn(new String[] {DEV});
+        given(environment.getActiveProfiles()).willReturn(DEV_ARRAY);
 
         // when
         // then
@@ -50,7 +54,7 @@ class SpringEnvironmentUtilTest {
     @Test
     void 테스트_환경이_아니라면_isDevProfile은_false를_반환한다() {
         // given
-        given(environment.getActiveProfiles()).willReturn(new String[] {LOCAL});
+        given(environment.getActiveProfiles()).willReturn(LOCAL_ARRAY);
 
         // when
         // then
@@ -60,7 +64,7 @@ class SpringEnvironmentUtilTest {
     @Test
     void 로컬_환경이라면_isProdAndDevProfile은_false를_반환한다() {
         // given
-        given(environment.getActiveProfiles()).willReturn(new String[] {LOCAL});
+        given(environment.getActiveProfiles()).willReturn(LOCAL_ARRAY);
 
         // when
         // then
@@ -70,7 +74,7 @@ class SpringEnvironmentUtilTest {
     @Test
     void 로컬_환경이_아니라면_isProdAndDevProfile은_true를_반환한다() {
         // given
-        given(environment.getActiveProfiles()).willReturn(new String[] {DEV});
+        given(environment.getActiveProfiles()).willReturn(DEV_ARRAY);
 
         // when
         // then
@@ -80,7 +84,7 @@ class SpringEnvironmentUtilTest {
     @Test
     void 상용_환경이라면_getCurrentProfile는은_prod를_반환한다() {
         // given
-        given(environment.getActiveProfiles()).willReturn(new String[] {PROD});
+        given(environment.getActiveProfiles()).willReturn(PROD_ARRAY);
 
         // when
         // then
@@ -90,7 +94,7 @@ class SpringEnvironmentUtilTest {
     @Test
     void 테스트_환경이라면_getCurrentProfile는은_dev를_반환한다() {
         // given
-        given(environment.getActiveProfiles()).willReturn(new String[] {DEV});
+        given(environment.getActiveProfiles()).willReturn(DEV_ARRAY);
 
         // when
         // then
@@ -100,7 +104,7 @@ class SpringEnvironmentUtilTest {
     @Test
     void 로컬_환경이라면_getCurrentProfile는은_local을_반환한다() {
         // given
-        given(environment.getActiveProfiles()).willReturn(new String[] {LOCAL});
+        given(environment.getActiveProfiles()).willReturn(LOCAL_ARRAY);
 
         // when
         // then
