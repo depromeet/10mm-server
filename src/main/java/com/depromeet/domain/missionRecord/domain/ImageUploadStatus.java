@@ -6,9 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ImageUploadStatus {
-    NONE("NONE"),
-    PENDING("PENDING"),
-    COMPLETE("COMPLETE");
+    NONE("업로드 없음"),
+    PENDING("업로드 중"),
+    COMPLETE("업로드 완료");
 
     private final String value;
 }

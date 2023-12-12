@@ -1,10 +1,7 @@
 package com.depromeet.domain.missionRecord.domain;
 
-import java.time.LocalDateTime;
-
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.mission.domain.Mission;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -73,7 +71,7 @@ public class MissionRecord extends BaseTimeEntity {
         return MissionRecord.builder()
                 .duration(duration)
                 .remark(remark)
-                .uploadStatus(ImageUploadStatus.COMPLETE)
+                .uploadStatus(ImageUploadStatus.NONE)
                 .startedAt(startedAt)
                 .finishedAt(finishedAt)
                 .mission(mission)
