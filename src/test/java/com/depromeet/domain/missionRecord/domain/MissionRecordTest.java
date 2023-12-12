@@ -13,19 +13,18 @@ import com.depromeet.domain.mission.domain.Mission;
 
 class MissionRecordTest {
 
-    Member member;
-    Profile profile;
-    Mission mission;
+    private static Mission mission;
 
     @BeforeEach
     void setUp() {
-        profile = new Profile("testNickname", "testProfileImageUrl");
-        member = Member.createNormalMember(profile);
+        Profile profile = new Profile("testNickname", "testProfileImageUrl");
+		Member member = Member.createNormalMember(profile);
         mission = Mission.registerPublicMission("testMissionName", "testMissionContent", member);
     }
 
     @Test
     void 미션기록_업로드_상태_DEFAULT값은_NONE이다() {
+        // given
         int duration = 32;
         LocalDateTime startedAt = LocalDateTime.now();
         LocalDateTime finishedAt = LocalDateTime.now().plusMinutes(duration);
@@ -33,6 +32,10 @@ class MissionRecordTest {
                 MissionRecord.createMissionRecord(
                         duration, "testMissionRecord_remark", startedAt, finishedAt, mission);
 
-        assertEquals(missionRecord.getUploadStatus(), ImageUploadStatus.NONE);
+        // when
+        ImageUploadStatus uploadStatus = missionRecord.getUploadStatus();
+
+        // then
+        assertEquals(ImageUploadStatus.NONE, uploadStatus);
     }
 }

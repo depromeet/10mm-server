@@ -10,12 +10,11 @@ import com.depromeet.domain.member.domain.Profile;
 
 class MissionTest {
 
-    Member member;
-    Profile profile;
+    private static Member member;
 
     @BeforeEach
     void setUp() {
-        profile = new Profile("testNickname", "testProfileImageUrl");
+        Profile profile = new Profile("testNickname", "testProfileImageUrl");
         member = Member.createNormalMember(profile);
     }
 
