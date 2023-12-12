@@ -12,9 +12,9 @@ import org.springframework.util.CollectionUtils;
 public class SpringEnvironmentUtil {
     private final Environment environment;
 
-    private final String PROD = "prod";
-    private final String DEV = "dev";
-    private final String LOCAL = "local";
+    public static final String PROD = "prod";
+	public static String DEV = "dev";
+	public static String LOCAL = "local";
 
     private final List<String> PROD_AND_DEV = List.of(PROD, DEV);
 

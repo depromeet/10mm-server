@@ -1,5 +1,6 @@
 package com.depromeet.global.util;
 
+import static com.depromeet.global.util.SpringEnvironmentUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -16,10 +17,6 @@ class SpringEnvironmentUtilTest {
     @Mock private Environment environment;
 
     @InjectMocks private SpringEnvironmentUtil springEnvironmentUtil;
-
-    private final String PROD = "prod";
-    private final String DEV = "dev";
-    private final String LOCAL = "local";
 
     @Test
     @DisplayName("상용 환경이라면 isProdProfile은 true를 반환한다")
