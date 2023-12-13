@@ -2,11 +2,10 @@ package com.depromeet.domain.mission.domain;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class MissionTest {
 

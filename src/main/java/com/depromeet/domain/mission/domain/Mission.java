@@ -1,8 +1,14 @@
 package com.depromeet.domain.mission.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.Comment;
+
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,8 +22,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,10 +37,12 @@ public class Mission extends BaseTimeEntity {
     @Column(name = "mission_id")
     private Long id;
 
-    @Column(columnDefinition = "varchar(50) not null COMMENT '미션 이름'")
+    @Comment("미션 이름")
+    @Column(columnDefinition = "varchar(50) not null")
     private String name;
 
-    @Column(columnDefinition = "text not null COMMENT '미션 내용'")
+    @Comment("미션 내용")
+    @Column(columnDefinition = "text not null")
     @Lob
     private String content;
 
@@ -46,8 +52,9 @@ public class Mission extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private MissionVisibility visibility;
 
-    @Column(columnDefinition = "smallint(6) not null default 1 COMMENT '미션 정렬값'")
-    private Short sort;
+    @Comment("미션 정렬값")
+    @Column(columnDefinition = "int not null default '1'", name = "sort")
+    private Integer sort;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -62,7 +69,7 @@ public class Mission extends BaseTimeEntity {
             String content,
             MissionCategory category,
             MissionVisibility visibility,
-            Short sort,
+            Integer sort,
             Member member) {
         this.name = name;
         this.content = content;
@@ -78,7 +85,7 @@ public class Mission extends BaseTimeEntity {
                 .content(content)
                 .category(MissionCategory.ETC)
                 .visibility(MissionVisibility.PUBLIC)
-                .sort((short) 1)
+                .sort(1)
                 .member(member)
                 .build();
     }
