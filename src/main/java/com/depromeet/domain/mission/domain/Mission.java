@@ -1,8 +1,14 @@
 package com.depromeet.domain.mission.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.Comment;
+
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,13 +22,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
 
 @Getter
 @Entity
@@ -35,11 +38,11 @@ public class Mission extends BaseTimeEntity {
     private Long id;
 
     @Comment("미션 이름")
-    @Column(columnDefinition = "varchar(50) not null")
+    @Column(nullable = false, length = 20)
     private String name;
 
     @Comment("미션 내용")
-    @Column(columnDefinition = "text not null")
+    @Column(columnDefinition = "text", nullable = false)
     @Lob
     private String content;
 
@@ -50,14 +53,14 @@ public class Mission extends BaseTimeEntity {
     private MissionVisibility visibility;
 
     @Comment("미션 정렬값")
-    @Column(columnDefinition = "int not null default '1'", name = "sort")
+    @Column(name = "sort", nullable = false)
     private Integer sort;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL,  orphanRemoval = true)
     private final List<MissionRecord> missionRecords = new ArrayList<>();
 
     @Builder(access = AccessLevel.PRIVATE)
@@ -76,12 +79,17 @@ public class Mission extends BaseTimeEntity {
         this.member = member;
     }
 
-    public static Mission registerPublicMission(String name, String content, Member member) {
+    public static Mission createPublicMission(
+            String name,
+            String content,
+            MissionCategory category,
+            MissionVisibility visibility,
+            Member member) {
         return Mission.builder()
                 .name(name)
                 .content(content)
-                .category(MissionCategory.ETC)
-                .visibility(MissionVisibility.PUBLIC)
+                .category(category)
+                .visibility(visibility)
                 .sort(1)
                 .member(member)
                 .build();

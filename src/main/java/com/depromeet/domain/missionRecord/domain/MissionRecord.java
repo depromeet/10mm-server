@@ -1,7 +1,12 @@
 package com.depromeet.domain.missionRecord.domain;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.Comment;
+
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.mission.domain.Mission;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,7 +18,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,9 +33,10 @@ public class MissionRecord extends BaseTimeEntity {
     @Column(name = "mission_record_id")
     private Long id;
 
-    @Column private Integer duration;
+    private Integer duration;
 
-    @Column(columnDefinition = "text not null COMMENT '미션 일지'")
+	@Comment("미션 일지")
+    @Column(nullable = false)
     @Lob
     private String remark;
 
