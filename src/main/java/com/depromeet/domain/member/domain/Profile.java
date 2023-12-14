@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Profile {
-	private String nickname;
-	private String profileImageUrl;
+    private String nickname;
+    private String profileImageUrl;
 }
