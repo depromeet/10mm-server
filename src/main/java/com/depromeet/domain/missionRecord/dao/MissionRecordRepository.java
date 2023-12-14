@@ -1,7 +1,6 @@
 package com.depromeet.domain.missionRecord.dao;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MissionRecordRepository extends JpaRepository<MissionRecord, Long> {}

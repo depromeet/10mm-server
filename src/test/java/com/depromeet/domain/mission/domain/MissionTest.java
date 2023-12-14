@@ -2,11 +2,10 @@ package com.depromeet.domain.mission.domain;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class MissionTest {
 
@@ -22,7 +21,12 @@ class MissionTest {
     void 미션_카테고리_기타값_테스트() {
         // given
         Mission mission =
-                Mission.createPublicMission("testMissionName", "testMissionContent", MissionCategory.ETC, MissionVisibility.PUBLIC, member);
+                Mission.createPublicMission(
+                        "testMissionName",
+                        "testMissionContent",
+                        MissionCategory.ETC,
+                        MissionVisibility.PUBLIC,
+                        member);
 
         // when
         MissionCategory category = mission.getCategory();
@@ -35,7 +39,12 @@ class MissionTest {
     void 미션_공개여부_공개_테스트() {
         // given
         Mission mission =
-                Mission.createPublicMission("testMissionName", "testMissionContent",  MissionCategory.ETC, MissionVisibility.PUBLIC, member);
+                Mission.createPublicMission(
+                        "testMissionName",
+                        "testMissionContent",
+                        MissionCategory.ETC,
+                        MissionVisibility.PUBLIC,
+                        member);
 
         // when
         MissionVisibility visibility = mission.getVisibility();
