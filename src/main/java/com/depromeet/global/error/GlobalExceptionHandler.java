@@ -2,6 +2,7 @@ package com.depromeet.global.error;
 
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.ConstraintViolationException;
 import java.util.HashMap;
@@ -11,9 +12,12 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -29,6 +33,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+	// @Override
+	// protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+	// 	HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+	// 	return super.handleMethodArgumentNotValid(ex, headers, status, request);
+	// }
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(
@@ -46,10 +55,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * javax.validation.Valid or @Validated 으로 binding error 발생시 발생한다. HttpMessageConverter 에서 등록한
      * HttpMessageConverter binding 못할경우 발생 주로 @RequestBody, @RequestPart 어노테이션에서 발생
      */
-    @SneakyThrows
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException e, HttpStatus status) {
+	@SneakyThrows
+	@Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e,
+		HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error("MethodArgumentNotValidException : {}", e.getMessage(), e);
         List<FieldError> errors = e.getBindingResult().getFieldErrors();
         Map<String, Object> fieldAndErrorMessages =
@@ -59,29 +68,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                         FieldError::getField, FieldError::getDefaultMessage));
 
         String errorsToJsonString = new ObjectMapper().writeValueAsString(fieldAndErrorMessages);
-        final ErrorResponse errorResponse = ErrorResponse.of(status, errorsToJsonString);
-
-        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
-    }
-
-    /**
-     * @ModelAttribut 으로 binding error 발생시 BindException 발생한다. ref.
-     * https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc-ann-modelattrib-method-args
-     */
-    @SneakyThrows
-    @ExceptionHandler(BindException.class)
-    protected ResponseEntity<ErrorResponse> handleBindException(
-            BindException e, HttpStatus status) {
-        log.error("BindException : {}", e.getMessage(), e);
-        List<FieldError> errors = e.getBindingResult().getFieldErrors();
-        Map<String, Object> fieldAndErrorMessages =
-                errors.stream()
-                        .collect(
-                                Collectors.toMap(
-                                        FieldError::getField, FieldError::getDefaultMessage));
-
-        String errorsToJsonString = new ObjectMapper().writeValueAsString(fieldAndErrorMessages);
-        final ErrorResponse errorResponse = ErrorResponse.of(status, errorsToJsonString);
+        final ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.resolve(status.value()), errorsToJsonString);
 
         return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
@@ -129,9 +116,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /** 지원하지 않은 HTTP method 호출 할 경우 발생 */
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    protected ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(
-            HttpRequestMethodNotSupportedException e) {
+	@Override
+	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException e,
+		HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error("HttpRequestMethodNotSupportedException : {}", e.getMessage(), e);
         final ErrorCode errorCode = ErrorCode.METHOD_NOT_ALLOWED;
         final ErrorResponse errorResponse =
