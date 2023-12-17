@@ -24,7 +24,7 @@ class MissionRecordTest {
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.ETC,
-                        MissionVisibility.PUBLIC,
+                        MissionVisibility.ALL,
                         member);
     }
 

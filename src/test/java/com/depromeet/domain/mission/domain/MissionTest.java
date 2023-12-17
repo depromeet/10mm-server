@@ -25,7 +25,7 @@ class MissionTest {
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.ETC,
-                        MissionVisibility.PUBLIC,
+                        MissionVisibility.ALL,
                         member);
 
         // when
@@ -43,13 +43,13 @@ class MissionTest {
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.ETC,
-                        MissionVisibility.PUBLIC,
+                        MissionVisibility.ALL,
                         member);
 
         // when
         MissionVisibility visibility = mission.getVisibility();
 
         // then
-        assertEquals(MissionVisibility.PUBLIC, visibility);
+        assertEquals(MissionVisibility.ALL, visibility);
     }
 }
