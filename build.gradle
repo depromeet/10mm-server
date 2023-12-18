@@ -86,7 +86,7 @@ sonar {
         property 'sonar.exclusions', jacocoExcludePatterns.join(',')
         property 'sonar.test.inclusions', '**/*Test.java'
         property 'sonar.java.coveragePlugin', 'jacoco'
-        property 'sonar.coverage.jacoco.xmlReportPaths', "$buildDir/reports/jacoco/index.xml"
+        property 'sonar.coverage.jacoco.xmlReportPaths', jacocoDir.get().file("jacoco/index.xml").asFile
     }
 }
 
