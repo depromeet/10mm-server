@@ -21,11 +21,12 @@ class MissionTest {
     void 미션_카테고리_기타값_테스트() {
         // given
         Mission mission =
-                Mission.createPublicMission(
+                Mission.createMission(
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.ETC,
                         MissionVisibility.ALL,
+                        1,
                         member);
 
         // when
@@ -39,11 +40,12 @@ class MissionTest {
     void 미션_공개여부_공개_테스트() {
         // given
         Mission mission =
-                Mission.createPublicMission(
+                Mission.createMission(
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.ETC,
                         MissionVisibility.ALL,
+                        1,
                         member);
 
         // when

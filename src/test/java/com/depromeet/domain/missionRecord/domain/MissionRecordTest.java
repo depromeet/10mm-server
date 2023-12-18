@@ -20,11 +20,12 @@ class MissionRecordTest {
         Profile profile = new Profile("testNickname", "testProfileImageUrl");
         Member member = Member.createNormalMember(profile);
         mission =
-                Mission.createPublicMission(
+                Mission.createMission(
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.ETC,
                         MissionVisibility.ALL,
+                        1,
                         member);
     }
 

@@ -79,12 +79,12 @@ public class Mission extends BaseTimeEntity {
         this.member = member;
     }
 
-    public static Mission createPublicMission(
+    public static Mission createMission(
             String name,
             String content,
             MissionCategory category,
             MissionVisibility visibility,
-			Integer sort,
+            Integer sort,
             Member member) {
         return Mission.builder()
                 .name(name)
