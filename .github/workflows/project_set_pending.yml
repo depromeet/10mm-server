@@ -71,7 +71,7 @@ jobs:
              }
            }
           }' -f project=$PROJECT_ID -f pr=$PR_ID --jq '.data.addProjectV2ItemById.item.id')"
-
+          
           echo 'ITEM_ID='$item_id >> $GITHUB_ENV
 
       # 프로젝트에 추가된 PR의 item_id를 환경변수에서 읽어와 Status 필드의 값을 Pending으로 변경
@@ -80,13 +80,13 @@ jobs:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
           PENDING_OPTION_ID="${{ env.PENDING_OPTION_ID }}"
-
+          
           gh api graphql -f query='
             mutation ($project: ID!, $item: ID!, $status_field: ID!, $status_value: String!) {
               updateProjectV2ItemFieldValue(
                 input: {
-                  projectId: $project,
-                  itemId: $item,
+                  projectId: $project, 
+                  itemId: $item, 
                   fieldId: $status_field,
                   value: {singleSelectOptionId: $status_value}
                 }
