@@ -1,5 +1,6 @@
 package com.depromeet.global.util;
 
+import com.depromeet.global.common.constants.TenminuteConstants;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -12,25 +13,25 @@ import org.springframework.stereotype.Component;
 public class SpringEnvironmentUtil {
     private final Environment environment;
 
-    public static final String PROD = "prod";
-    public static final String DEV = "dev";
-    public static final String LOCAL = "local";
-
-    private final List<String> PROD_AND_DEV = List.of(PROD, DEV);
+    private final List<String> PROD_AND_DEV =
+            List.of(TenminuteConstants.PROD.getValue(), TenminuteConstants.DEV.getValue());
 
     public String getCurrentProfile() {
         return getActiveProfiles()
-                .filter(profile -> profile.equals(PROD) || profile.equals(DEV))
+                .filter(
+                        profile ->
+                                profile.equals(TenminuteConstants.PROD.getValue())
+                                        || profile.equals(TenminuteConstants.DEV.getValue()))
                 .findFirst()
-                .orElse(LOCAL);
+                .orElse(TenminuteConstants.LOCAL.getValue());
     }
 
     public Boolean isProdProfile() {
-        return getActiveProfiles().anyMatch(PROD::equals);
+        return getActiveProfiles().anyMatch(TenminuteConstants.PROD.getValue()::equals);
     }
 
     public Boolean isDevProfile() {
-        return getActiveProfiles().anyMatch(DEV::equals);
+        return getActiveProfiles().anyMatch(TenminuteConstants.DEV.getValue()::equals);
     }
 
     public Boolean isProdAndDevProfile() {
