@@ -1,8 +1,15 @@
 package com.depromeet.domain.mission.domain;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.Comment;
+
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,13 +23,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
 
 @Getter
 @Entity
@@ -57,6 +61,12 @@ public class Mission extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    private LocalDateTime startedAt;
+
+    private LocalDateTime finishedAt;
+
+    private ArchiveStatus archiveStatus;
+
     @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<MissionRecord> missionRecords = new ArrayList<>();
 
@@ -67,13 +77,19 @@ public class Mission extends BaseTimeEntity {
             MissionCategory category,
             MissionVisibility visibility,
             Integer sort,
-            Member member) {
+            LocalDateTime startedAt,
+            LocalDateTime finishedAt,
+            Member member,
+            ArchiveStatus archiveStatus) {
         this.name = name;
         this.content = content;
         this.category = category;
         this.visibility = visibility;
         this.sort = sort;
+        this.startedAt = startedAt;
+        this.finishedAt = finishedAt;
         this.member = member;
+        this.archiveStatus = archiveStatus;
     }
 
     public static Mission createMission(
@@ -82,6 +98,9 @@ public class Mission extends BaseTimeEntity {
             MissionCategory category,
             MissionVisibility visibility,
             Integer sort,
+            LocalDateTime startedAt,
+            LocalDateTime finishedAt,
+            ArchiveStatus archiveStatus,
             Member member) {
         return Mission.builder()
                 .name(name)
@@ -90,6 +109,9 @@ public class Mission extends BaseTimeEntity {
                 .visibility(visibility)
                 .sort(sort)
                 .member(member)
+                .startedAt(startedAt)
+                .finishedAt(finishedAt)
+                .archiveStatus(archiveStatus)
                 .build();
     }
 }

@@ -1,7 +1,12 @@
 package com.depromeet.domain.missionRecord.domain;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.Comment;
+
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.mission.domain.Mission;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,14 +16,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
 
 @Getter
 @Entity
@@ -33,12 +35,14 @@ public class MissionRecord extends BaseTimeEntity {
     private Integer duration;
 
     @Comment("미션 일지")
-    @Column(nullable = false)
-    @Lob
     private String remark;
 
     @Enumerated(EnumType.STRING)
     private ImageUploadStatus uploadStatus;
+
+    @Comment("인증 사진")
+    @Column(nullable = false)
+    private String imageUrl;
 
     private LocalDateTime startedAt;
 
@@ -53,12 +57,14 @@ public class MissionRecord extends BaseTimeEntity {
             Integer duration,
             String remark,
             ImageUploadStatus uploadStatus,
+            String imageUrl,
             LocalDateTime startedAt,
             LocalDateTime finishedAt,
             Mission mission) {
         this.duration = duration;
         this.remark = remark;
         this.uploadStatus = uploadStatus;
+        this.imageUrl = imageUrl;
         this.startedAt = startedAt;
         this.finishedAt = finishedAt;
         this.mission = mission;
@@ -69,6 +75,7 @@ public class MissionRecord extends BaseTimeEntity {
             String remark,
             LocalDateTime startedAt,
             LocalDateTime finishedAt,
+            String imageUrl,
             Mission mission) {
         return MissionRecord.builder()
                 .duration(duration)
@@ -76,6 +83,7 @@ public class MissionRecord extends BaseTimeEntity {
                 .uploadStatus(ImageUploadStatus.NONE)
                 .startedAt(startedAt)
                 .finishedAt(finishedAt)
+                .imageUrl(imageUrl)
                 .mission(mission)
                 .build();
     }
