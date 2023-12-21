@@ -20,7 +20,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
@@ -44,7 +43,6 @@ public class Mission extends BaseTimeEntity {
 
     @Comment("미션 내용")
     @Column(columnDefinition = "text", nullable = false)
-    @Lob
     private String content;
 
     @Enumerated(EnumType.STRING)
@@ -65,6 +63,7 @@ public class Mission extends BaseTimeEntity {
 
     private LocalDateTime finishedAt;
 
+	@Enumerated(EnumType.STRING)
     private ArchiveStatus archiveStatus;
 
     @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -79,8 +78,8 @@ public class Mission extends BaseTimeEntity {
             Integer sort,
             LocalDateTime startedAt,
             LocalDateTime finishedAt,
-            Member member,
-            ArchiveStatus archiveStatus) {
+            ArchiveStatus archiveStatus,
+            Member member) {
         this.name = name;
         this.content = content;
         this.category = category;
@@ -88,8 +87,8 @@ public class Mission extends BaseTimeEntity {
         this.sort = sort;
         this.startedAt = startedAt;
         this.finishedAt = finishedAt;
-        this.member = member;
         this.archiveStatus = archiveStatus;
+        this.member = member;
     }
 
     public static Mission createMission(
@@ -100,7 +99,6 @@ public class Mission extends BaseTimeEntity {
             Integer sort,
             LocalDateTime startedAt,
             LocalDateTime finishedAt,
-            ArchiveStatus archiveStatus,
             Member member) {
         return Mission.builder()
                 .name(name)
@@ -111,7 +109,7 @@ public class Mission extends BaseTimeEntity {
                 .member(member)
                 .startedAt(startedAt)
                 .finishedAt(finishedAt)
-                .archiveStatus(archiveStatus)
+                .archiveStatus(ArchiveStatus.NONE)
                 .build();
     }
 }
