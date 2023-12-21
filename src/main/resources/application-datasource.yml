@@ -14,6 +14,5 @@ spring:
     properties:
       hibernate:
         default_batch_fetch_size: ${JPA_BATCH_FETCH_SIZE:100}
-    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
 
 
