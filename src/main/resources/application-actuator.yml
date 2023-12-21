@@ -1,0 +1,17 @@
+spring:
+  config:
+    activate:
+      on-profile: "actuator"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+      base-path: ${ACTUATOR_BASE_PATH:}/10mm-actuator
+    jmx:
+      exposure:
+        exclude: "*"
+    enabled-by-default: false
+  endpoint:
+    health:
+      enabled: true
