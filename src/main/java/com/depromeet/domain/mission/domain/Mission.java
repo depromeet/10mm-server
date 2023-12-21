@@ -1,15 +1,8 @@
 package com.depromeet.domain.mission.domain;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.hibernate.annotations.Comment;
-
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,10 +15,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 
 @Getter
 @Entity
@@ -63,7 +60,7 @@ public class Mission extends BaseTimeEntity {
 
     private LocalDateTime finishedAt;
 
-	@Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private ArchiveStatus archiveStatus;
 
     @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, orphanRemoval = true)
