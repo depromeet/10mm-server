@@ -39,3 +39,4 @@ out/
 ### Custom ###
 *.env
 *.DS_Stroe
+/src/main/generated
