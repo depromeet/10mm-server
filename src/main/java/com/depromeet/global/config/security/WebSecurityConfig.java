@@ -1,6 +1,6 @@
 package com.depromeet.global.config.security;
 
-import com.depromeet.global.common.constants.TenminuteConstants;
+import com.depromeet.global.common.constants.UrlConstants;
 import com.depromeet.global.util.SpringEnvironmentUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -40,10 +40,10 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.addAllowedOriginPattern(TenminuteConstants.PROD_DOMAIN_URL.getValue());
+        configuration.addAllowedOriginPattern(UrlConstants.PROD_DOMAIN_URL.getValue());
 
         if (!springEnvironmentUtil.isProdProfile()) {
-            configuration.addAllowedOriginPattern(TenminuteConstants.LOCAL_DOMAIN_URL.getValue());
+            configuration.addAllowedOriginPattern(UrlConstants.LOCAL_DOMAIN_URL.getValue());
         }
 
         configuration.addAllowedHeader("*");

@@ -5,11 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum TenminuteConstants {
-    PROD("prod"),
-    DEV("dev"),
-    LOCAL("local"),
-
+public enum UrlConstants {
     PROD_SERVER_URL("https://api.10mm.today"),
     DEV_SERVER_URL("https://dev-api.10mm.today"),
     LOCAL_SERVER_URL("http://localhost:8080"),

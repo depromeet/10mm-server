@@ -1,6 +1,6 @@
 package com.depromeet.global.util;
 
-import com.depromeet.global.common.constants.TenminuteConstants;
+import com.depromeet.global.common.constants.EnvironmentConstants;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -14,24 +14,24 @@ public class SpringEnvironmentUtil {
     private final Environment environment;
 
     private final List<String> PROD_AND_DEV =
-            List.of(TenminuteConstants.PROD.getValue(), TenminuteConstants.DEV.getValue());
+            List.of(EnvironmentConstants.PROD.getValue(), EnvironmentConstants.DEV.getValue());
 
     public String getCurrentProfile() {
         return getActiveProfiles()
                 .filter(
                         profile ->
-                                profile.equals(TenminuteConstants.PROD.getValue())
-                                        || profile.equals(TenminuteConstants.DEV.getValue()))
+                                profile.equals(EnvironmentConstants.PROD.getValue())
+                                        || profile.equals(EnvironmentConstants.DEV.getValue()))
                 .findFirst()
-                .orElse(TenminuteConstants.LOCAL.getValue());
+                .orElse(EnvironmentConstants.LOCAL.getValue());
     }
 
     public Boolean isProdProfile() {
-        return getActiveProfiles().anyMatch(TenminuteConstants.PROD.getValue()::equals);
+        return getActiveProfiles().anyMatch(EnvironmentConstants.PROD.getValue()::equals);
     }
 
     public Boolean isDevProfile() {
-        return getActiveProfiles().anyMatch(TenminuteConstants.DEV.getValue()::equals);
+        return getActiveProfiles().anyMatch(EnvironmentConstants.DEV.getValue()::equals);
     }
 
     public Boolean isProdAndDevProfile() {
