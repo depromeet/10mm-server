@@ -19,6 +19,8 @@ class MissionRecordTest {
     void setUp() {
         Profile profile = new Profile("testNickname", "testProfileImageUrl");
         Member member = Member.createNormalMember(profile);
+        LocalDateTime startedAt = LocalDateTime.of(2023, 12, 1, 1, 5, 0);
+        LocalDateTime finishedAt = LocalDateTime.of(2023, 12, 15, 1, 37, 0);
         mission =
                 Mission.createMission(
                         "testMissionName",
@@ -26,6 +28,8 @@ class MissionRecordTest {
                         MissionCategory.ETC,
                         MissionVisibility.ALL,
                         1,
+                        startedAt,
+                        finishedAt,
                         member);
     }
 
@@ -36,7 +40,12 @@ class MissionRecordTest {
         LocalDateTime finishedAt = LocalDateTime.of(2023, 12, 15, 1, 37, 0);
         MissionRecord missionRecord =
                 MissionRecord.createMissionRecord(
-                        32, "testMissionRecordRemark", startedAt, finishedAt, mission);
+                        32,
+                        "testMissionRecordRemark",
+                        startedAt,
+                        finishedAt,
+                        "image/url/path",
+                        mission);
 
         // when
         ImageUploadStatus uploadStatus = missionRecord.getUploadStatus();
