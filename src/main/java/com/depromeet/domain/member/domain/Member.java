@@ -1,8 +1,20 @@
 package com.depromeet.domain.member.domain;
 
 import com.depromeet.domain.common.model.BaseTimeEntity;
-import jakarta.persistence.*;
+import com.depromeet.domain.mission.domain.Mission;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,6 +42,9 @@ public class Member extends BaseTimeEntity {
     private MemberVisibility visibility;
 
     private LocalDateTime lastLoginAt;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Mission> missions = new ArrayList<>();
 
     @Builder(access = AccessLevel.PRIVATE)
     private Member(

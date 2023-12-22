@@ -38,6 +38,13 @@ dependencies {
     // Spring Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.security:spring-security-test'
+
+    // Querydsl
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 }
 
 tasks.named('bootBuildImage') {
@@ -83,7 +90,7 @@ sonar {
         property 'sonar.sources', 'src'
         property 'sonar.language', 'java'
         property 'sonar.sourceEncoding', 'UTF-8'
-        property 'sonar.test.exclusions', jacocoExcludePatterns.join(',')
+        property 'sonar.exclusions', jacocoExcludePatterns.join(',')
         property 'sonar.test.inclusions', '**/*Test.java'
         property 'sonar.java.coveragePlugin', 'jacoco'
         property 'sonar.coverage.jacoco.xmlReportPaths', jacocoDir.get().file("jacoco/index.xml").asFile

@@ -10,7 +10,7 @@ import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.depromeet")
 public class GlobalResponseAdvice implements ResponseBodyAdvice {
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
@@ -29,7 +29,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice {
                 ((ServletServerHttpResponse) response).getServletResponse();
         int status = servletResponse.getStatus();
         HttpStatus resolve = HttpStatus.resolve(status);
-        if (resolve == null) {
+        if (resolve == null || body instanceof String) {
             return body;
         }
         if (resolve.is2xxSuccessful()) {
