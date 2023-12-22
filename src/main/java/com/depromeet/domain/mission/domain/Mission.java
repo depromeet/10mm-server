@@ -64,7 +64,7 @@ public class Mission extends BaseTimeEntity {
     private ArchiveStatus archiveStatus;
 
     @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<MissionRecord> missionRecords = new ArrayList<>();
+    private List<MissionRecord> missionRecords = new ArrayList<>();
 
     @Builder(access = AccessLevel.PRIVATE)
     private Mission(
