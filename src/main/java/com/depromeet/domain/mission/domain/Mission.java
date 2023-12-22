@@ -39,7 +39,7 @@ public class Mission extends BaseTimeEntity {
     private String name;
 
     @Comment("미션 내용")
-    @Column(nullable = false, length = 30)
+    @Column(length = 30)
     private String content;
 
     @Comment("미션 정렬값")
