@@ -2,6 +2,7 @@ package com.depromeet.global.config;
 
 import static com.depromeet.global.util.SpringEnvironmentUtil.*;
 
+import com.depromeet.global.common.constants.UrlConstants;
 import com.depromeet.global.util.SpringEnvironmentUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.core.jackson.ModelResolver;
@@ -48,11 +49,11 @@ public class SwaggerConfig {
     private String getServerUrl() {
         switch (springEnvironmentUtil.getCurrentProfile()) {
             case "prod":
-                return "https://api.10mm.today";
+                return UrlConstants.PROD_SERVER_URL.getValue();
             case "dev":
-                return "https://dev-api.10mm.today";
+                return UrlConstants.DEV_SERVER_URL.getValue();
             default:
-                return "https://localhost:8080";
+                return UrlConstants.LOCAL_SERVER_URL.getValue();
         }
     }
 
