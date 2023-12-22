@@ -1,8 +1,15 @@
 package com.depromeet.domain.mission.domain;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.Comment;
+
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,14 +22,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
 
 @Getter
 @Entity
@@ -39,7 +42,7 @@ public class Mission extends BaseTimeEntity {
     private String name;
 
     @Comment("미션 내용")
-    @Column(columnDefinition = "text", nullable = false)
+    @Column(nullable = false, length = 30)
     private String content;
 
     @Enumerated(EnumType.STRING)
@@ -49,7 +52,7 @@ public class Mission extends BaseTimeEntity {
     private MissionVisibility visibility;
 
     @Comment("미션 정렬값")
-    @Column(name = "sort", nullable = false)
+    @Column(nullable = false)
     private Integer sort;
 
     @ManyToOne(fetch = FetchType.LAZY)
