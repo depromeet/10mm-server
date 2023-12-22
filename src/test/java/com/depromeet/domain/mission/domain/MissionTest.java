@@ -27,9 +27,9 @@ class MissionTest {
                 Mission.createMission(
                         "testMissionName",
                         "testMissionContent",
+                        1,
                         MissionCategory.ETC,
                         MissionVisibility.ALL,
-                        1,
                         startedAt,
                         finishedAt,
                         member);
@@ -50,9 +50,9 @@ class MissionTest {
                 Mission.createMission(
                         "testMissionName",
                         "testMissionContent",
+                        1,
                         MissionCategory.ETC,
                         MissionVisibility.ALL,
-                        1,
                         startedAt,
                         finishedAt,
                         member);
@@ -73,9 +73,9 @@ class MissionTest {
                 Mission.createMission(
                         "testMissionName",
                         "testMissionContent",
+                        1,
                         MissionCategory.ETC,
                         MissionVisibility.ALL,
-                        1,
                         startedAt,
                         finishedAt,
                         member);

@@ -34,12 +34,12 @@ public class MissionRecord extends BaseTimeEntity {
     @Comment("미션 일지")
     private String remark;
 
-    @Enumerated(EnumType.STRING)
-    private ImageUploadStatus uploadStatus;
-
     @Comment("인증 사진")
     @Column(nullable = false)
     private String imageUrl;
+
+    @Enumerated(EnumType.STRING)
+    private ImageUploadStatus uploadStatus;
 
     private LocalDateTime startedAt;
 
@@ -53,8 +53,8 @@ public class MissionRecord extends BaseTimeEntity {
     private MissionRecord(
             Integer duration,
             String remark,
-            ImageUploadStatus uploadStatus,
             String imageUrl,
+            ImageUploadStatus uploadStatus,
             LocalDateTime startedAt,
             LocalDateTime finishedAt,
             Mission mission) {
@@ -70,9 +70,9 @@ public class MissionRecord extends BaseTimeEntity {
     public static MissionRecord createMissionRecord(
             Integer duration,
             String remark,
+            String imageUrl,
             LocalDateTime startedAt,
             LocalDateTime finishedAt,
-            String imageUrl,
             Mission mission) {
         return MissionRecord.builder()
                 .duration(duration)

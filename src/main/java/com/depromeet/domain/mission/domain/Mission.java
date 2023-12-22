@@ -42,26 +42,26 @@ public class Mission extends BaseTimeEntity {
     @Column(nullable = false, length = 30)
     private String content;
 
+    @Comment("미션 정렬값")
+    @Column(nullable = false)
+    private Integer sort;
+
+    @Enumerated(EnumType.STRING)
+    private ArchiveStatus archiveStatus;
+
     @Enumerated(EnumType.STRING)
     private MissionCategory category;
 
     @Enumerated(EnumType.STRING)
     private MissionVisibility visibility;
 
-    @Comment("미션 정렬값")
-    @Column(nullable = false)
-    private Integer sort;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
-
     private LocalDateTime startedAt;
 
     private LocalDateTime finishedAt;
 
-    @Enumerated(EnumType.STRING)
-    private ArchiveStatus archiveStatus;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MissionRecord> missionRecords = new ArrayList<>();
@@ -70,43 +70,43 @@ public class Mission extends BaseTimeEntity {
     private Mission(
             String name,
             String content,
+            Integer sort,
+            ArchiveStatus archiveStatus,
             MissionCategory category,
             MissionVisibility visibility,
-            Integer sort,
             LocalDateTime startedAt,
             LocalDateTime finishedAt,
-            ArchiveStatus archiveStatus,
             Member member) {
         this.name = name;
         this.content = content;
+        this.sort = sort;
+        this.archiveStatus = archiveStatus;
         this.category = category;
         this.visibility = visibility;
-        this.sort = sort;
         this.startedAt = startedAt;
         this.finishedAt = finishedAt;
-        this.archiveStatus = archiveStatus;
         this.member = member;
     }
 
     public static Mission createMission(
             String name,
             String content,
+            Integer sort,
             MissionCategory category,
             MissionVisibility visibility,
-            Integer sort,
             LocalDateTime startedAt,
             LocalDateTime finishedAt,
             Member member) {
         return Mission.builder()
                 .name(name)
                 .content(content)
+                .sort(sort)
+                .archiveStatus(ArchiveStatus.NONE)
                 .category(category)
                 .visibility(visibility)
-                .sort(sort)
-                .member(member)
                 .startedAt(startedAt)
                 .finishedAt(finishedAt)
-                .archiveStatus(ArchiveStatus.NONE)
+                .member(member)
                 .build();
     }
 }

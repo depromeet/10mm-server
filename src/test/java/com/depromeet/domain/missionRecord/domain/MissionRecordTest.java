@@ -25,9 +25,9 @@ class MissionRecordTest {
                 Mission.createMission(
                         "testMissionName",
                         "testMissionContent",
+                        1,
                         MissionCategory.ETC,
                         MissionVisibility.ALL,
-                        1,
                         startedAt,
                         finishedAt,
                         member);
@@ -42,9 +42,9 @@ class MissionRecordTest {
                 MissionRecord.createMissionRecord(
                         32,
                         "testMissionRecordRemark",
+                        "image/url/path",
                         startedAt,
                         finishedAt,
-                        "image/url/path",
                         mission);
 
         // when
