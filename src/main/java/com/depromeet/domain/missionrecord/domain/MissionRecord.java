@@ -1,4 +1,4 @@
-package com.depromeet.domain.missionRecord.domain;
+package com.depromeet.domain.missionrecord.domain;
 
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.mission.domain.Mission;

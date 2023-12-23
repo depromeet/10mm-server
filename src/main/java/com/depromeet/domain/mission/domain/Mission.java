@@ -2,7 +2,7 @@ package com.depromeet.domain.mission.domain;
 
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.member.domain.Member;
-import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import com.depromeet.domain.missionrecord.domain.MissionRecord;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

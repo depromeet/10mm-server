@@ -1,4 +1,4 @@
-package com.depromeet.domain.missionRecord.domain;
+package com.depromeet.domain.missionrecord.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
