@@ -1,4 +1,4 @@
-package com.depromeet.domain.mission.dto;
+package com.depromeet.domain.mission.dto.response;
 
 import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;

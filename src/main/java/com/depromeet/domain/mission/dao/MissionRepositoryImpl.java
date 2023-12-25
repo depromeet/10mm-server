@@ -1,12 +1,14 @@
 package com.depromeet.domain.mission.dao;
 
 import static com.depromeet.domain.mission.domain.QMission.mission;
+import static com.depromeet.domain.missionRecord.domain.QMissionRecord.missionRecord;
 
 import com.depromeet.domain.mission.domain.Mission;
-import com.depromeet.domain.mission.dto.MissionResponse;
+import com.depromeet.domain.mission.dto.response.MissionResponse;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,18 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class MissionRepositoryImpl implements MissionRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
+
+    @Override
+    public Optional<Mission> findByMissionId(Long missionId) {
+        Mission findMission =
+                jpaQueryFactory
+                        .selectFrom(mission)
+                        .leftJoin(mission.missionRecords, missionRecord)
+                        .fetchJoin()
+                        .where(mission.id.eq(missionId))
+                        .fetchOne();
+        return Optional.ofNullable(findMission);
+    }
 
     @Override
     public Slice<MissionResponse> findMissionList(Long memberId, Pageable pageable, Long lastId) {
