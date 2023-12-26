@@ -112,9 +112,10 @@ class MissionServiceTest {
     @Test
     void 미션_리스트_조회_성공() {
         // given
+
         Member saveMember = memberRepository.save(member);
         List<CreateMissionRequest> createMissionRequests =
-                IntStream.range(1, 7)
+                IntStream.range(1, 40)
                         .mapToObj(
                                 i ->
                                         new CreateMissionRequest(
@@ -122,16 +123,21 @@ class MissionServiceTest {
                                                 "testMissionContent_" + i,
                                                 MissionCategory.STUDY,
                                                 MissionVisibility.ALL))
-                        .collect(Collectors.toList());
+                        .toList();
 
         createMissionRequests.forEach(
                 request -> missionService.addMission(request, saveMember.getId()));
 
         // when
-        Slice<MissionResponse> missionList = missionService.listMission(saveMember.getId(), 5, 4L);
+        Slice<MissionResponse> missionList = missionService.listMission(saveMember.getId(), 7, 11L);
 
+        // log.info("{}", missionList.get().toList().size());
+        // log.info("{}", missionList.getContent().get(0).getName());
+        // log.info("{}", missionList.getContent().get(1).getName());
+        // log.info("{}", missionList.getContent().get(2).getName());
+        // em.clear();
         // expected
-        assertEquals(missionList.getContent().size(), 5);
+        assertEquals(missionList.getContent().size(), 7);
         assertEquals(missionList.getContent().get(0).getName(), "testMissionName_1");
         assertEquals(missionList.getContent().get(2).getContent(), "testMissionContent_3");
     }

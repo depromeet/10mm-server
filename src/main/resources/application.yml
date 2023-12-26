@@ -29,3 +29,8 @@ springdoc:
     syntax-highlight:
       theme: none
     urls-primary-name: 10MM API DOCS
+spring:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console

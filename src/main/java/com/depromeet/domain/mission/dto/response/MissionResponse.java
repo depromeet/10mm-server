@@ -1,5 +1,6 @@
 package com.depromeet.domain.mission.dto.response;
 
+import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -39,5 +40,14 @@ public class MissionResponse {
         this.category = category.getValue();
         this.visibility = visibility.getValue();
         this.sort = sort;
+    }
+
+    public MissionResponse(Mission mission) {
+        this.missionId = mission.getId();
+        this.name = mission.getName();
+        this.content = mission.getContent();
+        this.category = mission.getCategory().getValue();
+        this.visibility = mission.getVisibility().getValue();
+        this.sort = mission.getSort();
     }
 }

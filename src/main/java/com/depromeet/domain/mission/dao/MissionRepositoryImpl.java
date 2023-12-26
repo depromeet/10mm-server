@@ -6,16 +6,19 @@ import static com.depromeet.domain.missionRecord.domain.QMissionRecord.missionRe
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.dto.response.MissionResponse;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class MissionRepositoryImpl implements MissionRepositoryCustom {
@@ -35,23 +38,19 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
 
     @Override
     public Slice<MissionResponse> findMissionList(Long memberId, Pageable pageable, Long lastId) {
-        List<Mission> missions =
+        JPAQuery<Mission> query =
                 jpaQueryFactory
                         .selectFrom(mission)
-                        .where(memberIdEq(memberId), ltMissionId(lastId))
-                        .fetch();
+                        .leftJoin(mission.missionRecords, missionRecord)
+                        .fetchJoin()
+                        .where(ltMissionId(lastId), memberIdEq(memberId))
+                        .limit(pageable.getPageSize() + 1);
+
+        log.info("query: {}", query);
+
+        List<Mission> missions = query.fetch();
         List<MissionResponse> list =
-                missions.stream()
-                        .map(
-                                n ->
-                                        new MissionResponse(
-                                                n.getId(),
-                                                n.getName(),
-                                                n.getContent(),
-                                                n.getCategory(),
-                                                n.getVisibility(),
-                                                n.getSort()))
-                        .collect(Collectors.toList());
+                missions.stream().map(MissionResponse::new).collect(Collectors.toList());
         return checkLastPage(pageable, list);
     }
 

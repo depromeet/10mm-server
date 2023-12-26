@@ -52,7 +52,7 @@ public class MissionService {
 
     public Slice<MissionResponse> listMission(Long memberId, int size, Long lastId) {
         Sort.Direction direction = Sort.Direction.DESC;
-        Pageable pageable = PageRequest.of(0, size, Sort.by(direction, "id"));
+        Pageable pageable = PageRequest.of(0, size, Sort.by(direction, "createdAt").descending());
         return missionRepository.findMissionList(memberId, pageable, lastId);
     }
 
