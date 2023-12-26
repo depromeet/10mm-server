@@ -17,7 +17,7 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           NCP_CONTAINER_REGISTRY: ${{ secrets.NCP_CONTAINER_REGISTRY }}
-          NCP_IMAGE_TAG: ${{ needs.build.outputs.sha }}
+          NCP_IMAGE_TAG: ${{ github.event.inputs.commit_hash }}
         with:
           host: ${{ secrets.NCP_HOST }}
           username: tenminute
@@ -26,6 +26,6 @@ jobs:
           envs: NCP_CONTAINER_REGISTRY,NCP_IMAGE_TAG  # docker-compose.yml 에서 사용할 환경 변수
           script: |
             echo "${{ secrets.NCP_SECRET_KEY }}" | docker login -u "${{ secrets.NCP_ACCESS_KEY }}" --password-stdin "${{ secrets.NCP_CONTAINER_REGISTRY }}"
-            docker pull ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ needs.build.outputs.sha }}
+            docker pull ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ github.event.inputs.commit_hash }}
             docker compose -f /home/tenminute/docker-compose.yaml up -d
             docker image prune -a -f
