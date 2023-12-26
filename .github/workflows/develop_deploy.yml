@@ -11,7 +11,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: DEV
-    needs: build
     steps:
       - name: Deploy to NCP Server
         uses: appleboy/ssh-action@master
