@@ -10,7 +10,6 @@ import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.CreateMissionRequest;
-import com.depromeet.domain.mission.dto.request.ModifyMissionRequest;
 import com.depromeet.domain.mission.dto.response.MissionResponse;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -163,21 +162,21 @@ class MissionServiceTest {
         assertEquals(missionList.isLast(), false);
     }
 
-	// @Test
-	// void 미션_수정_성공() {
-	// 	Member saveMember = memberRepository.save(member);
-	// 	CreateMissionRequest createMissionRequest =
-	// 		new CreateMissionRequest(
-	// 			"testMissionName",
-	// 			"testMissionContent",
-	// 			MissionCategory.STUDY,
-	// 			MissionVisibility.ALL);
-	// 	Mission saveMission = missionService.addMission(createMissionRequest, saveMember.getId());
-	// 	ModifyMissionRequest modifyMissionRequest = new ModifyMissionRequest()
-	// }
-	//
-	// @Test
-	// void 미션_삭제_성공() {
-	//
-	// }
+    // @Test
+    // void 미션_수정_성공() {
+    // 	Member saveMember = memberRepository.save(member);
+    // 	CreateMissionRequest createMissionRequest =
+    // 		new CreateMissionRequest(
+    // 			"testMissionName",
+    // 			"testMissionContent",
+    // 			MissionCategory.STUDY,
+    // 			MissionVisibility.ALL);
+    // 	Mission saveMission = missionService.addMission(createMissionRequest, saveMember.getId());
+    // 	ModifyMissionRequest modifyMissionRequest = new ModifyMissionRequest()
+    // }
+    //
+    // @Test
+    // void 미션_삭제_성공() {
+    //
+    // }
 }
