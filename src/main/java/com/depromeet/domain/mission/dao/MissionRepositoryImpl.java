@@ -36,7 +36,7 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     @Override
     public Slice<MissionResponse> findMissionList(Long memberId, Pageable pageable, Long lastId) {
         List<Mission> missions =
-                jpaQueryFactory.selectFrom(mission).where(memberIdEq(memberId)).fetch();
+                jpaQueryFactory.selectFrom(mission).where(memberIdEq(memberId), ltMissionId(lastId)).fetch();
         List<MissionResponse> list =
                 missions.stream()
                         .map(
@@ -55,6 +55,10 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     private BooleanExpression memberIdEq(Long memberId) {
         return memberId == null ? null : mission.member.id.eq(memberId);
     }
+
+	private BooleanExpression ltMissionId(Long lastId) {
+		return lastId == null ? null : mission.id.lt(lastId);
+	}
 
     // 무한 스크롤 방식 처리하는 메서드
     private Slice<MissionResponse> checkLastPage(
