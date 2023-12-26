@@ -7,7 +7,7 @@ management:
     web:
       exposure:
         include: health
-      base-path: ${ACTUATOR_BASE_PATH:}/10mm-actuator
+      base-path: /10mm-actuator
     jmx:
       exposure:
         exclude: "*"
