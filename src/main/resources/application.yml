@@ -1,22 +1,13 @@
-# Actuator 설정
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health
-      base-path: /10mm-actuator
-    jmx:
-      exposure:
-        exclude: "*"
-    enabled-by-default: false
-  endpoint:
-    health:
-      enabled: true
+spring:
+  profiles:
+    group:
+      test: "test"
+      local: "local, datasource"
+      dev: "dev, datasource, actuator"
+      prod: "prod, datasource, actuator"
 
 swagger:
   version: 0.0.1
-
 springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
@@ -29,3 +20,7 @@ springdoc:
     syntax-highlight:
       theme: none
     urls-primary-name: 10MM API DOCS
+
+logging:
+  level:
+    com.depromeet.domain.*.api.*: debug

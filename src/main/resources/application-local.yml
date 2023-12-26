@@ -1,0 +1,17 @@
+spring:
+  config:
+    activate:
+      on-profile: "local"
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: ${SHOW_SQL:true}
+    properties:
+      hibernate:
+        format_sql: ${FORMAT_SQL:true}
+    defer-datasource-initialization: true
+    open-in-view: false
+logging:
+  level:
+    org.springframework.orm.jpa: DEBUG
+    org.springframework.transaction: DEBUG
