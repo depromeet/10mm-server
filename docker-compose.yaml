@@ -6,3 +6,5 @@ services:
     container_name: server-spring
     restart: always
     network_mode: host
+    env_file:
+      - .env
