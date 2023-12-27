@@ -42,8 +42,9 @@ public class DatabaseCleaner implements InitializingBean {
 
     @Transactional
     public void execute() {
+        // 쓰기 지연 저장소에 남은 SQL을 마저 수행
         entityManager.flush();
-        entityManager.clear();
+        // 연관 관계 매핑된 테이블 참조 무결성 해제
         entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
 
         for (String tableName : tableNames) {
