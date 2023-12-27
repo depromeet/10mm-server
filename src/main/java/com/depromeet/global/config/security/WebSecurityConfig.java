@@ -71,6 +71,7 @@ public class WebSecurityConfig {
                 authorize ->
                         authorize
                                 .requestMatchers(
+										HttpMethod.GET,
                                         Arrays.stream(SwaggerUrlConstants.values())
                                                 .map(SwaggerUrlConstants::getValue)
                                                 .toArray(String[]::new))
