@@ -41,12 +41,9 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
         JPAQuery<Mission> query =
                 jpaQueryFactory
                         .selectFrom(mission)
-                        .leftJoin(mission.missionRecords, missionRecord)
-                        .fetchJoin()
                         .where(ltMissionId(lastId), memberIdEq(memberId))
+                        .orderBy(mission.id.desc())
                         .limit(pageable.getPageSize() + 1);
-
-        log.info("query: {}", query);
 
         List<Mission> missions = query.fetch();
         List<MissionResponse> list =

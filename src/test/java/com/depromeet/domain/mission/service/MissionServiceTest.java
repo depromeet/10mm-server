@@ -1,5 +1,6 @@
 package com.depromeet.domain.mission.service;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.depromeet.domain.member.dao.MemberRepository;
@@ -12,7 +13,6 @@ import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.CreateMissionRequest;
 import com.depromeet.domain.mission.dto.response.MissionResponse;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,23 +27,19 @@ class MissionServiceTest {
     @Autowired private MissionService missionService;
     @Autowired private MissionRepository missionRepository;
     @Autowired private MemberRepository memberRepository;
-
     Member member;
+    Member saveMember;
 
     @BeforeEach
     void setUp() {
-        memberRepository.deleteAll();
         missionRepository.deleteAll();
-
-        Profile profile = new Profile("testNickname", "testProfileImageUrl");
-        member = Member.createNormalMember(profile);
+        member = Member.createNormalMember(new Profile("testNickname", "testProfileImageUrl"));
+        saveMember = memberRepository.save(member);
     }
 
     @Test
     void 공부_미션_생성_성공() {
         // given
-        Member saveMember = memberRepository.save(member);
-
         CreateMissionRequest createMissionRequest =
                 new CreateMissionRequest(
                         "testMissionName",
@@ -63,8 +59,6 @@ class MissionServiceTest {
     @Test
     void 미션이름_초과_생성_실패() {
         // given
-        Member saveMember = memberRepository.save(member);
-
         CreateMissionRequest createMissionRequest =
                 new CreateMissionRequest(
                         "testMissionNameMoreThan",
@@ -90,7 +84,6 @@ class MissionServiceTest {
     @Test
     void 미션_단건_조회_성공() {
         // given
-        Member saveMember = memberRepository.save(member);
         CreateMissionRequest createMissionRequest =
                 new CreateMissionRequest(
                         "testMissionName",
@@ -112,10 +105,8 @@ class MissionServiceTest {
     @Test
     void 미션_리스트_조회_성공() {
         // given
-
-        Member saveMember = memberRepository.save(member);
         List<CreateMissionRequest> createMissionRequests =
-                IntStream.range(1, 40)
+                IntStream.range(1, 41)
                         .mapToObj(
                                 i ->
                                         new CreateMissionRequest(
@@ -127,45 +118,20 @@ class MissionServiceTest {
 
         createMissionRequests.forEach(
                 request -> missionService.addMission(request, saveMember.getId()));
-
         // when
-        Slice<MissionResponse> missionList = missionService.listMission(saveMember.getId(), 7, 11L);
-
-        // log.info("{}", missionList.get().toList().size());
-        // log.info("{}", missionList.getContent().get(0).getName());
-        // log.info("{}", missionList.getContent().get(1).getName());
-        // log.info("{}", missionList.getContent().get(2).getName());
-        // em.clear();
-        // expected
-        assertEquals(missionList.getContent().size(), 7);
-        assertEquals(missionList.getContent().get(0).getName(), "testMissionName_1");
-        assertEquals(missionList.getContent().get(2).getContent(), "testMissionContent_3");
-    }
-
-    @Test
-    void 미션_리스트_조회_마지막_객체_여부() {
-        // given
-        Member saveMember = memberRepository.save(member);
-        List<CreateMissionRequest> createMissionRequests =
-                IntStream.range(1, 7)
-                        .mapToObj(
-                                i ->
-                                        new CreateMissionRequest(
-                                                "testMissionName_" + i,
-                                                "testMissionContent_" + i,
-                                                MissionCategory.STUDY,
-                                                MissionVisibility.ALL))
-                        .collect(Collectors.toList());
-        createMissionRequests.forEach(
-                request -> missionService.addMission(request, saveMember.getId()));
-
-        // when
-        Slice<MissionResponse> missionList =
-                missionService.listMission(saveMember.getId(), 5, null);
+        Slice<MissionResponse> missionList = missionService.listMission(saveMember.getId(), 4, 30L);
 
         // expected
-        assertEquals(missionList.getContent().size(), 5);
-        assertEquals(missionList.isLast(), false);
+        assertThat(missionList.getContent().size()).isEqualTo(4);
+        assertThat(missionList.getContent())
+                .hasSize(4)
+                .extracting("missionId", "name", "content")
+                .containsExactlyInAnyOrder(
+                        tuple(29L, "testMissionName_28", "testMissionContent_28"),
+                        tuple(28L, "testMissionName_27", "testMissionContent_27"),
+                        tuple(27L, "testMissionName_26", "testMissionContent_26"),
+                        tuple(26L, "testMissionName_25", "testMissionContent_25"));
+        assertFalse(missionList.isLast());
     }
 
     // @Test
