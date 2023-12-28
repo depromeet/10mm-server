@@ -1,11 +1,10 @@
 package com.depromeet.domain.mission.dto.response;
 
 import com.depromeet.domain.mission.domain.Mission;
-import com.depromeet.domain.mission.domain.MissionCategory;
-import com.depromeet.domain.mission.domain.MissionVisibility;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+// TODO: record 변환, record 변환 시 Schema 어노테이션 적용 가능 여부 체크, from으로 정적 팩토리 메서드, 단건 조회, 리스트 조회 별도 DTO 분리
 @Data
 public class MissionResponse {
 
@@ -26,21 +25,6 @@ public class MissionResponse {
 
     @Schema(description = "미션 정렬 값")
     private final Integer sort;
-
-    public MissionResponse(
-            Long missionId,
-            String name,
-            String content,
-            MissionCategory category,
-            MissionVisibility visibility,
-            Integer sort) {
-        this.missionId = missionId;
-        this.name = name;
-        this.content = content;
-        this.category = category.getValue();
-        this.visibility = visibility.getValue();
-        this.sort = sort;
-    }
 
     public MissionResponse(Mission mission) {
         this.missionId = mission.getId();
