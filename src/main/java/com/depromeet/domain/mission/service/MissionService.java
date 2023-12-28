@@ -1,7 +1,5 @@
 package com.depromeet.domain.mission.service;
 
-import com.depromeet.domain.member.dao.MemberRepository;
-import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.dto.request.CreateMissionRequest;
@@ -9,6 +7,7 @@ import com.depromeet.domain.mission.dto.request.ModifyMissionRequest;
 import com.depromeet.domain.mission.dto.response.MissionResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
+import com.depromeet.global.util.MemberUtil;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -22,37 +21,37 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MissionService {
 
-    private final MemberRepository memberRepository;
     private final MissionRepository missionRepository;
+    private final MemberUtil memberUtil;
 
     @Transactional
-    public Mission addMission(CreateMissionRequest createMissionRequest, Long memberId) {
-        Member member =
-                memberRepository
-                        .findById(memberId)
-                        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    public Mission addMission(CreateMissionRequest createMissionRequest) {
+		LocalDateTime startedAt = LocalDateTime.now();
+
+		Integer maxSort = missionRepository.findMaxSortByMemberId(memberUtil.getCurrentMember().getId()) + 1;
         Mission mission =
                 Mission.createMission(
                         createMissionRequest.getName(),
                         createMissionRequest.getContent(),
-                        1,
+						maxSort,
                         createMissionRequest.getCategory(),
                         createMissionRequest.getVisibility(),
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusWeeks(2),
-                        member);
+                        startedAt,
+						startedAt.plusWeeks(2),
+                        memberUtil.getCurrentMember());
         return missionRepository.save(mission);
     }
 
-    public Mission findMission(Long missionId) {
+    public MissionResponse findMission(Long missionId) {
         return missionRepository
                 .findByMissionId(missionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
     }
 
-    public Slice<MissionResponse> listMission(Long memberId, int size, Long lastId) {
+    public Slice<MissionResponse> listMission(int size, Long lastId) {
         Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
-        return missionRepository.findMissionList(memberId, pageable, lastId);
+
+        return missionRepository.findMissionList(memberUtil.getCurrentMember(), pageable, lastId);
     }
 
     @Transactional

@@ -6,7 +6,6 @@ import com.depromeet.domain.mission.dto.request.CreateMissionRequest;
 import com.depromeet.domain.mission.dto.request.ModifyMissionRequest;
 import com.depromeet.domain.mission.dto.response.MissionResponse;
 import com.depromeet.domain.mission.service.MissionService;
-import com.depromeet.global.util.SecurityUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
@@ -20,22 +19,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class MissionController implements MissionApi {
 
     private final MissionService missionService;
-    private final SecurityUtil securityUtil;
 
     @Override
     public Mission missionAdd(@Valid CreateMissionRequest createMissionRequest) {
-        return missionService.addMission(createMissionRequest, securityUtil.getCurrentMemberId());
+        return missionService.addMission(createMissionRequest);
     }
 
     @Override
-    public Mission missionDetails(@PathVariable(value = "missionId") Long missionId) {
+    public MissionResponse missionDetails(@PathVariable(value = "missionId") Long missionId) {
         return missionService.findMission(missionId);
     }
 
     @Override
     public Slice<MissionResponse> missionList(
             @RequestParam int size, @RequestParam(required = false) Long lastId) {
-        return missionService.listMission(securityUtil.getCurrentMemberId(), size, lastId);
+        return missionService.listMission(size, lastId);
     }
 
     @Override

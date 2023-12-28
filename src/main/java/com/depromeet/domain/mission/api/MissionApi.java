@@ -30,7 +30,7 @@ public interface MissionApi {
 
     @Operation(summary = "미션 단건 조회", description = "미션을 한 개를 조회합니다.")
     @GetMapping("/{missionId}")
-    Mission missionDetails(@PathVariable(value = "missionId") Long missionId);
+    MissionResponse missionDetails(@PathVariable(value = "missionId") Long missionId);
 
     @Operation(summary = "미션 리스트 조회", description = "미션 리스트를 조회합니다. (무한 스크롤)")
     @GetMapping("")

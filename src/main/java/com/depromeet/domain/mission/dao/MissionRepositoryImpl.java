@@ -3,6 +3,7 @@ package com.depromeet.domain.mission.dao;
 import static com.depromeet.domain.mission.domain.QMission.mission;
 import static com.depromeet.domain.missionRecord.domain.QMissionRecord.missionRecord;
 
+import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.dto.response.MissionResponse;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -25,7 +26,7 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Optional<Mission> findByMissionId(Long missionId) {
+    public Optional<MissionResponse> findByMissionId(Long missionId) {
         Mission findMission =
                 jpaQueryFactory
                         .selectFrom(mission)
@@ -33,15 +34,15 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                         .fetchJoin()
                         .where(mission.id.eq(missionId))
                         .fetchOne();
-        return Optional.ofNullable(findMission);
+        return Optional.ofNullable(findMission).map(MissionResponse::new);
     }
 
     @Override
-    public Slice<MissionResponse> findMissionList(Long memberId, Pageable pageable, Long lastId) {
+    public Slice<MissionResponse> findMissionList(Member member, Pageable pageable, Long lastId) {
         JPAQuery<Mission> query =
                 jpaQueryFactory
                         .selectFrom(mission)
-                        .where(ltMissionId(lastId), memberIdEq(memberId))
+                        .where(ltMissionId(lastId), memberIdEq(member.getId()))
                         .orderBy(mission.id.desc())
                         .limit(pageable.getPageSize() + 1);
 
