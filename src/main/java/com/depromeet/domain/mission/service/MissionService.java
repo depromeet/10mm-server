@@ -26,18 +26,19 @@ public class MissionService {
 
     @Transactional
     public Mission addMission(CreateMissionRequest createMissionRequest) {
-		LocalDateTime startedAt = LocalDateTime.now();
+        LocalDateTime startedAt = LocalDateTime.now();
 
-		Integer maxSort = missionRepository.findMaxSortByMemberId(memberUtil.getCurrentMember().getId()) + 1;
+        Integer maxSort =
+                missionRepository.findMaxSortByMemberId(memberUtil.getCurrentMember().getId()) + 1;
         Mission mission =
                 Mission.createMission(
                         createMissionRequest.getName(),
                         createMissionRequest.getContent(),
-						maxSort,
+                        maxSort,
                         createMissionRequest.getCategory(),
                         createMissionRequest.getVisibility(),
                         startedAt,
-						startedAt.plusWeeks(2),
+                        startedAt.plusWeeks(2),
                         memberUtil.getCurrentMember());
         return missionRepository.save(mission);
     }

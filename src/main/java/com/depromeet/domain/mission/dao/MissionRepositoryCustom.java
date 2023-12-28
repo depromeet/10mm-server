@@ -10,6 +10,4 @@ public interface MissionRepositoryCustom {
     Optional<MissionResponse> findByMissionId(Long missionId);
 
     Slice<MissionResponse> findMissionList(Member member, Pageable pageable, Long lastId);
-
-
 }
