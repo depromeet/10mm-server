@@ -1,10 +1,10 @@
 package com.depromeet;
 
+import com.google.common.base.CaseFormat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Table;
-import jakarta.persistence.metamodel.EntityType;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,14 +23,11 @@ public class DatabaseCleaner implements InitializingBean {
                 entityManager.getMetamodel().getEntities().stream()
                         .filter(e -> e.getJavaType().getAnnotation(Entity.class) != null)
                         .filter(e -> e.getJavaType().getAnnotation(Table.class) == null)
-                        .map(EntityType::getName)
+                        .map(
+                                e ->
+                                        CaseFormat.UPPER_CAMEL.to(
+                                                CaseFormat.LOWER_UNDERSCORE, e.getName()))
                         .collect(Collectors.toList());
-        List<String> tableNamesWithAnnotation =
-                entityManager.getMetamodel().getEntities().stream()
-                        .filter(e -> e.getJavaType().getAnnotation(Table.class) != null)
-                        .map(e -> e.getJavaType().getAnnotation(Table.class).name())
-                        .toList();
-        tableNames.addAll(tableNamesWithAnnotation);
     }
 
     @Transactional
