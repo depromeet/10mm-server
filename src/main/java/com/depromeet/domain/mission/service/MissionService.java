@@ -10,6 +10,7 @@ import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MissionService {
@@ -28,15 +30,16 @@ public class MissionService {
     public Mission addMission(CreateMissionRequest createMissionRequest) {
         LocalDateTime startedAt = LocalDateTime.now();
 
-        Integer maxSort =
-                missionRepository.findMaxSortByMemberId(memberUtil.getCurrentMember().getId()) + 1;
+        Mission missionByMaxSort =
+                missionRepository.findTopByMemberOrderBySortDesc(memberUtil.getCurrentMember());
+        Integer maxSort = missionByMaxSort == null ? 1 : missionByMaxSort.getSort() + 1;
         Mission mission =
                 Mission.createMission(
-                        createMissionRequest.getName(),
-                        createMissionRequest.getContent(),
+                        createMissionRequest.name(),
+                        createMissionRequest.content(),
                         maxSort,
-                        createMissionRequest.getCategory(),
-                        createMissionRequest.getVisibility(),
+                        createMissionRequest.category(),
+                        createMissionRequest.visibility(),
                         startedAt,
                         startedAt.plusWeeks(2),
                         memberUtil.getCurrentMember());
@@ -62,9 +65,9 @@ public class MissionService {
                         .findById(missionId)
                         .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
         mission.modifyMission(
-                modifyMissionRequest.getName(),
-                modifyMissionRequest.getContent(),
-                modifyMissionRequest.getVisibility());
+                modifyMissionRequest.name(),
+                modifyMissionRequest.content(),
+                modifyMissionRequest.visibility());
         return mission;
     }
 

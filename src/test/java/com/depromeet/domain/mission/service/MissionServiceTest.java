@@ -3,9 +3,6 @@ package com.depromeet.domain.mission.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.depromeet.domain.member.dao.MemberRepository;
-import com.depromeet.domain.member.domain.Member;
-import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
@@ -15,7 +12,6 @@ import com.depromeet.domain.mission.dto.request.ModifyMissionRequest;
 import com.depromeet.domain.mission.dto.response.MissionResponse;
 import java.util.List;
 import java.util.stream.IntStream;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,23 +24,10 @@ class MissionServiceTest {
 
     @Autowired private MissionService missionService;
     @Autowired private MissionRepository missionRepository;
-    @Autowired private MemberRepository memberRepository;
-
-    Member member;
-    Member saveMember;
 
     @BeforeEach
     void setUp() {
-        memberRepository.deleteAll();
         missionRepository.deleteAll();
-        member = Member.createNormalMember(new Profile("testNickname", "testProfileImageUrl"));
-        saveMember = memberRepository.save(member);
-    }
-
-    @AfterEach
-    void tearDown() {
-        missionRepository.deleteAll();
-        memberRepository.deleteAll();
     }
 
     @Test
@@ -58,7 +41,7 @@ class MissionServiceTest {
                         MissionVisibility.ALL);
 
         // when
-        missionService.addMission(createMissionRequest, saveMember.getId());
+        missionService.addMission(createMissionRequest);
 
         // expected
         Mission mission = missionRepository.findAll().get(0);
@@ -81,7 +64,7 @@ class MissionServiceTest {
                 assertThrows(
                         DataIntegrityViolationException.class,
                         () -> {
-                            missionService.addMission(createMissionRequest, saveMember.getId());
+                            missionService.addMission(createMissionRequest);
                         });
 
         // expected
@@ -100,16 +83,16 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        Mission saveMission = missionService.addMission(createMissionRequest, saveMember.getId());
+        Mission saveMission = missionService.addMission(createMissionRequest);
 
         // when
-        Mission findMission = missionService.findMission(saveMission.getId());
+        MissionResponse findMission = missionService.findMission(saveMission.getId());
 
         // expected
-        assertEquals(findMission.getName(), "testMissionName");
-        assertEquals(findMission.getContent(), "testMissionContent");
-        assertEquals(findMission.getCategory().getValue(), "공부");
-        assertEquals(findMission.getVisibility().getValue(), "전체 공개");
+        assertEquals(findMission.name(), "testMissionName");
+        assertEquals(findMission.content(), "testMissionContent");
+        assertEquals(findMission.category(), "공부");
+        assertEquals(findMission.visibility(), "전체 공개");
     }
 
     @Test
@@ -126,10 +109,9 @@ class MissionServiceTest {
                                                 MissionVisibility.ALL))
                         .toList();
 
-        createMissionRequests.forEach(
-                request -> missionService.addMission(request, saveMember.getId()));
+        createMissionRequests.forEach(request -> missionService.addMission(request));
         // when
-        Slice<MissionResponse> missionList = missionService.listMission(saveMember.getId(), 4, 30L);
+        Slice<MissionResponse> missionList = missionService.listMission(4, 30L);
 
         // expected
         assertThat(missionList.getContent().size()).isEqualTo(4);
@@ -153,7 +135,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        Mission saveMission = missionService.addMission(createMissionRequest, saveMember.getId());
+        Mission saveMission = missionService.addMission(createMissionRequest);
         ModifyMissionRequest modifyMissionRequest =
                 new ModifyMissionRequest("modifyName", "modifyContent", MissionVisibility.FOLLOWER);
 
@@ -176,7 +158,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        Mission saveMission = missionService.addMission(createMissionRequest, saveMember.getId());
+        Mission saveMission = missionService.addMission(createMissionRequest);
 
         // when
         missionService.removeMission(saveMission.getId());
