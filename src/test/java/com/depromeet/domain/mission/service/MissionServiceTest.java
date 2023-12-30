@@ -59,19 +59,12 @@ class MissionServiceTest {
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
 
-        // when
-        DataIntegrityViolationException e =
-                assertThrows(
-                        DataIntegrityViolationException.class,
-                        () -> {
-                            missionService.addMission(createMissionRequest);
-                        });
-
         // expected
-        // 예외 메시지 확인
-        assertTrue(
-                e.getMessage()
-                        .contains("Value too long for column \"NAME CHARACTER VARYING(20)\""));
+		assertThatThrownBy(() -> missionService.addMission(createMissionRequest))
+			// instance 검증
+			.isInstanceOf(DataIntegrityViolationException.class)
+        	// 예외 메시지 확인
+			.hasMessageContaining("Value too long for column \"NAME CHARACTER VARYING(20)\"");
     }
 
     @Test
