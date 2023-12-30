@@ -18,7 +18,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class MissionServiceTest {
@@ -44,7 +47,7 @@ class MissionServiceTest {
                         MissionVisibility.ALL);
 
         // when
-        missionService.addMission(createMissionRequest);
+        missionService.craeteMission(createMissionRequest);
 
         // expected
         Mission mission = missionRepository.findAll().get(0);
@@ -63,7 +66,7 @@ class MissionServiceTest {
                         MissionVisibility.ALL);
 
         // expected
-        assertThatThrownBy(() -> missionService.addMission(createMissionRequest))
+        assertThatThrownBy(() -> missionService.craeteMission(createMissionRequest))
                 // instance 검증
                 .isInstanceOf(DataIntegrityViolationException.class)
                 // 예외 메시지 확인
@@ -79,10 +82,10 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        Mission saveMission = missionService.addMission(createMissionRequest);
+        Mission saveMission = missionService.craeteMission(createMissionRequest);
 
         // when
-        MissionResponse findMission = missionService.findMission(saveMission.getId());
+        MissionResponse findMission = missionService.findOneMission(saveMission.getId());
 
         // expected
         assertEquals(findMission.name(), "testMissionName");
@@ -105,9 +108,10 @@ class MissionServiceTest {
                                                 MissionVisibility.ALL))
                         .toList();
 
-        createMissionRequests.forEach(request -> missionService.addMission(request));
+        createMissionRequests.forEach(request -> missionService.craeteMission(request));
+        Pageable pageable = PageRequest.of(0, 4, Sort.by(Sort.Direction.DESC, "id"));
         // when
-        Slice<MissionResponse> missionList = missionService.listMission(4, 30L);
+        Slice<MissionResponse> missionList = missionService.findAllMission(pageable, 30L);
 
         // expected
         assertThat(missionList.getContent().size()).isEqualTo(4);
@@ -131,13 +135,13 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        Mission saveMission = missionService.addMission(createMissionRequest);
+        Mission saveMission = missionService.craeteMission(createMissionRequest);
         ModifyMissionRequest modifyMissionRequest =
                 new ModifyMissionRequest("modifyName", "modifyContent", MissionVisibility.FOLLOWER);
 
         // when
         Mission modifyMission =
-                missionService.modifyMission(modifyMissionRequest, saveMission.getId());
+                missionService.updateMission(modifyMissionRequest, saveMission.getId());
 
         // expected
         assertEquals(modifyMission.getName(), "modifyName");
@@ -154,10 +158,10 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        Mission saveMission = missionService.addMission(createMissionRequest);
+        Mission saveMission = missionService.craeteMission(createMissionRequest);
 
         // when
-        missionService.removeMission(saveMission.getId());
+        missionService.deleteMission(saveMission.getId());
 
         // expected
         assertThat(missionRepository.findAll()).isEmpty();

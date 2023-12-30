@@ -51,7 +51,6 @@ public class MissionService {
 
     public Slice<MissionResponse> findAllMission(Pageable pageable, Long lastId) {
         PageRequest pageRequest = PageRequest.of(0, pageable.getPageSize(), pageable.getSort());
-
         return missionRepository.findAllMission(memberUtil.getCurrentMember(), pageRequest, lastId);
     }
 
