@@ -3,6 +3,7 @@ package com.depromeet.domain.mission.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.depromeet.DatabaseCleaner;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
@@ -19,14 +20,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Slice;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class MissionServiceTest {
 
     @Autowired private MissionService missionService;
     @Autowired private MissionRepository missionRepository;
+	@Autowired private DatabaseCleaner databaseCleaner;
 
     @BeforeEach
     void setUp() {
+		databaseCleaner.execute();
         missionRepository.deleteAll();
     }
 
