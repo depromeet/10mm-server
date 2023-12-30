@@ -8,10 +8,10 @@ import jakarta.persistence.Table;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Component
 public class DatabaseCleaner implements InitializingBean {
 
     @PersistenceContext private EntityManager entityManager;
