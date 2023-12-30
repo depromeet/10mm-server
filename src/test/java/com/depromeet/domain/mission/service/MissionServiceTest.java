@@ -25,11 +25,11 @@ class MissionServiceTest {
 
     @Autowired private MissionService missionService;
     @Autowired private MissionRepository missionRepository;
-	@Autowired private DatabaseCleaner databaseCleaner;
+    @Autowired private DatabaseCleaner databaseCleaner;
 
     @BeforeEach
     void setUp() {
-		databaseCleaner.execute();
+        databaseCleaner.execute();
         missionRepository.deleteAll();
     }
 
@@ -63,11 +63,11 @@ class MissionServiceTest {
                         MissionVisibility.ALL);
 
         // expected
-		assertThatThrownBy(() -> missionService.addMission(createMissionRequest))
-			// instance 검증
-			.isInstanceOf(DataIntegrityViolationException.class)
-        	// 예외 메시지 확인
-			.hasMessageContaining("Value too long for column \"NAME CHARACTER VARYING(20)\"");
+        assertThatThrownBy(() -> missionService.addMission(createMissionRequest))
+                // instance 검증
+                .isInstanceOf(DataIntegrityViolationException.class)
+                // 예외 메시지 확인
+                .hasMessageContaining("Value too long for column \"NAME CHARACTER VARYING(20)\"");
     }
 
     @Test
