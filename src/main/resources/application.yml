@@ -8,6 +8,8 @@ spring:
 
 swagger:
   version: 0.0.1
+  user: ${SWAGGER_USER:default}
+  password: ${SWAGGER_PASSWORD:default}
 springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
