@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +24,7 @@ public class MissionService {
     private final MemberUtil memberUtil;
 
     @Transactional
-    public Mission addMission(CreateMissionRequest createMissionRequest) {
+    public Mission craeteMission(CreateMissionRequest createMissionRequest) {
         LocalDateTime startedAt = LocalDateTime.now();
 
         Mission missionByMaxSort =
@@ -44,20 +43,20 @@ public class MissionService {
         return missionRepository.save(mission);
     }
 
-    public MissionResponse findMission(Long missionId) {
+    public MissionResponse findOneMission(Long missionId) {
         return missionRepository
                 .findByMissionId(missionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
     }
 
-    public Slice<MissionResponse> listMission(int size, Long lastId) {
-        Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
+    public Slice<MissionResponse> findAllMission(Pageable pageable, Long lastId) {
+        PageRequest pageRequest = PageRequest.of(0, pageable.getPageSize(), pageable.getSort());
 
-        return missionRepository.findMissionList(memberUtil.getCurrentMember(), pageable, lastId);
+        return missionRepository.findAllMission(memberUtil.getCurrentMember(), pageRequest, lastId);
     }
 
     @Transactional
-    public Mission modifyMission(ModifyMissionRequest modifyMissionRequest, Long missionId) {
+    public Mission updateMission(ModifyMissionRequest modifyMissionRequest, Long missionId) {
         Mission mission =
                 missionRepository
                         .findById(missionId)
@@ -70,7 +69,7 @@ public class MissionService {
     }
 
     @Transactional
-    public void removeMission(Long missionId) {
+    public void deleteMission(Long missionId) {
         missionRepository.deleteById(missionId);
     }
 }

@@ -36,7 +36,7 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     }
 
     @Override
-    public Slice<MissionResponse> findMissionList(Member member, Pageable pageable, Long lastId) {
+    public Slice<MissionResponse> findAllMission(Member member, Pageable pageable, Long lastId) {
         JPAQuery<Mission> query =
                 jpaQueryFactory
                         .selectFrom(mission)

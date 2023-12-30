@@ -9,5 +9,5 @@ import org.springframework.data.domain.Slice;
 public interface MissionRepositoryCustom {
     Optional<MissionResponse> findByMissionId(Long missionId);
 
-    Slice<MissionResponse> findMissionList(Member member, Pageable pageable, Long lastId);
+    Slice<MissionResponse> findAllMission(Member member, Pageable pageable, Long lastId);
 }
