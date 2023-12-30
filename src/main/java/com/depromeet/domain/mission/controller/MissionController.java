@@ -5,7 +5,7 @@ import static org.springframework.data.domain.Sort.Direction.*;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.dto.request.CreateMissionRequest;
 import com.depromeet.domain.mission.dto.request.ModifyMissionRequest;
-import com.depromeet.domain.mission.dto.response.MissionResponse;
+import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.service.MissionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,13 +40,13 @@ public class MissionController {
 
     @Operation(summary = "미션 단건 조회", description = "미션을 한 개를 조회합니다.")
     @GetMapping("/{missionId}")
-    public MissionResponse missionFindOne(@PathVariable Long missionId) {
+    public MissionFindResponse missionFindOne(@PathVariable Long missionId) {
         return missionService.findOneMission(missionId);
     }
 
     @Operation(summary = "미션 리스트 조회", description = "미션 리스트를 조회합니다. (무한 스크롤)")
     @GetMapping
-    public Slice<MissionResponse> missionFindAll(
+    public Slice<MissionFindResponse> missionFindAll(
             @PageableDefault(sort = "id", direction = DESC) Pageable pageable,
             @RequestParam(required = false) Long lastId) {
         return missionService.findAllMission(pageable, lastId);

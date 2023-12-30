@@ -4,7 +4,7 @@ import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.dto.request.CreateMissionRequest;
 import com.depromeet.domain.mission.dto.request.ModifyMissionRequest;
-import com.depromeet.domain.mission.dto.response.MissionResponse;
+import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -43,13 +43,13 @@ public class MissionService {
         return missionRepository.save(mission);
     }
 
-    public MissionResponse findOneMission(Long missionId) {
+    public MissionFindResponse findOneMission(Long missionId) {
         return missionRepository
                 .findByMissionId(missionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
     }
 
-    public Slice<MissionResponse> findAllMission(Pageable pageable, Long lastId) {
+    public Slice<MissionFindResponse> findAllMission(Pageable pageable, Long lastId) {
         PageRequest pageRequest = PageRequest.of(0, pageable.getPageSize(), pageable.getSort());
         return missionRepository.findAllMission(memberUtil.getCurrentMember(), pageRequest, lastId);
     }

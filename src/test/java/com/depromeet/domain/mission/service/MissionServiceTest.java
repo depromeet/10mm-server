@@ -10,7 +10,7 @@ import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.CreateMissionRequest;
 import com.depromeet.domain.mission.dto.request.ModifyMissionRequest;
-import com.depromeet.domain.mission.dto.response.MissionResponse;
+import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,7 +85,7 @@ class MissionServiceTest {
         Mission saveMission = missionService.craeteMission(createMissionRequest);
 
         // when
-        MissionResponse findMission = missionService.findOneMission(saveMission.getId());
+        MissionFindResponse findMission = missionService.findOneMission(saveMission.getId());
 
         // expected
         assertEquals(findMission.name(), "testMissionName");
@@ -111,7 +111,7 @@ class MissionServiceTest {
         createMissionRequests.forEach(request -> missionService.craeteMission(request));
         Pageable pageable = PageRequest.of(0, 4, Sort.by(Sort.Direction.DESC, "id"));
         // when
-        Slice<MissionResponse> missionList = missionService.findAllMission(pageable, 30L);
+        Slice<MissionFindResponse> missionList = missionService.findAllMission(pageable, 30L);
 
         // expected
         assertThat(missionList.getContent().size()).isEqualTo(4);

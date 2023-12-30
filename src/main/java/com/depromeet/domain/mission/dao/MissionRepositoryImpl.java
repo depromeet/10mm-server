@@ -5,7 +5,7 @@ import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.domain.Mission;
-import com.depromeet.domain.mission.dto.response.MissionResponse;
+import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -24,7 +24,7 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Optional<MissionResponse> findByMissionId(Long missionId) {
+    public Optional<MissionFindResponse> findByMissionId(Long missionId) {
         Mission findMission =
                 jpaQueryFactory
                         .selectFrom(mission)
@@ -32,11 +32,12 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                         .fetchJoin()
                         .where(mission.id.eq(missionId))
                         .fetchOne();
-        return Optional.ofNullable(findMission).map(MissionResponse::new);
+        return Optional.ofNullable(findMission).map(MissionFindResponse::new);
     }
 
     @Override
-    public Slice<MissionResponse> findAllMission(Member member, Pageable pageable, Long lastId) {
+    public Slice<MissionFindResponse> findAllMission(
+            Member member, Pageable pageable, Long lastId) {
         JPAQuery<Mission> query =
                 jpaQueryFactory
                         .selectFrom(mission)
@@ -45,8 +46,8 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                         .limit(pageable.getPageSize() + 1);
 
         List<Mission> missions = query.fetch();
-        List<MissionResponse> list =
-                missions.stream().map(MissionResponse::new).collect(Collectors.toList());
+        List<MissionFindResponse> list =
+                missions.stream().map(MissionFindResponse::new).collect(Collectors.toList());
         return checkLastPage(pageable, list);
     }
 
@@ -59,8 +60,8 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     }
 
     // 무한 스크롤 방식 처리하는 메서드
-    private Slice<MissionResponse> checkLastPage(
-            Pageable pageable, List<MissionResponse> resultDtos) {
+    private Slice<MissionFindResponse> checkLastPage(
+            Pageable pageable, List<MissionFindResponse> resultDtos) {
 
         boolean hasNext = false;
 
