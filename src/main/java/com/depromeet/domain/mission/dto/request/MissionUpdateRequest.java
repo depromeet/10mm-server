@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record ModifyMissionRequest(
+public record MissionUpdateRequest(
         @NotBlank(message = "이름은 비워둘 수 없습니다.")
                 @Size(min = 1, max = 20, message = "미션명은 1자 이상 20자 이하")
                 @Schema(description = "미션 이름")

@@ -2,8 +2,8 @@ package com.depromeet.domain.mission.service;
 
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
-import com.depromeet.domain.mission.dto.request.CreateMissionRequest;
-import com.depromeet.domain.mission.dto.request.ModifyMissionRequest;
+import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
+import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
@@ -24,7 +24,7 @@ public class MissionService {
     private final MemberUtil memberUtil;
 
     @Transactional
-    public Mission craeteMission(CreateMissionRequest createMissionRequest) {
+    public Mission craeteMission(MissionCreateRequest missionCreateRequest) {
         LocalDateTime startedAt = LocalDateTime.now();
 
         Mission missionByMaxSort =
@@ -32,11 +32,11 @@ public class MissionService {
         Integer maxSort = missionByMaxSort == null ? 1 : missionByMaxSort.getSort() + 1;
         Mission mission =
                 Mission.createMission(
-                        createMissionRequest.name(),
-                        createMissionRequest.content(),
+                        missionCreateRequest.name(),
+                        missionCreateRequest.content(),
                         maxSort,
-                        createMissionRequest.category(),
-                        createMissionRequest.visibility(),
+                        missionCreateRequest.category(),
+                        missionCreateRequest.visibility(),
                         startedAt,
                         startedAt.plusWeeks(2),
                         memberUtil.getCurrentMember());
@@ -55,15 +55,15 @@ public class MissionService {
     }
 
     @Transactional
-    public Mission updateMission(ModifyMissionRequest modifyMissionRequest, Long missionId) {
+    public Mission updateMission(MissionUpdateRequest missionUpdateRequest, Long missionId) {
         Mission mission =
                 missionRepository
                         .findById(missionId)
                         .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
         mission.modifyMission(
-                modifyMissionRequest.name(),
-                modifyMissionRequest.content(),
-                modifyMissionRequest.visibility());
+                missionUpdateRequest.name(),
+                missionUpdateRequest.content(),
+                missionUpdateRequest.visibility());
         return mission;
     }
 

@@ -8,8 +8,8 @@ import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
-import com.depromeet.domain.mission.dto.request.CreateMissionRequest;
-import com.depromeet.domain.mission.dto.request.ModifyMissionRequest;
+import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
+import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -39,15 +39,15 @@ class MissionServiceTest {
     @Test
     void 공부_미션_생성_성공() {
         // given
-        CreateMissionRequest createMissionRequest =
-                new CreateMissionRequest(
+        MissionCreateRequest missionCreateRequest =
+                new MissionCreateRequest(
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
 
         // when
-        missionService.craeteMission(createMissionRequest);
+        missionService.craeteMission(missionCreateRequest);
 
         // expected
         Mission mission = missionRepository.findAll().get(0);
@@ -58,15 +58,15 @@ class MissionServiceTest {
     @Test
     void 미션이름_초과_생성_실패() {
         // given
-        CreateMissionRequest createMissionRequest =
-                new CreateMissionRequest(
+        MissionCreateRequest missionCreateRequest =
+                new MissionCreateRequest(
                         "testMissionNameMoreThan",
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
 
         // expected
-        assertThatThrownBy(() -> missionService.craeteMission(createMissionRequest))
+        assertThatThrownBy(() -> missionService.craeteMission(missionCreateRequest))
                 // instance 검증
                 .isInstanceOf(DataIntegrityViolationException.class)
                 // 예외 메시지 확인
@@ -76,13 +76,13 @@ class MissionServiceTest {
     @Test
     void 미션_단건_조회_성공() {
         // given
-        CreateMissionRequest createMissionRequest =
-                new CreateMissionRequest(
+        MissionCreateRequest missionCreateRequest =
+                new MissionCreateRequest(
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        Mission saveMission = missionService.craeteMission(createMissionRequest);
+        Mission saveMission = missionService.craeteMission(missionCreateRequest);
 
         // when
         MissionFindResponse findMission = missionService.findOneMission(saveMission.getId());
@@ -97,18 +97,18 @@ class MissionServiceTest {
     @Test
     void 미션_리스트_조회_성공() {
         // given
-        List<CreateMissionRequest> createMissionRequests =
+        List<MissionCreateRequest> missionCreateRequests =
                 IntStream.range(1, 41)
                         .mapToObj(
                                 i ->
-                                        new CreateMissionRequest(
+                                        new MissionCreateRequest(
                                                 "testMissionName_" + i,
                                                 "testMissionContent_" + i,
                                                 MissionCategory.STUDY,
                                                 MissionVisibility.ALL))
                         .toList();
 
-        createMissionRequests.forEach(request -> missionService.craeteMission(request));
+        missionCreateRequests.forEach(request -> missionService.craeteMission(request));
         Pageable pageable = PageRequest.of(0, 4, Sort.by(Sort.Direction.DESC, "id"));
         // when
         Slice<MissionFindResponse> missionList = missionService.findAllMission(pageable, 30L);
@@ -129,19 +129,19 @@ class MissionServiceTest {
     @Test
     void 미션_수정_성공() {
         // given
-        CreateMissionRequest createMissionRequest =
-                new CreateMissionRequest(
+        MissionCreateRequest missionCreateRequest =
+                new MissionCreateRequest(
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        Mission saveMission = missionService.craeteMission(createMissionRequest);
-        ModifyMissionRequest modifyMissionRequest =
-                new ModifyMissionRequest("modifyName", "modifyContent", MissionVisibility.FOLLOWER);
+        Mission saveMission = missionService.craeteMission(missionCreateRequest);
+        MissionUpdateRequest missionUpdateRequest =
+                new MissionUpdateRequest("modifyName", "modifyContent", MissionVisibility.FOLLOWER);
 
         // when
         Mission modifyMission =
-                missionService.updateMission(modifyMissionRequest, saveMission.getId());
+                missionService.updateMission(missionUpdateRequest, saveMission.getId());
 
         // expected
         assertEquals(modifyMission.getName(), "modifyName");
@@ -152,13 +152,13 @@ class MissionServiceTest {
     @Test
     void 미션_삭제_성공() {
         // given
-        CreateMissionRequest createMissionRequest =
-                new CreateMissionRequest(
+        MissionCreateRequest missionCreateRequest =
+                new MissionCreateRequest(
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        Mission saveMission = missionService.craeteMission(createMissionRequest);
+        Mission saveMission = missionService.craeteMission(missionCreateRequest);
 
         // when
         missionService.deleteMission(saveMission.getId());

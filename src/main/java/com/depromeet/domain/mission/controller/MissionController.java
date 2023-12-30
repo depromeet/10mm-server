@@ -3,8 +3,8 @@ package com.depromeet.domain.mission.controller;
 import static org.springframework.data.domain.Sort.Direction.*;
 
 import com.depromeet.domain.mission.domain.Mission;
-import com.depromeet.domain.mission.dto.request.CreateMissionRequest;
-import com.depromeet.domain.mission.dto.request.ModifyMissionRequest;
+import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
+import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.service.MissionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,8 +34,8 @@ public class MissionController {
 
     @Operation(summary = "미션 생성", description = "미션을 생성합니다.")
     @PostMapping
-    public Mission missionCreate(@Valid CreateMissionRequest createMissionRequest) {
-        return missionService.craeteMission(createMissionRequest);
+    public Mission missionCreate(@Valid MissionCreateRequest missionCreateRequest) {
+        return missionService.craeteMission(missionCreateRequest);
     }
 
     @Operation(summary = "미션 단건 조회", description = "미션을 한 개를 조회합니다.")
@@ -55,9 +55,9 @@ public class MissionController {
     @Operation(summary = "미션 단건 수정", description = "단건 미션을 수정합니다.")
     @PutMapping("/{missionId}")
     public Mission missionUpdate(
-            @Valid @RequestBody ModifyMissionRequest modifyMissionRequest,
+            @Valid @RequestBody MissionUpdateRequest missionUpdateRequest,
             @PathVariable Long missionId) {
-        return missionService.updateMission(modifyMissionRequest, missionId);
+        return missionService.updateMission(missionUpdateRequest, missionId);
     }
 
     @Operation(summary = "미션 단건 삭제", description = "단건 미션을 삭제합니다.")
