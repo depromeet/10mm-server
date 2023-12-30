@@ -2,13 +2,13 @@ package com.depromeet.global.config.security;
 
 import java.util.Collection;
 import java.util.Collections;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-@Getter
+import lombok.AllArgsConstructor;
+
 @AllArgsConstructor
 public class PrincipalDetails implements UserDetails {
 
