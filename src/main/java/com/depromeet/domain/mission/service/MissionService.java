@@ -27,7 +27,7 @@ public class MissionService {
     @Transactional
     public Mission craeteMission(MissionCreateRequest missionCreateRequest) {
         LocalDateTime startedAt = LocalDateTime.now();
-		final Member member = memberUtil.getCurrentMember();
+        final Member member = memberUtil.getCurrentMember();
 
         Mission missionByMaxSort =
                 missionRepository.findTopByMemberOrderBySortDesc(memberUtil.getCurrentMember());
@@ -42,7 +42,7 @@ public class MissionService {
                         missionCreateRequest.visibility(),
                         startedAt,
                         startedAt.plusWeeks(2),
-						member);
+                        member);
         return missionRepository.save(mission);
     }
 
