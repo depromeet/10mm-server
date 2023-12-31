@@ -14,5 +14,5 @@ public record MissionUpdateRequest(
         @Size(min = 1, max = 30, message = "미션 내용은 1자 이상 30자 이하")
                 @Schema(description = "미션 내용", defaultValue = "default content")
                 String content,
-        @NotNull @Schema(description = "미션 공개여부", defaultValue = "공개")
+        @NotNull @Schema(description = "미션 공개여부", defaultValue = "ALL")
                 MissionVisibility visibility) {}
