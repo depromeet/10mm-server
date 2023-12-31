@@ -111,6 +111,9 @@ public class Mission extends BaseTimeEntity {
     }
 
     public void modifyMission(String name, String content, MissionVisibility visibility) {
+        if (visibility == null) {
+            throw new IllegalArgumentException("MissionVisibility cannot be null");
+        }
         this.name = name;
         this.content = content;
         this.visibility = visibility;

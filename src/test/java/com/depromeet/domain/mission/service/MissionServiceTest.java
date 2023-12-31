@@ -150,6 +150,80 @@ class MissionServiceTest {
     }
 
     @Test
+    void 미션_이름_null_수정_실패() {
+        // given
+        MissionCreateRequest missionCreateRequest =
+                new MissionCreateRequest(
+                        "testMissionName",
+                        "testMissionContent",
+                        MissionCategory.STUDY,
+                        MissionVisibility.ALL);
+        Mission saveMission = missionService.craeteMission(missionCreateRequest);
+        MissionUpdateRequest missionUpdateRequest =
+                new MissionUpdateRequest(null, "modifyContent", MissionVisibility.FOLLOWER);
+
+        // when & expected
+        assertThatThrownBy(
+                        () ->
+                                missionService.updateMission(
+                                        missionUpdateRequest, saveMission.getId()))
+                // instance 검증
+                .isInstanceOf(DataIntegrityViolationException.class)
+                // 예외 메시지 확인
+                .hasMessageContaining("not-null property references a null or transient value");
+    }
+
+    @Test
+    void 미션_수정_공개여부_null_예외처리() {
+        // given
+        MissionCreateRequest missionCreateRequest =
+                new MissionCreateRequest(
+                        "testMissionName",
+                        "testMissionContent",
+                        MissionCategory.STUDY,
+                        MissionVisibility.ALL);
+        Mission saveMission = missionService.craeteMission(missionCreateRequest);
+        MissionUpdateRequest missionUpdateRequest =
+                new MissionUpdateRequest("modifyName", "modifyContent", null);
+
+        // when
+        IllegalArgumentException exception =
+                assertThrows(
+                        IllegalArgumentException.class,
+                        () -> {
+                            missionService.updateMission(missionUpdateRequest, saveMission.getId());
+                        });
+
+        // expected
+        assertEquals(exception.getMessage(), "MissionVisibility cannot be null");
+    }
+
+    @Test
+    void 미션_이름_초과_수정_실패() {
+        // given
+        MissionCreateRequest missionCreateRequest =
+                new MissionCreateRequest(
+                        "testMissionName",
+                        "testMissionContent",
+                        MissionCategory.STUDY,
+                        MissionVisibility.ALL);
+        Mission saveMission = missionService.craeteMission(missionCreateRequest);
+        MissionUpdateRequest missionUpdateRequest =
+                new MissionUpdateRequest(
+                        "modifyMissionName_test", "modifyContent", MissionVisibility.FOLLOWER);
+
+        // when & expected
+        assertThatThrownBy(
+                        () ->
+                                missionService.updateMission(
+                                        missionUpdateRequest, saveMission.getId()))
+                // instance 검증
+                .isInstanceOf(DataIntegrityViolationException.class)
+                // 예외 메시지 확인
+                .hasMessageContaining("Value too long for column \"NAME CHARACTER VARYING(20)\"");
+    }
+
+    @Test
     void 미션_삭제_성공() {
         // given
         MissionCreateRequest missionCreateRequest =
@@ -166,5 +240,23 @@ class MissionServiceTest {
         // expected
         assertThat(missionRepository.findAll()).isEmpty();
         assertThat(missionRepository.count()).isEqualTo(0);
+    }
+
+    @Test
+    void 미션_삭제_실패() {
+        // given
+        MissionCreateRequest missionCreateRequest =
+                new MissionCreateRequest(
+                        "testMissionName",
+                        "testMissionContent",
+                        MissionCategory.STUDY,
+                        MissionVisibility.ALL);
+        Mission saveMission = missionService.craeteMission(missionCreateRequest);
+
+        // when
+        missionService.deleteMission(200L);
+
+        // expected
+        assertThat(missionRepository.findAll()).isNotEmpty();
     }
 }
