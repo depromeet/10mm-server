@@ -1,5 +1,6 @@
 package com.depromeet.domain.mission.service;
 
+import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
@@ -26,10 +27,12 @@ public class MissionService {
     @Transactional
     public Mission craeteMission(MissionCreateRequest missionCreateRequest) {
         LocalDateTime startedAt = LocalDateTime.now();
+		final Member member = memberUtil.getCurrentMember();
 
         Mission missionByMaxSort =
                 missionRepository.findTopByMemberOrderBySortDesc(memberUtil.getCurrentMember());
         Integer maxSort = missionByMaxSort == null ? 1 : missionByMaxSort.getSort() + 1;
+
         Mission mission =
                 Mission.createMission(
                         missionCreateRequest.name(),
@@ -39,7 +42,7 @@ public class MissionService {
                         missionCreateRequest.visibility(),
                         startedAt,
                         startedAt.plusWeeks(2),
-                        memberUtil.getCurrentMember());
+						member);
         return missionRepository.save(mission);
     }
 
