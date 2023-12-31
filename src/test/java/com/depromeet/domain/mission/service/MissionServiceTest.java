@@ -11,6 +11,7 @@ import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
+import com.depromeet.global.error.exception.CustomException;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -187,15 +188,15 @@ class MissionServiceTest {
                 new MissionUpdateRequest("modifyName", "modifyContent", null);
 
         // when
-        IllegalArgumentException exception =
+        CustomException exception =
                 assertThrows(
-                        IllegalArgumentException.class,
+                        CustomException.class,
                         () -> {
                             missionService.updateMission(missionUpdateRequest, saveMission.getId());
                         });
 
         // expected
-        assertEquals(exception.getMessage(), "MissionVisibility cannot be null");
+        assertEquals(exception.getMessage(), "미션 공개 여부가 null입니다.");
     }
 
     @Test
