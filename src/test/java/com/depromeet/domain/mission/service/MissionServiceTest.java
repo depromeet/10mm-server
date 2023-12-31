@@ -10,7 +10,9 @@ import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
+import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
+import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
 import com.depromeet.global.error.exception.CustomException;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -83,10 +85,10 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        Mission saveMission = missionService.craeteMission(missionCreateRequest);
+        MissionCreateResponse saveMission = missionService.craeteMission(missionCreateRequest);
 
         // when
-        MissionFindResponse findMission = missionService.findOneMission(saveMission.getId());
+        MissionFindResponse findMission = missionService.findOneMission(saveMission.missionId());
 
         // expected
         assertEquals(findMission.name(), "testMissionName");
@@ -136,18 +138,18 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        Mission saveMission = missionService.craeteMission(missionCreateRequest);
+        MissionCreateResponse saveMission = missionService.craeteMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
                 new MissionUpdateRequest("modifyName", "modifyContent", MissionVisibility.FOLLOWER);
 
         // when
-        Mission modifyMission =
-                missionService.updateMission(missionUpdateRequest, saveMission.getId());
+        MissionUpdateResponse modifyMission =
+                missionService.updateMission(missionUpdateRequest, saveMission.missionId());
 
         // expected
-        assertEquals(modifyMission.getName(), "modifyName");
-        assertEquals(modifyMission.getContent(), "modifyContent");
-        assertEquals(modifyMission.getVisibility().getValue(), "팔로워에게 공개");
+        assertEquals(modifyMission.name(), "modifyName");
+        assertEquals(modifyMission.content(), "modifyContent");
+        assertEquals(modifyMission.visibility(), "팔로워에게 공개");
     }
 
     @Test
@@ -159,7 +161,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        Mission saveMission = missionService.craeteMission(missionCreateRequest);
+        MissionCreateResponse saveMission = missionService.craeteMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
                 new MissionUpdateRequest(null, "modifyContent", MissionVisibility.FOLLOWER);
 
@@ -167,7 +169,7 @@ class MissionServiceTest {
         assertThatThrownBy(
                         () ->
                                 missionService.updateMission(
-                                        missionUpdateRequest, saveMission.getId()))
+                                        missionUpdateRequest, saveMission.missionId()))
                 // instance 검증
                 .isInstanceOf(DataIntegrityViolationException.class)
                 // 예외 메시지 확인
@@ -183,7 +185,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        Mission saveMission = missionService.craeteMission(missionCreateRequest);
+        MissionCreateResponse saveMission = missionService.craeteMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
                 new MissionUpdateRequest("modifyName", "modifyContent", null);
 
@@ -192,7 +194,8 @@ class MissionServiceTest {
                 assertThrows(
                         CustomException.class,
                         () -> {
-                            missionService.updateMission(missionUpdateRequest, saveMission.getId());
+                            missionService.updateMission(
+                                    missionUpdateRequest, saveMission.missionId());
                         });
 
         // expected
@@ -208,7 +211,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        Mission saveMission = missionService.craeteMission(missionCreateRequest);
+        MissionCreateResponse saveMission = missionService.craeteMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
                 new MissionUpdateRequest(
                         "modifyMissionName_test", "modifyContent", MissionVisibility.FOLLOWER);
@@ -217,7 +220,7 @@ class MissionServiceTest {
         assertThatThrownBy(
                         () ->
                                 missionService.updateMission(
-                                        missionUpdateRequest, saveMission.getId()))
+                                        missionUpdateRequest, saveMission.missionId()))
                 // instance 검증
                 .isInstanceOf(DataIntegrityViolationException.class)
                 // 예외 메시지 확인
@@ -233,10 +236,10 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        Mission saveMission = missionService.craeteMission(missionCreateRequest);
+        MissionCreateResponse saveMission = missionService.craeteMission(missionCreateRequest);
 
         // when
-        missionService.deleteMission(saveMission.getId());
+        missionService.deleteMission(saveMission.missionId());
 
         // expected
         assertThat(missionRepository.findAll()).isEmpty();

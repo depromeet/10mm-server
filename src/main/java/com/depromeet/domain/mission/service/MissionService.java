@@ -5,7 +5,9 @@ import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
+import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
+import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -25,7 +27,7 @@ public class MissionService {
     private final MemberUtil memberUtil;
 
     @Transactional
-    public Mission craeteMission(MissionCreateRequest missionCreateRequest) {
+    public MissionCreateResponse craeteMission(MissionCreateRequest missionCreateRequest) {
         LocalDateTime startedAt = LocalDateTime.now();
         final Member member = memberUtil.getCurrentMember();
 
@@ -43,7 +45,7 @@ public class MissionService {
                         startedAt,
                         startedAt.plusWeeks(2),
                         member);
-        return missionRepository.save(mission);
+        return new MissionCreateResponse(missionRepository.save(mission));
     }
 
     public MissionFindResponse findOneMission(Long missionId) {
@@ -58,7 +60,8 @@ public class MissionService {
     }
 
     @Transactional
-    public Mission updateMission(MissionUpdateRequest missionUpdateRequest, Long missionId) {
+    public MissionUpdateResponse updateMission(
+            MissionUpdateRequest missionUpdateRequest, Long missionId) {
         Mission mission =
                 missionRepository
                         .findById(missionId)
@@ -67,7 +70,7 @@ public class MissionService {
                 missionUpdateRequest.name(),
                 missionUpdateRequest.content(),
                 missionUpdateRequest.visibility());
-        return mission;
+        return new MissionUpdateResponse(mission);
     }
 
     @Transactional
