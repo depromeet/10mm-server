@@ -1,4 +1,4 @@
-package com.depromeet.domain.mission.controller;
+package com.depromeet.domain.mission.api;
 
 import static org.springframework.data.domain.Sort.Direction.*;
 
