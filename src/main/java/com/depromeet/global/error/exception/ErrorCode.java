@@ -22,7 +22,8 @@ public enum ErrorCode {
 
     // Mission
     MISSION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 미션을 찾을 수 없습니다."),
-    ;
+
+    MISSION_VISIBILITY_NULL(HttpStatus.BAD_REQUEST, "미션 공개 여부가 null입니다.");
 
     private final HttpStatus status;
     private final String message;
