@@ -2,9 +2,9 @@ spring:
   profiles:
     group:
       test: "test"
-      local: "local, datasource"
-      dev: "dev, datasource, actuator"
-      prod: "prod, datasource, actuator"
+      local: "local, datasource, redis"
+      dev: "dev, datasource, redis, actuator"
+      prod: "prod, datasource, redis, actuator"
 
 swagger:
   version: 0.0.1
