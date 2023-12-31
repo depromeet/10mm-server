@@ -251,7 +251,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        Mission saveMission = missionService.craeteMission(missionCreateRequest);
+        missionService.craeteMission(missionCreateRequest);
 
         // when
         missionService.deleteMission(200L);
