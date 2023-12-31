@@ -34,7 +34,8 @@ public class MissionController {
 
     @Operation(summary = "미션 생성", description = "미션을 생성합니다.")
     @PostMapping
-    public Mission missionCreate(@Valid @RequestBody final MissionCreateRequest missionCreateRequest) {
+    public Mission missionCreate(
+            @Valid @RequestBody MissionCreateRequest missionCreateRequest) {
         return missionService.craeteMission(missionCreateRequest);
     }
 
