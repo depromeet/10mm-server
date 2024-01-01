@@ -21,10 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class MissionServiceTest {
@@ -114,9 +111,8 @@ class MissionServiceTest {
                         .toList();
 
         missionCreateRequests.forEach(request -> missionService.createMission(request));
-        Pageable pageable = PageRequest.of(0, 4, Sort.by(Sort.Direction.DESC, "id"));
         // when
-        Slice<MissionFindResponse> missionList = missionService.findAllMission(pageable, 30L);
+        Slice<MissionFindResponse> missionList = missionService.findAllMission(4, 30L);
 
         // expected
         assertThat(missionList.getContent().size()).isEqualTo(4);
