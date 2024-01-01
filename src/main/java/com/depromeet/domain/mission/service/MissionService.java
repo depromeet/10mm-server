@@ -66,7 +66,7 @@ public class MissionService {
                 missionRepository
                         .findById(missionId)
                         .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
-        mission.modifyMission(
+        mission.updateMission(
                 missionUpdateRequest.name(),
                 missionUpdateRequest.content(),
                 missionUpdateRequest.visibility());

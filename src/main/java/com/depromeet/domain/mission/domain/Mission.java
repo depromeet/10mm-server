@@ -112,7 +112,7 @@ public class Mission extends BaseTimeEntity {
                 .build();
     }
 
-    public void modifyMission(String name, String content, MissionVisibility visibility) {
+    public void updateMission(String name, String content, MissionVisibility visibility) {
         if (visibility == null) {
             throw new CustomException(ErrorCode.MISSION_VISIBILITY_NULL);
         }
