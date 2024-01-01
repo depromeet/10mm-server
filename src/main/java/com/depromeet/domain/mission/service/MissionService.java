@@ -27,7 +27,7 @@ public class MissionService {
     private final MemberUtil memberUtil;
 
     @Transactional
-    public MissionCreateResponse craeteMission(MissionCreateRequest missionCreateRequest) {
+    public MissionCreateResponse createMission(MissionCreateRequest missionCreateRequest) {
         LocalDateTime startedAt = LocalDateTime.now();
         final Member member = memberUtil.getCurrentMember();
 

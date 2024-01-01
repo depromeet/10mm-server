@@ -50,12 +50,14 @@ class MissionServiceTest {
                         MissionVisibility.ALL);
 
         // when
-        missionService.craeteMission(missionCreateRequest);
+        missionService.createMission(missionCreateRequest);
 
         // expected
         Mission mission = missionRepository.findAll().get(0);
         assertEquals("testMissionName", mission.getName());
         assertEquals("testMissionContent", mission.getContent());
+        assertEquals(MissionCategory.STUDY, mission.getCategory());
+        assertEquals(MissionVisibility.ALL, mission.getVisibility());
     }
 
     @Test
@@ -69,7 +71,7 @@ class MissionServiceTest {
                         MissionVisibility.ALL);
 
         // expected
-        assertThatThrownBy(() -> missionService.craeteMission(missionCreateRequest))
+        assertThatThrownBy(() -> missionService.createMission(missionCreateRequest))
                 // instance 검증
                 .isInstanceOf(DataIntegrityViolationException.class)
                 // 예외 메시지 확인
@@ -85,7 +87,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        MissionCreateResponse saveMission = missionService.craeteMission(missionCreateRequest);
+        MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
 
         // when
         MissionFindResponse findMission = missionService.findOneMission(saveMission.missionId());
@@ -93,8 +95,8 @@ class MissionServiceTest {
         // expected
         assertEquals(findMission.name(), "testMissionName");
         assertEquals(findMission.content(), "testMissionContent");
-        assertEquals(findMission.category(), "공부");
-        assertEquals(findMission.visibility(), "전체 공개");
+        assertEquals(findMission.category(), MissionCategory.STUDY);
+        assertEquals(findMission.visibility(), MissionVisibility.ALL);
     }
 
     @Test
@@ -111,7 +113,7 @@ class MissionServiceTest {
                                                 MissionVisibility.ALL))
                         .toList();
 
-        missionCreateRequests.forEach(request -> missionService.craeteMission(request));
+        missionCreateRequests.forEach(request -> missionService.createMission(request));
         Pageable pageable = PageRequest.of(0, 4, Sort.by(Sort.Direction.DESC, "id"));
         // when
         Slice<MissionFindResponse> missionList = missionService.findAllMission(pageable, 30L);
@@ -138,7 +140,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        MissionCreateResponse saveMission = missionService.craeteMission(missionCreateRequest);
+        MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
                 new MissionUpdateRequest("modifyName", "modifyContent", MissionVisibility.FOLLOWER);
 
@@ -149,7 +151,7 @@ class MissionServiceTest {
         // expected
         assertEquals(modifyMission.name(), "modifyName");
         assertEquals(modifyMission.content(), "modifyContent");
-        assertEquals(modifyMission.visibility(), "팔로워에게 공개");
+        assertEquals(modifyMission.visibility(), MissionVisibility.FOLLOWER);
     }
 
     @Test
@@ -161,7 +163,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        MissionCreateResponse saveMission = missionService.craeteMission(missionCreateRequest);
+        MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
                 new MissionUpdateRequest(null, "modifyContent", MissionVisibility.FOLLOWER);
 
@@ -185,7 +187,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        MissionCreateResponse saveMission = missionService.craeteMission(missionCreateRequest);
+        MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
                 new MissionUpdateRequest("modifyName", "modifyContent", null);
 
@@ -211,7 +213,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        MissionCreateResponse saveMission = missionService.craeteMission(missionCreateRequest);
+        MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
                 new MissionUpdateRequest(
                         "modifyMissionName_test", "modifyContent", MissionVisibility.FOLLOWER);
@@ -236,7 +238,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        MissionCreateResponse saveMission = missionService.craeteMission(missionCreateRequest);
+        MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
 
         // when
         missionService.deleteMission(saveMission.missionId());
@@ -255,7 +257,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
-        missionService.craeteMission(missionCreateRequest);
+        missionService.createMission(missionCreateRequest);
 
         // when
         missionService.deleteMission(200L);

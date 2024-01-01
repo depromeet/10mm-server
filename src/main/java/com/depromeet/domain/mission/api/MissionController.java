@@ -37,7 +37,7 @@ public class MissionController {
     @PostMapping
     public MissionCreateResponse missionCreate(
             @Valid @RequestBody MissionCreateRequest missionCreateRequest) {
-        return missionService.craeteMission(missionCreateRequest);
+        return missionService.createMission(missionCreateRequest);
     }
 
     @Operation(summary = "미션 단건 조회", description = "미션을 한 개를 조회합니다.")
