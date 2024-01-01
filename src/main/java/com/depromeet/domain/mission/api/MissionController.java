@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,9 +37,10 @@ public class MissionController {
 
     @Operation(summary = "미션 생성", description = "미션을 생성합니다.")
     @PostMapping
-    public MissionCreateResponse missionCreate(
+    public ResponseEntity<MissionCreateResponse> missionCreate(
             @Valid @RequestBody MissionCreateRequest missionCreateRequest) {
-        return missionService.createMission(missionCreateRequest);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(missionService.createMission(missionCreateRequest));
     }
 
     @Operation(summary = "미션 단건 조회", description = "미션을 한 개를 조회합니다.")
