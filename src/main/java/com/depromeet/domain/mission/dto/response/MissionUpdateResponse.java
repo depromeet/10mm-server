@@ -5,7 +5,6 @@ import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
@@ -22,13 +21,13 @@ public record MissionUpdateResponse(
                 mission.getContent(),
                 mission.getCategory(),
                 mission.getVisibility());
-		validateVisibility();
+        validateVisibility();
     }
 
-	@NotNull(message = "미션 공개여부는 null이 될 수 없습니다.")
-	private void validateVisibility() {
-		if (visibility == null) {
-			throw new CustomException(ErrorCode.MISSION_VISIBILITY_NULL);
-		}
-	}
+    @NotNull(message = "미션 공개여부는 null이 될 수 없습니다.")
+    private void validateVisibility() {
+        if (visibility == null) {
+            throw new CustomException(ErrorCode.MISSION_VISIBILITY_NULL);
+        }
+    }
 }

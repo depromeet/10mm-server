@@ -15,9 +15,8 @@ import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.util.MemberUtil;
-
+import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,8 +27,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.persistence.EntityManager;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 class MissionServiceTest {
@@ -37,8 +34,8 @@ class MissionServiceTest {
     @Autowired private MissionService missionService;
     @Autowired private MissionRepository missionRepository;
     @Autowired private DatabaseCleaner databaseCleaner;
-	@Autowired private EntityManager entityManager;
-	@Autowired private MemberUtil memberUtil;
+    @Autowired private EntityManager entityManager;
+    @Autowired private MemberUtil memberUtil;
 
     @BeforeEach
     void setUp() {
@@ -57,9 +54,9 @@ class MissionServiceTest {
                         MissionVisibility.ALL);
 
         // when
-		MissionCreateResponse mission = missionService.createMission(missionCreateRequest);
+        MissionCreateResponse mission = missionService.createMission(missionCreateRequest);
 
-		// expected
+        // expected
         assertNotNull(mission);
         assertEquals("testMissionName", mission.name());
         assertEquals("testMissionContent", mission.content());
@@ -104,47 +101,50 @@ class MissionServiceTest {
         assertEquals(findMission.visibility(), MissionVisibility.ALL);
     }
 
-	@Test
-	@Transactional
-	void 미션_리스트를_조회한다() {
-		// given
-		LocalDateTime startedAt = LocalDateTime.now();
+    @Test
+    @Transactional
+    void 미션_리스트를_조회한다() {
+        // given
+        LocalDateTime startedAt = LocalDateTime.now();
 
-		IntStream.range(1, 41)
-			.mapToObj(i ->
-				new MissionCreateRequest(
-					"testMissionName_" + i,
-					"testMissionContent_" + i,
-					MissionCategory.STUDY,
-					MissionVisibility.ALL))
-			.forEach(request -> entityManager.persist(Mission.createMission(request.name(),
-				request.content(),
-				1,
-				request.category(),
-				request.visibility(),
-				startedAt,
-				startedAt.plusWeeks(2),
-				memberUtil.getCurrentMember()
-				)));
+        IntStream.range(1, 41)
+                .mapToObj(
+                        i ->
+                                new MissionCreateRequest(
+                                        "testMissionName_" + i,
+                                        "testMissionContent_" + i,
+                                        MissionCategory.STUDY,
+                                        MissionVisibility.ALL))
+                .forEach(
+                        request ->
+                                entityManager.persist(
+                                        Mission.createMission(
+                                                request.name(),
+                                                request.content(),
+                                                1,
+                                                request.category(),
+                                                request.visibility(),
+                                                startedAt,
+                                                startedAt.plusWeeks(2),
+                                                memberUtil.getCurrentMember())));
 
-		// when
-		Slice<MissionFindResponse> missionList = missionService.findAllMission(4, 30L);
+        // when
+        Slice<MissionFindResponse> missionList = missionService.findAllMission(4, 30L);
 
-		// expected
-		assertThat(missionList.getContent().size()).isEqualTo(4);
-		assertThat(missionList.getContent())
-			.hasSize(4)
-			.extracting("missionId", "name", "content")
-			.containsExactlyInAnyOrder(
-				tuple(29L, "testMissionName_29", "testMissionContent_29"),
-				tuple(28L, "testMissionName_28", "testMissionContent_28"),
-				tuple(27L, "testMissionName_27", "testMissionContent_27"),
-				tuple(26L, "testMissionName_26", "testMissionContent_26"));
-		assertFalse(missionList.isLast());
-	}
+        // expected
+        assertThat(missionList.getContent().size()).isEqualTo(4);
+        assertThat(missionList.getContent())
+                .hasSize(4)
+                .extracting("missionId", "name", "content")
+                .containsExactlyInAnyOrder(
+                        tuple(29L, "testMissionName_29", "testMissionContent_29"),
+                        tuple(28L, "testMissionName_28", "testMissionContent_28"),
+                        tuple(27L, "testMissionName_27", "testMissionContent_27"),
+                        tuple(26L, "testMissionName_26", "testMissionContent_26"));
+        assertFalse(missionList.isLast());
+    }
 
-
-	@Test
+    @Test
     void 미션_단건_수정한다() {
         // given
         MissionCreateRequest missionCreateRequest =
