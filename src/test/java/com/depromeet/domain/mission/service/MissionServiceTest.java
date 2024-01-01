@@ -40,7 +40,7 @@ class MissionServiceTest {
     }
 
     @Test
-    void 공부_미션_생성_성공() {
+    void 공부미션을_생성한다() {
         // given
         MissionCreateRequest missionCreateRequest =
                 new MissionCreateRequest(
@@ -61,7 +61,7 @@ class MissionServiceTest {
     }
 
     @Test
-    void 미션이름_초과_생성_실패() {
+    void 미션이름_20자초과_시_생성되지_않는다() {
         // given
         MissionCreateRequest missionCreateRequest =
                 new MissionCreateRequest(
@@ -79,7 +79,7 @@ class MissionServiceTest {
     }
 
     @Test
-    void 미션_단건_조회_성공() {
+    void 미션_단건_조회한다() {
         // given
         MissionCreateRequest missionCreateRequest =
                 new MissionCreateRequest(
@@ -100,7 +100,7 @@ class MissionServiceTest {
     }
 
     @Test
-    void 미션_리스트_조회_성공() {
+    void 미션_리스트를_조회한다() {
         // given
         List<MissionCreateRequest> missionCreateRequests =
                 IntStream.range(1, 41)
@@ -132,7 +132,7 @@ class MissionServiceTest {
     }
 
     @Test
-    void 미션_수정_성공() {
+    void 미션_단건_수정한다() {
         // given
         MissionCreateRequest missionCreateRequest =
                 new MissionCreateRequest(
@@ -155,7 +155,7 @@ class MissionServiceTest {
     }
 
     @Test
-    void 미션_이름_null_수정_실패() {
+    void 미션이름에_null값은_수정되지_않는다() {
         // given
         MissionCreateRequest missionCreateRequest =
                 new MissionCreateRequest(
@@ -179,7 +179,7 @@ class MissionServiceTest {
     }
 
     @Test
-    void 미션_수정_공개여부_null_예외처리() {
+    void 미션_공개여부_null값은_잘못된_요청이다() {
         // given
         MissionCreateRequest missionCreateRequest =
                 new MissionCreateRequest(
@@ -205,7 +205,7 @@ class MissionServiceTest {
     }
 
     @Test
-    void 미션_이름_초과_수정_실패() {
+    void 미션이름_20자초과_시_수정되지_않는다() {
         // given
         MissionCreateRequest missionCreateRequest =
                 new MissionCreateRequest(
@@ -230,7 +230,7 @@ class MissionServiceTest {
     }
 
     @Test
-    void 미션_삭제_성공() {
+    void 미션_단건_삭제한다() {
         // given
         MissionCreateRequest missionCreateRequest =
                 new MissionCreateRequest(
@@ -249,7 +249,7 @@ class MissionServiceTest {
     }
 
     @Test
-    void 미션_삭제_실패() {
+    void 미션_삭제_시_존재하지_않는_아이디라면_삭제되지_않는다() {
         // given
         MissionCreateRequest missionCreateRequest =
                 new MissionCreateRequest(
