@@ -3,7 +3,6 @@ package com.depromeet.domain.mission.dto.response;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record MissionUpdateResponse(
