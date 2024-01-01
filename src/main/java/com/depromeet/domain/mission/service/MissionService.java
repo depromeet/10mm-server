@@ -21,44 +21,33 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MissionService {
 
     private final MissionRepository missionRepository;
     private final MemberUtil memberUtil;
 
-    @Transactional
-    public MissionCreateResponse createMission(MissionCreateRequest missionCreateRequest) {
-        LocalDateTime startedAt = LocalDateTime.now();
-        final Member member = memberUtil.getCurrentMember();
+	public MissionCreateResponse createMission(MissionCreateRequest missionCreateRequest) {
+		Mission mission = createMissionEntity(missionCreateRequest);
+		return createMissionResponse(missionRepository.save(mission));
+	}
 
-        Mission missionByMaxSort = missionRepository.findTopByMemberOrderBySortDesc(member);
-        Integer maxSort = missionByMaxSort == null ? 1 : missionByMaxSort.getSort() + 1;
-
-        Mission mission =
-                Mission.createMission(
-                        missionCreateRequest.name(),
-                        missionCreateRequest.content(),
-                        maxSort,
-                        missionCreateRequest.category(),
-                        missionCreateRequest.visibility(),
-                        startedAt,
-                        startedAt.plusWeeks(2),
-                        member);
-        return new MissionCreateResponse(missionRepository.save(mission));
-    }
-
+	@Transactional(readOnly = true) // 읽기 전용 트랜잭션 설정. 읽기 전용으로 설정한다.
     public MissionFindResponse findOneMission(Long missionId) {
-        return missionRepository
-                .findByMissionId(missionId)
-                .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
-    }
+		Mission mission = missionRepository
+			.findByMissionId(missionId)
+			.orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
+		return new MissionFindResponse(mission);
+	}
 
+	@Transactional(readOnly = true) // 읽기 전용 트랜잭션 설정. 읽기 전용으로 설정한다.
     public Slice<MissionFindResponse> findAllMission(int size, Long lastId) {
         PageRequest pageRequest = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
-        return missionRepository.findAllMission(memberUtil.getCurrentMember(), pageRequest, lastId);
-    }
+		Slice<Mission> mappedMissions = missionRepository.findAllMission(memberUtil.getCurrentMember(), pageRequest,
+			lastId);
+		return mappedMissions.map(MissionFindResponse::new); // 여기서 예외 처리 필요함. 아직 안 함.
+	}
 
-    @Transactional
     public MissionUpdateResponse updateMission(
             MissionUpdateRequest missionUpdateRequest, Long missionId) {
         Mission mission =
@@ -72,8 +61,32 @@ public class MissionService {
         return new MissionUpdateResponse(mission);
     }
 
-    @Transactional
     public void deleteMission(Long missionId) {
         missionRepository.deleteById(missionId);
     }
+
+	private Integer maxSort(Member member) {
+		Mission missionByMaxSort = missionRepository.findTopByMemberOrderBySortDesc(member);
+		return missionByMaxSort == null ? 1 : missionByMaxSort.getSort() + 1;
+	}
+
+	private Mission createMissionEntity(MissionCreateRequest missionCreateRequest) {
+		LocalDateTime startedAt = LocalDateTime.now();
+		final Member member = memberUtil.getCurrentMember();
+		Integer maxSort = maxSort(member);
+
+		return Mission.createMission(
+			missionCreateRequest.name(),
+			missionCreateRequest.content(),
+			maxSort,
+			missionCreateRequest.category(),
+			missionCreateRequest.visibility(),
+			startedAt,
+			startedAt.plusWeeks(2),
+			member);
+	}
+
+	private MissionCreateResponse createMissionResponse(Mission mission) {
+		return new MissionCreateResponse(mission);
+	}
 }

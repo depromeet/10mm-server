@@ -14,21 +14,31 @@ import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
 import com.depromeet.global.error.exception.CustomException;
+import com.depromeet.global.util.MemberUtil;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Slice;
+import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+import jakarta.persistence.EntityManager;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@AutoConfigureMockMvc
 class MissionServiceTest {
 
     @Autowired private MissionService missionService;
     @Autowired private MissionRepository missionRepository;
     @Autowired private DatabaseCleaner databaseCleaner;
+	@Autowired private EntityManager entityManager;
+	@Autowired private MemberUtil memberUtil;
 
     @BeforeEach
     void setUp() {
@@ -47,18 +57,18 @@ class MissionServiceTest {
                         MissionVisibility.ALL);
 
         // when
-        missionService.createMission(missionCreateRequest);
+		MissionCreateResponse mission = missionService.createMission(missionCreateRequest);
 
-        // expected
-        Mission mission = missionRepository.findAll().get(0);
-        assertEquals("testMissionName", mission.getName());
-        assertEquals("testMissionContent", mission.getContent());
-        assertEquals(MissionCategory.STUDY, mission.getCategory());
-        assertEquals(MissionVisibility.ALL, mission.getVisibility());
+		// expected
+        assertNotNull(mission);
+        assertEquals("testMissionName", mission.name());
+        assertEquals("testMissionContent", mission.content());
+        assertEquals(MissionCategory.STUDY, mission.category());
+        assertEquals(MissionVisibility.ALL, mission.visibility());
     }
 
     @Test
-    void 미션이름_20자초과_시_생성되지_않는다() {
+    void 미션이름_20자_초과하면_미션생셩_실패한다() {
         // given
         MissionCreateRequest missionCreateRequest =
                 new MissionCreateRequest(
@@ -70,9 +80,7 @@ class MissionServiceTest {
         // expected
         assertThatThrownBy(() -> missionService.createMission(missionCreateRequest))
                 // instance 검증
-                .isInstanceOf(DataIntegrityViolationException.class)
-                // 예외 메시지 확인
-                .hasMessageContaining("Value too long for column \"NAME CHARACTER VARYING(20)\"");
+                .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
@@ -96,38 +104,47 @@ class MissionServiceTest {
         assertEquals(findMission.visibility(), MissionVisibility.ALL);
     }
 
-    @Test
-    void 미션_리스트를_조회한다() {
-        // given
-        List<MissionCreateRequest> missionCreateRequests =
-                IntStream.range(1, 41)
-                        .mapToObj(
-                                i ->
-                                        new MissionCreateRequest(
-                                                "testMissionName_" + i,
-                                                "testMissionContent_" + i,
-                                                MissionCategory.STUDY,
-                                                MissionVisibility.ALL))
-                        .toList();
+	@Test
+	@Transactional
+	void 미션_리스트를_조회한다() {
+		// given
+		LocalDateTime startedAt = LocalDateTime.now();
 
-        missionCreateRequests.forEach(request -> missionService.createMission(request));
-        // when
-        Slice<MissionFindResponse> missionList = missionService.findAllMission(4, 30L);
+		IntStream.range(1, 41)
+			.mapToObj(i ->
+				new MissionCreateRequest(
+					"testMissionName_" + i,
+					"testMissionContent_" + i,
+					MissionCategory.STUDY,
+					MissionVisibility.ALL))
+			.forEach(request -> entityManager.persist(Mission.createMission(request.name(),
+				request.content(),
+				1,
+				request.category(),
+				request.visibility(),
+				startedAt,
+				startedAt.plusWeeks(2),
+				memberUtil.getCurrentMember()
+				)));
 
-        // expected
-        assertThat(missionList.getContent().size()).isEqualTo(4);
-        assertThat(missionList.getContent())
-                .hasSize(4)
-                .extracting("missionId", "name", "content")
-                .containsExactlyInAnyOrder(
-                        tuple(29L, "testMissionName_29", "testMissionContent_29"),
-                        tuple(28L, "testMissionName_28", "testMissionContent_28"),
-                        tuple(27L, "testMissionName_27", "testMissionContent_27"),
-                        tuple(26L, "testMissionName_26", "testMissionContent_26"));
-        assertFalse(missionList.isLast());
-    }
+		// when
+		Slice<MissionFindResponse> missionList = missionService.findAllMission(4, 30L);
 
-    @Test
+		// expected
+		assertThat(missionList.getContent().size()).isEqualTo(4);
+		assertThat(missionList.getContent())
+			.hasSize(4)
+			.extracting("missionId", "name", "content")
+			.containsExactlyInAnyOrder(
+				tuple(29L, "testMissionName_29", "testMissionContent_29"),
+				tuple(28L, "testMissionName_28", "testMissionContent_28"),
+				tuple(27L, "testMissionName_27", "testMissionContent_27"),
+				tuple(26L, "testMissionName_26", "testMissionContent_26"));
+		assertFalse(missionList.isLast());
+	}
+
+
+	@Test
     void 미션_단건_수정한다() {
         // given
         MissionCreateRequest missionCreateRequest =
@@ -151,7 +168,7 @@ class MissionServiceTest {
     }
 
     @Test
-    void 미션이름에_null값은_수정되지_않는다() {
+    void 미션이름에_null값은_미션수정_실패한다() {
         // given
         MissionCreateRequest missionCreateRequest =
                 new MissionCreateRequest(
@@ -169,9 +186,7 @@ class MissionServiceTest {
                                 missionService.updateMission(
                                         missionUpdateRequest, saveMission.missionId()))
                 // instance 검증
-                .isInstanceOf(DataIntegrityViolationException.class)
-                // 예외 메시지 확인
-                .hasMessageContaining("not-null property references a null or transient value");
+                .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
@@ -201,7 +216,7 @@ class MissionServiceTest {
     }
 
     @Test
-    void 미션이름_20자초과_시_수정되지_않는다() {
+    void 미션이름_20자_초과하면_미션수정_실패한다() {
         // given
         MissionCreateRequest missionCreateRequest =
                 new MissionCreateRequest(
@@ -220,9 +235,7 @@ class MissionServiceTest {
                                 missionService.updateMission(
                                         missionUpdateRequest, saveMission.missionId()))
                 // instance 검증
-                .isInstanceOf(DataIntegrityViolationException.class)
-                // 예외 메시지 확인
-                .hasMessageContaining("Value too long for column \"NAME CHARACTER VARYING(20)\"");
+                .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test

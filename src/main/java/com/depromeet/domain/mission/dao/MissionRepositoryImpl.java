@@ -24,7 +24,7 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Optional<MissionFindResponse> findByMissionId(Long missionId) {
+    public Optional<Mission> findByMissionId(Long missionId) {
         Mission findMission =
                 jpaQueryFactory
                         .selectFrom(mission)
@@ -32,11 +32,11 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                         .fetchJoin()
                         .where(mission.id.eq(missionId))
                         .fetchOne();
-        return Optional.ofNullable(findMission).map(MissionFindResponse::new);
+        return Optional.ofNullable(findMission);
     }
 
     @Override
-    public Slice<MissionFindResponse> findAllMission(
+    public Slice<Mission> findAllMission(
             Member member, Pageable pageable, Long lastId) {
         JPAQuery<Mission> query =
                 jpaQueryFactory
@@ -46,9 +46,8 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                         .limit(pageable.getPageSize() + 1);
 
         List<Mission> missions = query.fetch();
-        List<MissionFindResponse> list =
-                missions.stream().map(MissionFindResponse::new).collect(Collectors.toList());
-        return checkLastPage(pageable, list);
+
+        return checkLastPage(pageable, missions);
     }
 
     private BooleanExpression memberIdEq(Long memberId) {
@@ -60,16 +59,16 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     }
 
     // 무한 스크롤 방식 처리하는 메서드
-    private Slice<MissionFindResponse> checkLastPage(
-            Pageable pageable, List<MissionFindResponse> resultDtos) {
+    private Slice<Mission> checkLastPage(
+            Pageable pageable, List<Mission> result) {
 
         boolean hasNext = false;
 
         // 조회한 결과 개수가 요청한 페이지 사이즈보다 크면 뒤에 더 있음, next = true
-        if (resultDtos.size() > pageable.getPageSize()) {
+        if (result.size() > pageable.getPageSize()) {
             hasNext = true;
-            resultDtos.remove(pageable.getPageSize());
+			result.remove(pageable.getPageSize());
         }
-        return new SliceImpl<>(resultDtos, pageable, hasNext);
+        return new SliceImpl<>(result, pageable, hasNext);
     }
 }
