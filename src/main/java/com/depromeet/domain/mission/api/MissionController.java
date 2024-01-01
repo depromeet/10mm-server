@@ -12,9 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -52,9 +50,8 @@ public class MissionController {
     @Operation(summary = "미션 리스트 조회", description = "미션 리스트를 조회합니다. (무한 스크롤)")
     @GetMapping
     public Slice<MissionFindResponse> missionFindAll(
-            @PageableDefault(sort = "id", direction = DESC) Pageable pageable,
-            @RequestParam(required = false) Long lastId) {
-        return missionService.findAllMission(pageable, lastId);
+            @RequestParam int size, @RequestParam(required = false) Long lastId) {
+        return missionService.findAllMission(size, lastId);
     }
 
     @Operation(summary = "미션 단건 수정", description = "단건 미션을 수정합니다.")

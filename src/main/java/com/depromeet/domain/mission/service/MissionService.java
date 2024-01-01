@@ -14,8 +14,8 @@ import com.depromeet.global.util.MemberUtil;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,8 +53,8 @@ public class MissionService {
                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
     }
 
-    public Slice<MissionFindResponse> findAllMission(Pageable pageable, Long lastId) {
-        PageRequest pageRequest = PageRequest.of(0, pageable.getPageSize(), pageable.getSort());
+    public Slice<MissionFindResponse> findAllMission(int size, Long lastId) {
+        PageRequest pageRequest = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
         return missionRepository.findAllMission(memberUtil.getCurrentMember(), pageRequest, lastId);
     }
 
