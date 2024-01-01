@@ -31,8 +31,7 @@ public class MissionService {
         LocalDateTime startedAt = LocalDateTime.now();
         final Member member = memberUtil.getCurrentMember();
 
-        Mission missionByMaxSort =
-                missionRepository.findTopByMemberOrderBySortDesc(memberUtil.getCurrentMember());
+        Mission missionByMaxSort = missionRepository.findTopByMemberOrderBySortDesc(member);
         Integer maxSort = missionByMaxSort == null ? 1 : missionByMaxSort.getSort() + 1;
 
         Mission mission =
