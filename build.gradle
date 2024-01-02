@@ -38,6 +38,8 @@ dependencies {
     // Spring Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.security:spring-security-test'
+    implementation 'org.springframework.security:spring-security-oauth2-client'
+    implementation 'org.springframework.security:spring-security-oauth2-jose'
 
     // Querydsl
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
