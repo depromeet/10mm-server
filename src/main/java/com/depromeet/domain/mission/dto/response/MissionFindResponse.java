@@ -24,4 +24,8 @@ public record MissionFindResponse(
                 mission.getArchiveStatus(),
                 mission.getSort());
     }
+
+    public static MissionFindResponse from(Mission mission) {
+        return new MissionFindResponse(mission);
+    }
 }

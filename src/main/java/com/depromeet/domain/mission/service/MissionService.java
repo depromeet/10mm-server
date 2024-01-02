@@ -29,7 +29,7 @@ public class MissionService {
 
     public MissionCreateResponse createMission(MissionCreateRequest missionCreateRequest) {
         Mission mission = createMissionEntity(missionCreateRequest);
-        return createMissionResponse(missionRepository.save(mission));
+        return MissionCreateResponse.from(missionRepository.save(mission));
     }
 
     @Transactional(readOnly = true) // 읽기 전용 트랜잭션 설정. 읽기 전용으로 설정한다.
@@ -38,7 +38,7 @@ public class MissionService {
                 missionRepository
                         .findByMissionId(missionId)
                         .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
-        return new MissionFindResponse(mission);
+        return MissionFindResponse.from(mission);
     }
 
     @Transactional(readOnly = true) // 읽기 전용 트랜잭션 설정. 읽기 전용으로 설정한다.
@@ -47,7 +47,7 @@ public class MissionService {
         Slice<Mission> mappedMissions =
                 missionRepository.findAllMission(
                         memberUtil.getCurrentMember(), pageRequest, lastId);
-        return mappedMissions.map(MissionFindResponse::new); // 여기서 예외 처리 필요함. 아직 안 함.
+        return mappedMissions.map(MissionFindResponse::new);
     }
 
     public MissionUpdateResponse updateMission(
@@ -86,9 +86,5 @@ public class MissionService {
                 startedAt,
                 startedAt.plusWeeks(2),
                 member);
-    }
-
-    private MissionCreateResponse createMissionResponse(Mission mission) {
-        return new MissionCreateResponse(mission);
     }
 }

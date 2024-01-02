@@ -19,4 +19,8 @@ public record MissionCreateResponse(
                 mission.getCategory(),
                 mission.getVisibility());
     }
+
+    public static MissionCreateResponse from(Mission mission) {
+        return new MissionCreateResponse(mission);
+    }
 }
