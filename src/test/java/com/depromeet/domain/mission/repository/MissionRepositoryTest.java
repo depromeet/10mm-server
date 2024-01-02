@@ -3,35 +3,45 @@ package com.depromeet.domain.mission.repository;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.depromeet.TestQuerydslConfig;
+import com.depromeet.domain.member.dao.MemberRepository;
+import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
-import com.depromeet.global.util.MemberUtil;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@ActiveProfiles("test")
+@DataJpaTest
+@Import(TestQuerydslConfig.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles(value = "test")
 class MissionRepositoryTest {
 
     @Autowired private MissionRepository missionRepository;
-    @Autowired private MemberUtil memberUtil;
+    @Autowired private MemberRepository memberRepository;
+    private Member saveMember;
 
     @BeforeEach
     void setUp() {
         missionRepository.deleteAll();
+        Member member = Member.createNormalMember(new Profile("testNickname", "testImageUrl"));
+        saveMember = memberRepository.save(member);
     }
 
     @Test
@@ -56,7 +66,7 @@ class MissionRepositoryTest {
                                 missionCreateRequest.visibility(),
                                 startedAt,
                                 startedAt.plusWeeks(2),
-                                memberUtil.getCurrentMember()));
+                                saveMember));
 
         // then
         assertThat(saveMission.getId()).isNotNull();
@@ -88,7 +98,7 @@ class MissionRepositoryTest {
                         missionCreateRequest.visibility(),
                         startedAt,
                         startedAt.plusWeeks(2),
-                        memberUtil.getCurrentMember());
+                        saveMember);
 
         // expected
         assertThatThrownBy(() -> missionRepository.save(mission))
@@ -98,7 +108,6 @@ class MissionRepositoryTest {
 
     @Test
     void 단건_미션을_조회한다() {
-
         // given
         MissionCreateRequest missionCreateRequest =
                 new MissionCreateRequest(
@@ -117,7 +126,7 @@ class MissionRepositoryTest {
                                 missionCreateRequest.visibility(),
                                 startedAt,
                                 startedAt.plusWeeks(2),
-                                memberUtil.getCurrentMember()));
+                                saveMember));
         // when
         Optional<Mission> findMission = missionRepository.findByMissionId(saveMission.getId());
 
@@ -156,14 +165,12 @@ class MissionRepositoryTest {
                                                 request.visibility(),
                                                 startedAt,
                                                 startedAt.plusWeeks(2),
-                                                memberUtil.getCurrentMember())));
+                                                saveMember)));
 
         // when
         Slice<Mission> missionList =
                 missionRepository.findAllMission(
-                        memberUtil.getCurrentMember(),
-                        PageRequest.of(0, 4, Sort.by(Sort.Direction.DESC, "id")),
-                        7L);
+                        saveMember, PageRequest.of(0, 4, Sort.by(Sort.Direction.DESC, "id")), 7L);
 
         // then
         assertThat(missionList.getContent().size()).isEqualTo(4);
