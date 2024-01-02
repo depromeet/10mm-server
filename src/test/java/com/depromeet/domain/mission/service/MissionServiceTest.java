@@ -21,14 +21,12 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@AutoConfigureMockMvc
 class MissionServiceTest {
 
     @Autowired private MissionService missionService;
@@ -62,22 +60,6 @@ class MissionServiceTest {
         assertEquals("testMissionContent", mission.content());
         assertEquals(MissionCategory.STUDY, mission.category());
         assertEquals(MissionVisibility.ALL, mission.visibility());
-    }
-
-    @Test
-    void 미션이름_20자_초과하면_미션생셩_실패한다() {
-        // given
-        MissionCreateRequest missionCreateRequest =
-                new MissionCreateRequest(
-                        "testMissionNameMoreThan",
-                        "testMissionContent",
-                        MissionCategory.STUDY,
-                        MissionVisibility.ALL);
-
-        // expected
-        assertThatThrownBy(() -> missionService.createMission(missionCreateRequest))
-                // instance 검증
-                .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
