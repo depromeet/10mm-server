@@ -29,7 +29,8 @@ public class MissionService {
 
     public MissionCreateResponse createMission(MissionCreateRequest missionCreateRequest) {
         Mission mission = createMissionEntity(missionCreateRequest);
-        return MissionCreateResponse.from(missionRepository.save(mission));
+		Mission saveMission = missionRepository.save(mission);
+		return MissionCreateResponse.from(saveMission);
     }
 
     @Transactional(readOnly = true) // 읽기 전용 트랜잭션 설정. 읽기 전용으로 설정한다.
