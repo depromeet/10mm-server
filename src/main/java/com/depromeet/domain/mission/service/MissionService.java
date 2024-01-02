@@ -29,8 +29,8 @@ public class MissionService {
 
     public MissionCreateResponse createMission(MissionCreateRequest missionCreateRequest) {
         Mission mission = createMissionEntity(missionCreateRequest);
-		Mission saveMission = missionRepository.save(mission);
-		return MissionCreateResponse.from(saveMission);
+        Mission saveMission = missionRepository.save(mission);
+        return MissionCreateResponse.from(saveMission);
     }
 
     @Transactional(readOnly = true) // 읽기 전용 트랜잭션 설정. 읽기 전용으로 설정한다.
@@ -48,7 +48,7 @@ public class MissionService {
         Slice<Mission> mappedMissions =
                 missionRepository.findAllMission(
                         memberUtil.getCurrentMember(), pageRequest, lastId);
-        return mappedMissions.map(MissionFindResponse::new);
+        return mappedMissions.map(MissionFindResponse::from);
     }
 
     public MissionUpdateResponse updateMission(

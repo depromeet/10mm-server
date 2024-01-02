@@ -14,8 +14,9 @@ public record MissionFindResponse(
         @Schema(description = "미션 공개여부", defaultValue = "ALL") MissionVisibility visibility,
         @Schema(description = "미션 아카이빙 상태", defaultValue = "NONE") ArchiveStatus status,
         @Schema(description = "미션 정렬 값", defaultValue = "1") Integer sort) {
-    public MissionFindResponse(Mission mission) {
-        this(
+
+    public static MissionFindResponse from(Mission mission) {
+        return new MissionFindResponse(
                 mission.getId(),
                 mission.getName(),
                 mission.getContent(),
@@ -23,9 +24,5 @@ public record MissionFindResponse(
                 mission.getVisibility(),
                 mission.getArchiveStatus(),
                 mission.getSort());
-    }
-
-    public static MissionFindResponse from(Mission mission) {
-        return new MissionFindResponse(mission);
     }
 }

@@ -11,16 +11,13 @@ public record MissionCreateResponse(
         @Schema(description = "미션 내용", defaultValue = "default content") String content,
         @Schema(description = "미션 카테고리", defaultValue = "STUDY") MissionCategory category,
         @Schema(description = "미션 공개여부", defaultValue = "ALL") MissionVisibility visibility) {
-    public MissionCreateResponse(Mission mission) {
-        this(
+
+    public static MissionCreateResponse from(Mission mission) {
+        return new MissionCreateResponse(
                 mission.getId(),
                 mission.getName(),
                 mission.getContent(),
                 mission.getCategory(),
                 mission.getVisibility());
-    }
-
-    public static MissionCreateResponse from(Mission mission) {
-        return new MissionCreateResponse(mission);
     }
 }
