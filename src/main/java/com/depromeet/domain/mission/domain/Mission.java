@@ -109,4 +109,10 @@ public class Mission extends BaseTimeEntity {
                 .member(member)
                 .build();
     }
+
+    public void updateMission(String name, String content, MissionVisibility visibility) {
+        this.name = name;
+        this.content = content;
+        this.visibility = visibility;
+    }
 }
