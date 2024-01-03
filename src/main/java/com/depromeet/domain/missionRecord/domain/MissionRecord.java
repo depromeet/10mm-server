@@ -75,6 +75,9 @@ public class MissionRecord extends BaseTimeEntity {
             Mission mission) {
         Integer duration = durationMin * 60 + durationSec;
 
+        if (duration > 3600) {
+            duration = 3600;
+        }
         return MissionRecord.builder()
                 .duration(duration)
                 .uploadStatus(ImageUploadStatus.NONE)
