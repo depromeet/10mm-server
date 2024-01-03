@@ -81,7 +81,9 @@ public class WebSecurityConfig {
                                 .requestMatchers("/v1/**")
                                 .permitAll() // 임시로 모든 요청 허용
                                 .anyRequest()
-                                .authenticated());
+                                // TODO: 임시로 모든 url 허용했지만, OIDC에서 권한따라 authentication 할 수 있도록 변경 필요
+                                // .authenticated()
+                                .permitAll());
 
         return http.build();
     }
