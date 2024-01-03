@@ -64,6 +64,14 @@ public class Member extends BaseTimeEntity {
         this.lastLoginAt = lastLoginAt;
     }
 
+    public static Member createGuestMember(OauthInfo oauthInfo) {
+        return Member.builder()
+                .oauthInfo(oauthInfo)
+                .status(MemberStatus.GUEST)
+                .role(MemberRole.USER)
+                .build();
+    }
+
     public static Member createNormalMember(Profile profile) {
         return Member.builder()
                 .profile(profile)
