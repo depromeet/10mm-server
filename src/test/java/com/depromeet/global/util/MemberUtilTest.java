@@ -2,9 +2,11 @@ package com.depromeet.global.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.depromeet.DatabaseCleaner;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +16,12 @@ class MemberUtilTest {
 
     @Autowired private MemberUtil memberUtil;
     @Autowired private MemberRepository memberRepository;
+    @Autowired private DatabaseCleaner databaseCleaner;
+
+    @BeforeEach
+    void setUp() {
+        databaseCleaner.execute();
+    }
 
     @Test
     void 이미_회원이_존재하면_임시_회원을_삽입하지_않는다() {
