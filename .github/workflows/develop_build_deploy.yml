@@ -32,6 +32,10 @@ jobs:
         id: image-tag
         run: echo "value=$(echo ${GITHUB_SHA::7})" >> $GITHUB_OUTPUT
 
+      # test 돌릴때 레디스 필요
+      - name: Start containers
+        run: docker-compose -f ./docker-compose-test.yaml up -d
+
       # Gradlew 실행 허용
       - name: Run chmod to make gradlew executable
         run: chmod +x ./gradlew

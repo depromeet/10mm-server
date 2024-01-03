@@ -19,7 +19,11 @@ public enum ErrorCode {
 
     // Security
     AUTH_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "시큐리티 인증 정보를 찾을 수 없습니다."),
-    ;
+
+    // Mission
+    MISSION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 미션을 찾을 수 없습니다."),
+
+    MISSION_VISIBILITY_NULL(HttpStatus.BAD_REQUEST, "미션 공개 여부가 null입니다.");
 
     private final HttpStatus status;
     private final String message;

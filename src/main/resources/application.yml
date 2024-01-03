@@ -2,9 +2,9 @@ spring:
   profiles:
     group:
       test: "test"
-      local: "local, datasource"
-      dev: "dev, datasource, actuator"
-      prod: "prod, datasource, actuator"
+      local: "local, datasource, redis"
+      dev: "dev, datasource, redis, actuator"
+      prod: "prod, datasource, redis, actuator"
   security:
     oauth2:
       client:
@@ -31,6 +31,8 @@ spring:
 
 swagger:
   version: 0.0.1
+  user: ${SWAGGER_USER:default}
+  password: ${SWAGGER_PASSWORD:default}
 springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
