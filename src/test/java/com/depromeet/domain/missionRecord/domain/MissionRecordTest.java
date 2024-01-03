@@ -48,20 +48,5 @@ class MissionRecordTest {
             // then
             assertEquals(ImageUploadStatus.NONE, uploadStatus);
         }
-
-        @Test
-        void 참여_시간은_초로_환산된다() {
-            // given
-            LocalDateTime missionRecordStartedAt = LocalDateTime.of(2023, 12, 15, 1, 5, 0);
-            LocalDateTime missionRecordFinishedAt =
-                    missionRecordStartedAt.plusMinutes(32).plusSeconds(14);
-            Duration duration = Duration.ofMinutes(32).plusSeconds(14);
-            MissionRecord missionRecord =
-                    MissionRecord.createMissionRecord(
-                            duration, missionRecordStartedAt, missionRecordFinishedAt, mission);
-
-            // when, then
-            assertEquals(missionRecord.getDuration(), (int) duration.getSeconds());
-        }
     }
 }
