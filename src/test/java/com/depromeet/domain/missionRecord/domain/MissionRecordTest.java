@@ -19,8 +19,8 @@ class MissionRecordTest {
     void setUp() {
         Profile profile = new Profile("testNickname", "testProfileImageUrl");
         Member member = Member.createNormalMember(profile);
-        LocalDateTime startedAt = LocalDateTime.of(2023, 12, 1, 1, 5, 0);
-        LocalDateTime finishedAt = LocalDateTime.of(2023, 12, 15, 1, 37, 0);
+        LocalDateTime missionStartedAt = LocalDateTime.of(2023, 12, 1, 1, 5, 0);
+        LocalDateTime missionFinishedAt = missionStartedAt.minusWeeks(2);
         mission =
                 Mission.createMission(
                         "testMissionName",
@@ -28,29 +28,45 @@ class MissionRecordTest {
                         1,
                         MissionCategory.ETC,
                         MissionVisibility.ALL,
-                        startedAt,
-                        finishedAt,
+                        missionStartedAt,
+                        missionFinishedAt,
                         member);
     }
 
     @Test
-    void 미션기록_업로드_상태_DEFAULT값은_NONE이다() {
+    void 미션기록_생성_시_업로드_상태_DEFAULT값은_NONE이다() {
         // given
-        LocalDateTime startedAt = LocalDateTime.of(2023, 12, 15, 1, 5, 0);
-        LocalDateTime finishedAt = LocalDateTime.of(2023, 12, 15, 1, 37, 0);
+        LocalDateTime missionRecordStartedAt = LocalDateTime.of(2023, 12, 15, 1, 5, 0);
+        LocalDateTime missionRecordFinishedAt =
+                missionRecordStartedAt.plusMinutes(32).plusSeconds(14);
         MissionRecord missionRecord =
                 MissionRecord.createMissionRecord(
-                        32,
-                        "testMissionRecordRemark",
-                        "image/url/path",
-                        startedAt,
-                        finishedAt,
-                        mission);
+                        32, 14, missionRecordStartedAt, missionRecordFinishedAt, mission);
 
         // when
         ImageUploadStatus uploadStatus = missionRecord.getUploadStatus();
 
         // then
         assertEquals(ImageUploadStatus.NONE, uploadStatus);
+    }
+
+    @Test
+    void 미션기록_생성_시_참여_시간은_초로_환산된다() {
+        // given
+        LocalDateTime missionRecordStartedAt = LocalDateTime.of(2023, 12, 15, 1, 5, 0);
+        LocalDateTime missionRecordFinishedAt =
+                missionRecordStartedAt.plusMinutes(32).plusSeconds(14);
+        Integer durationMin = 32;
+        Integer durationSec = 14;
+        MissionRecord missionRecord =
+                MissionRecord.createMissionRecord(
+                        durationMin,
+                        durationSec,
+                        missionRecordStartedAt,
+                        missionRecordFinishedAt,
+                        mission);
+
+        // when, then
+        assertEquals(durationMin * 60 + durationSec, missionRecord.getDuration());
     }
 }
