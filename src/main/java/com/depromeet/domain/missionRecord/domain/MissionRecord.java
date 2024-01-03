@@ -68,19 +68,18 @@ public class MissionRecord extends BaseTimeEntity {
     }
 
     public static MissionRecord createMissionRecord(
-            Integer duration,
-            String remark,
-            String imageUrl,
+            Integer durationMin,
+            Integer durationSec,
             LocalDateTime startedAt,
             LocalDateTime finishedAt,
             Mission mission) {
+        Integer duration = durationMin * 60 + durationSec;
+
         return MissionRecord.builder()
                 .duration(duration)
-                .remark(remark)
                 .uploadStatus(ImageUploadStatus.NONE)
                 .startedAt(startedAt)
                 .finishedAt(finishedAt)
-                .imageUrl(imageUrl)
                 .mission(mission)
                 .build();
     }
