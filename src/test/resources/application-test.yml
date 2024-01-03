@@ -4,3 +4,9 @@ spring:
       on-profile: "test"
   datasource:
     url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false;MODE=MYSQL
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
