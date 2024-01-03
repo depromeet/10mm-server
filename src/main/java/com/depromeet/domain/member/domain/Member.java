@@ -32,6 +32,8 @@ public class Member extends BaseTimeEntity {
 
     @Embedded private Profile profile;
 
+    @Embedded private OauthInfo oauthInfo;
+
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
@@ -49,11 +51,13 @@ public class Member extends BaseTimeEntity {
     @Builder(access = AccessLevel.PRIVATE)
     private Member(
             Profile profile,
+            OauthInfo oauthInfo,
             MemberStatus status,
             MemberRole role,
             MemberVisibility visibility,
             LocalDateTime lastLoginAt) {
         this.profile = profile;
+        this.oauthInfo = oauthInfo;
         this.status = status;
         this.role = role;
         this.visibility = visibility;
