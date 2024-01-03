@@ -26,11 +26,11 @@ public class MissionRecordService {
         final Mission mission = findMission(request);
         final Member member = memberUtil.getCurrentMember();
 
-		Duration duration =
-			Duration.ofMinutes(request.durationMin()).plusSeconds(request.durationSec());
+        Duration duration =
+                Duration.ofMinutes(request.durationMin()).plusSeconds(request.durationSec());
 
         validateMissionRecordUserMismatch(mission, member);
-		validateMissionRecordDuration(duration);
+        validateMissionRecordDuration(duration);
 
         MissionRecord missionRecord =
                 MissionRecord.createMissionRecord(

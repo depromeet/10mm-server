@@ -32,12 +32,12 @@ public record MissionRecordCreateRequest(
                         type = "string")
                 LocalDateTime finishedAt,
         @NotNull(message = "미션 참여 시간(분)은 비워둘 수 없습니다.")
-		@Min(value = 0, message = "미션 참여 시간(분)의 최소 값은 0입니다.")
-		@Max(value = 60, message = "미션 참여 시간(분)의 최대값은 60입니다.")
+                @Min(value = 0, message = "미션 참여 시간(분)의 최소 값은 0입니다.")
+                @Max(value = 60, message = "미션 참여 시간(분)의 최대값은 60입니다.")
                 @Schema(description = "미션 참여 시간(분)", defaultValue = "32")
                 Integer durationMin,
         @NotNull(message = "미션 참여 시간(초)은 비워둘 수 없습니다.")
-		@Min(value = 0, message = "미션 참여 시간(초)의 최소값는 0입니다.")
-		@Max(value = 60, message = "미션 참여 시간(초)의 최대값는 60입니다.")
+                @Min(value = 0, message = "미션 참여 시간(초)의 최소값는 0입니다.")
+                @Max(value = 60, message = "미션 참여 시간(초)의 최대값는 60입니다.")
                 @Schema(description = "미션 참여 시간(초)", defaultValue = "14")
                 Integer durationSec) {}
