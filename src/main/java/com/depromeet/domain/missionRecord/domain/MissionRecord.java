@@ -2,6 +2,9 @@ package com.depromeet.domain.missionRecord.domain;
 
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.mission.domain.Mission;
+import com.depromeet.global.error.exception.CustomException;
+import com.depromeet.global.error.exception.ErrorCode;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -29,13 +33,12 @@ public class MissionRecord extends BaseTimeEntity {
     @Column(name = "mission_record_id")
     private Long id;
 
-    private Integer duration;
+    private Duration duration;
 
     @Comment("미션 일지")
     private String remark;
 
     @Comment("인증 사진")
-    @Column(nullable = false)
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)
@@ -51,7 +54,7 @@ public class MissionRecord extends BaseTimeEntity {
 
     @Builder(access = AccessLevel.PRIVATE)
     private MissionRecord(
-            Integer duration,
+            Duration duration,
             String remark,
             String imageUrl,
             ImageUploadStatus uploadStatus,
@@ -68,16 +71,7 @@ public class MissionRecord extends BaseTimeEntity {
     }
 
     public static MissionRecord createMissionRecord(
-            Integer durationMin,
-            Integer durationSec,
-            LocalDateTime startedAt,
-            LocalDateTime finishedAt,
-            Mission mission) {
-        Integer duration = durationMin * 60 + durationSec;
-
-        if (duration > 3600) {
-            duration = 3600;
-        }
+            Duration duration, LocalDateTime startedAt, LocalDateTime finishedAt, Mission mission) {
         return MissionRecord.builder()
                 .duration(duration)
                 .uploadStatus(ImageUploadStatus.NONE)

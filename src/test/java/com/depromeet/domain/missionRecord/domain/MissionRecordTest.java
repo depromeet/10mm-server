@@ -7,6 +7,7 @@ import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ class MissionRecordTest {
         Profile profile = new Profile("testNickname", "testProfileImageUrl");
         Member member = Member.createNormalMember(profile);
         LocalDateTime missionStartedAt = LocalDateTime.of(2023, 12, 1, 1, 5, 0);
-        LocalDateTime missionFinishedAt = missionStartedAt.minusWeeks(2);
+        LocalDateTime missionFinishedAt = missionStartedAt.plusWeeks(2);
         Mission mission =
                 Mission.createMission(
                         "testMissionName",
@@ -36,9 +37,10 @@ class MissionRecordTest {
             LocalDateTime missionRecordStartedAt = LocalDateTime.of(2023, 12, 15, 1, 5, 0);
             LocalDateTime missionRecordFinishedAt =
                     missionRecordStartedAt.plusMinutes(32).plusSeconds(14);
+            Duration duration = Duration.ofMinutes(32).plusSeconds(14);
             MissionRecord missionRecord =
                     MissionRecord.createMissionRecord(
-                            32, 14, missionRecordStartedAt, missionRecordFinishedAt, mission);
+                            duration, missionRecordStartedAt, missionRecordFinishedAt, mission);
 
             // when
             ImageUploadStatus uploadStatus = missionRecord.getUploadStatus();
@@ -53,38 +55,13 @@ class MissionRecordTest {
             LocalDateTime missionRecordStartedAt = LocalDateTime.of(2023, 12, 15, 1, 5, 0);
             LocalDateTime missionRecordFinishedAt =
                     missionRecordStartedAt.plusMinutes(32).plusSeconds(14);
-            Integer durationMin = 32;
-            Integer durationSec = 14;
+            Duration duration = Duration.ofMinutes(32).plusSeconds(14);
             MissionRecord missionRecord =
                     MissionRecord.createMissionRecord(
-                            durationMin,
-                            durationSec,
-                            missionRecordStartedAt,
-                            missionRecordFinishedAt,
-                            mission);
+                            duration, missionRecordStartedAt, missionRecordFinishedAt, mission);
 
             // when, then
-            assertEquals(missionRecord.getDuration(), durationMin * 60 + durationSec);
-        }
-
-        @Test
-        void 참여_시간이_1시간이_넘어가면_1시간으로_변환된다() {
-            // given
-            LocalDateTime missionRecordStartedAt = LocalDateTime.of(2023, 12, 15, 1, 5, 0);
-            LocalDateTime missionRecordFinishedAt =
-                    missionRecordStartedAt.plusMinutes(32).plusSeconds(14);
-            Integer durationMin = 60;
-            Integer durationSec = 01;
-            MissionRecord missionRecord =
-                    MissionRecord.createMissionRecord(
-                            durationMin,
-                            durationSec,
-                            missionRecordStartedAt,
-                            missionRecordFinishedAt,
-                            mission);
-
-            // when, then
-            assertEquals(missionRecord.getDuration(), 3600);
+            assertEquals(missionRecord.getDuration(), (int) duration.getSeconds());
         }
     }
 }

@@ -9,6 +9,7 @@ import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,29 +22,37 @@ public class MissionRecordService {
     private final MissionRepository missionRepository;
     private final MissionRecordRepository missionRecordRepository;
 
-    public void createMissionRecord(MissionRecordCreateRequest request) {
-        final Mission mission =
-                missionRepository
-                        .findByMissionId(request.missionId())
-                        .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
+    public Long createMissionRecord(MissionRecordCreateRequest request) {
+        final Mission mission = findMission(request);
         final Member member = memberUtil.getCurrentMember();
 
+		Duration duration =
+			Duration.ofMinutes(request.durationMin()).plusSeconds(request.durationSec());
+
         validateMissionRecordUserMismatch(mission, member);
+		validateMissionRecordDuration(duration);
 
         MissionRecord missionRecord =
                 MissionRecord.createMissionRecord(
-                        request.durationMin(),
-                        request.durationSec(),
-                        request.startedAt(),
-                        request.finishedAt(),
-                        mission);
+                        duration, request.startedAt(), request.finishedAt(), mission);
+        return missionRecordRepository.save(missionRecord).getId();
+    }
 
-        missionRecordRepository.save(missionRecord);
+    private Mission findMission(MissionRecordCreateRequest request) {
+        return missionRepository
+                .findByMissionId(request.missionId())
+                .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
     }
 
     private void validateMissionRecordUserMismatch(Mission mission, Member member) {
-        if (member.getId().equals(mission.getMember().getId())) {
+        if (!member.getId().equals(mission.getMember().getId())) {
             throw new CustomException(ErrorCode.MISSION_RECORD_USER_MISMATCH);
+        }
+    }
+
+    private void validateMissionRecordDuration(Duration duration) {
+        if (duration.getSeconds() > 3600L) {
+            throw new CustomException(ErrorCode.MISSION_RECORD_DURATION_OVERBALANCE);
         }
     }
 }

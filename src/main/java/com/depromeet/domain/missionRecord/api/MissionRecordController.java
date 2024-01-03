@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class MissionRecordController {
     private final MissionRecordService missionRecordService;
 
-    @Operation(summary = "미션 기록 생성", description = "미션 기록을 생성합니다.")
+    @Operation(summary = "미션 기록 생성", description = "미션 기록을 생성하고 생성 된 id를 반환합니다.")
     @PostMapping
-    public ResponseEntity<Void> missionRecordCreate(
+    public ResponseEntity<Long> missionRecordCreate(
             @Valid @RequestBody MissionRecordCreateRequest request) {
-        missionRecordService.createMissionRecord(request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        Long missionRecordId = missionRecordService.createMissionRecord(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(missionRecordId);
     }
 }
