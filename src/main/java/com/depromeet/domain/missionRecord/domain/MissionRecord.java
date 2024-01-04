@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -29,13 +30,12 @@ public class MissionRecord extends BaseTimeEntity {
     @Column(name = "mission_record_id")
     private Long id;
 
-    private Integer duration;
+    private Duration duration;
 
     @Comment("미션 일지")
     private String remark;
 
     @Comment("인증 사진")
-    @Column(nullable = false)
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)
@@ -51,7 +51,7 @@ public class MissionRecord extends BaseTimeEntity {
 
     @Builder(access = AccessLevel.PRIVATE)
     private MissionRecord(
-            Integer duration,
+            Duration duration,
             String remark,
             String imageUrl,
             ImageUploadStatus uploadStatus,
@@ -68,19 +68,12 @@ public class MissionRecord extends BaseTimeEntity {
     }
 
     public static MissionRecord createMissionRecord(
-            Integer duration,
-            String remark,
-            String imageUrl,
-            LocalDateTime startedAt,
-            LocalDateTime finishedAt,
-            Mission mission) {
+            Duration duration, LocalDateTime startedAt, LocalDateTime finishedAt, Mission mission) {
         return MissionRecord.builder()
                 .duration(duration)
-                .remark(remark)
                 .uploadStatus(ImageUploadStatus.NONE)
                 .startedAt(startedAt)
                 .finishedAt(finishedAt)
-                .imageUrl(imageUrl)
                 .mission(mission)
                 .build();
     }
