@@ -36,6 +36,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -110,28 +111,26 @@ class MissionControllerTest {
                 .andDo(print());
     }
 
-    // TODO: validation 의존성 생기면 진행
-    // @Test
-    // void 미션_생성하는_데에_이름은_null일_수_없다() throws Exception {
-    // 	// given
-    // 	MissionCreateRequest createRequest =
-    // 		new MissionCreateRequest(
-    // 			"",
-    // 			"testMissionContent",
-    // 			MissionCategory.STUDY,
-    // 			MissionVisibility.ALL);
-    //
-    // 	// expected
-    // 	mockMvc.perform(
-    // 			post("/missions")
-    // 				.accept(APPLICATION_JSON)
-    // 				.contentType(APPLICATION_JSON)
-    // 				.with(csrf())
-    // 				.content(objectMapper.writeValueAsString(createRequest)))
-    // 		.andExpect(status().isBadRequest())
-    //
-    // 		.andDo(print());
-    // }
+    @Test
+    void 미션_생성하는데_이름은_null일_수_없다() throws Exception {
+        // given
+        MissionCreateRequest createRequest =
+                new MissionCreateRequest(
+                        null, "testMissionContent", MissionCategory.STUDY, MissionVisibility.ALL);
+
+        // expected
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/missions")
+                                .accept(APPLICATION_JSON)
+                                .contentType(APPLICATION_JSON)
+                                .with(csrf())
+                                .content(objectMapper.writeValueAsString(createRequest)));
+        perform.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.message").value("{\"name\":\"이름은 비워둘 수 없습니다.\"}"))
+                .andDo(print());
+    }
 
     @Test
     void 미션_단건_조회한다() throws Exception {
