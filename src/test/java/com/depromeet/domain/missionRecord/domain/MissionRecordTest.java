@@ -7,50 +7,46 @@ import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
+import java.time.Duration;
 import java.time.LocalDateTime;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class MissionRecordTest {
 
-    Mission mission;
-
-    @BeforeEach
-    void setUp() {
+    @Nested
+    class 미션기록_생성_시 {
         Profile profile = new Profile("testNickname", "testProfileImageUrl");
         Member member = Member.createNormalMember(profile);
-        LocalDateTime startedAt = LocalDateTime.of(2023, 12, 1, 1, 5, 0);
-        LocalDateTime finishedAt = LocalDateTime.of(2023, 12, 15, 1, 37, 0);
-        mission =
+        LocalDateTime missionStartedAt = LocalDateTime.of(2023, 12, 1, 1, 5, 0);
+        LocalDateTime missionFinishedAt = missionStartedAt.plusWeeks(2);
+        Mission mission =
                 Mission.createMission(
                         "testMissionName",
                         "testMissionContent",
                         1,
                         MissionCategory.ETC,
                         MissionVisibility.ALL,
-                        startedAt,
-                        finishedAt,
+                        missionStartedAt,
+                        missionFinishedAt,
                         member);
-    }
 
-    @Test
-    void 미션기록_업로드_상태_DEFAULT값은_NONE이다() {
-        // given
-        LocalDateTime startedAt = LocalDateTime.of(2023, 12, 15, 1, 5, 0);
-        LocalDateTime finishedAt = LocalDateTime.of(2023, 12, 15, 1, 37, 0);
-        MissionRecord missionRecord =
-                MissionRecord.createMissionRecord(
-                        32,
-                        "testMissionRecordRemark",
-                        "image/url/path",
-                        startedAt,
-                        finishedAt,
-                        mission);
+        @Test
+        void 업로드_상태_DEFAULT값은_NONE이다() {
+            // given
+            LocalDateTime missionRecordStartedAt = LocalDateTime.of(2023, 12, 15, 1, 5, 0);
+            LocalDateTime missionRecordFinishedAt =
+                    missionRecordStartedAt.plusMinutes(32).plusSeconds(14);
+            Duration duration = Duration.ofMinutes(32).plusSeconds(14);
+            MissionRecord missionRecord =
+                    MissionRecord.createMissionRecord(
+                            duration, missionRecordStartedAt, missionRecordFinishedAt, mission);
 
-        // when
-        ImageUploadStatus uploadStatus = missionRecord.getUploadStatus();
+            // when
+            ImageUploadStatus uploadStatus = missionRecord.getUploadStatus();
 
-        // then
-        assertEquals(ImageUploadStatus.NONE, uploadStatus);
+            // then
+            assertEquals(ImageUploadStatus.NONE, uploadStatus);
+        }
     }
 }
