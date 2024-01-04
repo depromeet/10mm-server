@@ -10,23 +10,19 @@ import org.springframework.data.redis.connection.lettuce.LettuceClientConfigurat
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
+import lombok.RequiredArgsConstructor;
+
 @EnableRedisRepositories
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfig {
-    @Value("${spring.data.redis.host}")
-    private String redisHost;
-
-    @Value("${spring.data.redis.port}")
-    private int redisPort;
-
-    @Value("${spring.data.redis.password}")
-    private String redisPassword;
+	private final RedisProperties redisProperties;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration redisConfig =
-                new RedisStandaloneConfiguration(redisHost, redisPort);
-        if (!redisPassword.isBlank()) redisConfig.setPassword(redisPassword);
+                new RedisStandaloneConfiguration(redisProperties.getHost(), redisProperties.getPort());
+        if (!redisProperties.getPassword().isBlank()) redisConfig.setPassword(redisProperties.getPassword());
         LettuceClientConfiguration clientConfig =
                 LettuceClientConfiguration.builder()
                         .commandTimeout(Duration.ofSeconds(1))
