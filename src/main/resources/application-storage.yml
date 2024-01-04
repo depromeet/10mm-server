@@ -1,0 +1,9 @@
+spring:
+  config:
+    activate:
+      on-profile: "storage"
+storage:
+  accessKey: ${STORAGE_ACCESS_KEY:}
+  secretKey: ${STORAGE_SECRET_KEY:}
+  region: ${STORAGE_REGION:}
+  bucket: ${STORAGE_BUCKET:}
