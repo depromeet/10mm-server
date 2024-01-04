@@ -28,6 +28,7 @@ public enum ErrorCode {
     // MissionRecord
     MISSION_RECORD_USER_MISMATCH(HttpStatus.BAD_REQUEST, "미션을 생성한 유저와 로그인된 계정이 일치하지 않습니다"),
     MISSION_RECORD_DURATION_OVERBALANCE(HttpStatus.BAD_REQUEST, "미션 참여 시간이 지정 된 시간보다 초과하였습니다"),
+	MiSSION_RECORD_YEAR_MONTH_INVALID(HttpStatus.BAD_REQUEST, "유효하지 않은 년월입니다."),
     ;
 
     private final HttpStatus status;
