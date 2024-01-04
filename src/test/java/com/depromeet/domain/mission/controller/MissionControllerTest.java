@@ -14,8 +14,10 @@ import com.depromeet.domain.mission.domain.ArchiveStatus;
 import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
+import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
 import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
+import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
 import com.depromeet.domain.mission.service.MissionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
@@ -162,7 +164,7 @@ class MissionControllerTest {
     void 미션_리스트를_조회한다() throws Exception {
         // given
         int size = 3;
-		long lastId = 4;
+        long lastId = 4;
         PageRequest pageRequest = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
         List<MissionFindResponse> mappedMissions =
                 Arrays.asList(
@@ -205,5 +207,34 @@ class MissionControllerTest {
                 .andExpect(jsonPath("$.data.content[0].missionId").value(size))
                 .andExpect(jsonPath("$.data.last", is(true)))
                 .andExpect(jsonPath("$.data.empty", is(false)));
+    }
+
+    @Test
+    void 미션_공개여부를_팔로워로_수정한다() throws Exception {
+        MissionUpdateRequest updateRequest =
+                new MissionUpdateRequest(
+                        "testMissionName", "testMissionContent", MissionVisibility.NONE);
+        given(missionService.updateMission(ArgumentMatchers.any(), ArgumentMatchers.any()))
+                .willReturn(
+                        new MissionUpdateResponse(
+                                1L,
+                                "testMissionName",
+                                "testMissionContent",
+                                MissionCategory.STUDY,
+                                MissionVisibility.FOLLOWER));
+
+        ResultActions perform =
+                mockMvc.perform(
+                        put("/missions/{missionId}", 1L)
+                                .accept(APPLICATION_JSON)
+                                .contentType(APPLICATION_JSON)
+                                .with(csrf())
+                                .content(objectMapper.writeValueAsString(updateRequest)));
+
+        perform.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.missionId").exists())
+                .andExpect(
+                        jsonPath("$.data.visibility").value(MissionVisibility.FOLLOWER.toString()))
+                .andDo(print());
     }
 }
