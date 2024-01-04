@@ -1,7 +1,7 @@
 package com.depromeet.infra.config.redis;
 
 import java.time.Duration;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -10,19 +10,19 @@ import org.springframework.data.redis.connection.lettuce.LettuceClientConfigurat
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
-import lombok.RequiredArgsConstructor;
-
 @EnableRedisRepositories
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
-	private final RedisProperties redisProperties;
+    private final RedisProperties redisProperties;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration redisConfig =
-                new RedisStandaloneConfiguration(redisProperties.getHost(), redisProperties.getPort());
-        if (!redisProperties.getPassword().isBlank()) redisConfig.setPassword(redisProperties.getPassword());
+                new RedisStandaloneConfiguration(
+                        redisProperties.getHost(), redisProperties.getPort());
+        if (!redisProperties.getPassword().isBlank())
+            redisConfig.setPassword(redisProperties.getPassword());
         LettuceClientConfiguration clientConfig =
                 LettuceClientConfiguration.builder()
                         .commandTimeout(Duration.ofSeconds(1))
