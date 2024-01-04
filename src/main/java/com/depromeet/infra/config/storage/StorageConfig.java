@@ -18,10 +18,10 @@ public class StorageConfig {
     public AmazonS3 amazonS3() {
         AWSCredentials credentials =
                 new BasicAWSCredentials(
-                        storageProperties.getAccessKey(), storageProperties.getSecretKey());
+                        storageProperties.accessKey(), storageProperties.secretKey());
         return AmazonS3ClientBuilder.standard()
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                .withRegion(storageProperties.getRegion())
+                .withRegion(storageProperties.region())
                 .build();
     }
 }
