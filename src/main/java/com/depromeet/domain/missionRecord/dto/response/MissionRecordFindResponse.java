@@ -11,18 +11,16 @@ public record MissionRecordFindResponse(
 	String imageUrl,
 	int missionDay,
 	LocalDateTime startedAt,
-	LocalDateTime finishedAt,
-	LocalDateTime createdAt
+	LocalDateTime finishedAt
 ) {
 	public static MissionRecordFindResponse from(MissionRecord missionRecord) {
 		return new MissionRecordFindResponse(
 			missionRecord.getId(),
 			missionRecord.getRemark(),
 			missionRecord.getImageUrl(),
-			missionRecord.getCreatedAt().getDayOfMonth(),
+			missionRecord.getStartedAt().getDayOfMonth(),
 			missionRecord.getStartedAt(),
-			missionRecord.getFinishedAt(),
-			missionRecord.getCreatedAt()
+			missionRecord.getFinishedAt()
 		);
 	}
 }

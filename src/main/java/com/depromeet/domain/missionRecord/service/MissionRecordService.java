@@ -59,7 +59,7 @@ public class MissionRecordService {
 
     private Mission findMission(MissionRecordCreateRequest request) {
         return missionRepository
-                .findByMissionId(request.missionId())
+                .findById(request.missionId())
                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
     }
 

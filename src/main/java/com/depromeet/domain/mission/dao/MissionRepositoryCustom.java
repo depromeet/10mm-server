@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 public interface MissionRepositoryCustom {
-    Optional<Mission> findByMissionId(Long missionId);
 
     Slice<Mission> findAllMission(Member member, Pageable pageable, Long lastId);
 }

@@ -33,10 +33,6 @@ public class MissionRecordController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(missionRecordId);
 	}
 
-	/*
-	missionDay: 미션 생성 일자의 day 값
-	continuousDay: 연속된 일수는 미션 상세에서 처리함.
-	 */
 	@Operation(summary = "미션 기록 조회", description = "미션 기록을 조회합니다.")
 	@GetMapping
 	public List<MissionRecordFindResponse> missionRecordFind(

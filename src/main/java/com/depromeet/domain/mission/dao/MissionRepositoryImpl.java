@@ -22,18 +22,6 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Optional<Mission> findByMissionId(Long missionId) {
-        Mission findMission =
-                jpaQueryFactory
-                        .selectFrom(mission)
-                        .leftJoin(mission.missionRecords, missionRecord)
-                        .fetchJoin()
-                        .where(mission.id.eq(missionId))
-                        .fetchOne();
-        return Optional.ofNullable(findMission);
-    }
-
-    @Override
     public Slice<Mission> findAllMission(Member member, Pageable pageable, Long lastId) {
         JPAQuery<Mission> query =
                 jpaQueryFactory
