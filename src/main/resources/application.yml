@@ -1,33 +1,10 @@
 spring:
   profiles:
     group:
-      test: "test"
-      local: "local, datasource, redis"
-      dev: "dev, datasource, redis, actuator"
-      prod: "prod, datasource, redis, actuator"
-  security:
-    oauth2:
-      client:
-        registration:
-          kakao:
-            authorization-grant-type: authorization_code
-            client-id: ${KAKAO_CLIENT_ID}
-            client-secret: ${KAKAO_CLIENT_SECRET}
-            redirect-uri: ${KAKAO_REDIRECT_URI}
-            client-name: Kakao
-            client-authentication-method: client_secret_post
-            scope:
-              - openid
-              - profile_nickname
-              - profile_image
-              - account_email
-        provider:
-          kakao:
-            authorization-uri: https://kauth.kakao.com/oauth/authorize
-            token-uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v1/oidc/userinfo
-            user-name-attribute: sub
-            jwk-set-uri: https://kauth.kakao.com/.well-known/jwks.json
+      test: "test, redis, storage"
+      local: "local, datasource, redis, storage"
+      dev: "dev, datasource, redis, storage, actuator"
+      prod: "prod, datasource, redis, storage, actuator"
 
 swagger:
   version: 0.0.1
