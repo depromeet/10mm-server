@@ -54,6 +54,10 @@ class MissionControllerTest {
     }
 
     // 무한 스크롤 방식 처리하는 메서드
+    /*
+    Repository에서 구현된 List<Mission>은 Repository 계층에서 이뤄지지에
+    테스트 코드는 MissionFindResponse로 변경
+    */
     private Slice<MissionFindResponse> checkLastPage(
             Pageable pageable, List<MissionFindResponse> result) {
         boolean hasNext = false;
@@ -158,6 +162,7 @@ class MissionControllerTest {
     void 미션_리스트를_조회한다() throws Exception {
         // given
         int size = 3;
+		long lastId = 4;
         PageRequest pageRequest = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
         List<MissionFindResponse> mappedMissions =
                 Arrays.asList(
@@ -191,13 +196,13 @@ class MissionControllerTest {
         // expected
         ResultActions perform =
                 mockMvc.perform(
-                        get("/missions?size=3&lastId=4")
+                        get("/missions?size={size}&lastId={lastId}", size, lastId)
                                 .accept(APPLICATION_JSON)
                                 .contentType(APPLICATION_JSON)
                                 .with(csrf()));
         perform.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.content.length()", is(3)))
-                .andExpect(jsonPath("$.data.content[0].missionId").value(3))
+                .andExpect(jsonPath("$.data.content.length()", is(size)))
+                .andExpect(jsonPath("$.data.content[0].missionId").value(size))
                 .andExpect(jsonPath("$.data.last", is(true)))
                 .andExpect(jsonPath("$.data.empty", is(false)));
     }
