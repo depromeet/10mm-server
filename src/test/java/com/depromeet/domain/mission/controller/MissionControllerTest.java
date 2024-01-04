@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -55,9 +56,9 @@ class MissionControllerTest {
         databaseCleaner.execute();
     }
 
-    // 무한 스크롤 방식 처리하는 메서드
     /*
-    Repository에서 구현된 List<Mission>은 Repository 계층에서 이뤄지지에
+    무한 스크롤 방식 처리하는 메서드로
+    MissionRepository에서 구현된 List<Mission>은 Repository 계층에서 이뤄지지에
     테스트 코드는 MissionFindResponse로 변경
     */
     private Slice<MissionFindResponse> checkLastPage(
@@ -211,6 +212,7 @@ class MissionControllerTest {
 
     @Test
     void 미션_공개여부를_팔로워로_수정한다() throws Exception {
+        // given
         MissionUpdateRequest updateRequest =
                 new MissionUpdateRequest(
                         "testMissionName", "testMissionContent", MissionVisibility.NONE);
@@ -223,6 +225,7 @@ class MissionControllerTest {
                                 MissionCategory.STUDY,
                                 MissionVisibility.FOLLOWER));
 
+        // expected
         ResultActions perform =
                 mockMvc.perform(
                         put("/missions/{missionId}", 1L)
@@ -235,6 +238,41 @@ class MissionControllerTest {
                 .andExpect(jsonPath("$.data.missionId").exists())
                 .andExpect(
                         jsonPath("$.data.visibility").value(MissionVisibility.FOLLOWER.toString()))
+                .andDo(print());
+    }
+
+    @Test
+    void 미션_단건_삭제한다() throws Exception {
+        // given
+        Long missionId = 1L;
+        doNothing().when(missionService).deleteMission(missionId);
+
+        // expected
+        mockMvc.perform(
+                        delete("/missions/{missionId}", missionId)
+                                .accept(APPLICATION_JSON)
+                                .contentType(APPLICATION_JSON)
+                                .with(csrf()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void 존재하지_않는_미션을_삭제한다() throws Exception {
+        // given
+        Long nonExistingMissionId = 999L;
+
+        // when
+        doThrow(new EmptyResultDataAccessException(1))
+                .when(missionService)
+                .deleteMission(nonExistingMissionId);
+
+        // then
+        mockMvc.perform(
+                        delete("/missions/{missionId}", nonExistingMissionId)
+                                .accept(APPLICATION_JSON)
+                                .contentType(APPLICATION_JSON)
+                                .with(csrf()))
+                .andExpect(status().isInternalServerError())
                 .andDo(print());
     }
 }
