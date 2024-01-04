@@ -1,10 +1,14 @@
 spring:
   profiles:
     group:
-      test: "test, redis, storage"
-      local: "local, datasource, redis, storage"
-      dev: "dev, datasource, redis, storage, actuator"
-      prod: "prod, datasource, redis, storage, actuator"
+      test: "test"
+      local: "local, datasource"
+      dev: "dev, datasource, actuator"
+      prod: "prod, datasource actuator"
+    include:
+      - redis
+      - storage
+      - security
 
 swagger:
   version: 0.0.1
