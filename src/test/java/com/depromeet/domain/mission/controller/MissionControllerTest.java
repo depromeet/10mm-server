@@ -125,12 +125,14 @@ class MissionControllerTest {
                                 1));
 
         // expected
-        mockMvc.perform(
+        ResultActions perform =
+                mockMvc.perform(
                         get("/missions/{missionId}", 1L)
                                 .accept(APPLICATION_JSON)
                                 .contentType(APPLICATION_JSON)
-                                .with(csrf()))
-                .andExpect(status().isOk())
+                                .with(csrf()));
+
+        perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.missionId").exists())
                 .andExpect(jsonPath("$.data.name").exists())
                 .andExpect(jsonPath("$.data.name").value("testMissionName"));
@@ -171,12 +173,13 @@ class MissionControllerTest {
                                 false));
 
         // expected
-        mockMvc.perform(
+        ResultActions perform =
+                mockMvc.perform(
                         get("/missions?size=3&lastId=4")
                                 .accept(APPLICATION_JSON)
                                 .contentType(APPLICATION_JSON)
-                                .with(csrf()))
-                .andExpect(status().isOk())
+                                .with(csrf()));
+        perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.content.length()", is(3)))
                 .andExpect(jsonPath("$.data.content[0].missionId").value(3))
                 .andExpect(jsonPath("$.data.last", is(true)))
