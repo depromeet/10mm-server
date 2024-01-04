@@ -23,7 +23,12 @@ public enum ErrorCode {
     // Mission
     MISSION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 미션을 찾을 수 없습니다."),
 
-    MISSION_VISIBILITY_NULL(HttpStatus.BAD_REQUEST, "미션 공개 여부가 null입니다.");
+    MISSION_VISIBILITY_NULL(HttpStatus.BAD_REQUEST, "미션 공개 여부가 null입니다."),
+
+    // MissionRecord
+    MISSION_RECORD_USER_MISMATCH(HttpStatus.BAD_REQUEST, "미션을 생성한 유저와 로그인된 계정이 일치하지 않습니다"),
+    MISSION_RECORD_DURATION_OVERBALANCE(HttpStatus.BAD_REQUEST, "미션 참여 시간이 지정 된 시간보다 초과하였습니다"),
+    ;
 
     private final HttpStatus status;
     private final String message;
