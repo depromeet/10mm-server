@@ -19,6 +19,7 @@ import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.service.MissionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -27,6 +28,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
@@ -48,6 +51,19 @@ class MissionControllerTest {
     @BeforeEach
     void setUp() {
         databaseCleaner.execute();
+    }
+
+    // 무한 스크롤 방식 처리하는 메서드
+    private Slice<MissionFindResponse> checkLastPage(
+            Pageable pageable, List<MissionFindResponse> result) {
+        boolean hasNext = false;
+
+        // 조회한 결과 개수가 요청한 페이지 사이즈보다 크면 뒤에 더 있음, next = true
+        if (result.size() > pageable.getPageSize()) {
+            hasNext = true;
+            result.remove(pageable.getPageSize());
+        }
+        return new SliceImpl<>(result, pageable, hasNext);
     }
 
     @Test
@@ -141,36 +157,36 @@ class MissionControllerTest {
     @Test
     void 미션_리스트를_조회한다() throws Exception {
         // given
+        int size = 3;
+        PageRequest pageRequest = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
+        List<MissionFindResponse> mappedMissions =
+                Arrays.asList(
+                        new MissionFindResponse(
+                                3L,
+                                "testMissionName_3",
+                                "testMissionContent_3",
+                                MissionCategory.WRITING,
+                                MissionVisibility.ALL,
+                                ArchiveStatus.NONE,
+                                3),
+                        new MissionFindResponse(
+                                2L,
+                                "testMissionName_2",
+                                "testMissionContent_2",
+                                MissionCategory.ETC,
+                                MissionVisibility.ALL,
+                                ArchiveStatus.NONE,
+                                2),
+                        new MissionFindResponse(
+                                1L,
+                                "testMissionName_1",
+                                "testMissionContent_1",
+                                MissionCategory.STUDY,
+                                MissionVisibility.ALL,
+                                ArchiveStatus.NONE,
+                                1));
         given(missionService.findAllMission(anyInt(), anyLong()))
-                .willReturn(
-                        new SliceImpl<>(
-                                Arrays.asList(
-                                        new MissionFindResponse(
-                                                3L,
-                                                "testMissionName_3",
-                                                "testMissionContent_3",
-                                                MissionCategory.WRITING,
-                                                MissionVisibility.ALL,
-                                                ArchiveStatus.NONE,
-                                                3),
-                                        new MissionFindResponse(
-                                                2L,
-                                                "testMissionName_2",
-                                                "testMissionContent_2",
-                                                MissionCategory.ETC,
-                                                MissionVisibility.ALL,
-                                                ArchiveStatus.NONE,
-                                                2),
-                                        new MissionFindResponse(
-                                                1L,
-                                                "testMissionName_1",
-                                                "testMissionContent_1",
-                                                MissionCategory.STUDY,
-                                                MissionVisibility.ALL,
-                                                ArchiveStatus.NONE,
-                                                1)),
-                                PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "id")),
-                                false));
+                .willReturn(checkLastPage(pageRequest, mappedMissions));
 
         // expected
         ResultActions perform =
