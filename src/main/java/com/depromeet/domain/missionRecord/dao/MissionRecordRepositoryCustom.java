@@ -1,10 +1,10 @@
 package com.depromeet.domain.missionRecord.dao;
 
-import java.util.List;
-
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import java.time.YearMonth;
+import java.util.List;
 
 public interface MissionRecordRepositoryCustom {
 
-	List<MissionRecord> findAllByMissionId(Long missionId, String year, String month);
+    List<MissionRecord> findAllByMissionId(Long missionId, YearMonth yearMonth);
 }
