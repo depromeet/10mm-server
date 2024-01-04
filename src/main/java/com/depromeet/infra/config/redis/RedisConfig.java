@@ -1,4 +1,4 @@
-package com.depromeet.infra.config;
+package com.depromeet.infra.config.redis;
 
 import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
