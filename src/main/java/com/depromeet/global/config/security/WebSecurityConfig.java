@@ -1,5 +1,7 @@
 package com.depromeet.global.config.security;
 
+import static org.springframework.security.config.Customizer.*;
+
 import com.depromeet.global.common.constants.SwaggerUrlConstants;
 import com.depromeet.global.common.constants.UrlConstants;
 import com.depromeet.global.util.SpringEnvironmentUtil;
@@ -9,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -54,9 +55,12 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.formLogin(AbstractHttpConfigurer::disable).csrf(AbstractHttpConfigurer::disable);
 
-        http.sessionManagement(
+      http
+          .formLogin(AbstractHttpConfigurer::disable)
+          .cors(withDefaults())
+          .csrf(AbstractHttpConfigurer::disable)
+          .sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         if (springEnvironmentUtil.isProdAndDevProfile()) {
@@ -69,7 +73,7 @@ public class WebSecurityConfig {
                                                             .map(SwaggerUrlConstants::getValue)
                                                             .toArray(String[]::new))
                                             .authenticated())
-                    .httpBasic(Customizer.withDefaults());
+                    .httpBasic(withDefaults());
         }
 
         http.authorizeHttpRequests(
