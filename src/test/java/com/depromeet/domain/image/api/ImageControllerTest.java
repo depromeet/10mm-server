@@ -12,7 +12,6 @@ import com.depromeet.domain.image.domain.ImageFileExtension;
 import com.depromeet.domain.image.dto.request.MissionRecordImageCreateRequest;
 import com.depromeet.domain.image.dto.request.MissionRecordImageUploadCompleteRequest;
 import com.depromeet.domain.image.dto.response.PresignedUrlResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.awt.*;
 import org.junit.jupiter.api.Nested;
@@ -48,118 +47,127 @@ class ImageControllerTest {
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
-                    .andExpect(jsonPath("$.message").value("{\"missionRecordId\":\"미션 기록 ID는 비워둘 수 없습니다.\"}"))
+                    .andExpect(
+                            jsonPath("$.message")
+                                    .value("{\"missionRecordId\":\"미션 기록 ID는 비워둘 수 없습니다.\"}"))
                     .andDo(print());
         }
 
-		@Test
-		void 이미지_파일의_확장자가_NULL_이라면_예외를_발생시킨다() throws Exception {
-			// given
-			MissionRecordImageCreateRequest request =
-					new MissionRecordImageCreateRequest(1L, null);
+        @Test
+        void 이미지_파일의_확장자가_NULL_이라면_예외를_발생시킨다() throws Exception {
+            // given
+            MissionRecordImageCreateRequest request = new MissionRecordImageCreateRequest(1L, null);
 
-			// when, then
-			mockMvc.perform(
-					post("/images/records/upload-url")
-						.contentType(APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
-				.andExpect(jsonPath("$.message").value("{\"imageFileExtension\":\"이미지 파일의 확장자는 비워둘 수 없습니다.\"}"))
-				.andDo(print());
-		}
+            // when, then
+            mockMvc.perform(
+                            post("/images/records/upload-url")
+                                    .contentType(APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                    .andExpect(
+                            jsonPath("$.message")
+                                    .value("{\"imageFileExtension\":\"이미지 파일의 확장자는 비워둘 수 없습니다.\"}"))
+                    .andDo(print());
+        }
 
-		@Test
-		void 입력_값이_정상이라면_예외가_발생하지_않는다() throws Exception {
-			// given
-			MissionRecordImageCreateRequest request =
-					new MissionRecordImageCreateRequest(30L, ImageFileExtension.JPEG);
-			PresignedUrlResponse response = PresignedUrlResponse.from("presignedUrl");
+        @Test
+        void 입력_값이_정상이라면_예외가_발생하지_않는다() throws Exception {
+            // given
+            MissionRecordImageCreateRequest request =
+                    new MissionRecordImageCreateRequest(30L, ImageFileExtension.JPEG);
+            PresignedUrlResponse response = PresignedUrlResponse.from("presignedUrl");
 
-			// when
-			given(imageService.createMissionRecordPresignedUrl(request))
-					.willReturn(response);
+            // when
+            given(imageService.createMissionRecordPresignedUrl(request)).willReturn(response);
 
-			// then
-			mockMvc.perform(
-					post("/images/records/upload-url")
-						.contentType(APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.success").value(true))
-				.andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
-				.andExpect(jsonPath("$.data.presignedUrl").value("presignedUrl"))
-				.andDo(print());
-		}
+            // then
+            mockMvc.perform(
+                            post("/images/records/upload-url")
+                                    .contentType(APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success").value(true))
+                    .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                    .andExpect(jsonPath("$.data.presignedUrl").value("presignedUrl"))
+                    .andDo(print());
+        }
     }
 
-	@Nested
-	class 미션_기록_이미지_업로드_완료_처리할_때 {
-		@Test
-		void 미션_ID가_NULL_이라면_예외를_발생시킨다() throws Exception {
-			// given
-			MissionRecordImageUploadCompleteRequest request =
-				new MissionRecordImageUploadCompleteRequest(null, ImageFileExtension.JPEG, "미션 일지");
+    @Nested
+    class 미션_기록_이미지_업로드_완료_처리할_때 {
+        @Test
+        void 미션_ID가_NULL_이라면_예외를_발생시킨다() throws Exception {
+            // given
+            MissionRecordImageUploadCompleteRequest request =
+                    new MissionRecordImageUploadCompleteRequest(
+                            null, ImageFileExtension.JPEG, "미션 일지");
 
-			// when, then
-			mockMvc.perform(
-					post("/images/records/upload-complete")
-						.contentType(APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
-				.andExpect(jsonPath("$.message").value("{\"missionRecordId\":\"미션 기록 ID는 비워둘 수 없습니다.\"}"))
-				.andDo(print());
-		}
+            // when, then
+            mockMvc.perform(
+                            post("/images/records/upload-complete")
+                                    .contentType(APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                    .andExpect(
+                            jsonPath("$.message")
+                                    .value("{\"missionRecordId\":\"미션 기록 ID는 비워둘 수 없습니다.\"}"))
+                    .andDo(print());
+        }
 
-		@Test
-		void 이미지_파일의_확장자가_NULL_이라면_예외를_발생시킨다() throws Exception {
-			// given
-			MissionRecordImageUploadCompleteRequest request =
-				new MissionRecordImageUploadCompleteRequest(182L, null, "미션 일지");
+        @Test
+        void 이미지_파일의_확장자가_NULL_이라면_예외를_발생시킨다() throws Exception {
+            // given
+            MissionRecordImageUploadCompleteRequest request =
+                    new MissionRecordImageUploadCompleteRequest(182L, null, "미션 일지");
 
-			// when, then
-			mockMvc.perform(
-					post("/images/records/upload-complete")
-						.contentType(APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
-				.andExpect(jsonPath("$.message").value("{\"imageFileExtension\":\"이미지 파일의 확장자는 비워둘 수 없습니다.\"}"))
-				.andDo(print());
-		}
+            // when, then
+            mockMvc.perform(
+                            post("/images/records/upload-complete")
+                                    .contentType(APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                    .andExpect(
+                            jsonPath("$.message")
+                                    .value("{\"imageFileExtension\":\"이미지 파일의 확장자는 비워둘 수 없습니다.\"}"))
+                    .andDo(print());
+        }
 
-		@Test
-		void 미션_일지는_NULL_이라도_예외가_발생하지_않는다() throws Exception {
-			MissionRecordImageUploadCompleteRequest request =
-				new MissionRecordImageUploadCompleteRequest(182L, ImageFileExtension.JPEG, null);
+        @Test
+        void 미션_일지는_NULL_이라도_예외가_발생하지_않는다() throws Exception {
+            MissionRecordImageUploadCompleteRequest request =
+                    new MissionRecordImageUploadCompleteRequest(
+                            182L, ImageFileExtension.JPEG, null);
 
-			// when, then
-			mockMvc.perform(
-					post("/images/records/upload-complete")
-						.contentType(APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.success").value(true))
-				.andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
-				.andDo(print());
-		}
+            // when, then
+            mockMvc.perform(
+                            post("/images/records/upload-complete")
+                                    .contentType(APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success").value(true))
+                    .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                    .andDo(print());
+        }
 
-		@Test
-		void 입력_값이_정상이라면_예외가_발생하지_않는다() throws Exception {
-			// given
-			MissionRecordImageUploadCompleteRequest request =
-				new MissionRecordImageUploadCompleteRequest(182L, ImageFileExtension.JPEG, "미션 일지");
+        @Test
+        void 입력_값이_정상이라면_예외가_발생하지_않는다() throws Exception {
+            // given
+            MissionRecordImageUploadCompleteRequest request =
+                    new MissionRecordImageUploadCompleteRequest(
+                            182L, ImageFileExtension.JPEG, "미션 일지");
 
-			// when, then
-			mockMvc.perform(
-					post("/images/records/upload-url")
-						.contentType(APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.success").value(true))
-				.andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
-				.andDo(print());
-		}
-	}
+            // when, then
+            mockMvc.perform(
+                            post("/images/records/upload-url")
+                                    .contentType(APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success").value(true))
+                    .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                    .andDo(print());
+        }
+    }
 }
