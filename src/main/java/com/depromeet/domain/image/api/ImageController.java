@@ -2,6 +2,7 @@ package com.depromeet.domain.image.api;
 
 import com.depromeet.domain.image.application.ImageService;
 import com.depromeet.domain.image.dto.request.MissionRecordImageCreateRequest;
+import com.depromeet.domain.image.dto.request.MissionRecordImageUploadCompleteRequest;
 import com.depromeet.domain.image.dto.response.PresignedUrlResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,5 +27,12 @@ public class ImageController {
     public PresignedUrlResponse missionRecordPresignedUrlCreate(
             @Valid @RequestBody MissionRecordImageCreateRequest request) {
         return imageService.createMissionRecordPresignedUrl(request);
+    }
+
+    @Operation(summary = "미션 기록 이미지 업로드 완료처리", description = "미션 기록 이미지 업로드 완료 시 호출하시면 됩니다.")
+    @PostMapping("/records/upload-complete")
+    public void missionRecordUploaded(
+            @Valid @RequestBody MissionRecordImageUploadCompleteRequest request) {
+        imageService.uploadCompleteMissionRecord(request);
     }
 }

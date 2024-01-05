@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.depromeet.domain.image.domain.ImageFileExtension;
 import com.depromeet.domain.image.domain.ImageType;
 import com.depromeet.domain.image.dto.request.MissionRecordImageCreateRequest;
+import com.depromeet.domain.image.dto.request.MissionRecordImageUploadCompleteRequest;
 import com.depromeet.domain.image.dto.response.PresignedUrlResponse;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
@@ -57,6 +58,32 @@ public class ImageService {
 
         missionRecord.updateUploadStatusPending();
         return PresignedUrlResponse.from(presignedUrl);
+    }
+
+    @Transactional
+    public void uploadCompleteMissionRecord(MissionRecordImageUploadCompleteRequest request) {
+        final Member currentMember = memberUtil.getCurrentMember();
+        MissionRecord missionRecord =
+                missionRecordRepository
+                        .findById(request.missionRecordId())
+                        .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
+        String imageUrl =
+                storageProperties.endpoint()
+                        + "/"
+                        + storageProperties.bucket()
+                        + "/"
+                        + springEnvironmentUtil.getCurrentProfile()
+                        + "/"
+                        + "members"
+                        + "/"
+                        + currentMember.getId()
+                        + "/"
+                        + ImageType.MISSION_RECORD
+                        + "/"
+                        + request.missionRecordId()
+                        + "/image."
+                        + request.imageFileExtension().getUploadExtension();
+        missionRecord.updateUploadStatusComplete(request.remark(), imageUrl);
     }
 
     private String createFileName(
