@@ -81,4 +81,10 @@ public class MissionRecord extends BaseTimeEntity {
     public void updateUploadStatusPending() {
         this.uploadStatus = ImageUploadStatus.PENDING;
     }
+
+    public void updateUploadStatusComplete(String remark, String imageUrl) {
+        this.uploadStatus = ImageUploadStatus.COMPLETE;
+        this.remark = remark;
+        this.imageUrl = imageUrl;
+    }
 }
