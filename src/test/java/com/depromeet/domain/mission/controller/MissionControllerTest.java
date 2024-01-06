@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.depromeet.DatabaseCleaner;
 import com.depromeet.domain.mission.api.MissionController;
 import com.depromeet.domain.mission.domain.ArchiveStatus;
 import com.depromeet.domain.mission.domain.MissionCategory;
@@ -22,7 +21,6 @@ import com.depromeet.domain.mission.service.MissionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -234,35 +232,34 @@ class MissionControllerTest {
                 .andDo(print());
     }
 
-	@Test
-	void 미션이름을_null로_수정할_수_없다 () throws Exception {
-		// given
-		MissionUpdateRequest updateRequest =
-			new MissionUpdateRequest(
-				null, "testMissionContent", MissionVisibility.NONE);
-		given(missionService.updateMission(ArgumentMatchers.any(), ArgumentMatchers.any()))
-			.willReturn(
-				new MissionUpdateResponse(
-					1L,
-					null,
-					"testMissionContent",
-					MissionCategory.STUDY,
-					MissionVisibility.FOLLOWER));
+    @Test
+    void 미션이름을_null로_수정할_수_없다() throws Exception {
+        // given
+        MissionUpdateRequest updateRequest =
+                new MissionUpdateRequest(null, "testMissionContent", MissionVisibility.NONE);
+        given(missionService.updateMission(ArgumentMatchers.any(), ArgumentMatchers.any()))
+                .willReturn(
+                        new MissionUpdateResponse(
+                                1L,
+                                null,
+                                "testMissionContent",
+                                MissionCategory.STUDY,
+                                MissionVisibility.FOLLOWER));
 
-		// expected
-		ResultActions perform =
-			mockMvc.perform(
-				put("/missions/{missionId}", 1L)
-					.accept(APPLICATION_JSON)
-					.contentType(APPLICATION_JSON)
-					.with(csrf())
-					.content(objectMapper.writeValueAsString(updateRequest)));
+        // expected
+        ResultActions perform =
+                mockMvc.perform(
+                        put("/missions/{missionId}", 1L)
+                                .accept(APPLICATION_JSON)
+                                .contentType(APPLICATION_JSON)
+                                .with(csrf())
+                                .content(objectMapper.writeValueAsString(updateRequest)));
 
-		perform.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
-			.andExpect(jsonPath("$.message").value("{\"name\":\"이름은 비워둘 수 없습니다.\"}"))
-			.andDo(print());
-	}
+        perform.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.message").value("{\"name\":\"이름은 비워둘 수 없습니다.\"}"))
+                .andDo(print());
+    }
 
     @Test
     void 미션_단건_삭제한다() throws Exception {
