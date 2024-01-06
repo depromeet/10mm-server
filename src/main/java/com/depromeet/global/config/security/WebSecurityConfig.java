@@ -4,6 +4,8 @@ import static org.springframework.security.config.Customizer.*;
 
 import com.depromeet.global.common.constants.SwaggerUrlConstants;
 import com.depromeet.global.common.constants.UrlConstants;
+import com.depromeet.global.security.CustomOidcAuthenticationSuccessHandler;
+import com.depromeet.global.security.CustomOidcUserService;
 import com.depromeet.global.util.SpringEnvironmentUtil;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class WebSecurityConfig {
 
     private final SpringEnvironmentUtil springEnvironmentUtil;
+    private final CustomOidcUserService customOidcUserService;
+    private final CustomOidcAuthenticationSuccessHandler customOidcAuthenticationSuccessHandler;
 
     @Value("${swagger.user}")
     private String swaggerUser;
@@ -56,12 +60,11 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-      http
-          .formLogin(AbstractHttpConfigurer::disable)
-          .cors(withDefaults())
-          .csrf(AbstractHttpConfigurer::disable)
-          .sessionManagement(
-                session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.formLogin(AbstractHttpConfigurer::disable)
+                .cors(withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         if (springEnvironmentUtil.isProdAndDevProfile()) {
             http.authorizeHttpRequests(
@@ -93,6 +96,12 @@ public class WebSecurityConfig {
                                 // TODO: 임시로 모든 url 허용했지만, OIDC에서 권한따라 authentication 할 수 있도록 변경 필요
                                 // .authenticated()
                                 .permitAll());
+
+        http.oauth2Login(
+                oauth2 ->
+                        oauth2.userInfoEndpoint(
+                                        userInfo -> userInfo.oidcUserService(customOidcUserService))
+                                .successHandler(customOidcAuthenticationSuccessHandler));
 
         return http.build();
     }
