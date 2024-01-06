@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 public record MissionRecordFindResponse(
         Long missionRecordId,
-        String remart,
+        String remark,
         String imageUrl,
         int missionDay,
         LocalDateTime startedAt,
