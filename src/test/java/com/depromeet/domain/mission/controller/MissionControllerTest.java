@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -284,9 +283,9 @@ class MissionControllerTest {
         Long nonExistingMissionId = 999L;
 
         // when
-		doThrow(new CustomException(ErrorCode.MISSION_NOT_FOUND))
-			.when(missionService)
-			.deleteMission(nonExistingMissionId);
+        doThrow(new CustomException(ErrorCode.MISSION_NOT_FOUND))
+                .when(missionService)
+                .deleteMission(nonExistingMissionId);
 
         // then
         mockMvc.perform(
