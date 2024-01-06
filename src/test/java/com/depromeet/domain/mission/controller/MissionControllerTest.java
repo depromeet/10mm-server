@@ -19,6 +19,8 @@ import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
 import com.depromeet.domain.mission.service.MissionService;
+import com.depromeet.global.error.exception.CustomException;
+import com.depromeet.global.error.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.List;
@@ -282,9 +284,9 @@ class MissionControllerTest {
         Long nonExistingMissionId = 999L;
 
         // when
-        doThrow(new EmptyResultDataAccessException(1))
-                .when(missionService)
-                .deleteMission(nonExistingMissionId);
+		doThrow(new CustomException(ErrorCode.MISSION_NOT_FOUND))
+			.when(missionService)
+			.deleteMission(nonExistingMissionId);
 
         // then
         mockMvc.perform(
@@ -292,7 +294,7 @@ class MissionControllerTest {
                                 .accept(APPLICATION_JSON)
                                 .contentType(APPLICATION_JSON)
                                 .with(csrf()))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isNotFound())
                 .andDo(print());
     }
 }
