@@ -12,8 +12,6 @@ spring:
             client-authentication-method: client_secret_post
             scope:
               - openid
-              - profile_nickname
-              - profile_image
               - account_email
         provider:
           kakao:
@@ -26,3 +24,6 @@ spring:
 jwt:
   access-token-secret: ${JWT_ACCESS_TOKEN_SECRET}
   refresh-token-secret: ${JWT_REFRESH_TOKEN_SECRET}
+  access-token-expiration-time: 1800 # 30분
+  refresh-token-expiration-time: 604800 # 7일
+  issuer: ${JWT_ISSUER}
