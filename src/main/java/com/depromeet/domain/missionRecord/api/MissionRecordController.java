@@ -6,6 +6,7 @@ import com.depromeet.domain.missionRecord.service.MissionRecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.time.YearMonth;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,7 @@ public class MissionRecordController {
     @GetMapping
     public List<MissionRecordFindResponse> missionRecordFind(
             @RequestParam("missionId") Long missionId,
-            @RequestParam("yearMonth") String yearMonth) {
+            @RequestParam("yearMonth") YearMonth yearMonth) {
         return missionRecordService.findAllMissionRecord(missionId, yearMonth);
     }
 }

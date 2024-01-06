@@ -12,8 +12,6 @@ import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
 import java.time.Duration;
 import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -43,13 +41,10 @@ public class MissionRecordService {
         return missionRecordRepository.save(missionRecord).getId();
     }
 
-    public List<MissionRecordFindResponse> findAllMissionRecord(Long missionId, String yearMonth) {
-        // "yyyy-MM" 형식인지 검증
-        validateYearMonthFormat(yearMonth);
-        YearMonth yearMonthObj = YearMonth.parse(yearMonth);
-
+    public List<MissionRecordFindResponse> findAllMissionRecord(
+            Long missionId, YearMonth yearMonth) {
         List<MissionRecord> missionRecords =
-                missionRecordRepository.findAllByMissionId(missionId, yearMonthObj);
+                missionRecordRepository.findAllByMissionIdAndYearMonth(missionId, yearMonth);
         return missionRecords.stream().map(MissionRecordFindResponse::from).toList();
     }
 
@@ -68,16 +63,6 @@ public class MissionRecordService {
     private void validateMissionRecordDuration(Duration duration) {
         if (duration.getSeconds() > 3600L) {
             throw new CustomException(ErrorCode.MISSION_RECORD_DURATION_OVERBALANCE);
-        }
-    }
-
-    private void validateYearMonthFormat(String yearMonth) {
-        try {
-            // 파싱 가능한지 확인
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-            YearMonth.parse(yearMonth, formatter);
-        } catch (DateTimeParseException e) {
-            throw new CustomException(ErrorCode.MiSSION_RECORD_YEAR_MONTH_INVALID);
         }
     }
 }

@@ -17,7 +17,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<MissionRecord> findAllByMissionId(Long missionId, YearMonth yearMonth) {
+    public List<MissionRecord> findAllByMissionIdAndYearMonth(Long missionId, YearMonth yearMonth) {
         return jpaQueryFactory
                 .selectFrom(missionRecord)
                 .where(missionIdEq(missionId), yearMonthEq(yearMonth))

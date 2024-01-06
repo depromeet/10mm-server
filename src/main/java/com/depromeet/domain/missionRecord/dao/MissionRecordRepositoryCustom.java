@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface MissionRecordRepositoryCustom {
 
-    List<MissionRecord> findAllByMissionId(Long missionId, YearMonth yearMonth);
+    List<MissionRecord> findAllByMissionIdAndYearMonth(Long missionId, YearMonth yearMonth);
 }
