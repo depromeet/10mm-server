@@ -11,7 +11,6 @@ import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -76,8 +75,8 @@ public class MissionRecordService {
         try {
             // 파싱 가능한지 확인
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-			YearMonth.parse(yearMonth, formatter);
-		} catch (DateTimeParseException e) {
+            YearMonth.parse(yearMonth, formatter);
+        } catch (DateTimeParseException e) {
             throw new CustomException(ErrorCode.MiSSION_RECORD_YEAR_MONTH_INVALID);
         }
     }
