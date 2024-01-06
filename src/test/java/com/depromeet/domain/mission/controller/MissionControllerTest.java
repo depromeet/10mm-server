@@ -1,6 +1,7 @@
 package com.depromeet.domain.mission.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.http.MediaType.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
@@ -22,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -76,7 +76,7 @@ class MissionControllerTest {
                         MissionCategory.STUDY,
                         MissionVisibility.ALL);
 
-        given(missionService.createMission(ArgumentMatchers.any()))
+        given(missionService.createMission(any()))
                 .willReturn(
                         new MissionCreateResponse(
                                 1L,
@@ -127,7 +127,7 @@ class MissionControllerTest {
     @Test
     void 미션_단건_조회한다() throws Exception {
         // given
-        given(missionService.findOneMission(ArgumentMatchers.any()))
+        given(missionService.findOneMission(any()))
                 .willReturn(
                         new MissionFindResponse(
                                 1L,
@@ -207,7 +207,7 @@ class MissionControllerTest {
         MissionUpdateRequest updateRequest =
                 new MissionUpdateRequest(
                         "testMissionName", "testMissionContent", MissionVisibility.NONE);
-        given(missionService.updateMission(ArgumentMatchers.any(), ArgumentMatchers.any()))
+        given(missionService.updateMission(any(), any()))
                 .willReturn(
                         new MissionUpdateResponse(
                                 1L,
@@ -237,7 +237,7 @@ class MissionControllerTest {
         // given
         MissionUpdateRequest updateRequest =
                 new MissionUpdateRequest(null, "testMissionContent", MissionVisibility.NONE);
-        given(missionService.updateMission(ArgumentMatchers.any(), ArgumentMatchers.any()))
+        given(missionService.updateMission(any(), any()))
                 .willReturn(
                         new MissionUpdateResponse(
                                 1L,
