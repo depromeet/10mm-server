@@ -20,7 +20,10 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     public List<MissionRecord> findAllByMissionIdAndYearMonth(Long missionId, YearMonth yearMonth) {
         return jpaQueryFactory
                 .selectFrom(missionRecord)
-                .where(missionIdEq(missionId), yearMonthEq(yearMonth))
+                .where(
+                        missionIdEq(missionId),
+                        yearEq(yearMonth.getYear()),
+                        monthEq(yearMonth.getMonthValue()))
                 .orderBy(missionRecord.startedAt.asc())
                 .fetch();
     }
@@ -29,10 +32,11 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
         return missionRecord.mission.id.eq(missionId);
     }
 
-    private BooleanExpression yearMonthEq(YearMonth yearMonth) {
-        return missionRecord
-                .createdAt
-                .yearMonth()
-                .eq(yearMonth.getYear() * 100 + yearMonth.getMonthValue());
+    private BooleanExpression yearEq(int year) {
+        return missionRecord.startedAt.year().eq(year);
+    }
+
+    private BooleanExpression monthEq(int month) {
+        return missionRecord.startedAt.month().eq(month);
     }
 }
