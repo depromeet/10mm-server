@@ -50,12 +50,6 @@ class MissionControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @MockBean private MissionService missionService;
-    @MockBean private DatabaseCleaner databaseCleaner;
-
-    @BeforeEach
-    void setUp() {
-        databaseCleaner.execute();
-    }
 
     /*
     무한 스크롤 방식 처리하는 메서드로
@@ -239,6 +233,36 @@ class MissionControllerTest {
                         jsonPath("$.data.visibility").value(MissionVisibility.FOLLOWER.toString()))
                 .andDo(print());
     }
+
+	@Test
+	void 미션이름을_null로_수정할_수_없다 () throws Exception {
+		// given
+		MissionUpdateRequest updateRequest =
+			new MissionUpdateRequest(
+				null, "testMissionContent", MissionVisibility.NONE);
+		given(missionService.updateMission(ArgumentMatchers.any(), ArgumentMatchers.any()))
+			.willReturn(
+				new MissionUpdateResponse(
+					1L,
+					null,
+					"testMissionContent",
+					MissionCategory.STUDY,
+					MissionVisibility.FOLLOWER));
+
+		// expected
+		ResultActions perform =
+			mockMvc.perform(
+				put("/missions/{missionId}", 1L)
+					.accept(APPLICATION_JSON)
+					.contentType(APPLICATION_JSON)
+					.with(csrf())
+					.content(objectMapper.writeValueAsString(updateRequest)));
+
+		perform.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+			.andExpect(jsonPath("$.message").value("{\"name\":\"이름은 비워둘 수 없습니다.\"}"))
+			.andDo(print());
+	}
 
     @Test
     void 미션_단건_삭제한다() throws Exception {
