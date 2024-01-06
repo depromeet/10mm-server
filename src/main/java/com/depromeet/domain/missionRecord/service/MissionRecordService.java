@@ -76,8 +76,8 @@ public class MissionRecordService {
         try {
             // 파싱 가능한지 확인
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-            LocalDate.parse(yearMonth + "-01", formatter);
-        } catch (DateTimeParseException e) {
+			YearMonth.parse(yearMonth, formatter);
+		} catch (DateTimeParseException e) {
             throw new CustomException(ErrorCode.MiSSION_RECORD_YEAR_MONTH_INVALID);
         }
     }
