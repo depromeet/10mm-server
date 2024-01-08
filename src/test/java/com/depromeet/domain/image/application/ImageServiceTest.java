@@ -24,8 +24,6 @@ import com.depromeet.domain.missionRecord.service.MissionRecordService;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import java.time.LocalDateTime;
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -197,9 +195,7 @@ class ImageServiceTest {
             // then
             assertThat(missionRecordPresignedUrl.presignedUrl())
                     .contains(
-                            String.format(
-                                    "/local/mission_record/%s/image.jpeg",
-                                    missionRecordId));
+                            String.format("/local/mission_record/%s/image.jpeg", missionRecordId));
         }
     }
 
@@ -207,25 +203,27 @@ class ImageServiceTest {
     class 미션_기록_이미지_업로드_완료_처리할_때 {
 
         // TODO: MemberUtil insertMockMemberIfNotExist메서드 제거 후 주석해제 예정
-//         @Test
-//         void 회원이_존재하지_않는다면_예외를_발생시킨다() {
-//         	// given
-//             MissionRecordImageUploadCompleteRequest request =
-//         		new MissionRecordImageUploadCompleteRequest(192L, ImageFileExtension.JPEG, "testRemark");
-//
-//         	// when, then
-//         	assertThatThrownBy(() -> imageService.uploadCompleteMissionRecord(request))
-//         		.isInstanceOf(CustomException.class)
-//         		.hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
-//         }
+        //         @Test
+        //         void 회원이_존재하지_않는다면_예외를_발생시킨다() {
+        //         	// given
+        //             MissionRecordImageUploadCompleteRequest request =
+        //         		new MissionRecordImageUploadCompleteRequest(192L, ImageFileExtension.JPEG,
+        // "testRemark");
+        //
+        //         	// when, then
+        //         	assertThatThrownBy(() -> imageService.uploadCompleteMissionRecord(request))
+        //         		.isInstanceOf(CustomException.class)
+        //         		.hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
+        //         }
 
         @Test
         void 미션이_존재하지_않는다면_예외를_발생시킨다() {
             // given
             memberRepository.save(
                     Member.createNormalMember(new Profile("testNickname", "testImageUrl")));
-             MissionRecordImageUploadCompleteRequest request =
-         		new MissionRecordImageUploadCompleteRequest(192L, ImageFileExtension.JPEG, "testRemark");
+            MissionRecordImageUploadCompleteRequest request =
+                    new MissionRecordImageUploadCompleteRequest(
+                            192L, ImageFileExtension.JPEG, "testRemark");
 
             // when, then
             assertThatThrownBy(() -> imageService.uploadCompleteMissionRecord(request))
@@ -258,7 +256,8 @@ class ImageServiceTest {
                             missionRecordFinishedAt,
                             32,
                             14);
-            Long missionRecordId = missionRecordService.createMissionRecord(missionRecordCreateRequest);
+            Long missionRecordId =
+                    missionRecordService.createMissionRecord(missionRecordCreateRequest);
 
             ImageFileExtension imageFileExtension = ImageFileExtension.JPEG;
             MissionRecordImageCreateRequest missionRecordImageCreateRequest =
@@ -266,7 +265,8 @@ class ImageServiceTest {
             imageService.createMissionRecordPresignedUrl(missionRecordImageCreateRequest);
 
             MissionRecordImageUploadCompleteRequest request =
-                    new MissionRecordImageUploadCompleteRequest(missionRecordId, imageFileExtension, "testRemark");
+                    new MissionRecordImageUploadCompleteRequest(
+                            missionRecordId, imageFileExtension, "testRemark");
 
             // when
             imageService.uploadCompleteMissionRecord(request);
@@ -277,10 +277,7 @@ class ImageServiceTest {
             assertThat(missionRecord.getRemark()).isEqualTo("testRemark");
             assertThat(missionRecord.getImageUrl())
                     .contains(
-                            String.format(
-                                    "/local/mission_record/%s/image.jpeg",
-                                    missionRecordId));
-
+                            String.format("/local/mission_record/%s/image.jpeg", missionRecordId));
         }
     }
 }

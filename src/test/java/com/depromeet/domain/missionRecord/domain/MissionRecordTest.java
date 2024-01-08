@@ -96,13 +96,12 @@ class MissionRecordTest {
 
                 // when, then
                 assertThatThrownBy(
-                        () ->
-                                missionRecord.updateUploadStatusComplete(
-                                        "testRemark", "testImageUrl"))
+                                () ->
+                                        missionRecord.updateUploadStatusComplete(
+                                                "testRemark", "testImageUrl"))
                         .isInstanceOf(CustomException.class)
                         .hasMessage(
-                                ErrorCode.MISSION_RECORD_UPLOAD_STATUS_IS_NOT_PENDING
-                                        .getMessage());
+                                ErrorCode.MISSION_RECORD_UPLOAD_STATUS_IS_NOT_PENDING.getMessage());
             }
         }
     }
