@@ -41,7 +41,7 @@ class ReactionTest {
     }
 
     @Test
-    void 좋아요_반응_테스트() {
+    void 별_이모지_반응_테스트() {
         // given
         Reaction reaction = Reaction.createReaction(ReactionType.STAR, member, missionRecord);
 
