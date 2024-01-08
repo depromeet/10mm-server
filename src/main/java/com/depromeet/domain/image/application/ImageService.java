@@ -18,6 +18,8 @@ import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
 import com.depromeet.global.util.SpringEnvironmentUtil;
 import com.depromeet.infra.config.storage.StorageProperties;
+
+import java.time.YearMonth;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,7 +46,6 @@ public class ImageService {
 
         String fileName =
                 createFileName(
-                        currentMember.getId(),
                         ImageType.MISSION_RECORD,
                         request.missionRecordId(),
                         request.imageFileExtension());
@@ -74,10 +75,6 @@ public class ImageService {
                         + "/"
                         + springEnvironmentUtil.getCurrentProfile()
                         + "/"
-                        + "members"
-                        + "/"
-                        + currentMember.getId()
-                        + "/"
                         + ImageType.MISSION_RECORD
                         + "/"
                         + request.missionRecordId()
@@ -87,15 +84,8 @@ public class ImageService {
     }
 
     private String createFileName(
-            Long memberId,
-            ImageType imageType,
-            Long targetId,
-            ImageFileExtension imageFileExtension) {
+            ImageType imageType, Long targetId, ImageFileExtension imageFileExtension) {
         return springEnvironmentUtil.getCurrentProfile()
-                + "/"
-                + "members"
-                + "/"
-                + memberId
                 + "/"
                 + imageType.getValue()
                 + "/"
