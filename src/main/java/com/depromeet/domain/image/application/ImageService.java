@@ -81,7 +81,7 @@ public class ImageService {
                         + "/"
                         + springEnvironmentUtil.getCurrentProfile()
                         + "/"
-                        + ImageType.MISSION_RECORD
+                        + ImageType.MISSION_RECORD.getValue()
                         + "/"
                         + request.missionRecordId()
                         + "/image."

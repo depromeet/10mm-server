@@ -31,6 +31,7 @@ public enum ErrorCode {
     MISSION_RECORD_DURATION_OVERBALANCE(HttpStatus.BAD_REQUEST, "미션 참여 시간이 지정 된 시간보다 초과하였습니다"),
     MISSION_RECORD_UPLOAD_STATUS_IS_NOT_NONE(
             HttpStatus.BAD_REQUEST, "미션 기록의 이미지 업로드 상태가 NONE이 아닙니다."),
+    MISSION_RECORD_UPLOAD_STATUS_IS_NOT_PENDING(HttpStatus.BAD_REQUEST, "미션 기록의 이미지 업로드 상태가 PENDING이 아닙니다."),
     MISSION_RECORD_UPLOAD_STATUS_ALREADY_COMPLETED(
             HttpStatus.BAD_REQUEST, "미션 기록의 이미지 업로드 상태가 이미 완료되어있습니다."),
     ;

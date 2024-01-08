@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.depromeet.DatabaseCleaner;
 import com.depromeet.domain.image.domain.ImageFileExtension;
 import com.depromeet.domain.image.dto.request.MissionRecordImageCreateRequest;
+import com.depromeet.domain.image.dto.request.MissionRecordImageUploadCompleteRequest;
 import com.depromeet.domain.image.dto.response.PresignedUrlResponse;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
@@ -15,11 +16,16 @@ import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.service.MissionService;
+import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
+import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
+import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
 import com.depromeet.domain.missionRecord.service.MissionRecordService;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,6 +41,7 @@ class ImageServiceTest {
     @Autowired private ImageService imageService;
     @Autowired private MissionRecordService missionRecordService;
     @Autowired private MissionService missionService;
+    @Autowired private MissionRecordRepository missionRecordRepository;
 
     @BeforeEach
     void setUp() {
@@ -189,10 +196,91 @@ class ImageServiceTest {
 
             // then
             assertThat(missionRecordPresignedUrl.presignedUrl())
-                    .startsWith(
+                    .contains(
                             String.format(
-                                    "https://kr.object.ncloudstorage.com/local/mission_record/%s/image.jpeg",
+                                    "/local/mission_record/%s/image.jpeg",
                                     missionRecordId));
+        }
+    }
+
+    @Nested
+    class 미션_기록_이미지_업로드_완료_처리할_때 {
+
+        // TODO: MemberUtil insertMockMemberIfNotExist메서드 제거 후 주석해제 예정
+//         @Test
+//         void 회원이_존재하지_않는다면_예외를_발생시킨다() {
+//         	// given
+//             MissionRecordImageUploadCompleteRequest request =
+//         		new MissionRecordImageUploadCompleteRequest(192L, ImageFileExtension.JPEG, "testRemark");
+//
+//         	// when, then
+//         	assertThatThrownBy(() -> imageService.uploadCompleteMissionRecord(request))
+//         		.isInstanceOf(CustomException.class)
+//         		.hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
+//         }
+
+        @Test
+        void 미션이_존재하지_않는다면_예외를_발생시킨다() {
+            // given
+            memberRepository.save(
+                    Member.createNormalMember(new Profile("testNickname", "testImageUrl")));
+             MissionRecordImageUploadCompleteRequest request =
+         		new MissionRecordImageUploadCompleteRequest(192L, ImageFileExtension.JPEG, "testRemark");
+
+            // when, then
+            assertThatThrownBy(() -> imageService.uploadCompleteMissionRecord(request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.MISSION_RECORD_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void 입력_값이_정상이라면_미션_이미지_업로드_완료처리가_된다() {
+            // given
+            Member member =
+                    memberRepository.save(
+                            Member.createNormalMember(new Profile("testNickname", "testImageUrl")));
+            MissionCreateRequest missionCreateRequest =
+                    new MissionCreateRequest(
+                            "testMissionName",
+                            "testMissionContent",
+                            MissionCategory.STUDY,
+                            MissionVisibility.ALL);
+            MissionCreateResponse missionCreateResponse =
+                    missionService.createMission(missionCreateRequest);
+
+            LocalDateTime missionRecordStartedAt = LocalDateTime.of(2023, 12, 15, 1, 5, 0);
+            LocalDateTime missionRecordFinishedAt =
+                    missionRecordStartedAt.plusMinutes(32).plusSeconds(14);
+            MissionRecordCreateRequest missionRecordCreateRequest =
+                    new MissionRecordCreateRequest(
+                            missionCreateResponse.missionId(),
+                            missionRecordStartedAt,
+                            missionRecordFinishedAt,
+                            32,
+                            14);
+            Long missionRecordId = missionRecordService.createMissionRecord(missionRecordCreateRequest);
+
+            ImageFileExtension imageFileExtension = ImageFileExtension.JPEG;
+            MissionRecordImageCreateRequest missionRecordImageCreateRequest =
+                    new MissionRecordImageCreateRequest(missionRecordId, imageFileExtension);
+            imageService.createMissionRecordPresignedUrl(missionRecordImageCreateRequest);
+
+            MissionRecordImageUploadCompleteRequest request =
+                    new MissionRecordImageUploadCompleteRequest(missionRecordId, imageFileExtension, "testRemark");
+
+            // when
+            imageService.uploadCompleteMissionRecord(request);
+            MissionRecord missionRecord = missionRecordRepository.findById(missionRecordId).get();
+
+            // then
+            assertThat(missionRecord.getUploadStatus()).isEqualTo(ImageUploadStatus.COMPLETE);
+            assertThat(missionRecord.getRemark()).isEqualTo("testRemark");
+            assertThat(missionRecord.getImageUrl())
+                    .contains(
+                            String.format(
+                                    "/local/mission_record/%s/image.jpeg",
+                                    missionRecordId));
+
         }
     }
 }

@@ -88,8 +88,8 @@ public class MissionRecord extends BaseTimeEntity {
     }
 
     public void updateUploadStatusComplete(String remark, String imageUrl) {
-        if (this.uploadStatus == ImageUploadStatus.COMPLETE) {
-            throw new CustomException(ErrorCode.MISSION_RECORD_UPLOAD_STATUS_ALREADY_COMPLETED);
+        if (this.uploadStatus != ImageUploadStatus.PENDING) {
+            throw new CustomException(ErrorCode.MISSION_RECORD_UPLOAD_STATUS_IS_NOT_PENDING);
         }
         this.uploadStatus = ImageUploadStatus.COMPLETE;
         this.remark = remark;

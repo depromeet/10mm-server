@@ -53,52 +53,57 @@ class MissionRecordTest {
             assertEquals(ImageUploadStatus.NONE, uploadStatus);
         }
 
-        @Test
-        void 업로드_상태를_PENDING으로_변경할때_업로드_상태가_NONE이_아니라면_예외가_발생한다()
-                throws NoSuchFieldException, IllegalAccessException {
-            // given
-            LocalDateTime missionRecordStartedAt = LocalDateTime.of(2023, 12, 15, 1, 5, 0);
-            LocalDateTime missionRecordFinishedAt =
-                    missionRecordStartedAt.plusMinutes(32).plusSeconds(14);
-            Duration duration = Duration.ofMinutes(32).plusSeconds(14);
-            MissionRecord missionRecord =
-                    MissionRecord.createMissionRecord(
-                            duration, missionRecordStartedAt, missionRecordFinishedAt, mission);
+        @Nested
+        class 미션기록의_이미지_업로드_상태를 {
+            @Test
+            void PENDING으로_변경할때_업로드_상태가_NONE이_아니라면_예외가_발생한다()
+                    throws NoSuchFieldException, IllegalAccessException {
+                // given
+                LocalDateTime missionRecordStartedAt = LocalDateTime.of(2023, 12, 15, 1, 5, 0);
+                LocalDateTime missionRecordFinishedAt =
+                        missionRecordStartedAt.plusMinutes(32).plusSeconds(14);
+                Duration duration = Duration.ofMinutes(32).plusSeconds(14);
+                MissionRecord missionRecord =
+                        MissionRecord.createMissionRecord(
+                                duration, missionRecordStartedAt, missionRecordFinishedAt, mission);
 
-            Field uploadStatusField = MissionRecord.class.getDeclaredField("uploadStatus");
-            uploadStatusField.setAccessible(true);
-            uploadStatusField.set(missionRecord, ImageUploadStatus.PENDING);
+                Field uploadStatusField = MissionRecord.class.getDeclaredField("uploadStatus");
+                uploadStatusField.setAccessible(true);
+                uploadStatusField.set(missionRecord, ImageUploadStatus.PENDING);
 
-            // when, then
-            assertThatThrownBy(() -> missionRecord.updateUploadStatusPending())
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(ErrorCode.MISSION_RECORD_UPLOAD_STATUS_IS_NOT_NONE.getMessage());
-        }
+                // when, then
+                assertThatThrownBy(() -> missionRecord.updateUploadStatusPending())
+                        .isInstanceOf(CustomException.class)
+                        .hasMessage(
+                                ErrorCode.MISSION_RECORD_UPLOAD_STATUS_IS_NOT_NONE.getMessage());
+            }
 
-        @Test
-        void 업로드_상태를_COMPLETE로_변경할때_업로드_상태가_이미_COMPLETE라면_예외가_발생한다()
-                throws NoSuchFieldException, IllegalAccessException {
-            // given
-            LocalDateTime missionRecordStartedAt = LocalDateTime.of(2023, 12, 15, 1, 5, 0);
-            LocalDateTime missionRecordFinishedAt =
-                    missionRecordStartedAt.plusMinutes(32).plusSeconds(14);
-            Duration duration = Duration.ofMinutes(32).plusSeconds(14);
-            MissionRecord missionRecord =
-                    MissionRecord.createMissionRecord(
-                            duration, missionRecordStartedAt, missionRecordFinishedAt, mission);
+            @Test
+            void COMPLETE로_변경할때_업로드_상태가_PENDING상태가_아니라면_예외가_발생한다()
+                    throws NoSuchFieldException, IllegalAccessException {
+                // given
+                LocalDateTime missionRecordStartedAt = LocalDateTime.of(2023, 12, 15, 1, 5, 0);
+                LocalDateTime missionRecordFinishedAt =
+                        missionRecordStartedAt.plusMinutes(32).plusSeconds(14);
+                Duration duration = Duration.ofMinutes(32).plusSeconds(14);
+                MissionRecord missionRecord =
+                        MissionRecord.createMissionRecord(
+                                duration, missionRecordStartedAt, missionRecordFinishedAt, mission);
 
-            Field uploadStatusField = MissionRecord.class.getDeclaredField("uploadStatus");
-            uploadStatusField.setAccessible(true);
-            uploadStatusField.set(missionRecord, ImageUploadStatus.COMPLETE);
+                Field uploadStatusField = MissionRecord.class.getDeclaredField("uploadStatus");
+                uploadStatusField.setAccessible(true);
+                uploadStatusField.set(missionRecord, ImageUploadStatus.COMPLETE);
 
-            // when, then
-            assertThatThrownBy(
-                            () ->
-                                    missionRecord.updateUploadStatusComplete(
-                                            "testRemark", "testImageUrl"))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(
-                            ErrorCode.MISSION_RECORD_UPLOAD_STATUS_ALREADY_COMPLETED.getMessage());
+                // when, then
+                assertThatThrownBy(
+                        () ->
+                                missionRecord.updateUploadStatusComplete(
+                                        "testRemark", "testImageUrl"))
+                        .isInstanceOf(CustomException.class)
+                        .hasMessage(
+                                ErrorCode.MISSION_RECORD_UPLOAD_STATUS_IS_NOT_PENDING
+                                        .getMessage());
+            }
         }
     }
 }
