@@ -19,7 +19,6 @@ import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
 import com.depromeet.global.util.SpringEnvironmentUtil;
 import com.depromeet.infra.config.storage.StorageProperties;
-
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -63,8 +62,8 @@ public class ImageService {
 
     private MissionRecord findMissionRecordByMissionRecordId(Long request) {
         return missionRecordRepository
-                        .findById(request)
-                        .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
+                .findById(request)
+                .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
     }
 
     @Transactional
