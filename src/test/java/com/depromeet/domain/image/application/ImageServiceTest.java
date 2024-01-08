@@ -143,8 +143,8 @@ class ImageServiceTest {
             assertThat(missionRecordPresignedUrl.presignedUrl())
                     .startsWith(
                             String.format(
-                                    "https://kr.object.ncloudstorage.com/local/members/%s/mission_record/%s/image.jpeg",
-                                    member.getId(), missionRecordId));
+                                    "https://kr.object.ncloudstorage.com/local/mission_record/%s/image.jpeg",
+                                    missionRecordId));
         }
     }
 }
