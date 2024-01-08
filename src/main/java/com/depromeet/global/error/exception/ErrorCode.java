@@ -33,8 +33,6 @@ public enum ErrorCode {
             HttpStatus.BAD_REQUEST, "미션 기록의 이미지 업로드 상태가 NONE이 아닙니다."),
     MISSION_RECORD_UPLOAD_STATUS_IS_NOT_PENDING(
             HttpStatus.BAD_REQUEST, "미션 기록의 이미지 업로드 상태가 PENDING이 아닙니다."),
-    MISSION_RECORD_UPLOAD_STATUS_ALREADY_COMPLETED(
-            HttpStatus.BAD_REQUEST, "미션 기록의 이미지 업로드 상태가 이미 완료되어있습니다."),
     ;
 
     private final HttpStatus status;
