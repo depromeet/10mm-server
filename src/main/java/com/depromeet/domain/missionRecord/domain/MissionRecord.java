@@ -2,6 +2,8 @@ package com.depromeet.domain.missionRecord.domain;
 
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.mission.domain.Mission;
+import com.depromeet.global.error.exception.CustomException;
+import com.depromeet.global.error.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -76,5 +78,21 @@ public class MissionRecord extends BaseTimeEntity {
                 .finishedAt(finishedAt)
                 .mission(mission)
                 .build();
+    }
+
+    public void updateUploadStatusPending() {
+        if (this.uploadStatus != ImageUploadStatus.NONE) {
+            throw new CustomException(ErrorCode.MISSION_RECORD_UPLOAD_STATUS_IS_NOT_NONE);
+        }
+        this.uploadStatus = ImageUploadStatus.PENDING;
+    }
+
+    public void updateUploadStatusComplete(String remark, String imageUrl) {
+        if (this.uploadStatus != ImageUploadStatus.PENDING) {
+            throw new CustomException(ErrorCode.MISSION_RECORD_UPLOAD_STATUS_IS_NOT_PENDING);
+        }
+        this.uploadStatus = ImageUploadStatus.COMPLETE;
+        this.remark = remark;
+        this.imageUrl = imageUrl;
     }
 }
