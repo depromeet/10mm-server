@@ -11,6 +11,7 @@ import com.depromeet.domain.image.dto.request.MissionRecordImageCreateRequest;
 import com.depromeet.domain.image.dto.request.MissionRecordImageUploadCompleteRequest;
 import com.depromeet.domain.image.dto.response.PresignedUrlResponse;
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.global.error.exception.CustomException;
@@ -19,7 +20,6 @@ import com.depromeet.global.util.MemberUtil;
 import com.depromeet.global.util.SpringEnvironmentUtil;
 import com.depromeet.infra.config.storage.StorageProperties;
 
-import java.time.YearMonth;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,10 +39,10 @@ public class ImageService {
             MissionRecordImageCreateRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
 
-        MissionRecord missionRecord =
-                missionRecordRepository
-                        .findById(request.missionRecordId())
-                        .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
+        MissionRecord missionRecord = findMissionRecordByMissionRecordId(request.missionRecordId());
+
+        Mission mission = missionRecord.getMission();
+        mission.validateUserMismatch(currentMember);
 
         String fileName =
                 createFileName(
@@ -61,13 +61,20 @@ public class ImageService {
         return PresignedUrlResponse.from(presignedUrl);
     }
 
+    private MissionRecord findMissionRecordByMissionRecordId(Long request) {
+        return missionRecordRepository
+                        .findById(request)
+                        .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
+    }
+
     @Transactional
     public void uploadCompleteMissionRecord(MissionRecordImageUploadCompleteRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
-        MissionRecord missionRecord =
-                missionRecordRepository
-                        .findById(request.missionRecordId())
-                        .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
+        MissionRecord missionRecord = findMissionRecordByMissionRecordId(request.missionRecordId());
+
+        Mission mission = missionRecord.getMission();
+        mission.validateUserMismatch(currentMember);
+
         String imageUrl =
                 storageProperties.endpoint()
                         + "/"

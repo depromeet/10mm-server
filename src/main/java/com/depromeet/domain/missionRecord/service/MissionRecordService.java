@@ -23,13 +23,13 @@ public class MissionRecordService {
     private final MissionRecordRepository missionRecordRepository;
 
     public Long createMissionRecord(MissionRecordCreateRequest request) {
-        final Mission mission = findMission(request);
+        final Mission mission = findMissionByMissionId(request.missionId());
         final Member member = memberUtil.getCurrentMember();
 
         Duration duration =
                 Duration.ofMinutes(request.durationMin()).plusSeconds(request.durationSec());
 
-        validateMissionRecordUserMismatch(mission, member);
+        mission.validateUserMismatch(member);
         validateMissionRecordDuration(duration);
 
         MissionRecord missionRecord =
@@ -38,16 +38,10 @@ public class MissionRecordService {
         return missionRecordRepository.save(missionRecord).getId();
     }
 
-    private Mission findMission(MissionRecordCreateRequest request) {
+    private Mission findMissionByMissionId(Long missionId) {
         return missionRepository
-                .findByMissionId(request.missionId())
+                .findByMissionId(missionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
-    }
-
-    private void validateMissionRecordUserMismatch(Mission mission, Member member) {
-        if (!member.getId().equals(mission.getMember().getId())) {
-            throw new CustomException(ErrorCode.MISSION_RECORD_USER_MISMATCH);
-        }
     }
 
     private void validateMissionRecordDuration(Duration duration) {
