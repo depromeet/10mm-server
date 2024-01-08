@@ -32,6 +32,7 @@ public class Reaction extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Comment("응원하기 종류")
+    @Column(nullable = false)
     private ReactionType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
