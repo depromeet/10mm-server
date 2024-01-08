@@ -4,7 +4,7 @@ import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import java.time.LocalDateTime;
 
 public record MissionRecordFindResponse(
-        Long missionRecordId,
+        Long recordId,
         String remark,
         String imageUrl,
         int missionDay,
