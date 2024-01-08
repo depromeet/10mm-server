@@ -8,13 +8,11 @@ import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
-
+import com.depromeet.global.error.exception.CustomException;
+import com.depromeet.global.error.exception.ErrorCode;
 import java.lang.reflect.Field;
 import java.time.Duration;
 import java.time.LocalDateTime;
-
-import com.depromeet.global.error.exception.CustomException;
-import com.depromeet.global.error.exception.ErrorCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +54,8 @@ class MissionRecordTest {
         }
 
         @Test
-        void 업로드_상태를_PENDING으로_변경할때_업로드_상태가_NONE이_아니라면_예외가_발생한다() throws NoSuchFieldException, IllegalAccessException {
+        void 업로드_상태를_PENDING으로_변경할때_업로드_상태가_NONE이_아니라면_예외가_발생한다()
+                throws NoSuchFieldException, IllegalAccessException {
             // given
             LocalDateTime missionRecordStartedAt = LocalDateTime.of(2023, 12, 15, 1, 5, 0);
             LocalDateTime missionRecordFinishedAt =
@@ -77,7 +76,8 @@ class MissionRecordTest {
         }
 
         @Test
-        void 업로드_상태를_COMPLETE로_변경할때_업로드_상태가_이미_COMPLETE라면_예외가_발생한다() throws NoSuchFieldException, IllegalAccessException {
+        void 업로드_상태를_COMPLETE로_변경할때_업로드_상태가_이미_COMPLETE라면_예외가_발생한다()
+                throws NoSuchFieldException, IllegalAccessException {
             // given
             LocalDateTime missionRecordStartedAt = LocalDateTime.of(2023, 12, 15, 1, 5, 0);
             LocalDateTime missionRecordFinishedAt =
