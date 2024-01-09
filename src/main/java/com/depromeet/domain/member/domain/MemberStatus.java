@@ -6,7 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum MemberStatus {
-    GUEST("GUEST"),
     NORMAL("NORMAL"),
     DELETED("DELETED"),
     FORBIDDEN("FORBIDDEN");
