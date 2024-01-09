@@ -81,4 +81,9 @@ public class Member extends BaseTimeEntity {
                 .lastLoginAt(LocalDateTime.now())
                 .build();
     }
+
+    public void updateLastLoginAt(LocalDateTime lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
+    }
+
 }
