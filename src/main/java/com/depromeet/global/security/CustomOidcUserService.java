@@ -14,12 +14,15 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
 public class CustomOidcUserService extends OidcUserService {
 
-    private static final Set<String> KAKAO_ACCESSIBLE_SCOPES = Set.of("account_email");
     private final MemberRepository memberRepository;
+
+    public CustomOidcUserService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+        setAccessibleScopes(Collections.emptySet()); // 빈 스코프로 설정하여 항상 UserInfo 엔드포인트에 액세스
+    }
 
     @Override
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
