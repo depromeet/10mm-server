@@ -33,7 +33,7 @@ public class MissionRecordController {
         return ResponseEntity.status(HttpStatus.CREATED).body(missionRecordId);
     }
 
-    @Operation(summary = "미션 기록 조회", description = "미션 기록을 조회합니다.")
+    @Operation(summary = "미션 기록 조회 (캘린더 뷰)", description = "미션 기록을 조회합니다.")
     @GetMapping
     public List<MissionRecordFindResponse> missionRecordFind(
             @RequestParam("missionId") Long missionId,
