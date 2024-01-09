@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ImageService {
     private final MemberUtil memberUtil;
     private final SpringEnvironmentUtil springEnvironmentUtil;
@@ -33,7 +34,6 @@ public class ImageService {
     private final AmazonS3 amazonS3;
     private final MissionRecordRepository missionRecordRepository;
 
-    @Transactional
     public PresignedUrlResponse createMissionRecordPresignedUrl(
             MissionRecordImageCreateRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
@@ -66,7 +66,6 @@ public class ImageService {
                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
     }
 
-    @Transactional
     public void uploadCompleteMissionRecord(MissionRecordImageUploadCompleteRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
         MissionRecord missionRecord = findMissionRecordByMissionRecordId(request.missionRecordId());
