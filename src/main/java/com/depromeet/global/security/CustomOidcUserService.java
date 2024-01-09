@@ -3,13 +3,11 @@ package com.depromeet.global.security;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.OauthInfo;
-import java.util.Set;
-import lombok.RequiredArgsConstructor;
+import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
@@ -26,32 +24,29 @@ public class CustomOidcUserService extends OidcUserService {
 
     @Override
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
-        Member member = fetchOrCreate(userRequest);
-        setAccessibleScopes(KAKAO_ACCESSIBLE_SCOPES);
+
         OidcUser oidcUser = super.loadUser(userRequest);
-        return oidcUser;
+        Member member = fetchOrCreate(oidcUser);
+
+        return new CustomOidcUser(oidcUser, member.getId(), member.getRole());
     }
 
-    private Member fetchOrCreate(OidcUserRequest request) {
+    private Member fetchOrCreate(OidcUser oidcUser) {
         return memberRepository
-                .findByOauthInfo(extractOauthInfo(request))
-                .orElseGet(() -> saveAsGuest(request));
+                .findByOauthInfo(extractOauthInfo(oidcUser))
+                .orElseGet(() -> saveAsGuest(oidcUser));
     }
 
-    private Member saveAsGuest(OidcUserRequest request) {
-        OauthInfo oauthInfo = extractOauthInfo(request);
-        Member member = Member.createGuestMember(oauthInfo);
-        return memberRepository.save(member);
+    private Member saveAsGuest(OidcUser oidcUser) {
+        OauthInfo oauthInfo = extractOauthInfo(oidcUser);
+        Member guest = Member.createGuestMember(oauthInfo);
+        return memberRepository.save(guest);
     }
 
-    private OauthInfo extractOauthInfo(OidcUserRequest request) {
+    private OauthInfo extractOauthInfo(OidcUser oidcUser) {
         return OauthInfo.builder()
-                .oauthId(request.getIdToken().getSubject())
-                .oauthProvider(request.getIdToken().getIssuer().toString())
+                .oauthId(oidcUser.getName())
+                .oauthProvider(oidcUser.getIssuer().toString())
                 .build();
-    }
-
-    private OidcUserInfo extractOidcUserInfo(Member member) {
-        return OidcUserInfo.builder().name(member.getId().toString()).build();
     }
 }
