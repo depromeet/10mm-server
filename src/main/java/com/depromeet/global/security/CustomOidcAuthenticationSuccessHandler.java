@@ -1,28 +1,23 @@
 package com.depromeet.global.security;
 
-import static com.depromeet.global.common.constants.SecurityConstants.TOKEN_PREFIX;
+import static com.depromeet.global.common.constants.SecurityConstants.*;
 
-import com.depromeet.domain.member.dao.MemberRepository;
-
+import com.depromeet.domain.auth.application.JwtTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class CustomOidcAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private final JwtTokenProvider jwtTokenProvider;
-    private final MemberRepository memberRepository;
+    private final JwtTokenService jwtTokenService;
 
     @Override
     public void onAuthenticationSuccess(
@@ -38,8 +33,8 @@ public class CustomOidcAuthenticationSuccessHandler extends SimpleUrlAuthenticat
         }
 
         String accessToken =
-                jwtTokenProvider.generateAccessToken(user.getMemberId(), user.getMemberRole());
-        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getMemberId());
+                jwtTokenService.createAccessToken(user.getMemberId(), user.getMemberRole());
+        String refreshToken = jwtTokenService.createRefreshToken(user.getMemberId());
 
         setTokenPairToResponseHeader(response, accessToken, refreshToken);
     }
