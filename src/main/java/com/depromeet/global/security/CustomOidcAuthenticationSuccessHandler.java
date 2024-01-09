@@ -27,9 +27,9 @@ public class CustomOidcAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 
         CustomOidcUser user = (CustomOidcUser) authentication.getPrincipal();
 
-		// 게스트인 경우 회원가입 페이지로 리다이렉트
+        // 게스트인 경우 회원가입 페이지로 리다이렉트
         if (user.isGuest()) {
-            response.sendRedirect("/auth/signup");
+            response.sendRedirect("/auth/register");
         }
 
         String accessToken =
@@ -41,7 +41,7 @@ public class CustomOidcAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 
     private void setTokenPairToResponseHeader(
             HttpServletResponse response, String accessToken, String refreshToken) {
-        response.setHeader("Authorization", TOKEN_PREFIX + accessToken);
-        response.setHeader("RefreshToken", TOKEN_PREFIX + refreshToken);
+        response.setHeader(ACCESS_TOKEN_HEADER, TOKEN_PREFIX + accessToken);
+        response.setHeader(REFRESH_TOKEN_HEADER, TOKEN_PREFIX + refreshToken);
     }
 }
