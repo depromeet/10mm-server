@@ -42,7 +42,7 @@ class ImageControllerTest {
 
             // when, then
             mockMvc.perform(
-                            post("/images/records/upload-url")
+                            post("/records/upload-url")
                                     .contentType(APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
@@ -60,7 +60,7 @@ class ImageControllerTest {
 
             // when, then
             mockMvc.perform(
-                            post("/images/records/upload-url")
+                            post("/records/upload-url")
                                     .contentType(APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
@@ -83,7 +83,7 @@ class ImageControllerTest {
 
             // then
             mockMvc.perform(
-                            post("/images/records/upload-url")
+                            post("/records/upload-url")
                                     .contentType(APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
@@ -105,7 +105,7 @@ class ImageControllerTest {
 
             // when, then
             mockMvc.perform(
-                            post("/images/records/upload-complete")
+                            post("/records/upload-complete")
                                     .contentType(APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
@@ -124,7 +124,7 @@ class ImageControllerTest {
 
             // when, then
             mockMvc.perform(
-                            post("/images/records/upload-complete")
+                            post("/records/upload-complete")
                                     .contentType(APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
@@ -143,7 +143,7 @@ class ImageControllerTest {
 
             // when, then
             mockMvc.perform(
-                            post("/images/records/upload-complete")
+                            post("/records/upload-complete")
                                     .contentType(APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
@@ -161,7 +161,7 @@ class ImageControllerTest {
 
             // when, then
             mockMvc.perform(
-                            post("/images/records/upload-url")
+                            post("/records/upload-url")
                                     .contentType(APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
