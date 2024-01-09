@@ -39,11 +39,8 @@ public record MissionRecordFindOneResponse(
                 missionRecord.getId(),
                 missionRecord.getRemark(),
                 missionRecord.getImageUrl(),
-                missionRecord.getDuration().getSeconds() / 60,
-                Duration.between(
-                                missionRecord.getStartedAt(),
-                                LocalDateTime.now())
-                        .toDays(),
+                missionRecord.getDuration().toMinutes(),
+                Duration.between(missionRecord.getStartedAt(), LocalDateTime.now()).toDays(),
                 missionRecord.getStartedAt(),
                 missionRecord.getFinishedAt());
     }
