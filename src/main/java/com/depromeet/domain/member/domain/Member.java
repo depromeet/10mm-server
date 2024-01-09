@@ -2,6 +2,8 @@ package com.depromeet.domain.member.domain;
 
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.mission.domain.Mission;
+import com.depromeet.global.error.exception.CustomException;
+import com.depromeet.global.error.exception.ErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -69,6 +71,7 @@ public class Member extends BaseTimeEntity {
                 .oauthInfo(oauthInfo)
                 .status(MemberStatus.NORMAL)
                 .role(MemberRole.GUEST)
+                .visibility(MemberVisibility.PUBLIC)
                 .build();
     }
 
@@ -86,4 +89,17 @@ public class Member extends BaseTimeEntity {
         this.lastLoginAt = lastLoginAt;
     }
 
+    public void register(String nickname) {
+        validateRegisterAvailable();
+        // TODO: Profile 클래스를 제거하고 Member 클래스 필드로 변경
+        // TODO: profileImageUrl이 항상 null이 되는 문제 해결
+        this.profile = new Profile(nickname, null);
+        this.role = MemberRole.USER;
+    }
+
+    private void validateRegisterAvailable() {
+        if (role != MemberRole.GUEST) {
+            throw new CustomException(ErrorCode.MEMBER_ALREADY_REGISTERED);
+        }
+    }
 }
