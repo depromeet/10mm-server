@@ -76,7 +76,7 @@ public class JwtTokenProvider {
             return;
         }
 
-        // subject가 Long 타입의 양수 memberId인지 검증
+        // subject 문자열 리터럴이 양수 memberId인지 검증
         if (claims.getBody().getSubject().matches("^[1-9][0-9]*$")) {
             return;
         }
