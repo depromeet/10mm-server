@@ -11,7 +11,6 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -51,7 +50,7 @@ public class JwtTokenProvider {
     }
 
     public Long parseRefreshToken(String token) {
-        Jws<Claims> claims = getClaims(token, getRefreshTokenKey()
+        Jws<Claims> claims = getClaims(token, getRefreshTokenKey());
 
         try {
             validateDefaultClaims(claims);
@@ -61,13 +60,13 @@ public class JwtTokenProvider {
         }
     }
 
-	private Key getRefreshTokenKey() {
-		return Keys.hmacShaKeyFor(jwtProperties.refreshTokenSecret().getBytes());
-	}
+    private Key getRefreshTokenKey() {
+        return Keys.hmacShaKeyFor(jwtProperties.refreshTokenSecret().getBytes());
+    }
 
-	private Key getAccessTokenKey() {
-		return Keys.hmacShaKeyFor(jwtProperties.accessTokenSecret().getBytes());
-	}
+    private Key getAccessTokenKey() {
+        return Keys.hmacShaKeyFor(jwtProperties.accessTokenSecret().getBytes());
+    }
 
     private void validateDefaultClaims(Jws<Claims> claims) {
         // issuer가 일치하는지 검증
