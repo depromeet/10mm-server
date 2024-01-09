@@ -1,4 +1,4 @@
-package com.depromeet.global.config;
+package com.depromeet.global.config.swagger;
 
 import static com.depromeet.global.util.SpringEnvironmentUtil.*;
 

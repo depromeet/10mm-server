@@ -1,4 +1,4 @@
-package com.depromeet.global.config.response;
+package com.depromeet.global.common.response;
 
 import java.time.LocalDateTime;
 
