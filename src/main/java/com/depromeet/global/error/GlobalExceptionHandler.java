@@ -54,16 +54,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatusCode status,
             WebRequest request) {
         log.error("MethodArgumentNotValidException : {}", e.getMessage(), e);
-        List<FieldError> errors = e.getBindingResult().getFieldErrors();
-        Map<String, Object> fieldAndErrorMessages =
-                errors.stream()
-                        .collect(
-                                Collectors.toMap(
-                                        FieldError::getField, FieldError::getDefaultMessage));
-
-        String errorsToJsonString = new ObjectMapper().writeValueAsString(fieldAndErrorMessages);
+        String errorMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         final ErrorResponse errorResponse =
-                ErrorResponse.of(e.getClass().getSimpleName(), errorsToJsonString);
+                ErrorResponse.of(e.getClass().getSimpleName(), errorMessage);
         GlobalResponse response = GlobalResponse.fail(status.value(), errorResponse);
         return ResponseEntity.status(status).body(response);
     }
