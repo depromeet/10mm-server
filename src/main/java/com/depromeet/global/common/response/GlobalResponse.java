@@ -1,7 +1,6 @@
 package com.depromeet.global.common.response;
 
 import com.depromeet.global.error.ErrorResponse;
-
 import java.time.LocalDateTime;
 
 public record GlobalResponse(boolean success, int status, Object data, LocalDateTime timestamp) {

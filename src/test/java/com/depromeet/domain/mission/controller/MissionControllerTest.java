@@ -122,7 +122,8 @@ class MissionControllerTest {
         perform.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.data.errorClassName").value("MethodArgumentNotValidException"))
+                .andExpect(
+                        jsonPath("$.data.errorClassName").value("MethodArgumentNotValidException"))
                 .andExpect(jsonPath("$.data.message").value("이름은 비워둘 수 없습니다."))
                 .andDo(print());
     }
@@ -261,7 +262,8 @@ class MissionControllerTest {
         perform.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.data.errorClassName").value("MethodArgumentNotValidException"))
+                .andExpect(
+                        jsonPath("$.data.errorClassName").value("MethodArgumentNotValidException"))
                 .andExpect(jsonPath("$.data.message").value("이름은 비워둘 수 없습니다."))
                 .andDo(print());
     }
