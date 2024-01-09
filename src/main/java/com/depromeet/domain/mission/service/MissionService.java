@@ -37,7 +37,7 @@ public class MissionService {
     public MissionFindResponse findOneMission(Long missionId) {
         Mission mission =
                 missionRepository
-                        .findByMissionId(missionId)
+                        .findById(missionId)
                         .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
         return MissionFindResponse.from(mission);
     }
