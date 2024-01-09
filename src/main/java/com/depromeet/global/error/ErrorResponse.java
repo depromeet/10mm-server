@@ -1,11 +1,8 @@
 package com.depromeet.global.error;
 
-import java.time.LocalDateTime;
-import org.springframework.http.HttpStatus;
+public record ErrorResponse(String errorClassName, String message) {
 
-public record ErrorResponse(int status, String message, LocalDateTime timestamp) {
-
-    public static ErrorResponse of(HttpStatus status, String message) {
-        return new ErrorResponse(status.value(), message, LocalDateTime.now());
+    public static ErrorResponse of(String errorClassName, String message) {
+        return new ErrorResponse(errorClassName, message);
     }
 }

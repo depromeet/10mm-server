@@ -1,5 +1,6 @@
 package com.depromeet.global.error;
 
+import com.depromeet.global.common.response.GlobalResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,7 +38,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatusCode statusCode,
             WebRequest request) {
         ErrorResponse errorResponse =
-                ErrorResponse.of(HttpStatus.resolve(statusCode.value()), ex.getMessage());
+                ErrorResponse.of(ex.getClass().getSimpleName(), ex.getMessage());
         return super.handleExceptionInternal(ex, errorResponse, headers, statusCode, request);
     }
 
@@ -62,14 +63,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         String errorsToJsonString = new ObjectMapper().writeValueAsString(fieldAndErrorMessages);
         final ErrorResponse errorResponse =
-                ErrorResponse.of(HttpStatus.resolve(status.value()), errorsToJsonString);
-
-        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+                ErrorResponse.of(e.getClass().getSimpleName(), errorsToJsonString);
+        GlobalResponse response = GlobalResponse.fail(status.value(), errorResponse);
+        return ResponseEntity.status(status).body(response);
     }
 
     /** Request Param Validation 예외 처리 */
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(
+    public ResponseEntity<GlobalResponse> handleConstraintViolationException(
             ConstraintViolationException e) {
         log.error("ConstraintViolationException : {}", e.getMessage(), e);
 
@@ -92,21 +93,23 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         });
 
         final ErrorResponse errorResponse =
-                ErrorResponse.of(HttpStatus.BAD_REQUEST, bindingErrors.toString());
-
-        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+                ErrorResponse.of(e.getClass().getSimpleName(), bindingErrors.toString());
+        final GlobalResponse response =
+                GlobalResponse.fail(HttpStatus.BAD_REQUEST.value(), errorResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     /** enum type 일치하지 않아 binding 못할 경우 발생 주로 @RequestParam enum으로 binding 못했을 경우 발생 */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    protected ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
+    protected ResponseEntity<GlobalResponse> handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException e) {
         log.error("MethodArgumentTypeMismatchException : {}", e.getMessage(), e);
         final ErrorCode errorCode = ErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH;
         final ErrorResponse errorResponse =
-                ErrorResponse.of(errorCode.getStatus(), errorCode.getMessage());
-
-        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+                ErrorResponse.of(e.getClass().getSimpleName(), errorCode.getMessage());
+        final GlobalResponse response =
+                GlobalResponse.fail(errorCode.getStatus().value(), errorResponse);
+        return ResponseEntity.status(errorCode.getStatus()).body(response);
     }
 
     /** 지원하지 않은 HTTP method 호출 할 경우 발생 */
@@ -119,30 +122,33 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("HttpRequestMethodNotSupportedException : {}", e.getMessage(), e);
         final ErrorCode errorCode = ErrorCode.METHOD_NOT_ALLOWED;
         final ErrorResponse errorResponse =
-                ErrorResponse.of(errorCode.getStatus(), errorCode.getMessage());
-
-        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+                ErrorResponse.of(e.getClass().getSimpleName(), errorCode.getMessage());
+        final GlobalResponse response =
+                GlobalResponse.fail(errorCode.getStatus().value(), errorResponse);
+        return ResponseEntity.status(errorCode.getStatus()).body(response);
     }
 
     /** CustomException 예외 처리 */
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
+    public ResponseEntity<GlobalResponse> handleCustomException(CustomException e) {
         log.error("CustomException : {}", e.getMessage(), e);
         final ErrorCode errorCode = e.getErrorCode();
         final ErrorResponse errorResponse =
-                ErrorResponse.of(errorCode.getStatus(), errorCode.getMessage());
-
-        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+                ErrorResponse.of(errorCode.name(), errorCode.getMessage());
+        final GlobalResponse response =
+                GlobalResponse.fail(errorCode.getStatus().value(), errorResponse);
+        return ResponseEntity.status(errorCode.getStatus()).body(response);
     }
 
     /** 500번대 에러 처리 */
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<ErrorResponse> handleException(Exception e) {
+    protected ResponseEntity<GlobalResponse> handleException(Exception e) {
         log.error("Internal Server Error : {}", e.getMessage(), e);
         final ErrorCode internalServerError = ErrorCode.INTERNAL_SERVER_ERROR;
         final ErrorResponse errorResponse =
-                ErrorResponse.of(internalServerError.getStatus(), internalServerError.getMessage());
-
-        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+                ErrorResponse.of(e.getClass().getSimpleName(), internalServerError.getMessage());
+        final GlobalResponse response =
+                GlobalResponse.fail(internalServerError.getStatus().value(), errorResponse);
+        return ResponseEntity.status(internalServerError.getStatus()).body(response);
     }
 }

@@ -33,7 +33,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice {
             return body;
         }
         if (resolve.is2xxSuccessful()) {
-            return GlobalResponse.of(status, body);
+            return GlobalResponse.success(status, body);
         }
         return body;
     }
