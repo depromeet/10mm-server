@@ -9,7 +9,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -20,18 +19,6 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class MissionRepositoryImpl implements MissionRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
-
-    @Override
-    public Optional<Mission> findByMissionId(Long missionId) {
-        Mission findMission =
-                jpaQueryFactory
-                        .selectFrom(mission)
-                        .leftJoin(mission.missionRecords, missionRecord)
-                        .fetchJoin()
-                        .where(mission.id.eq(missionId))
-                        .fetchOne();
-        return Optional.ofNullable(findMission);
-    }
 
     @Override
     public Slice<Mission> findAllMission(Member member, Pageable pageable, Long lastId) {

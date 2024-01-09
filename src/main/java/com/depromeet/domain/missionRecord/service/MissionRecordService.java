@@ -9,10 +9,13 @@ import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.domain.MissionRecordTTL;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
 import com.depromeet.global.common.constants.RedisExpireEventConstants;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
 import java.time.Duration;
+import java.time.YearMonth;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,9 +54,16 @@ public class MissionRecordService {
         return createdMissionRecord.getId();
     }
 
+    public List<MissionRecordFindResponse> findAllMissionRecord(
+            Long missionId, YearMonth yearMonth) {
+        List<MissionRecord> missionRecords =
+                missionRecordRepository.findAllByMissionIdAndYearMonth(missionId, yearMonth);
+        return missionRecords.stream().map(MissionRecordFindResponse::from).toList();
+    }
+
     private Mission findMission(MissionRecordCreateRequest request) {
         return missionRepository
-                .findByMissionId(request.missionId())
+                .findById(request.missionId())
                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
     }
 
