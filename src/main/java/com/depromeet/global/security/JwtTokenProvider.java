@@ -7,30 +7,21 @@ import com.depromeet.domain.token.dto.AccessToken;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.infra.config.jwt.JwtProperties;
-
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.stereotype.Component;
-
 import java.security.Key;
 import java.util.Date;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
 
     private final JwtProperties jwtProperties;
-    private final Key accessTokenKey;
-    private final Key refreshTokenKey;
-
-    public JwtTokenProvider(JwtProperties jwtProperties) {
-        this.jwtProperties = jwtProperties;
-        this.accessTokenKey = Keys.hmacShaKeyFor(jwtProperties.accessTokenSecret().getBytes());
-        this.refreshTokenKey = Keys.hmacShaKeyFor(jwtProperties.refreshTokenSecret().getBytes());
-    }
 
     public String generateAccessToken(Long memberId, MemberRole memberRole) {
         Date issuedAt = new Date();
@@ -47,7 +38,7 @@ public class JwtTokenProvider {
     }
 
     public AccessToken parseAccessToken(String token) {
-        Jws<Claims> claims = getClaims(token, accessTokenKey);
+        Jws<Claims> claims = getClaims(token, getAccessTokenKey());
 
         try {
             validateDefaultClaims(claims);
@@ -60,7 +51,7 @@ public class JwtTokenProvider {
     }
 
     public Long parseRefreshToken(String token) {
-        Jws<Claims> claims = getClaims(token, refreshTokenKey);
+        Jws<Claims> claims = getClaims(token, getRefreshTokenKey()
 
         try {
             validateDefaultClaims(claims);
@@ -69,6 +60,14 @@ public class JwtTokenProvider {
             throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
     }
+
+	private Key getRefreshTokenKey() {
+		return Keys.hmacShaKeyFor(jwtProperties.refreshTokenSecret().getBytes());
+	}
+
+	private Key getAccessTokenKey() {
+		return Keys.hmacShaKeyFor(jwtProperties.accessTokenSecret().getBytes());
+	}
 
     private void validateDefaultClaims(Jws<Claims> claims) {
         // issuer가 일치하는지 검증
@@ -103,7 +102,7 @@ public class JwtTokenProvider {
                 .claim(TOKEN_ROLE_NAME, memberRole.name())
                 .setIssuedAt(issuedAt)
                 .setExpiration(expiredAt)
-                .signWith(accessTokenKey)
+                .signWith(getAccessTokenKey())
                 .compact();
     }
 
@@ -113,7 +112,7 @@ public class JwtTokenProvider {
                 .setSubject(memberId.toString())
                 .setIssuedAt(issuedAt)
                 .setExpiration(expiredAt)
-                .signWith(refreshTokenKey)
+                .signWith(getRefreshTokenKey())
                 .compact();
     }
 }
