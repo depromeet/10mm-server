@@ -40,7 +40,7 @@ public class MissionRecordService {
                 MissionRecord.createMissionRecord(
                         duration, request.startedAt(), request.finishedAt(), mission);
         Long ttl =
-                Duration.between(request.finishedAt(), request.finishedAt().plusSeconds(10))
+                Duration.between(request.finishedAt(), request.finishedAt().plusMinutes(10))
                         .getSeconds();
         MissionRecord createdMissionRecord = missionRecordRepository.save(missionRecord);
         missionRecordTTLRepository.save(
