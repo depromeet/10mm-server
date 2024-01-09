@@ -1,22 +1,26 @@
 package com.depromeet.global.security;
 
+import static com.depromeet.global.common.constants.SecurityConstants.TOKEN_ROLE_NAME;
+
 import com.depromeet.domain.member.domain.MemberRole;
 import com.depromeet.domain.token.dto.AccessToken;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.infra.config.jwt.JwtProperties;
+
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.stereotype.Component;
+
 import java.security.Key;
 import java.util.Date;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 public class JwtTokenProvider {
-
-    private static final String TOKEN_ROLE_NAME = "role";
 
     private final JwtProperties jwtProperties;
     private final Key accessTokenKey;
