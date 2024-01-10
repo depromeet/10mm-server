@@ -120,8 +120,11 @@ class MissionControllerTest {
                                 .with(csrf())
                                 .content(objectMapper.writeValueAsString(createRequest)));
         perform.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.message").value("{\"name\":\"이름은 비워둘 수 없습니다.\"}"))
+                .andExpect(
+                        jsonPath("$.data.errorClassName").value("MethodArgumentNotValidException"))
+                .andExpect(jsonPath("$.data.message").value("이름은 비워둘 수 없습니다."))
                 .andDo(print());
     }
 
@@ -257,8 +260,11 @@ class MissionControllerTest {
                                 .content(objectMapper.writeValueAsString(updateRequest)));
 
         perform.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.message").value("{\"name\":\"이름은 비워둘 수 없습니다.\"}"))
+                .andExpect(
+                        jsonPath("$.data.errorClassName").value("MethodArgumentNotValidException"))
+                .andExpect(jsonPath("$.data.message").value("이름은 비워둘 수 없습니다."))
                 .andDo(print());
     }
 
