@@ -1,4 +1,4 @@
-package com.depromeet.global.config.response;
+package com.depromeet.global.common.response;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;
@@ -33,7 +33,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice {
             return body;
         }
         if (resolve.is2xxSuccessful()) {
-            return GlobalResponse.of(status, body);
+            return GlobalResponse.success(status, body);
         }
         return body;
     }
