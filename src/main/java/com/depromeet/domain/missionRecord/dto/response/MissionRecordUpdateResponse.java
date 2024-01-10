@@ -7,7 +7,7 @@ public record MissionRecordUpdateResponse(
         @Schema(description = "미션 기록 ID", defaultValue = "1") Long recordId,
         @Schema(description = "미션 기록 일지", defaultValue = "default missionRecord remark")
                 String remark) {
-    public MissionRecordUpdateResponse(MissionRecord missionRecord) {
-        this(missionRecord.getId(), missionRecord.getRemark());
+    public static MissionRecordUpdateResponse from(MissionRecord missionRecord) {
+        return new MissionRecordUpdateResponse(missionRecord.getId(), missionRecord.getRemark());
     }
 }

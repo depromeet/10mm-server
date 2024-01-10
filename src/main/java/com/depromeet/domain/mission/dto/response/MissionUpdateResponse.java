@@ -14,18 +14,18 @@ public record MissionUpdateResponse(
         @Schema(description = "미션 내용", defaultValue = "default content") String content,
         @Schema(description = "미션 카테고리", defaultValue = "STUDY") MissionCategory category,
         @Schema(description = "미션 공개여부", defaultValue = "ALL") MissionVisibility visibility) {
-    public MissionUpdateResponse(Mission mission) {
-        this(
+    public static MissionUpdateResponse from(Mission mission) {
+        validateVisibility(mission.getVisibility());
+        return new MissionUpdateResponse(
                 mission.getId(),
                 mission.getName(),
                 mission.getContent(),
                 mission.getCategory(),
                 mission.getVisibility());
-        validateVisibility();
     }
 
     @NotNull(message = "미션 공개여부는 null이 될 수 없습니다.")
-    private void validateVisibility() {
+    private static void validateVisibility(MissionVisibility visibility) {
         if (visibility == null) {
             throw new CustomException(ErrorCode.MISSION_VISIBILITY_NULL);
         }

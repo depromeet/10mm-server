@@ -72,7 +72,7 @@ public class MissionRecordService {
                 missionRecord.getMission(), memberUtil.getCurrentMember());
 
         missionRecord.updateMissionRecord(request);
-        return new MissionRecordUpdateResponse(missionRecord);
+        return MissionRecordUpdateResponse.from(missionRecord);
     }
 
     private Mission findMission(MissionRecordCreateRequest request) {
