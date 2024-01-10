@@ -108,6 +108,8 @@ public class WebSecurityConfig {
                                         userInfo -> userInfo.oidcUserService(customOidcUserService))
                                 .successHandler(customOidcAuthenticationSuccessHandler));
 
+        http.addFilterAfter(jwtAuthenticationFilter, LogoutFilter.class);
+
         return http.build();
     }
 
