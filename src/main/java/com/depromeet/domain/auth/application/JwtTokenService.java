@@ -8,15 +8,12 @@ import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.MemberRole;
 import com.depromeet.global.config.security.PrincipalDetails;
 import com.depromeet.global.security.JwtTokenProvider;
-
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor

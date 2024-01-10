@@ -2,7 +2,6 @@ package com.depromeet.domain.auth.domain;
 
 import lombok.Builder;
 import lombok.Getter;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;

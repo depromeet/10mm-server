@@ -4,15 +4,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.depromeet.TestRedisConfig;
 import com.depromeet.domain.auth.domain.RefreshToken;
-
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.util.Optional;
 
 @ActiveProfiles("test")
 @Import(TestRedisConfig.class)

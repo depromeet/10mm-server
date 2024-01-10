@@ -7,17 +7,13 @@ import com.depromeet.domain.member.domain.MemberRole;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.infra.config.jwt.JwtProperties;
-
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.stereotype.Component;
-
 import java.security.Key;
 import java.util.Date;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component

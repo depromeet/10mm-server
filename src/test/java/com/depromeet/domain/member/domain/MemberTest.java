@@ -5,11 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
-
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.time.LocalDateTime;
 
 class MemberTest {
 
