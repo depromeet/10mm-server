@@ -6,7 +6,9 @@ import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
+import com.depromeet.domain.missionRecord.dto.request.MissionRecordUpdateRequest;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindResponse;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordUpdateResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -46,6 +48,16 @@ public class MissionRecordService {
         List<MissionRecord> missionRecords =
                 missionRecordRepository.findAllByMissionIdAndYearMonth(missionId, yearMonth);
         return missionRecords.stream().map(MissionRecordFindResponse::from).toList();
+    }
+
+    public MissionRecordUpdateResponse updateMissionRecord(
+            MissionRecordUpdateRequest request, Long recordId) {
+        MissionRecord missionRecord =
+                missionRecordRepository
+                        .findById(recordId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
+        missionRecord.updateMissionRecord(request);
+        return new MissionRecordUpdateResponse(missionRecord);
     }
 
     private Mission findMission(MissionRecordCreateRequest request) {

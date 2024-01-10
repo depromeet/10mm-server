@@ -2,6 +2,7 @@ package com.depromeet.domain.missionRecord.domain;
 
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.mission.domain.Mission;
+import com.depromeet.domain.missionRecord.dto.request.MissionRecordUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -76,5 +77,9 @@ public class MissionRecord extends BaseTimeEntity {
                 .finishedAt(finishedAt)
                 .mission(mission)
                 .build();
+    }
+
+    public void updateMissionRecord(MissionRecordUpdateRequest missionRecordUpdateRequest) {
+        this.remark = missionRecordUpdateRequest.remark();
     }
 }
