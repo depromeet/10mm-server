@@ -27,14 +27,14 @@ public class CustomOidcAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 
         CustomOidcUser user = (CustomOidcUser) authentication.getPrincipal();
 
-        if (user.isGuest()) {
-            response.sendRedirect("/register");
-        }
+        // 게스트 유저이면 회원가입 필요하므로 헤더에 담아서 응답
+        response.setHeader(REGISTER_REQUIRED_HEADER, user.isGuest() ? "true" : "false");
 
         String accessToken =
                 jwtTokenService.createAccessToken(user.getMemberId(), user.getMemberRole());
         String refreshToken = jwtTokenService.createRefreshToken(user.getMemberId());
 
+        // 토큰을 헤더에 담아서 응답
         setTokenPairToResponseHeader(response, accessToken, refreshToken);
     }
 
