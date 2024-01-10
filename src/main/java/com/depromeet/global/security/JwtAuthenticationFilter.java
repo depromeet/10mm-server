@@ -60,6 +60,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             jwtTokenService.reissueRefreshToken(accessTokenDto);
         }
 
+        // ATK, RTK 둘 다 만료되지 않았으면 RTK 재발급
+        if (!isAccessTokenExpired && !isRefreshTokenExpired) {
+            AccessToken accessTokenDto = jwtTokenService.parseAccessToken(accessToken);
+            jwtTokenService.reissueRefreshToken(accessTokenDto);
+        }
+
         Authentication authentication = jwtTokenService.getAuthentication(accessToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
