@@ -29,7 +29,7 @@ public class MissionRecordService {
         Duration duration =
                 Duration.ofMinutes(request.durationMin()).plusSeconds(request.durationSec());
 
-        mission.validateUserMismatch(member);
+        validateMissionRecordUserMismatch(mission, member);
         validateMissionRecordDuration(duration);
 
         MissionRecord missionRecord =
@@ -47,6 +47,12 @@ public class MissionRecordService {
     private void validateMissionRecordDuration(Duration duration) {
         if (duration.getSeconds() > 3600L) {
             throw new CustomException(ErrorCode.MISSION_RECORD_DURATION_OVERBALANCE);
+        }
+    }
+
+    private void validateMissionRecordUserMismatch(Mission mission, Member member) {
+        if (!mission.getMember().getId().equals(member.getId())) {
+            throw new CustomException(ErrorCode.MISSION_RECORD_USER_MISMATCH);
         }
     }
 }

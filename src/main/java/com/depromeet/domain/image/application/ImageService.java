@@ -41,7 +41,7 @@ public class ImageService {
         MissionRecord missionRecord = findMissionRecordById(request.missionRecordId());
 
         Mission mission = missionRecord.getMission();
-        mission.validateUserMismatch(currentMember);
+        validateMissionRecordUserMismatch(mission, currentMember);
 
         String fileName =
                 createFileName(
@@ -71,7 +71,7 @@ public class ImageService {
         MissionRecord missionRecord = findMissionRecordById(request.missionRecordId());
 
         Mission mission = missionRecord.getMission();
-        mission.validateUserMismatch(currentMember);
+        validateMissionRecordUserMismatch(mission, currentMember);
 
         String imageUrl =
                 storageProperties.endpoint()
@@ -119,5 +119,11 @@ public class ImageService {
         expTimeMillis += 1000 * 60 * 30;
         expiration.setTime(expTimeMillis);
         return expiration;
+    }
+
+    private void validateMissionRecordUserMismatch(Mission mission, Member member) {
+        if (!mission.getMember().getId().equals(member.getId())) {
+            throw new CustomException(ErrorCode.MISSION_RECORD_USER_MISMATCH);
+        }
     }
 }
