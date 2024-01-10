@@ -64,6 +64,36 @@ public class JwtTokenProvider {
         }
     }
 
+    // TODO: ATK와 RTK의 유효성 검증을 한 번에 할 수 있도록 리팩토링
+    // TODO: 인증 사이클 당 2회의 토큰 파싱이 발생하는 이슈 개선
+    public boolean isAccessTokenExpired(String token) {
+        try {
+            parseAccessToken(token);
+            return false;
+        } catch (CustomException e) {
+            if (e.getErrorCode() == ErrorCode.EXPIRED_JWT_TOKEN) {
+                return true;
+            }
+            throw e;
+        }
+    }
+
+    public boolean isRefreshTokenExpired(String token) {
+        try {
+            parseRefreshToken(token);
+            return false;
+        } catch (CustomException e) {
+            if (e.getErrorCode() == ErrorCode.EXPIRED_JWT_TOKEN) {
+                return true;
+            }
+            throw e;
+        }
+    }
+
+    public long getRefreshTokenExpirationTime() {
+        return jwtProperties.refreshTokenExpirationTime();
+    }
+
     private Key getRefreshTokenKey() {
         return Keys.hmacShaKeyFor(jwtProperties.refreshTokenSecret().getBytes());
     }
