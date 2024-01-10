@@ -38,7 +38,7 @@ public class ImageService {
             MissionRecordImageCreateRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
 
-        MissionRecord missionRecord = findMissionRecordByMissionRecordId(request.missionRecordId());
+        MissionRecord missionRecord = findMissionRecordById(request.missionRecordId());
 
         Mission mission = missionRecord.getMission();
         mission.validateUserMismatch(currentMember);
@@ -60,7 +60,7 @@ public class ImageService {
         return PresignedUrlResponse.from(presignedUrl);
     }
 
-    private MissionRecord findMissionRecordByMissionRecordId(Long request) {
+    private MissionRecord findMissionRecordById(Long request) {
         return missionRecordRepository
                 .findById(request)
                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
@@ -68,7 +68,7 @@ public class ImageService {
 
     public void uploadCompleteMissionRecord(MissionRecordImageUploadCompleteRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
-        MissionRecord missionRecord = findMissionRecordByMissionRecordId(request.missionRecordId());
+        MissionRecord missionRecord = findMissionRecordById(request.missionRecordId());
 
         Mission mission = missionRecord.getMission();
         mission.validateUserMismatch(currentMember);
