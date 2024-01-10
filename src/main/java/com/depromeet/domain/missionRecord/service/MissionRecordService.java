@@ -33,7 +33,7 @@ public class MissionRecordService {
     private final MissionRecordTTLRepository missionRecordTTLRepository;
 
     public Long createMissionRecord(MissionRecordCreateRequest request) {
-        final Mission mission = findMission(request);
+        final Mission mission = findMissionById(request.missionId());
         final Member member = memberUtil.getCurrentMember();
 
         Duration duration =
@@ -59,6 +59,12 @@ public class MissionRecordService {
         return createdMissionRecord.getId();
     }
 
+    private Mission findMissionById(Long missionId) {
+        return missionRepository
+                .findById(missionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
+    }
+
     @Transactional(readOnly = true)
     public MissionRecordFindOneResponse findOneMissionRecord(Long recordId) {
         MissionRecord missionRecord =
@@ -76,21 +82,15 @@ public class MissionRecordService {
         return missionRecords.stream().map(MissionRecordFindResponse::from).toList();
     }
 
-    private Mission findMission(MissionRecordCreateRequest request) {
-        return missionRepository
-                .findById(request.missionId())
-                .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
-    }
-
-    private void validateMissionRecordUserMismatch(Mission mission, Member member) {
-        if (!member.getId().equals(mission.getMember().getId())) {
-            throw new CustomException(ErrorCode.MISSION_RECORD_USER_MISMATCH);
-        }
-    }
-
     private void validateMissionRecordDuration(Duration duration) {
         if (duration.getSeconds() > 3600L) {
             throw new CustomException(ErrorCode.MISSION_RECORD_DURATION_OVERBALANCE);
+        }
+    }
+
+    private void validateMissionRecordUserMismatch(Mission mission, Member member) {
+        if (!mission.getMember().getId().equals(member.getId())) {
+            throw new CustomException(ErrorCode.MISSION_RECORD_USER_MISMATCH);
         }
     }
 }
