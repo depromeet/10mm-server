@@ -77,14 +77,8 @@ public class MissionRecordService {
         validateMissionRecordUserMismatch(
                 missionRecord.getMission(), memberUtil.getCurrentMember());
 
-        missionRecord.updateMissionRecord(request);
+        missionRecord.updateMissionRecord(request.remark());
         return MissionRecordUpdateResponse.from(missionRecord);
-    }
-
-    private Mission findMission(MissionRecordCreateRequest request) {
-        return missionRepository
-                .findById(request.missionId())
-                .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
     }
 
     private void validateMissionRecordDuration(Duration duration) {
