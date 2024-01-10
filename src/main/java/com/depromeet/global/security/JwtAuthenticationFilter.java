@@ -14,9 +14,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -30,14 +32,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = extractAccessToken(request);
         String refreshToken = extractRefreshToken(request);
 
-        boolean isAccessTokenExpired = jwtTokenService.isAccessTokenExpired(accessToken);
-        boolean isRefreshTokenExpired = jwtTokenService.isRefreshTokenExpired(refreshToken);
-
         // ATK, RTK 둘 다 없으면 통과
         if (accessToken == null || refreshToken == null) {
             filterChain.doFilter(request, response);
             return;
         }
+
+        boolean isAccessTokenExpired = jwtTokenService.isAccessTokenExpired(accessToken);
+        boolean isRefreshTokenExpired = jwtTokenService.isRefreshTokenExpired(refreshToken);
 
         // ATK, RTK 둘 다 만료되었으면 통과
         if (isAccessTokenExpired && isRefreshTokenExpired) {
