@@ -29,7 +29,7 @@ public class MissionRecordService {
     private final MissionRecordRepository missionRecordRepository;
 
     public Long createMissionRecord(MissionRecordCreateRequest request) {
-        final Mission mission = findMission(request);
+        final Mission mission = findMissionById(request.missionId());
         final Member member = memberUtil.getCurrentMember();
 
         Duration duration =
@@ -42,6 +42,12 @@ public class MissionRecordService {
                 MissionRecord.createMissionRecord(
                         duration, request.startedAt(), request.finishedAt(), mission);
         return missionRecordRepository.save(missionRecord).getId();
+    }
+
+    private Mission findMissionById(Long missionId) {
+        return missionRepository
+                .findById(missionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
@@ -81,15 +87,15 @@ public class MissionRecordService {
                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
     }
 
-    private void validateMissionRecordUserMismatch(Mission mission, Member member) {
-        if (!member.getId().equals(mission.getMember().getId())) {
-            throw new CustomException(ErrorCode.MISSION_RECORD_USER_MISMATCH);
-        }
-    }
-
     private void validateMissionRecordDuration(Duration duration) {
         if (duration.getSeconds() > 3600L) {
             throw new CustomException(ErrorCode.MISSION_RECORD_DURATION_OVERBALANCE);
+        }
+    }
+
+    private void validateMissionRecordUserMismatch(Mission mission, Member member) {
+        if (!mission.getMember().getId().equals(member.getId())) {
+            throw new CustomException(ErrorCode.MISSION_RECORD_USER_MISMATCH);
         }
     }
 }
