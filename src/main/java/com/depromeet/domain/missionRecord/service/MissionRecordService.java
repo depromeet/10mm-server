@@ -42,13 +42,12 @@ public class MissionRecordService {
         return missionRecordRepository.save(missionRecord).getId();
     }
 
-
     private Mission findMissionById(Long missionId) {
         return missionRepository
                 .findById(missionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
     }
-  
+
     @Transactional(readOnly = true)
     public MissionRecordFindOneResponse findOneMissionRecord(Long recordId) {
         MissionRecord missionRecord =
