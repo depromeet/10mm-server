@@ -25,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class MissionRecordService {
+    private static final int EXPIRATION_TIME = 10;
+
     private final MemberUtil memberUtil;
     private final MissionRepository missionRepository;
     private final MissionRecordRepository missionRecordRepository;
@@ -43,15 +45,17 @@ public class MissionRecordService {
         MissionRecord missionRecord =
                 MissionRecord.createMissionRecord(
                         duration, request.startedAt(), request.finishedAt(), mission);
-        Long ttl =
-                Duration.between(request.finishedAt(), request.finishedAt().plusMinutes(10))
+        Long expirationTime =
+                Duration.between(
+                                request.finishedAt(),
+                                request.finishedAt().plusMinutes(EXPIRATION_TIME))
                         .getSeconds();
         MissionRecord createdMissionRecord = missionRecordRepository.save(missionRecord);
         missionRecordTTLRepository.save(
                 MissionRecordTTL.createMissionRecordTTL(
                         RedisExpireEventConstants.EXPIRE_EVENT_IMAGE_UPLOAD_TIME_END.getValue()
                                 + createdMissionRecord.getId(),
-                        ttl));
+                        expirationTime));
         return createdMissionRecord.getId();
     }
 
