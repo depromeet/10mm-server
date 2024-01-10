@@ -2,6 +2,7 @@ package com.depromeet.domain.missionRecord.api;
 
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordUpdateRequest;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindOneResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordUpdateResponse;
 import com.depromeet.domain.missionRecord.service.MissionRecordService;
@@ -35,6 +36,12 @@ public class MissionRecordController {
             @Valid @RequestBody MissionRecordCreateRequest request) {
         Long missionRecordId = missionRecordService.createMissionRecord(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(missionRecordId);
+    }
+
+    @Operation(summary = "미션 기록 조회", description = "미션 기록을 조회합니다.")
+    @GetMapping("/{recordId}")
+    public MissionRecordFindOneResponse missionRecordFindOne(@PathVariable Long recordId) {
+        return missionRecordService.findOneMissionRecord(recordId);
     }
 
     @Operation(summary = "미션 기록 조회 (캘린더 뷰)", description = "미션 기록을 조회합니다.")
