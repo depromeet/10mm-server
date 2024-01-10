@@ -45,7 +45,7 @@ public class MissionRecordService {
 
     private Mission findMissionById(Long missionId) {
         return missionRepository
-                .findByMissionId(missionId)
+                .findById(missionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
     }
   
