@@ -6,10 +6,14 @@ import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindOneResponse;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
 import java.time.Duration;
+import java.time.YearMonth;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +27,7 @@ public class MissionRecordService {
     private final MissionRecordRepository missionRecordRepository;
 
     public Long createMissionRecord(MissionRecordCreateRequest request) {
-        final Mission mission = findMissionByMissionId(request.missionId());
+        final Mission mission = findMissionById(request.missionId());
         final Member member = memberUtil.getCurrentMember();
 
         Duration duration =
@@ -38,10 +42,28 @@ public class MissionRecordService {
         return missionRecordRepository.save(missionRecord).getId();
     }
 
-    private Mission findMissionByMissionId(Long missionId) {
+
+    private Mission findMissionById(Long missionId) {
         return missionRepository
                 .findByMissionId(missionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
+    }
+  
+    @Transactional(readOnly = true)
+    public MissionRecordFindOneResponse findOneMissionRecord(Long recordId) {
+        MissionRecord missionRecord =
+                missionRecordRepository
+                        .findById(recordId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
+        return MissionRecordFindOneResponse.from(missionRecord);
+    }
+
+    @Transactional(readOnly = true)
+    public List<MissionRecordFindResponse> findAllMissionRecord(
+            Long missionId, YearMonth yearMonth) {
+        List<MissionRecord> missionRecords =
+                missionRecordRepository.findAllByMissionIdAndYearMonth(missionId, yearMonth);
+        return missionRecords.stream().map(MissionRecordFindResponse::from).toList();
     }
 
     private void validateMissionRecordDuration(Duration duration) {
