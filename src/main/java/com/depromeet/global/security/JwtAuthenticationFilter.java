@@ -3,17 +3,22 @@ package com.depromeet.global.security;
 import static com.depromeet.global.common.constants.SecurityConstants.*;
 
 import com.depromeet.domain.auth.application.JwtTokenService;
+import com.depromeet.domain.auth.dto.AccessToken;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,9 +34,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = extractAccessToken(request);
         String refreshToken = extractRefreshToken(request);
 
+        boolean isAccessTokenExpired = jwtTokenService.isAccessTokenExpired(accessToken);
+        boolean isRefreshTokenExpired = jwtTokenService.isRefreshTokenExpired(refreshToken);
+
+        // ATK, RTK 둘 다 없으면 통과
         if (accessToken == null || refreshToken == null) {
             filterChain.doFilter(request, response);
             return;
+        }
+
+        // ATK, RTK 둘 다 만료되었으면 통과
+        if (isAccessTokenExpired && isRefreshTokenExpired) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // ATK 만료되었고 RTK 만료되지 않았으면 RTK로 ATK, RTK 재발급
+        if (isAccessTokenExpired && !isRefreshTokenExpired) {
+            accessToken = jwtTokenService.reissueAccessToken(refreshToken);
+            jwtTokenService.reissueRefreshToken(refreshToken);
+        }
+
+        // ATK 만료되지 않았고 RTK 만료되었으면 ATK로 ATK, RTK 재발급
+        if (!isAccessTokenExpired && isRefreshTokenExpired) {
+            AccessToken accessTokenDto = jwtTokenService.parseAccessToken(accessToken);
+            accessToken = jwtTokenService.reissueAccessToken(accessTokenDto);
+            jwtTokenService.reissueRefreshToken(accessTokenDto);
         }
 
         Authentication authentication = jwtTokenService.getAuthentication(accessToken);
