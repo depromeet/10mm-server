@@ -6,6 +6,7 @@ import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindOneResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
@@ -41,6 +42,16 @@ public class MissionRecordService {
         return missionRecordRepository.save(missionRecord).getId();
     }
 
+    @Transactional(readOnly = true)
+    public MissionRecordFindOneResponse findOneMissionRecord(Long recordId) {
+        MissionRecord missionRecord =
+                missionRecordRepository
+                        .findById(recordId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
+        return MissionRecordFindOneResponse.from(missionRecord);
+    }
+
+    @Transactional(readOnly = true)
     public List<MissionRecordFindResponse> findAllMissionRecord(
             Long missionId, YearMonth yearMonth) {
         List<MissionRecord> missionRecords =
