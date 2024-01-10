@@ -46,10 +46,11 @@ class ImageControllerTest {
                                     .contentType(APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
                     .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
                     .andExpect(
-                            jsonPath("$.message")
-                                    .value("{\"missionRecordId\":\"미션 기록 ID는 비워둘 수 없습니다.\"}"))
+                            jsonPath("$.data.errorClassName").value("MethodArgumentNotValidException"))
+                    .andExpect(jsonPath("$.data.message").value("미션 기록 ID는 비워둘 수 없습니다."))
                     .andDo(print());
         }
 
@@ -64,10 +65,11 @@ class ImageControllerTest {
                                     .contentType(APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
                     .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
                     .andExpect(
-                            jsonPath("$.message")
-                                    .value("{\"imageFileExtension\":\"이미지 파일의 확장자는 비워둘 수 없습니다.\"}"))
+                            jsonPath("$.data.errorClassName").value("MethodArgumentNotValidException"))
+                    .andExpect(jsonPath("$.data.message").value("이미지 파일의 확장자는 비워둘 수 없습니다."))
                     .andDo(print());
         }
 
@@ -109,10 +111,11 @@ class ImageControllerTest {
                                     .contentType(APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
                     .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
                     .andExpect(
-                            jsonPath("$.message")
-                                    .value("{\"missionRecordId\":\"미션 기록 ID는 비워둘 수 없습니다.\"}"))
+                            jsonPath("$.data.errorClassName").value("MethodArgumentNotValidException"))
+                    .andExpect(jsonPath("$.data.message").value("미션 기록 ID는 비워둘 수 없습니다."))
                     .andDo(print());
         }
 
@@ -128,10 +131,11 @@ class ImageControllerTest {
                                     .contentType(APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
                     .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
                     .andExpect(
-                            jsonPath("$.message")
-                                    .value("{\"imageFileExtension\":\"이미지 파일의 확장자는 비워둘 수 없습니다.\"}"))
+                            jsonPath("$.data.errorClassName").value("MethodArgumentNotValidException"))
+                    .andExpect(jsonPath("$.data.message").value("이미지 파일의 확장자는 비워둘 수 없습니다."))
                     .andDo(print());
         }
 
