@@ -27,9 +27,8 @@ public class CustomOidcAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 
         CustomOidcUser user = (CustomOidcUser) authentication.getPrincipal();
 
-        // 게스트인 경우 회원가입 페이지로 리다이렉트
         if (user.isGuest()) {
-            response.sendRedirect("/auth/register");
+            response.sendRedirect("/register");
         }
 
         String accessToken =
