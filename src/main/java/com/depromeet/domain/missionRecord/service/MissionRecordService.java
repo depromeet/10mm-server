@@ -67,6 +67,10 @@ public class MissionRecordService {
                 missionRecordRepository
                         .findById(recordId)
                         .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
+
+        validateMissionRecordUserMismatch(
+                missionRecord.getMission(), memberUtil.getCurrentMember());
+
         missionRecord.updateMissionRecord(request);
         return new MissionRecordUpdateResponse(missionRecord);
     }
