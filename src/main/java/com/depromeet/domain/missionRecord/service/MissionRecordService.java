@@ -8,6 +8,7 @@ import com.depromeet.domain.missionRecord.dao.MissionRecordTTLRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.domain.MissionRecordTTL;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindOneResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindResponse;
 import com.depromeet.global.common.constants.RedisExpireEventConstants;
 import com.depromeet.global.error.exception.CustomException;
@@ -54,6 +55,16 @@ public class MissionRecordService {
         return createdMissionRecord.getId();
     }
 
+    @Transactional(readOnly = true)
+    public MissionRecordFindOneResponse findOneMissionRecord(Long recordId) {
+        MissionRecord missionRecord =
+                missionRecordRepository
+                        .findById(recordId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
+        return MissionRecordFindOneResponse.from(missionRecord);
+    }
+
+    @Transactional(readOnly = true)
     public List<MissionRecordFindResponse> findAllMissionRecord(
             Long missionId, YearMonth yearMonth) {
         List<MissionRecord> missionRecords =

@@ -18,7 +18,7 @@ public record MissionRecordCreateRequest(
                         timezone = "Asia/Seoul")
                 @Schema(
                         description = "미션 기록 시작 시간",
-                        defaultValue = "2024-01-03 00:00:00",
+                        defaultValue = "2023-01-03 00:00:00",
                         type = "string")
                 LocalDateTime startedAt,
         @NotNull(message = "미션 기록 종료 시간은 비워둘 수 없습니다.")
@@ -28,7 +28,7 @@ public record MissionRecordCreateRequest(
                         timezone = "Asia/Seoul")
                 @Schema(
                         description = "미션 기록 종료 시간",
-                        defaultValue = "2023-01-03 00:34:00",
+                        defaultValue = "2024-01-03 00:34:00",
                         type = "string")
                 LocalDateTime finishedAt,
         @NotNull(message = "미션 참여 시간(분)은 비워둘 수 없습니다.")
