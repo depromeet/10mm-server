@@ -32,15 +32,16 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     @Override
     public boolean existsByMissionIdAndToday(Long missionId) {
         LocalDate now = LocalDate.now();
-        return jpaQueryFactory
+        MissionRecord missionRecordFetchOne =
+                jpaQueryFactory
                         .selectFrom(missionRecord)
                         .where(
                                 missionIdEq(missionId),
                                 yearEq(now.getYear()),
                                 monthEq(now.getMonthValue()),
                                 dayEq(now.getDayOfMonth()))
-                        .fetchFirst()
-                != null;
+                        .fetchFirst();
+        return missionRecordFetchOne != null;
     }
 
     private BooleanExpression missionIdEq(Long missionId) {
