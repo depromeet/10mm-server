@@ -5,6 +5,7 @@ import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,20 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                 .fetch();
     }
 
+    @Override
+    public boolean existsByMissionIdAndToday(Long missionId) {
+        LocalDate now = LocalDate.now();
+        return jpaQueryFactory
+                        .selectFrom(missionRecord)
+                        .where(
+                                missionIdEq(missionId),
+                                yearEq(now.getYear()),
+                                monthEq(now.getMonthValue()),
+                                dayEq(now.getDayOfMonth()))
+                        .fetchFirst()
+                != null;
+    }
+
     private BooleanExpression missionIdEq(Long missionId) {
         return missionRecord.mission.id.eq(missionId);
     }
@@ -39,4 +54,12 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     private BooleanExpression monthEq(int month) {
         return missionRecord.startedAt.month().eq(month);
     }
+
+    private BooleanExpression dayEq(int day) {
+        return missionRecord.startedAt.dayOfMonth().eq(day);
+    }
+
+    //    private BooleanExpression startedAtEqNow(LocalDate localDate) {
+    //        return missionRecord.startedAt.da
+    //    }
 }
