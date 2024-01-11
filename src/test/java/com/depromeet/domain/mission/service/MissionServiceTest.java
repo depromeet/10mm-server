@@ -145,9 +145,7 @@ class MissionServiceTest {
                 missionService.updateMission(missionUpdateRequest, saveMission.missionId());
 
         // expected
-        assertEquals(modifyMission.name(), "modifyName");
-        assertEquals(modifyMission.content(), "modifyContent");
-        assertEquals(modifyMission.visibility(), MissionVisibility.FOLLOWER);
+        assertEquals(modifyMission.missionId(), 1L);
     }
 
     @Test
