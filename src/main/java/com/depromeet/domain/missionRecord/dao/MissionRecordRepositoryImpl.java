@@ -58,8 +58,4 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     private BooleanExpression dayEq(int day) {
         return missionRecord.startedAt.dayOfMonth().eq(day);
     }
-
-    //    private BooleanExpression startedAtEqNow(LocalDate localDate) {
-    //        return missionRecord.startedAt.da
-    //    }
 }
