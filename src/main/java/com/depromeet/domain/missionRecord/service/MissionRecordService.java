@@ -11,6 +11,7 @@ import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordUpdateRequest;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindOneResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindResponse;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordUpdateResponse;
 import com.depromeet.global.common.constants.RedisExpireEventConstants;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
@@ -83,17 +84,18 @@ public class MissionRecordService {
         return missionRecords.stream().map(MissionRecordFindResponse::from).toList();
     }
 
-    public Long updateMissionRecord(MissionRecordUpdateRequest request, Long recordId) {
+    public MissionRecordUpdateResponse updateMissionRecord(
+            MissionRecordUpdateRequest request, Long recordId) {
+        final Member member = memberUtil.getCurrentMember();
         MissionRecord missionRecord =
                 missionRecordRepository
                         .findById(recordId)
                         .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
 
-        validateMissionRecordUserMismatch(
-                missionRecord.getMission(), memberUtil.getCurrentMember());
+        validateMissionRecordUserMismatch(missionRecord.getMission(), member);
 
         missionRecord.updateMissionRecord(request.remark());
-        return missionRecord.getId();
+        return MissionRecordUpdateResponse.from(missionRecord);
     }
 
     private void validateMissionRecordDuration(Duration duration) {

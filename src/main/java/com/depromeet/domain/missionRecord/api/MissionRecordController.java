@@ -4,6 +4,7 @@ import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordUpdateRequest;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindOneResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindResponse;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordUpdateResponse;
 import com.depromeet.domain.missionRecord.service.MissionRecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,7 +54,7 @@ public class MissionRecordController {
 
     @Operation(summary = "미션 기록 단건 수정", description = "미션 기록을 수정합니다.")
     @PutMapping("/{recordId}")
-    public Long missionRecordUpdate(
+    public MissionRecordUpdateResponse missionRecordUpdate(
             @Valid @RequestBody MissionRecordUpdateRequest request, @PathVariable Long recordId) {
         return missionRecordService.updateMissionRecord(request, recordId);
     }
