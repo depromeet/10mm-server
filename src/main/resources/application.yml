@@ -6,6 +6,9 @@ spring:
       dev: "dev, datasource, redis, storage, actuator"
       prod: "prod, datasource, redis, storage, actuator"
 
+server:
+  port: ${SERVER_PORT:8080}
+
 swagger:
   version: 0.0.1
   user: ${SWAGGER_USER:default}
