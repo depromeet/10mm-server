@@ -40,6 +40,7 @@ public class CustomOidcAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 
     private void setTokenPairToResponseHeader(
             HttpServletResponse response, String accessToken, String refreshToken) {
+        // TODO: 리프레시 토큰은 쿠키로 관리하도록 개선
         response.setHeader(ACCESS_TOKEN_HEADER, TOKEN_PREFIX + accessToken);
         response.setHeader(REFRESH_TOKEN_HEADER, TOKEN_PREFIX + refreshToken);
     }
