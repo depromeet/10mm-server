@@ -5,9 +5,9 @@ spring:
         registration:
           kakao:
             authorization-grant-type: authorization_code
-            client-id: ${KAKAO_CLIENT_ID}
-            client-secret: ${KAKAO_CLIENT_SECRET}
-            redirect-uri: ${KAKAO_REDIRECT_URI}
+            client-id: ${KAKAO_CLIENT_ID:}
+            client-secret: ${KAKAO_CLIENT_SECRET:}
+            redirect-uri: ${KAKAO_REDIRECT_URI:}
             client-name: Kakao
             client-authentication-method: client_secret_post
             scope:
@@ -22,8 +22,8 @@ spring:
             jwk-set-uri: https://kauth.kakao.com/.well-known/jwks.json
 
 jwt:
-  access-token-secret: ${JWT_ACCESS_TOKEN_SECRET}
-  refresh-token-secret: ${JWT_REFRESH_TOKEN_SECRET}
+  access-token-secret: ${JWT_ACCESS_TOKEN_SECRET:}
+  refresh-token-secret: ${JWT_REFRESH_TOKEN_SECRET:}
   access-token-expiration-time: 1800 # 30분
   refresh-token-expiration-time: 604800 # 7일
-  issuer: ${JWT_ISSUER}
+  issuer: ${JWT_ISSUER:}
