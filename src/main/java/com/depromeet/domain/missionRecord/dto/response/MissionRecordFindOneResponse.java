@@ -3,9 +3,10 @@ package com.depromeet.domain.missionRecord.dto.response;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Duration;
 import java.time.LocalDateTime;
 
-public record MissionRecordFindResponse(
+public record MissionRecordFindOneResponse(
         @Schema(description = "미션 기록 ID", defaultValue = "1") Long recordId,
         @Schema(description = "미션 기록 일지", defaultValue = "default MissionRecord Remark")
                 String remark,
@@ -13,7 +14,8 @@ public record MissionRecordFindResponse(
                         description = "미션 기록 인증 사진 Url",
                         defaultValue = "https://ik.imagekit.io/demo/medium_cafe_B1iTdD0C.jpg")
                 String imageUrl,
-        @Schema(description = "미션 시작 일자", defaultValue = "3") int missionDay,
+        @Schema(description = "미션 수행한 시간", defaultValue = "21") long duration,
+        @Schema(description = "미션 시작한 지 N일차", defaultValue = "3") long sinceDay,
         @JsonFormat(
                         shape = JsonFormat.Shape.STRING,
                         pattern = "yyyy-MM-dd HH:mm:ss",
@@ -32,12 +34,13 @@ public record MissionRecordFindResponse(
                         defaultValue = "2024-01-03 00:34:00",
                         type = "string")
                 LocalDateTime finishedAt) {
-    public static MissionRecordFindResponse from(MissionRecord missionRecord) {
-        return new MissionRecordFindResponse(
+    public static MissionRecordFindOneResponse from(MissionRecord missionRecord) {
+        return new MissionRecordFindOneResponse(
                 missionRecord.getId(),
                 missionRecord.getRemark(),
                 missionRecord.getImageUrl(),
-                missionRecord.getStartedAt().getDayOfMonth(),
+                missionRecord.getDuration().toMinutes(),
+                Duration.between(missionRecord.getStartedAt(), LocalDateTime.now()).toDays(),
                 missionRecord.getStartedAt(),
                 missionRecord.getFinishedAt());
     }
