@@ -101,9 +101,10 @@ public class WebSecurityConfig {
                 break;
             case "dev":
                 configuration.addAllowedOriginPattern(UrlConstants.DEV_DOMAIN_URL.getValue());
+                configuration.addAllowedOriginPattern(UrlConstants.LOCAL_DOMAIN_URL.getValue());
                 break;
             default:
-                configuration.addAllowedOriginPattern(UrlConstants.LOCAL_DOMAIN_URL.getValue());
+                configuration.addAllowedOriginPattern("*");
                 break;
         }
 
