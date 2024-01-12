@@ -13,6 +13,15 @@ spring:
             scope:
               - openid
               - account_email
+          apple:
+            authorization-grant-type: authorization_code
+            client-id: ${APPLE_CLIENT_ID}
+            client-secret: ${APPLE_CLIENT_SECRET}
+            redirect-uri: ${APPLE_REDIRECT_URI}
+            scope:
+              - openid
+              - name
+              - email
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
@@ -20,6 +29,11 @@ spring:
             user-info-uri: https://kapi.kakao.com/v1/oidc/userinfo
             user-name-attribute: sub
             jwk-set-uri: https://kauth.kakao.com/.well-known/jwks.json
+          apple:
+            authorization-uri: https://appleid.apple.com/auth/authorize?response_mode=form_post
+            token-uri: https://appleid.apple.com/auth/token
+            user-name-attribute: sub
+            jwk-set-uri: https://appleid.apple.com/auth/keys
 
 jwt:
   access-token-secret: ${JWT_ACCESS_TOKEN_SECRET:}
