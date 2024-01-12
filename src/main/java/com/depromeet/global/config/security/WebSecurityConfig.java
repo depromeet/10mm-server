@@ -95,10 +95,16 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.addAllowedOriginPattern(UrlConstants.PROD_DOMAIN_URL.getValue());
-
-        if (!springEnvironmentUtil.isProdProfile()) {
-            configuration.addAllowedOriginPattern(UrlConstants.LOCAL_DOMAIN_URL.getValue());
+        switch (springEnvironmentUtil.getCurrentProfile()) {
+            case "prod":
+                configuration.addAllowedOriginPattern(UrlConstants.PROD_DOMAIN_URL.getValue());
+                break;
+            case "dev":
+                configuration.addAllowedOriginPattern(UrlConstants.DEV_DOMAIN_URL.getValue());
+                break;
+            default:
+                configuration.addAllowedOriginPattern(UrlConstants.LOCAL_DOMAIN_URL.getValue());
+                break;
         }
 
         configuration.addAllowedHeader("*");
