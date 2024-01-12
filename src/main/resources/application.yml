@@ -4,7 +4,7 @@ spring:
       test: "test"
       local: "local, datasource"
       dev: "dev, datasource, actuator"
-      prod: "prod, datasource actuator"
+      prod: "prod, datasource, actuator"
     include:
       - redis
       - storage
