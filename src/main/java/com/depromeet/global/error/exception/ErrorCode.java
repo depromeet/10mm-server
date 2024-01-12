@@ -24,6 +24,8 @@ public enum ErrorCode {
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 엑세스 토큰입니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다."),
     MEMBER_ALREADY_REGISTERED(HttpStatus.CONFLICT, "이미 가입된 회원입니다."),
+    SOCIAL_AUTHENTICATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류로 인해 소셜 로그인에 실패했습니다."),
+    INVALID_APPLE_PRIVATE_KEY(HttpStatus.INTERNAL_SERVER_ERROR, "애플 로그인에 필요한 비밀 키가 올바르지 않습니다."),
 
     // Mission
     MISSION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 미션을 찾을 수 없습니다."),
