@@ -2,9 +2,8 @@ package com.depromeet.domain.missionRecord.controller;
 
 import static org.mockito.BDDMockito.*;
 import static org.springframework.http.MediaType.*;
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -15,6 +14,8 @@ import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.service.MissionService;
 import com.depromeet.domain.missionRecord.api.MissionRecordController;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordCreateResponse;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindOneResponse;
 import com.depromeet.domain.missionRecord.service.MissionRecordService;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
@@ -69,7 +70,8 @@ class MissionRecordControllerTest {
                         durationMin,
                         durationSec);
 
-        given(missionRecordService.createMissionRecord(request)).willReturn(1L);
+		MissionRecordCreateResponse missionRecordCreateResponse = new MissionRecordCreateResponse(1L);
+        given(missionRecordService.createMissionRecord(request)).willReturn(missionRecordCreateResponse);
         // expected
         ResultActions perform =
                 mockMvc.perform(
@@ -80,7 +82,7 @@ class MissionRecordControllerTest {
                                 .content(objectMapper.writeValueAsString(request)));
 
         perform.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data").value(1L))
+                .andExpect(jsonPath("$.data.missionId").value(1L))
                 .andDo(print());
     }
 
@@ -116,8 +118,34 @@ class MissionRecordControllerTest {
                 .andDo(print());
     }
 
-    // @Test
-    // void 미션_기록을_조회한다() {
-    //
-    // }
+    @Test
+    void 미션_기록을_상세_조회한다() throws Exception {
+		// given
+		long duration = 21;
+		long sinceDay = 3;
+		LocalDateTime startedAt = LocalDateTime.of(2023, 1, 3, 0, 0, 0);
+		LocalDateTime finishedAt = startedAt.plusMinutes(21);
+		given(missionRecordService.findOneMissionRecord(1L))
+			.willReturn(
+				new MissionRecordFindOneResponse(
+					1L,
+					"testRemark",
+					"https://ik.imagekit.io/demo/medium_cafe_B1iTdD0C.jpg", duration, sinceDay,
+					startedAt,
+					finishedAt));
+
+		// then
+		ResultActions perform = mockMvc.perform(
+			get("/records/{recordId}", 1L)
+			.accept(APPLICATION_JSON)
+				.contentType(APPLICATION_JSON)
+				.with(csrf())
+		);
+
+		perform.andExpect(status().isOk())
+			.andExpect(jsonPath("$.data.recordId").value(1L))
+			.andExpect(jsonPath("$.data.remark").value("testRemark"))
+			.andExpect(jsonPath("$.data.duration").value(21))
+			.andExpect(jsonPath("$.data.sinceDay").value(3));
+    }
 }

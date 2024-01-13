@@ -36,7 +36,7 @@ public class MissionRecordController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "미션 기록 조회", description = "미션 기록을 조회합니다.")
+    @Operation(summary = "미션 기록 상세 조회", description = "미션 기록을 상세 조회합니다.")
     @GetMapping("/{recordId}")
     public MissionRecordFindOneResponse missionRecordFindOne(@PathVariable Long recordId) {
         return missionRecordService.findOneMissionRecord(recordId);
