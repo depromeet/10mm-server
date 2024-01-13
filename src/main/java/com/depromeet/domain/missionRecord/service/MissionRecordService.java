@@ -8,6 +8,7 @@ import com.depromeet.domain.missionRecord.dao.MissionRecordTTLRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.domain.MissionRecordTTL;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordCreateResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindOneResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindResponse;
 import com.depromeet.global.common.constants.RedisExpireEventConstants;
@@ -32,7 +33,7 @@ public class MissionRecordService {
     private final MissionRecordRepository missionRecordRepository;
     private final MissionRecordTTLRepository missionRecordTTLRepository;
 
-    public Long createMissionRecord(MissionRecordCreateRequest request) {
+    public MissionRecordCreateResponse createMissionRecord(MissionRecordCreateRequest request) {
         final Mission mission = findMissionById(request.missionId());
         final Member member = memberUtil.getCurrentMember();
 
@@ -56,7 +57,7 @@ public class MissionRecordService {
                         RedisExpireEventConstants.EXPIRE_EVENT_IMAGE_UPLOAD_TIME_END.getValue()
                                 + createdMissionRecord.getId(),
                         expirationTime));
-        return createdMissionRecord.getId();
+        return MissionRecordCreateResponse.from(createdMissionRecord.getId());
     }
 
     private Mission findMissionById(Long missionId) {

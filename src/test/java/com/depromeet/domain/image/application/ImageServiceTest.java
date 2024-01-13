@@ -20,6 +20,7 @@ import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordCreateResponse;
 import com.depromeet.domain.missionRecord.service.MissionRecordService;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
@@ -147,10 +148,12 @@ class ImageServiceTest {
                             missionRecordFinishedAt,
                             32,
                             14);
-            Long missionRecord =
+
+            MissionRecordCreateResponse missionRecordCreateResponse =
                     missionRecordService.createMissionRecord(missionRecordCreateRequest);
             MissionRecordImageCreateRequest request =
-                    new MissionRecordImageCreateRequest(missionRecord, ImageFileExtension.JPEG);
+                    new MissionRecordImageCreateRequest(
+                            missionRecordCreateResponse.missionId(), ImageFileExtension.JPEG);
 
             // when, then
             assertThatCode(() -> imageService.createMissionRecordPresignedUrl(request))
@@ -182,11 +185,12 @@ class ImageServiceTest {
                             missionRecordFinishedAt,
                             32,
                             14);
-            Long missionRecordId =
+            MissionRecordCreateResponse missionRecordCreateResponse =
                     missionRecordService.createMissionRecord(missionRecordCreateRequest);
             ImageFileExtension imageFileExtension = ImageFileExtension.JPEG;
             MissionRecordImageCreateRequest request =
-                    new MissionRecordImageCreateRequest(missionRecordId, imageFileExtension);
+                    new MissionRecordImageCreateRequest(
+                            missionRecordCreateResponse.missionId(), imageFileExtension);
 
             // when
             PresignedUrlResponse missionRecordPresignedUrl =
@@ -195,7 +199,9 @@ class ImageServiceTest {
             // then
             assertThat(missionRecordPresignedUrl.presignedUrl())
                     .contains(
-                            String.format("/local/mission_record/%s/image.jpeg", missionRecordId));
+                            String.format(
+                                    "/local/mission_record/%s/image.jpeg",
+                                    missionRecordCreateResponse.missionId()));
         }
     }
 
@@ -256,28 +262,34 @@ class ImageServiceTest {
                             missionRecordFinishedAt,
                             32,
                             14);
-            Long missionRecordId =
+            MissionRecordCreateResponse missionRecordCreateResponse =
                     missionRecordService.createMissionRecord(missionRecordCreateRequest);
 
             ImageFileExtension imageFileExtension = ImageFileExtension.JPEG;
             MissionRecordImageCreateRequest missionRecordImageCreateRequest =
-                    new MissionRecordImageCreateRequest(missionRecordId, imageFileExtension);
+                    new MissionRecordImageCreateRequest(
+                            missionRecordCreateResponse.missionId(), imageFileExtension);
             imageService.createMissionRecordPresignedUrl(missionRecordImageCreateRequest);
 
             MissionRecordImageUploadCompleteRequest request =
                     new MissionRecordImageUploadCompleteRequest(
-                            missionRecordId, imageFileExtension, "testRemark");
+                            missionRecordCreateResponse.missionId(),
+                            imageFileExtension,
+                            "testRemark");
 
             // when
             imageService.uploadCompleteMissionRecord(request);
-            MissionRecord missionRecord = missionRecordRepository.findById(missionRecordId).get();
+            MissionRecord missionRecord =
+                    missionRecordRepository.findById(missionRecordCreateResponse.missionId()).get();
 
             // then
             assertThat(missionRecord.getUploadStatus()).isEqualTo(ImageUploadStatus.COMPLETE);
             assertThat(missionRecord.getRemark()).isEqualTo("testRemark");
             assertThat(missionRecord.getImageUrl())
                     .contains(
-                            String.format("/local/mission_record/%s/image.jpeg", missionRecordId));
+                            String.format(
+                                    "/local/mission_record/%s/image.jpeg",
+                                    missionRecordCreateResponse.missionId()));
         }
     }
 }
