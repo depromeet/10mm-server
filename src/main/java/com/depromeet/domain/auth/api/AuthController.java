@@ -1,7 +1,6 @@
 package com.depromeet.domain.auth.api;
 
 import com.depromeet.domain.auth.application.AuthService;
-import com.depromeet.domain.auth.application.JwtTokenService;
 import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
 import com.depromeet.domain.auth.dto.response.MemberTempRegisterResponse;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final JwtTokenService jwtTokenService;
     private final AuthService authService;
 
     @Operation(summary = "회원가입", description = "회원가입을 진행합니다.")
