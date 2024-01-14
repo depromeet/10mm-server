@@ -6,8 +6,9 @@ import com.depromeet.global.common.constants.SwaggerUrlConstants;
 import com.depromeet.global.common.constants.UrlConstants;
 import com.depromeet.global.security.*;
 import com.depromeet.global.util.SpringEnvironmentUtil;
-import java.util.Arrays;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +28,8 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -127,11 +130,17 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.addAllowedOriginPattern(UrlConstants.PROD_DOMAIN_URL.getValue());
-        configuration.addAllowedOriginPattern("https://appleid.apple.com");
-
-        if (!springEnvironmentUtil.isProdProfile()) {
-            configuration.addAllowedOriginPattern(UrlConstants.LOCAL_DOMAIN_URL.getValue());
+        switch (springEnvironmentUtil.getCurrentProfile()) {
+            case "prod":
+                configuration.addAllowedOriginPattern(UrlConstants.PROD_DOMAIN_URL.getValue());
+                break;
+            case "dev":
+                configuration.addAllowedOriginPattern(UrlConstants.DEV_DOMAIN_URL.getValue());
+                configuration.addAllowedOriginPattern(UrlConstants.LOCAL_DOMAIN_URL.getValue());
+                break;
+            default:
+                configuration.addAllowedOriginPattern("*");
+                break;
         }
 
         configuration.addAllowedHeader("*");

@@ -8,8 +8,11 @@ import com.depromeet.domain.missionRecord.dao.MissionRecordTTLRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.domain.MissionRecordTTL;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
+import com.depromeet.domain.missionRecord.dto.request.MissionRecordUpdateRequest;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordCreateResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindOneResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindResponse;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordUpdateResponse;
 import com.depromeet.global.common.constants.RedisExpireEventConstants;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
@@ -32,7 +35,7 @@ public class MissionRecordService {
     private final MissionRecordRepository missionRecordRepository;
     private final MissionRecordTTLRepository missionRecordTTLRepository;
 
-    public Long createMissionRecord(MissionRecordCreateRequest request) {
+    public MissionRecordCreateResponse createMissionRecord(MissionRecordCreateRequest request) {
         final Mission mission = findMissionById(request.missionId());
         final Member member = memberUtil.getCurrentMember();
 
@@ -56,7 +59,7 @@ public class MissionRecordService {
                         RedisExpireEventConstants.EXPIRE_EVENT_IMAGE_UPLOAD_TIME_END.getValue()
                                 + createdMissionRecord.getId(),
                         expirationTime));
-        return createdMissionRecord.getId();
+        return MissionRecordCreateResponse.from(createdMissionRecord.getId());
     }
 
     private Mission findMissionById(Long missionId) {
@@ -80,6 +83,20 @@ public class MissionRecordService {
         List<MissionRecord> missionRecords =
                 missionRecordRepository.findAllByMissionIdAndYearMonth(missionId, yearMonth);
         return missionRecords.stream().map(MissionRecordFindResponse::from).toList();
+    }
+
+    public MissionRecordUpdateResponse updateMissionRecord(
+            MissionRecordUpdateRequest request, Long recordId) {
+        final Member member = memberUtil.getCurrentMember();
+        MissionRecord missionRecord =
+                missionRecordRepository
+                        .findById(recordId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
+
+        validateMissionRecordUserMismatch(missionRecord.getMission(), member);
+
+        missionRecord.updateMissionRecord(request.remark());
+        return MissionRecordUpdateResponse.from(missionRecord);
     }
 
     private void validateMissionRecordDuration(Duration duration) {

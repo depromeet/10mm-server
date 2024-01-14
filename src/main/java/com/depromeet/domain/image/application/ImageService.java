@@ -13,7 +13,9 @@ import com.depromeet.domain.image.dto.response.PresignedUrlResponse;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
+import com.depromeet.domain.missionRecord.dao.MissionRecordTTLRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import com.depromeet.global.common.constants.RedisExpireEventConstants;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -33,6 +35,7 @@ public class ImageService {
     private final StorageProperties storageProperties;
     private final AmazonS3 amazonS3;
     private final MissionRecordRepository missionRecordRepository;
+    private final MissionRecordTTLRepository missionRecordTTLRepository;
 
     public PresignedUrlResponse createMissionRecordPresignedUrl(
             MissionRecordImageCreateRequest request) {
@@ -57,6 +60,9 @@ public class ImageService {
         String presignedUrl = amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
 
         missionRecord.updateUploadStatusPending();
+        missionRecordTTLRepository.deleteById(
+                RedisExpireEventConstants.EXPIRE_EVENT_IMAGE_UPLOAD_TIME_END.getValue()
+                        + request.missionRecordId());
         return PresignedUrlResponse.from(presignedUrl);
     }
 
