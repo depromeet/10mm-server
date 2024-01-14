@@ -63,7 +63,7 @@ public class AuthService {
     }
 
     private void validatePasswordMatches(Member member, String password) {
-        if (!member.getPassword().equals(password)) {
+        if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new CustomException(ErrorCode.PASSWORD_NOT_MATCHES);
         }
     }
