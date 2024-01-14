@@ -4,6 +4,7 @@ import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -14,13 +15,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -47,6 +50,10 @@ public class Member extends BaseTimeEntity {
 
     private LocalDateTime lastLoginAt;
 
+    private String username;
+
+    private String password;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Mission> missions = new ArrayList<>();
 
@@ -57,18 +64,32 @@ public class Member extends BaseTimeEntity {
             MemberStatus status,
             MemberRole role,
             MemberVisibility visibility,
-            LocalDateTime lastLoginAt) {
+            LocalDateTime lastLoginAt,
+            String username,
+            String password) {
         this.profile = profile;
         this.oauthInfo = oauthInfo;
         this.status = status;
         this.role = role;
         this.visibility = visibility;
         this.lastLoginAt = lastLoginAt;
+        this.username = username;
+        this.password = password;
     }
 
     public static Member createGuestMember(OauthInfo oauthInfo) {
         return Member.builder()
                 .oauthInfo(oauthInfo)
+                .status(MemberStatus.NORMAL)
+                .role(MemberRole.GUEST)
+                .visibility(MemberVisibility.PUBLIC)
+                .build();
+    }
+
+    public static Member createGuestMember(String username, String password) {
+        return Member.builder()
+                .username(username)
+                .password(password)
                 .status(MemberStatus.NORMAL)
                 .role(MemberRole.GUEST)
                 .visibility(MemberVisibility.PUBLIC)
