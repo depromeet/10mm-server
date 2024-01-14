@@ -2,8 +2,8 @@ package com.depromeet.domain.auth.api;
 
 import com.depromeet.domain.auth.application.AuthService;
 import com.depromeet.domain.auth.application.JwtTokenService;
-import com.depromeet.domain.auth.dto.MemberRegisterRequest;
-import com.depromeet.domain.auth.dto.UsernamePasswordRequest;
+import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
+import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

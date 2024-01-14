@@ -1,7 +1,7 @@
 package com.depromeet.domain.auth.application;
 
-import com.depromeet.domain.auth.dto.MemberRegisterRequest;
-import com.depromeet.domain.auth.dto.UsernamePasswordRequest;
+import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
+import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.global.util.MemberUtil;

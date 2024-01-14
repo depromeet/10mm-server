@@ -1,4 +1,4 @@
-package com.depromeet.domain.auth.dto;
+package com.depromeet.domain.auth.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
