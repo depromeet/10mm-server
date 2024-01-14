@@ -4,18 +4,22 @@ import static com.depromeet.global.common.constants.SecurityConstants.*;
 
 import com.depromeet.domain.auth.application.JwtTokenService;
 import com.depromeet.domain.auth.dto.AccessToken;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -32,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = extractAccessToken(request);
         String refreshToken = extractRefreshToken(request);
 
-        // ATK, RTK 둘 다 없으면 통과
+        // ATK, RTK 둘 중 하나라도 빈 상태로 오면 통과
         if (accessToken == null || refreshToken == null) {
             filterChain.doFilter(request, response);
             return;
