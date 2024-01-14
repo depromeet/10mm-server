@@ -81,7 +81,8 @@ public class CustomRequestEntityConverterV2
 
     public PrivateKey getPrivateKey() {
         try {
-            PEMParser pemParser = new PEMParser(new StringReader(appleProperties.privateKey()));
+			StringReader reader = new StringReader(appleProperties.privateKey());
+			PEMParser pemParser = new PEMParser(reader);
             PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
             JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
             return converter.getPrivateKey(object);
