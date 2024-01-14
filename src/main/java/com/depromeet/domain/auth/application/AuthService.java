@@ -2,17 +2,19 @@ package com.depromeet.domain.auth.application;
 
 import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
-import com.depromeet.domain.auth.dto.response.LoginResponse;
-import com.depromeet.domain.auth.dto.response.MemberTempRegisterResponse;
+import com.depromeet.domain.auth.dto.response.TokenPairResponse;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.MemberRole;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
+
 import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +34,7 @@ public class AuthService {
         member.register(request.nickname());
     }
 
-    public MemberTempRegisterResponse registerWithUsernameAndPassword(
+    public TokenPairResponse registerWithUsernameAndPassword(
             UsernamePasswordRequest request) {
         validateUniqueUsername(request.username());
 
@@ -40,7 +42,7 @@ public class AuthService {
         final Member member = Member.createGuestMember(request.username(), encodedPassword);
 
         Member savedMember = memberRepository.save(member);
-        return MemberTempRegisterResponse.from(savedMember.getId());
+        return getLoginResponse(savedMember);
     }
 
     private void validateUniqueUsername(String username) {
@@ -49,7 +51,7 @@ public class AuthService {
         }
     }
 
-    public LoginResponse loginMember(UsernamePasswordRequest request) {
+    public TokenPairResponse loginMember(UsernamePasswordRequest request) {
         final Member member =
                 memberRepository
                         .findByUsername(request.username())
@@ -58,10 +60,7 @@ public class AuthService {
         validateNotGuestMember(member);
         validatePasswordMatches(member, request.password());
 
-        String accessToken = jwtTokenService.createAccessToken(member.getId(), member.getRole());
-        String refreshToken = jwtTokenService.createRefreshToken(member.getId());
-
-        return LoginResponse.from(accessToken, refreshToken);
+        return getLoginResponse(member);
     }
 
     private void validateNotGuestMember(Member member) {
@@ -74,5 +73,12 @@ public class AuthService {
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new CustomException(ErrorCode.PASSWORD_NOT_MATCHES);
         }
+    }
+
+    private TokenPairResponse getLoginResponse(Member member) {
+        String accessToken = jwtTokenService.createAccessToken(member.getId(), member.getRole());
+        String refreshToken = jwtTokenService.createRefreshToken(member.getId());
+
+        return TokenPairResponse.from(accessToken, refreshToken);
     }
 }
