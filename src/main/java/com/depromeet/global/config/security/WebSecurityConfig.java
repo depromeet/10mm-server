@@ -20,7 +20,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -34,11 +33,13 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class WebSecurityConfig {
 
     private final SpringEnvironmentUtil springEnvironmentUtil;
-    private final CustomOidcUserService customOidcUserService;
-    private final CustomOidcAuthenticationSuccessHandler customOidcAuthenticationSuccessHandler;
-    private final CustomOidcAuthenticationFailureHandler customOidcAuthenticationFailureHandler;
+    //    private final CustomOidcUserService customOidcUserService;
+    //    private final CustomOidcAuthenticationSuccessHandler
+    // customOidcAuthenticationSuccessHandler;
+    //    private final CustomOidcAuthenticationFailureHandler
+    // customOidcAuthenticationFailureHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final CustomRequestEntityConverterV2 customRequestEntityConverterV2;
+    //    private final CustomRequestEntityConverterV2 customRequestEntityConverterV2;
 
     @Value("${swagger.user}")
     private String swaggerUser;
@@ -103,20 +104,25 @@ public class WebSecurityConfig {
                                 .authenticated());
         //        .permitAll());
 
-        http.oauth2Login(
-                oauth2 ->
-                        oauth2.tokenEndpoint(
-                                        tokenEndpoint ->
-                                                tokenEndpoint.accessTokenResponseClient(
-                                                        customAccessTokenResponseClient()))
-                                .userInfoEndpoint(
-                                        userInfo -> userInfo.oidcUserService(customOidcUserService))
-                                .successHandler(customOidcAuthenticationSuccessHandler)
-                                .failureHandler(customOidcAuthenticationFailureHandler)
-                                .userInfoEndpoint(
-                                        userInfo -> userInfo.oidcUserService(customOidcUserService))
-                                .successHandler(customOidcAuthenticationSuccessHandler)
-                                .failureHandler(customOidcAuthenticationFailureHandler));
+        // TODO: 소셜 로그인은 별도 처리
+
+        //        http.oauth2Login(
+        //                oauth2 ->
+        //                        oauth2.tokenEndpoint(
+        //                                        tokenEndpoint ->
+        //                                                tokenEndpoint.accessTokenResponseClient(
+        //
+        // customAccessTokenResponseClient()))
+        //                                .userInfoEndpoint(
+        //                                        userInfo ->
+        // userInfo.oidcUserService(customOidcUserService))
+        //                                .successHandler(customOidcAuthenticationSuccessHandler)
+        //                                .failureHandler(customOidcAuthenticationFailureHandler)
+        //                                .userInfoEndpoint(
+        //                                        userInfo ->
+        // userInfo.oidcUserService(customOidcUserService))
+        //                                .successHandler(customOidcAuthenticationSuccessHandler)
+        //                                .failureHandler(customOidcAuthenticationFailureHandler));
 
         http.addFilterAfter(jwtAuthenticationFilter, LogoutFilter.class);
 
@@ -149,11 +155,12 @@ public class WebSecurityConfig {
         return source;
     }
 
-    @Bean
-    public DefaultAuthorizationCodeTokenResponseClient customAccessTokenResponseClient() {
-        DefaultAuthorizationCodeTokenResponseClient client =
-                new DefaultAuthorizationCodeTokenResponseClient();
-        client.setRequestEntityConverter(customRequestEntityConverterV2);
-        return client;
-    }
+    // TODO: 소셜 로그인 추가 시 빈으로 등록
+
+    //    public DefaultAuthorizationCodeTokenResponseClient customAccessTokenResponseClient() {
+    //        DefaultAuthorizationCodeTokenResponseClient client =
+    //                new DefaultAuthorizationCodeTokenResponseClient();
+    //        client.setRequestEntityConverter(customRequestEntityConverterV2);
+    //        return client;
+    //    }
 }

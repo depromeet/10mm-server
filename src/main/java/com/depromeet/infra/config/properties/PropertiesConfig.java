@@ -1,6 +1,5 @@
 package com.depromeet.infra.config.properties;
 
-import com.depromeet.infra.config.jwt.AppleProperties;
 import com.depromeet.infra.config.jwt.JwtProperties;
 import com.depromeet.infra.config.redis.RedisProperties;
 import com.depromeet.infra.config.storage.StorageProperties;
@@ -11,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
     StorageProperties.class,
     RedisProperties.class,
     JwtProperties.class,
-    AppleProperties.class
+    //    AppleProperties.class
 })
 @Configuration
 public class PropertiesConfig {}

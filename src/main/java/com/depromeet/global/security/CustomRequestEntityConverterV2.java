@@ -21,11 +21,9 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequestEntityConverter;
-import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class CustomRequestEntityConverterV2
         extends OAuth2AuthorizationCodeGrantRequestEntityConverter {
