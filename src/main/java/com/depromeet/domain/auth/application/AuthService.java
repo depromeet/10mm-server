@@ -4,7 +4,11 @@ import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.global.error.exception.CustomException;
+import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
+
+import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +18,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AuthService {
 
     private final MemberRepository memberRepository;
@@ -25,7 +30,15 @@ public class AuthService {
     }
 
     public void registerWithUsernameAndPassword(UsernamePasswordRequest request) {
+        validateUniqueUsername(request.username());
+
         final Member member = Member.createGuestMember(request.username(), request.password());
         memberRepository.save(member);
+    }
+
+    private void validateUniqueUsername(String username) {
+        if (memberRepository.existsByUsername(username)) {
+            throw new CustomException(ErrorCode.MEMBER_ALREADY_REGISTERED);
+        }
     }
 }
