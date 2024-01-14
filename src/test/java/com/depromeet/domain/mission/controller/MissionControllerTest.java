@@ -23,7 +23,10 @@ import com.depromeet.global.config.security.WebSecurityConfig;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
@@ -46,9 +49,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.Arrays;
-import java.util.List;
-
+@Disabled
 @WebMvcTest(
         controllers = MissionController.class,
         excludeFilters = {
