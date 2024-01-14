@@ -2,7 +2,7 @@ package com.depromeet.domain.auth.application;
 
 import com.depromeet.domain.auth.dao.RefreshTokenRepository;
 import com.depromeet.domain.auth.domain.RefreshToken;
-import com.depromeet.domain.auth.dto.AccessToken;
+import com.depromeet.domain.auth.dto.response.AccessToken;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.MemberRole;
