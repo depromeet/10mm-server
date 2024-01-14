@@ -4,14 +4,12 @@ import com.depromeet.domain.auth.application.AuthService;
 import com.depromeet.domain.auth.application.JwtTokenService;
 import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
-
+import com.depromeet.domain.auth.dto.response.MemberTempRegisterResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.validation.Valid;
-
 import lombok.RequiredArgsConstructor;
-
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,10 +34,10 @@ public class AuthController {
 
     @Operation(summary = "아이디/비밀번호 임시 회원가입", description = "아이디/비밀번호 임시 회원가입을 진행합니다.")
     @PostMapping("/register/temp")
-    public ResponseEntity<Void> memberTempRegister(
+    public ResponseEntity<MemberTempRegisterResponse> memberTempRegister(
             @Valid @RequestBody UsernamePasswordRequest request) {
-        authService.registerWithUsernameAndPassword(request);
-        return ResponseEntity.ok().build();
+        MemberTempRegisterResponse response = authService.registerWithUsernameAndPassword(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Operation(summary = "로그인", description = "로그인을 진행합니다.")
