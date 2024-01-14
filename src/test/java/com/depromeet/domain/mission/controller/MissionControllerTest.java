@@ -211,14 +211,7 @@ class MissionControllerTest {
         MissionUpdateRequest updateRequest =
                 new MissionUpdateRequest(
                         "testMissionName", "testMissionContent", MissionVisibility.NONE);
-        given(missionService.updateMission(any(), any()))
-                .willReturn(
-                        new MissionUpdateResponse(
-                                1L,
-                                "testMissionName",
-                                "testMissionContent",
-                                MissionCategory.STUDY,
-                                MissionVisibility.FOLLOWER));
+        given(missionService.updateMission(any(), any())).willReturn(new MissionUpdateResponse(1L));
 
         // expected
         ResultActions perform =
@@ -231,8 +224,7 @@ class MissionControllerTest {
 
         perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.missionId").exists())
-                .andExpect(
-                        jsonPath("$.data.visibility").value(MissionVisibility.FOLLOWER.toString()))
+                .andExpect(jsonPath("$.data.missionId").value(1L))
                 .andDo(print());
     }
 
@@ -241,14 +233,7 @@ class MissionControllerTest {
         // given
         MissionUpdateRequest updateRequest =
                 new MissionUpdateRequest(null, "testMissionContent", MissionVisibility.NONE);
-        given(missionService.updateMission(any(), any()))
-                .willReturn(
-                        new MissionUpdateResponse(
-                                1L,
-                                null,
-                                "testMissionContent",
-                                MissionCategory.STUDY,
-                                MissionVisibility.FOLLOWER));
+        given(missionService.updateMission(any(), any())).willReturn(new MissionUpdateResponse(1L));
 
         // expected
         ResultActions perform =

@@ -95,4 +95,8 @@ public class MissionRecord extends BaseTimeEntity {
         this.remark = remark;
         this.imageUrl = imageUrl;
     }
+
+    public void updateMissionRecord(String remark) {
+        this.remark = remark;
+    }
 }
