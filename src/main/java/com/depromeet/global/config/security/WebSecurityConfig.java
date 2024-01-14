@@ -4,9 +4,7 @@ import static org.springframework.security.config.Customizer.*;
 
 import com.depromeet.global.common.constants.SwaggerUrlConstants;
 import com.depromeet.global.common.constants.UrlConstants;
-import com.depromeet.global.security.CustomOidcAuthenticationSuccessHandler;
-import com.depromeet.global.security.CustomOidcUserService;
-import com.depromeet.global.security.JwtAuthenticationFilter;
+import com.depromeet.global.security.*;
 import com.depromeet.global.util.SpringEnvironmentUtil;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +20,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -37,7 +36,9 @@ public class WebSecurityConfig {
     private final SpringEnvironmentUtil springEnvironmentUtil;
     private final CustomOidcUserService customOidcUserService;
     private final CustomOidcAuthenticationSuccessHandler customOidcAuthenticationSuccessHandler;
+    private final CustomOidcAuthenticationFailureHandler customOidcAuthenticationFailureHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomRequestEntityConverterV2 customRequestEntityConverterV2;
 
     @Value("${swagger.user}")
     private String swaggerUser;
@@ -104,9 +105,18 @@ public class WebSecurityConfig {
 
         http.oauth2Login(
                 oauth2 ->
-                        oauth2.userInfoEndpoint(
+                        oauth2.tokenEndpoint(
+                                        tokenEndpoint ->
+                                                tokenEndpoint.accessTokenResponseClient(
+                                                        customAccessTokenResponseClient()))
+                                .userInfoEndpoint(
                                         userInfo -> userInfo.oidcUserService(customOidcUserService))
-                                .successHandler(customOidcAuthenticationSuccessHandler));
+                                .successHandler(customOidcAuthenticationSuccessHandler)
+                                .failureHandler(customOidcAuthenticationFailureHandler)
+                                .userInfoEndpoint(
+                                        userInfo -> userInfo.oidcUserService(customOidcUserService))
+                                .successHandler(customOidcAuthenticationSuccessHandler)
+                                .failureHandler(customOidcAuthenticationFailureHandler));
 
         http.addFilterAfter(jwtAuthenticationFilter, LogoutFilter.class);
 
@@ -118,6 +128,7 @@ public class WebSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.addAllowedOriginPattern(UrlConstants.PROD_DOMAIN_URL.getValue());
+        configuration.addAllowedOriginPattern("https://appleid.apple.com");
 
         if (!springEnvironmentUtil.isProdProfile()) {
             configuration.addAllowedOriginPattern(UrlConstants.LOCAL_DOMAIN_URL.getValue());
@@ -130,5 +141,13 @@ public class WebSecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    public DefaultAuthorizationCodeTokenResponseClient customAccessTokenResponseClient() {
+        DefaultAuthorizationCodeTokenResponseClient client =
+                new DefaultAuthorizationCodeTokenResponseClient();
+        client.setRequestEntityConverter(customRequestEntityConverterV2);
+        return client;
     }
 }
