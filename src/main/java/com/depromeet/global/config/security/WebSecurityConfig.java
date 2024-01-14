@@ -6,8 +6,9 @@ import com.depromeet.global.common.constants.SwaggerUrlConstants;
 import com.depromeet.global.common.constants.UrlConstants;
 import com.depromeet.global.security.*;
 import com.depromeet.global.util.SpringEnvironmentUtil;
-import java.util.Arrays;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,10 +23,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -39,6 +42,7 @@ public class WebSecurityConfig {
     //    private final CustomOidcAuthenticationFailureHandler
     // customOidcAuthenticationFailureHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
     //    private final CustomRequestEntityConverterV2 customRequestEntityConverterV2;
 
     @Value("${swagger.user}")
@@ -65,7 +69,7 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.formLogin(AbstractHttpConfigurer::disable)
+        http.formLogin(withDefaults())
                 .cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(
@@ -124,7 +128,8 @@ public class WebSecurityConfig {
         //                                .successHandler(customOidcAuthenticationSuccessHandler)
         //                                .failureHandler(customOidcAuthenticationFailureHandler));
 
-        http.addFilterAfter(jwtAuthenticationFilter, LogoutFilter.class);
+        //        http.addFilterAfter(jwtAuthenticationFilter, LogoutFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
