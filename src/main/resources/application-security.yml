@@ -18,8 +18,7 @@ spring:
             client-id: ${APPLE_CLIENT_ID:}
             client-secret: ${APPLE_PRIVATE_KEY:}|${APPLE_KEY_ID:}|${APPLE_TEAM_ID:}
             redirect-uri: ${APPLE_REDIRECT_URI:}
-            client-name: Apple
-            provider:
+            client-name: apple
             scope:
               - openid
               - name
