@@ -2,8 +2,8 @@ package com.depromeet.domain.auth.api;
 
 import com.depromeet.domain.auth.application.AuthService;
 import com.depromeet.domain.auth.application.JwtTokenService;
-import com.depromeet.domain.auth.dto.UsernamePasswordRequest;
 import com.depromeet.domain.auth.dto.MemberRegisterRequest;
+import com.depromeet.domain.auth.dto.UsernamePasswordRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +37,7 @@ public class AuthController {
     @Operation(summary = "아이디/비밀번호 임시 회원가입", description = "아이디/비밀번호 임시 회원가입을 진행합니다.")
     @PostMapping("/register/temp")
     public ResponseEntity<Void> memberTempRegister(
-            @Valid @RequestBody MemberRegisterRequest request) {
+            @Valid @RequestBody UsernamePasswordRequest request) {
         authService.registerWithUsernameAndPassword(request);
         return ResponseEntity.ok().build();
     }
