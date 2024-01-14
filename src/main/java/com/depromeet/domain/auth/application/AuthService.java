@@ -9,9 +9,12 @@ import com.depromeet.domain.member.domain.Member;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
+
 import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -54,12 +57,19 @@ public class AuthService {
                         .findByUsername(request.username())
                         .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
+        validateNotGuestMember(member);
         validatePasswordMatches(member, request.password());
 
         String accessToken = jwtTokenService.createAccessToken(member.getId(), member.getRole());
         String refreshToken = jwtTokenService.createRefreshToken(member.getId());
 
         return LoginResponse.from(accessToken, refreshToken);
+    }
+
+    private void validateNotGuestMember(Member member) {
+        if (member.isGuest()) {
+            throw new CustomException(ErrorCode.GUEST_MEMBER_REQUIRES_REGISTRATION);
+        }
     }
 
     private void validatePasswordMatches(Member member, String password) {

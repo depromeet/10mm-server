@@ -2,6 +2,7 @@ package com.depromeet.global.error.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -27,6 +28,7 @@ public enum ErrorCode {
     SOCIAL_AUTHENTICATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류로 인해 소셜 로그인에 실패했습니다."),
     INVALID_APPLE_PRIVATE_KEY(HttpStatus.INTERNAL_SERVER_ERROR, "애플 로그인에 필요한 비밀 키가 올바르지 않습니다."),
     PASSWORD_NOT_MATCHES(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
+    GUEST_MEMBER_REQUIRES_REGISTRATION(HttpStatus.UNAUTHORIZED, "게스트 회원은 회원가입을 먼저 진행해야 합니다."),
 
     // Mission
     MISSION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 미션을 찾을 수 없습니다."),
