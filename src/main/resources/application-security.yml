@@ -5,9 +5,9 @@ spring:
         registration:
           kakao:
             authorization-grant-type: authorization_code
-            client-id: ${KAKAO_CLIENT_ID:}
-            client-secret: ${KAKAO_CLIENT_SECRET:}
-            redirect-uri: ${KAKAO_REDIRECT_URI:}
+            client-id: ${KAKAO_CLIENT_ID:default}
+            client-secret: ${KAKAO_CLIENT_SECRET:default}
+            redirect-uri: ${KAKAO_REDIRECT_URI:default}
             client-name: Kakao
             client-authentication-method: client_secret_post
             scope:
@@ -15,9 +15,9 @@ spring:
               - account_email
           apple:
             authorization-grant-type: authorization_code
-            client-id: ${APPLE_CLIENT_ID:}
-            client-secret: ${APPLE_PRIVATE_KEY:}|${APPLE_KEY_ID:}|${APPLE_TEAM_ID:}
-            redirect-uri: ${APPLE_REDIRECT_URI:}
+            client-id: ${APPLE_CLIENT_ID:default}
+            client-secret: ${APPLE_PRIVATE_KEY:default}|${APPLE_KEY_ID:default}|${APPLE_TEAM_ID:default}
+            redirect-uri: ${APPLE_REDIRECT_URI:default}
             client-name: apple
             scope:
               - openid
