@@ -6,6 +6,7 @@ import com.depromeet.domain.auth.dto.response.LoginResponse;
 import com.depromeet.domain.auth.dto.response.MemberTempRegisterResponse;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.member.domain.MemberRole;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -67,7 +68,7 @@ public class AuthService {
     }
 
     private void validateNotGuestMember(Member member) {
-        if (member.isGuest()) {
+        if (member.getRole() == MemberRole.GUEST) {
             throw new CustomException(ErrorCode.GUEST_MEMBER_REQUIRES_REGISTRATION);
         }
     }
