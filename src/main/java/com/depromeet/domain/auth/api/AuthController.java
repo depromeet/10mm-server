@@ -4,14 +4,10 @@ import com.depromeet.domain.auth.application.AuthService;
 import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
 import com.depromeet.domain.auth.dto.response.TokenPairResponse;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.validation.Valid;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

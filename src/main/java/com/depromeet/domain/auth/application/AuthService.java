@@ -9,12 +9,9 @@ import com.depromeet.domain.member.domain.MemberRole;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
-
 import jakarta.transaction.Transactional;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,8 +31,7 @@ public class AuthService {
         member.register(request.nickname());
     }
 
-    public TokenPairResponse registerWithUsernameAndPassword(
-            UsernamePasswordRequest request) {
+    public TokenPairResponse registerWithUsernameAndPassword(UsernamePasswordRequest request) {
         validateUniqueUsername(request.username());
 
         String encodedPassword = passwordEncoder.encode(request.password());
