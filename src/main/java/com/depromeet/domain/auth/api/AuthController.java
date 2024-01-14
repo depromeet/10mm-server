@@ -3,6 +3,7 @@ package com.depromeet.domain.auth.api;
 import com.depromeet.domain.auth.application.AuthService;
 import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
+import com.depromeet.domain.auth.dto.response.LoginResponse;
 import com.depromeet.domain.auth.dto.response.MemberTempRegisterResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,9 +39,11 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "로그인", description = "로그인을 진행합니다.")
+    @Operation(summary = "로그인", description = "토큰 발급을 위해 로그인을 진행합니다.")
     @PostMapping("/login")
-    public ResponseEntity<Void> memberLogin(@Valid @RequestBody UsernamePasswordRequest request) {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<LoginResponse> memberLogin(
+            @Valid @RequestBody UsernamePasswordRequest request) {
+        LoginResponse response = authService.loginMember(request);
+        return ResponseEntity.ok(response);
     }
 }
