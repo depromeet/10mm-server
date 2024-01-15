@@ -112,41 +112,6 @@ public class MissionService {
         missionRepository.deleteById(missionId);
     }
 
-    public void deleteInProgressMission() {
-        Member currentMember = memberUtil.getCurrentMember();
-        final LocalDate today = LocalDate.now();
-
-        List<Mission> missions = missionRepository.findMissionsWithRecords(currentMember.getId());
-
-        for (Mission mission : missions) {
-            List<MissionRecord> records = mission.getMissionRecords();
-
-            Optional<MissionRecord> optionalRecord =
-                    records.stream()
-                            .filter(record -> record.getStartedAt().toLocalDate().equals(today))
-                            .findFirst();
-
-            // 당일 수행한 미션기록이 없으면 NONE
-            if (optionalRecord.isEmpty()) {
-                continue;
-            }
-
-            // 당일 수행한 미션기록의 인증사진이 존재하면 COMPLETE
-            if (optionalRecord.get().getUploadStatus() == ImageUploadStatus.COMPLETE) {
-                continue;
-            }
-
-            // 레디스에 미션기록의 인증사진 인증 대기시간 값이 존재하면 REQUIRED
-            Optional<MissionRecordTtl> missionRecordTTL =
-                    missionRecordTtlRepository.findById(optionalRecord.get().getId());
-
-            if (missionRecordTTL.isPresent()) {
-                missionRecordTtlRepository.deleteById(optionalRecord.get().getId());
-                missionRecordRepository.deleteById(optionalRecord.get().getId());
-            }
-        }
-    }
-
     private Integer maxSort(Member member) {
         Mission missionByMaxSort = missionRepository.findTopByMemberOrderBySortDesc(member);
         return missionByMaxSort == null ? 1 : missionByMaxSort.getSort() + 1;

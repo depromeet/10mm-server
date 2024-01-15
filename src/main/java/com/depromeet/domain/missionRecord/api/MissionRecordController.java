@@ -15,14 +15,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "3. [미션 기록]", description = "미션 기록 관련 API")
 @RestController
@@ -58,5 +51,14 @@ public class MissionRecordController {
     public MissionRecordUpdateResponse missionRecordUpdate(
             @Valid @RequestBody MissionRecordUpdateRequest request, @PathVariable Long recordId) {
         return missionRecordService.updateMissionRecord(request, recordId);
+    }
+
+    @Operation(
+            summary = "이미 진행중인 미션 기록들 삭제",
+            description = "이미 진행중인 미션 기록들을 삭제합니다. (인증 필요인 경우만 삭제)")
+    @DeleteMapping("/in-progress")
+    public ResponseEntity<Void> missionRecordInProgressDelete() {
+        missionRecordService.deleteInProgressMissionRecord();
+        return ResponseEntity.ok().build();
     }
 }
