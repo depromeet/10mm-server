@@ -2,6 +2,7 @@ package com.depromeet.domain.auth.api;
 
 import com.depromeet.domain.auth.application.AuthService;
 import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
+import com.depromeet.domain.auth.dto.request.UsernameCheckRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
 import com.depromeet.domain.auth.dto.response.TokenPairResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,6 +37,14 @@ public class AuthController {
             @Valid @RequestBody UsernamePasswordRequest request) {
         TokenPairResponse response = authService.registerWithUsernameAndPassword(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Operation(summary = "아이디 중복 체크", description = "아이디 중복 체크를 진행합니다.")
+    @PostMapping("/check-username")
+    public ResponseEntity<Void> memberUsernameCheck(
+            @Valid @RequestBody UsernameCheckRequest request) {
+        authService.checkUsername(request);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "로그인", description = "토큰 발급을 위해 로그인을 진행합니다.")

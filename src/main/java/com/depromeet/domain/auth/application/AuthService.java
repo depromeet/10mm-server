@@ -1,6 +1,7 @@
 package com.depromeet.domain.auth.application;
 
 import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
+import com.depromeet.domain.auth.dto.request.UsernameCheckRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
 import com.depromeet.domain.auth.dto.response.TokenPairResponse;
 import com.depromeet.domain.member.dao.MemberRepository;
@@ -76,5 +77,11 @@ public class AuthService {
         String refreshToken = jwtTokenService.createRefreshToken(member.getId());
 
         return TokenPairResponse.from(accessToken, refreshToken);
+    }
+
+    public void checkUsername(UsernameCheckRequest request) {
+        if (memberRepository.existsByUsername(request.username())) {
+            throw new CustomException(ErrorCode.MEMBER_ALREADY_REGISTERED);
+        }
     }
 }
