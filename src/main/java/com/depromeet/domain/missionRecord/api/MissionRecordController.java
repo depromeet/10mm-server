@@ -53,6 +53,12 @@ public class MissionRecordController {
         return missionRecordService.findAllMissionRecord(missionId, yearMonth);
     }
 
+	@Operation(summary = "미션 전체 현황", description = "미션 전체 현황을 조회합니다.")
+	@GetMapping("/summary")
+	public List<MissionRecordFindResponse> missionRecordFindSummary() {
+		return missionRecordService.findSummaryMissionRecord();
+	}
+
     @Operation(summary = "미션 기록 단건 수정", description = "미션 기록을 수정합니다.")
     @PutMapping("/{recordId}")
     public MissionRecordUpdateResponse missionRecordUpdate(

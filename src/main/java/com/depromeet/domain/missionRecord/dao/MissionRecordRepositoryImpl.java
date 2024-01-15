@@ -2,8 +2,10 @@ package com.depromeet.domain.missionRecord.dao;
 
 import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 
+import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -43,6 +45,12 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                         .fetchFirst();
         return missionRecordFetchOne != null;
     }
+
+	@Override
+	public List<MissionRecord> findSummaryMissionRecord() {
+		jpaQueryFactory.selectFrom(missionRecord);
+
+	}
 
     private BooleanExpression missionIdEq(Long missionId) {
         return missionRecord.mission.id.eq(missionId);

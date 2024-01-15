@@ -89,6 +89,11 @@ public class MissionRecordService {
         return missionRecords.stream().map(MissionRecordFindResponse::from).toList();
     }
 
+	@Transactional(readOnly = true)
+	public List<MissionRecordFindResponse> findSummaryMissionRecord() {
+		missionRecordRepository.findSummaryMissionRecord();
+	}
+
     public MissionRecordUpdateResponse updateMissionRecord(
             MissionRecordUpdateRequest request, Long recordId) {
         final Member member = memberUtil.getCurrentMember();

@@ -9,4 +9,6 @@ public interface MissionRecordRepositoryCustom {
     List<MissionRecord> findAllByMissionIdAndYearMonth(Long missionId, YearMonth yearMonth);
 
     boolean isCompletedMissionExistsToday(Long missionId);
+
+	List<MissionRecord> findSummaryMissionRecord();
 }
