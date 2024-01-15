@@ -2,7 +2,6 @@ package com.depromeet.domain.auth.api;
 
 import com.depromeet.domain.auth.application.AuthService;
 import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
-import com.depromeet.domain.auth.dto.request.UsernameCheckRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
 import com.depromeet.domain.auth.dto.response.TokenPairResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,13 +10,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "1. [인증]", description = "인증 관련 API")
+@Tag(name = "1-1. [인증]", description = "인증 관련 API")
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -40,27 +38,11 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "아이디 중복 체크", description = "아이디 중복 체크를 진행합니다.")
-    @PostMapping("/check-username")
-    public ResponseEntity<Void> memberUsernameCheck(
-            @Valid @RequestBody UsernameCheckRequest request) {
-        authService.checkUsername(request);
-        return ResponseEntity.ok().build();
-    }
-
     @Operation(summary = "로그인", description = "토큰 발급을 위해 로그인을 진행합니다.")
     @PostMapping("/login")
     public ResponseEntity<TokenPairResponse> memberLogin(
             @Valid @RequestBody UsernamePasswordRequest request) {
         TokenPairResponse response = authService.loginMember(request);
         return ResponseEntity.ok(response);
-    }
-
-    // TODO: 테스트 코드 작성 필요
-    @Operation(summary = "회원 탈퇴", description = "회원탈퇴를 진행합니다.")
-    @DeleteMapping("/withdrawal")
-    public ResponseEntity<Void> memberWithdrawal(@Valid @RequestBody UsernameCheckRequest request) {
-        authService.withdrawal(request);
-        return ResponseEntity.ok().build();
     }
 }
