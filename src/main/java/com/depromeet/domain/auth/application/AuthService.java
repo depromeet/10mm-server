@@ -10,11 +10,11 @@ import com.depromeet.domain.member.domain.MemberRole;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -79,6 +79,7 @@ public class AuthService {
         return TokenPairResponse.from(accessToken, refreshToken);
     }
 
+	@Transactional(readOnly = true)
     public void checkUsername(UsernameCheckRequest request) {
         if (memberRepository.existsByUsername(request.username())) {
             throw new CustomException(ErrorCode.MEMBER_ALREADY_REGISTERED);
