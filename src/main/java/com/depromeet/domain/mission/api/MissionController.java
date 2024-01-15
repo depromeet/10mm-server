@@ -64,4 +64,11 @@ public class MissionController {
     public void missionDelete(@PathVariable Long missionId) {
         missionService.deleteMission(missionId);
     }
+
+    @Operation(summary = "이미 진행중인 미션 삭제", description = "이미 진행중인 미션을 삭제합니다. (인증 필요인 경우만 삭제)")
+    @DeleteMapping("/in-progress")
+    public ResponseEntity<Void> missionInProgressDelete() {
+        missionService.deleteInProgressMission();
+        return ResponseEntity.ok().build();
+    }
 }

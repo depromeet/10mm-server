@@ -6,6 +6,7 @@ import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
 import com.depromeet.domain.mission.dto.response.*;
+import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.dao.MissionRecordTtlRepository;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MissionService {
 
     private final MissionRepository missionRepository;
+    private final MissionRecordRepository missionRecordRepository;
     private final MissionRecordTtlRepository missionRecordTtlRepository;
     private final MemberUtil memberUtil;
 
@@ -108,6 +110,45 @@ public class MissionService {
 
     public void deleteMission(Long missionId) {
         missionRepository.deleteById(missionId);
+    }
+
+    @Transactional(readOnly = true)
+    public void deleteInProgressMission() {
+        Member currentMember = memberUtil.getCurrentMember();
+        final LocalDate today = LocalDate.now();
+
+        List<Mission> missions = missionRepository.findMissionsWithRecords(currentMember.getId());
+
+        for (Mission mission : missions) {
+            List<MissionRecord> records = mission.getMissionRecords();
+
+            Optional<MissionRecord> optionalRecord =
+                    records.stream()
+                            .filter(record -> record.getStartedAt().toLocalDate().equals(today))
+                            .findFirst();
+
+            // 당일 수행한 미션기록이 없으면 NONE
+            if (optionalRecord.isEmpty()) {
+                continue;
+            }
+
+            // 당일 수행한 미션기록의 인증사진이 존재하면 COMPLETE
+            if (optionalRecord.get().getUploadStatus() == ImageUploadStatus.COMPLETE) {
+                continue;
+            }
+
+            // 레디스에 미션기록의 인증사진 인증 대기시간 값이 존재하면 REQUIRED
+            Optional<MissionRecordTtl> missionRecordTTL =
+                    missionRecordTtlRepository.findById(optionalRecord.get().getId());
+
+            if (missionRecordTTL.isPresent()) {
+                missionRecordTtlRepository.deleteById(optionalRecord.get().getId());
+                missionRecordRepository.deleteById(optionalRecord.get().getId());
+                continue;
+            }
+
+            throw new CustomException(ErrorCode.MISSION_STATUS_MISMATCH);
+        }
     }
 
     private Integer maxSort(Member member) {
