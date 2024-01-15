@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "2. [미션]", description = "미션 관련 API입니다.")
@@ -50,6 +52,14 @@ public class MissionController {
     public List<MissionFindAllResponse> missionFindAll() {
         return missionService.findAllMission();
     }
+
+    @Operation(summary = "종료미션 보관함", description = "종료된 미션 리스트를 조회합니다.")
+    @GetMapping("/archive")
+    public Slice<MissionFindAllResponse> missionFindAllArchive(
+		@RequestParam int size, @RequestParam(required = false) Long lastId
+	) {
+		return missionService.findAllArchivedMission(size, lastId);
+	}
 
     @Operation(summary = "미션 단건 수정", description = "단건 미션을 수정합니다.")
     @PutMapping("/{missionId}")
