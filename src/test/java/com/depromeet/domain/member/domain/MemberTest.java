@@ -16,7 +16,7 @@ class MemberTest {
 
     @BeforeEach
     void setUp() {
-        profile = new Profile("testNickname", "testProfileImageUrl");
+        profile = Profile.createProfile("testNickname", "testProfileImageUrl");
     }
 
     @Test
