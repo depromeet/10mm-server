@@ -8,10 +8,12 @@ import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.depromeet.domain.image.domain.ImageFileExtension;
 import com.depromeet.domain.image.domain.ImageType;
 import com.depromeet.domain.image.dto.request.MemberProfileImageCreateRequest;
+import com.depromeet.domain.image.dto.request.MemberProfileImageUploadCompleteRequest;
 import com.depromeet.domain.image.dto.request.MissionRecordImageCreateRequest;
 import com.depromeet.domain.image.dto.request.MissionRecordImageUploadCompleteRequest;
 import com.depromeet.domain.image.dto.response.PresignedUrlResponse;
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.dao.MissionRecordTtlRepository;
@@ -103,6 +105,24 @@ public class ImageService {
 
         String presignedUrl = amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
         return PresignedUrlResponse.from(presignedUrl);
+    }
+
+    public void uploadCompleteMemberProfile(MemberProfileImageUploadCompleteRequest request) {
+        final Member currentMember = memberUtil.getCurrentMember();
+
+        String imageUrl =
+                storageProperties.endpoint()
+                        + "/"
+                        + storageProperties.bucket()
+                        + "/"
+                        + springEnvironmentUtil.getCurrentProfile()
+                        + "/"
+                        + ImageType.MEMBER_PROFILE.getValue()
+                        + "/"
+                        + currentMember.getId()
+                        + "/image."
+                        + request.imageFileExtension().getUploadExtension();
+        currentMember.updateProfile(Profile.createProfile(request.nickname(), imageUrl));
     }
 
     private MissionRecord findMissionRecordById(Long request) {
