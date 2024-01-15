@@ -49,7 +49,7 @@ public class MissionService {
     @Transactional(readOnly = true) // 읽기 전용 트랜잭션 설정. 읽기 전용으로 설정한다.
     public List<MissionFindAllResponse> findAllMission() {
         Member currentMember = memberUtil.getCurrentMember();
-        LocalDate localDate = LocalDate.now();
+        final LocalDate today = LocalDate.now();
 
         List<Mission> missions = missionRepository.findMissionsWithRecords(currentMember.getId());
 
@@ -59,13 +59,7 @@ public class MissionService {
 
             Optional<MissionRecord> optionalRecord =
                     records.stream()
-                            .filter(
-                                    record -> {
-                                        System.out.println(record.getStartedAt().toLocalDate());
-                                        return record.getStartedAt()
-                                                .toLocalDate()
-                                                .equals(localDate);
-                                    })
+                            .filter(record -> record.getStartedAt().toLocalDate().equals(today))
                             .findFirst();
 
             // 당일 수행한 미션기록이 없으면 NONE
