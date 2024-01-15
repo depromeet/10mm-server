@@ -128,7 +128,7 @@ class MissionRepositoryTest {
                                 startedAt.plusWeeks(2),
                                 saveMember));
         // when
-        Optional<Mission> findMission = missionRepository.findByMissionId(saveMission.getId());
+        Optional<Mission> findMission = missionRepository.findById(saveMission.getId());
 
         // then
         assertThat(findMission).isPresent();
