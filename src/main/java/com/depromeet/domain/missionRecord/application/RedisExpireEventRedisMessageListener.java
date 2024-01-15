@@ -1,4 +1,4 @@
-package com.depromeet.domain.missionRecord.service;
+package com.depromeet.domain.missionRecord.application;
 
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.global.common.constants.RedisExpireEventConstants;

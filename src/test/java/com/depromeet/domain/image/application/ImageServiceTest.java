@@ -1,7 +1,6 @@
 package com.depromeet.domain.image.application;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.depromeet.DatabaseCleaner;
 import com.depromeet.domain.image.domain.ImageFileExtension;
@@ -11,17 +10,17 @@ import com.depromeet.domain.image.dto.response.PresignedUrlResponse;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
+import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
-import com.depromeet.domain.mission.service.MissionService;
+import com.depromeet.domain.missionRecord.application.MissionRecordService;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordCreateResponse;
-import com.depromeet.domain.missionRecord.service.MissionRecordService;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import java.time.LocalDateTime;
