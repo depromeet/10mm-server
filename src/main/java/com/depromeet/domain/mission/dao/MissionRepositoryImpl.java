@@ -27,7 +27,7 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                         .selectFrom(mission)
                         .where(ltMissionId(lastId), memberIdEq(member.getId()))
                         .orderBy(mission.id.desc())
-                        .limit(pageable.getPageSize() + 1);
+                        .limit((long) pageable.getPageSize() + 1);
 
         List<Mission> missions = query.fetch();
 
