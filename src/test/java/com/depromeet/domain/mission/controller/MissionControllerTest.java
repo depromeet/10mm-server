@@ -9,9 +9,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.mission.api.MissionController;
 import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.domain.ArchiveStatus;
+import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
@@ -19,10 +22,13 @@ import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
 import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
+import com.depromeet.domain.mission.dto.response.*;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.security.JwtAuthenticationFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -30,11 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
@@ -48,23 +49,6 @@ class MissionControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @MockBean private MissionService missionService;
-
-    /*
-    무한 스크롤 방식 처리하는 메서드로
-    MissionRepository에서 구현된 List<Mission>은 Repository 계층에서 이뤄지지에
-    테스트 코드는 MissionFindResponse로 변경
-    */
-    private Slice<MissionFindResponse> checkLastPage(
-            Pageable pageable, List<MissionFindResponse> result) {
-        boolean hasNext = false;
-
-        // 조회한 결과 개수가 요청한 페이지 사이즈보다 크면 뒤에 더 있음, next = true
-        if (result.size() > pageable.getPageSize()) {
-            hasNext = true;
-            result.remove(pageable.getPageSize());
-        }
-        return new SliceImpl<>(result, pageable, hasNext);
-    }
 
     @Test
     void 공부미션을_생성한다() throws Exception {
@@ -84,7 +68,7 @@ class MissionControllerTest {
                                 "testMissionContent",
                                 MissionCategory.STUDY,
                                 MissionVisibility.ALL));
-        // expected
+        // when, then
         ResultActions perform =
                 mockMvc.perform(
                         post("/missions")
@@ -110,7 +94,7 @@ class MissionControllerTest {
                 new MissionCreateRequest(
                         null, "testMissionContent", MissionCategory.STUDY, MissionVisibility.ALL);
 
-        // expected
+        // when, then
         ResultActions perform =
                 mockMvc.perform(
                         post("/missions")
@@ -141,7 +125,7 @@ class MissionControllerTest {
                                 ArchiveStatus.NONE,
                                 1));
 
-        // expected
+        // when, then
         ResultActions perform =
                 mockMvc.perform(
                         get("/missions/{missionId}", 1L)
@@ -160,48 +144,42 @@ class MissionControllerTest {
         // given
         int size = 3;
         long lastId = 4;
-        PageRequest pageRequest = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
-        List<MissionFindResponse> mappedMissions =
-                Arrays.asList(
-                        new MissionFindResponse(
-                                3L,
-                                "testMissionName_3",
-                                "testMissionContent_3",
-                                MissionCategory.WRITING,
-                                MissionVisibility.ALL,
-                                ArchiveStatus.NONE,
-                                3),
-                        new MissionFindResponse(
-                                2L,
-                                "testMissionName_2",
-                                "testMissionContent_2",
-                                MissionCategory.ETC,
-                                MissionVisibility.ALL,
-                                ArchiveStatus.NONE,
-                                2),
-                        new MissionFindResponse(
-                                1L,
-                                "testMissionName_1",
-                                "testMissionContent_1",
-                                MissionCategory.STUDY,
-                                MissionVisibility.ALL,
-                                ArchiveStatus.NONE,
-                                1));
-        given(missionService.findAllMission(anyInt(), anyLong()))
-                .willReturn(checkLastPage(pageRequest, mappedMissions));
+        LocalDateTime ttlFinishedAt = LocalDateTime.now().plusMinutes(10);
+        Member member = Member.createNormalMember(new Profile("testNickname", "testImageUrl"));
+        LocalDateTime missionStartedAt = LocalDateTime.of(2023, 12, 1, 1, 5, 0);
+        LocalDateTime missionFinishedAt = missionStartedAt.plusWeeks(2);
+        Mission mission = Mission.createMission("testMissionName_1", "testMissionContent_1", 1, MissionCategory.STUDY, MissionVisibility.ALL, missionStartedAt, missionFinishedAt, member);
 
-        // expected
+        List<MissionFindAllResponse> missionList =
+                Arrays.asList(
+                        MissionFindAllResponse.of(
+                                mission,
+                                MissionStatus.NONE,
+                                ttlFinishedAt),
+                        MissionFindAllResponse.of(
+                                mission,
+                                MissionStatus.COMPLETED,
+                                ttlFinishedAt),
+                        MissionFindAllResponse.of(
+                                mission,
+                                MissionStatus.REQUIRED,
+                                ttlFinishedAt)
+                        );
+        given(missionService.findAllMission())
+                .willReturn(missionList);
+
+        // when, then
         ResultActions perform =
                 mockMvc.perform(
-                        get("/missions?size={size}&lastId={lastId}", size, lastId)
+                        get("/missions")
+                                .param("size", String.valueOf(size))
+                                .param("lastId", String.valueOf(lastId))
                                 .accept(APPLICATION_JSON)
                                 .contentType(APPLICATION_JSON)
                                 .with(csrf()));
         perform.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.content.length()", is(size)))
-                .andExpect(jsonPath("$.data.content[0].missionId").value(size))
-                .andExpect(jsonPath("$.data.last", is(true)))
-                .andExpect(jsonPath("$.data.empty", is(false)));
+                .andExpect(jsonPath("$.data.length()", is(size)))
+                .andDo(print());
     }
 
     @Test
@@ -212,7 +190,7 @@ class MissionControllerTest {
                         "testMissionName", "testMissionContent", MissionVisibility.NONE);
         given(missionService.updateMission(any(), any())).willReturn(new MissionUpdateResponse(1L));
 
-        // expected
+        // when, then
         ResultActions perform =
                 mockMvc.perform(
                         put("/missions/{missionId}", 1L)
@@ -234,7 +212,7 @@ class MissionControllerTest {
                 new MissionUpdateRequest(null, "testMissionContent", MissionVisibility.NONE);
         given(missionService.updateMission(any(), any())).willReturn(new MissionUpdateResponse(1L));
 
-        // expected
+        // when, then
         ResultActions perform =
                 mockMvc.perform(
                         put("/missions/{missionId}", 1L)
@@ -258,7 +236,7 @@ class MissionControllerTest {
         Long missionId = 1L;
         doNothing().when(missionService).deleteMission(missionId);
 
-        // expected
+        // when, then
         mockMvc.perform(
                         delete("/missions/{missionId}", missionId)
                                 .accept(APPLICATION_JSON)

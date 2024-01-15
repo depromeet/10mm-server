@@ -6,7 +6,7 @@ import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
 import com.depromeet.domain.mission.dto.response.*;
-import com.depromeet.domain.missionRecord.dao.MissionRecordTTLRepository;
+import com.depromeet.domain.missionRecord.dao.MissionRecordTtlRepository;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.domain.MissionRecordTtl;
@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MissionService {
 
     private final MissionRepository missionRepository;
-    private final MissionRecordTTLRepository missionRecordTTLRepository;
+    private final MissionRecordTtlRepository missionRecordTtlRepository;
     private final MemberUtil memberUtil;
 
     public MissionCreateResponse createMission(MissionCreateRequest missionCreateRequest) {
@@ -82,7 +82,7 @@ public class MissionService {
 
             // 레디스에 미션기록의 인증사진 인증 대기시간 값이 존재하면 REQUIRED
             Optional<MissionRecordTtl> missionRecordTTL =
-                    missionRecordTTLRepository.findById(
+                    missionRecordTtlRepository.findById(
                             optionalRecord.get().getId());
 
             if (missionRecordTTL.isPresent()) {

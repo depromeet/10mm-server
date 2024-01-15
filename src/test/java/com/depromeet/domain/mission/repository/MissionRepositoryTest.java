@@ -13,6 +13,7 @@ import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -100,7 +101,7 @@ class MissionRepositoryTest {
                         startedAt.plusWeeks(2),
                         saveMember);
 
-        // expected
+        // then
         assertThatThrownBy(() -> missionRepository.save(mission))
                 // instance 검증
                 .isInstanceOf(DataIntegrityViolationException.class);
@@ -146,7 +147,7 @@ class MissionRepositoryTest {
         // given
         LocalDateTime startedAt = LocalDateTime.now();
 
-        IntStream.range(1, 10)
+        IntStream.range(1, 5)
                 .mapToObj(
                         i ->
                                 new MissionCreateRequest(
@@ -168,20 +169,18 @@ class MissionRepositoryTest {
                                                 saveMember)));
 
         // when
-        Slice<Mission> missionList =
-                missionRepository.findAllMission(
-                        saveMember, PageRequest.of(0, 4, Sort.by(Sort.Direction.DESC, "id")), 7L);
+        List<Mission> missionList = missionRepository.findMissionsWithRecords(
+                saveMember.getId());
 
         // then
-        assertThat(missionList.getContent().size()).isEqualTo(4);
-        assertThat(missionList.getContent())
+        assertThat(missionList.size()).isEqualTo(4);
+        assertThat(missionList)
                 .hasSize(4)
                 .extracting("id", "name", "content")
                 .containsExactlyInAnyOrder(
-                        tuple(6L, "testMissionName_6", "testMissionContent_6"),
-                        tuple(5L, "testMissionName_5", "testMissionContent_5"),
                         tuple(4L, "testMissionName_4", "testMissionContent_4"),
-                        tuple(3L, "testMissionName_3", "testMissionContent_3"));
-        assertFalse(missionList.isLast());
+                        tuple(3L, "testMissionName_3", "testMissionContent_3"),
+                        tuple(2L, "testMissionName_2", "testMissionContent_2"),
+                        tuple(1L, "testMissionName_1", "testMissionContent_1"));
     }
 }

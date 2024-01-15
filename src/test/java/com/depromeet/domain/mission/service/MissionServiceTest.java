@@ -12,11 +12,14 @@ import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
 import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
+import com.depromeet.domain.mission.dto.response.MissionFindAllResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
+import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.util.MemberUtil;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,7 +59,7 @@ class MissionServiceTest {
         // when
         MissionCreateResponse mission = missionService.createMission(missionCreateRequest);
 
-        // expected
+        // then
         assertNotNull(mission);
         assertEquals("testMissionName", mission.name());
         assertEquals("testMissionContent", mission.content());
@@ -78,7 +81,7 @@ class MissionServiceTest {
         // when
         MissionFindResponse findMission = missionService.findOneMission(saveMission.missionId());
 
-        // expected
+        // then
         assertEquals(findMission.name(), "testMissionName");
         assertEquals(findMission.content(), "testMissionContent");
         assertEquals(findMission.category(), MissionCategory.STUDY);
@@ -91,7 +94,7 @@ class MissionServiceTest {
         // given
         LocalDateTime startedAt = LocalDateTime.now();
 
-        IntStream.range(1, 41)
+        IntStream.range(1, 5)
                 .mapToObj(
                         i ->
                                 new MissionCreateRequest(
@@ -113,19 +116,17 @@ class MissionServiceTest {
                                                 memberUtil.getCurrentMember())));
 
         // when
-        Slice<MissionFindResponse> missionList = missionService.findAllMission(4, 30L);
+        List<MissionFindAllResponse> missionList = missionService.findAllMission();
 
-        // expected
-        assertThat(missionList.getContent().size()).isEqualTo(4);
-        assertThat(missionList.getContent())
-                .hasSize(4)
+        // then
+        assertThat(missionList.size()).isEqualTo(4);
+        assertThat(missionList)
                 .extracting("missionId", "name", "content")
                 .containsExactlyInAnyOrder(
-                        tuple(29L, "testMissionName_29", "testMissionContent_29"),
-                        tuple(28L, "testMissionName_28", "testMissionContent_28"),
-                        tuple(27L, "testMissionName_27", "testMissionContent_27"),
-                        tuple(26L, "testMissionName_26", "testMissionContent_26"));
-        assertFalse(missionList.isLast());
+                        tuple(1L, "testMissionName_1", "testMissionContent_1"),
+                        tuple(2L, "testMissionName_2", "testMissionContent_2"),
+                        tuple(3L, "testMissionName_3", "testMissionContent_3"),
+                        tuple(4L, "testMissionName_4", "testMissionContent_4"));
     }
 
     @Test
@@ -162,7 +163,7 @@ class MissionServiceTest {
         MissionUpdateRequest missionUpdateRequest =
                 new MissionUpdateRequest(null, "modifyContent", MissionVisibility.FOLLOWER);
 
-        // when & expected
+        // when, then
         assertThatThrownBy(
                         () ->
                                 missionService.updateMission(
@@ -185,7 +186,7 @@ class MissionServiceTest {
                 new MissionUpdateRequest(
                         "modifyMissionName_test", "modifyContent", MissionVisibility.FOLLOWER);
 
-        // when & expected
+        // when, then
         assertThatThrownBy(
                         () ->
                                 missionService.updateMission(
@@ -208,7 +209,7 @@ class MissionServiceTest {
         // when
         missionService.deleteMission(saveMission.missionId());
 
-        // expected
+        // then
         assertThat(missionRepository.findAll()).isEmpty();
         assertThat(missionRepository.count()).isEqualTo(0);
     }
@@ -227,7 +228,7 @@ class MissionServiceTest {
         // when
         missionService.deleteMission(200L);
 
-        // expected
+        // then
         assertThat(missionRepository.findAll()).isNotEmpty();
     }
 }
