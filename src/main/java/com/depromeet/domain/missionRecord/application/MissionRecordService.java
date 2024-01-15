@@ -43,6 +43,7 @@ public class MissionRecordService {
 
         validateMissionRecordUserMismatch(mission, member);
         validateMissionRecordDuration(duration);
+        validateMissionRecordExistsToday(mission.getId());
 
         MissionRecord missionRecord =
                 MissionRecord.createMissionRecord(
@@ -57,6 +58,12 @@ public class MissionRecordService {
                 MissionRecordTtl.createMissionRecordTtl(
                         createdMissionRecord.getId(), expirationTime, request.finishedAt()));
         return MissionRecordCreateResponse.from(createdMissionRecord.getId());
+    }
+
+    private void validateMissionRecordExistsToday(Long missionId) {
+        if (missionRecordRepository.isCompletedMissionExistsToday(missionId)) {
+            throw new CustomException(ErrorCode.MISSION_RECORD_ALREADY_EXISTS_TODAY);
+        }
     }
 
     private Mission findMissionById(Long missionId) {
