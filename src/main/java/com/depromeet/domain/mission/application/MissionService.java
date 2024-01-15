@@ -144,10 +144,7 @@ public class MissionService {
             if (missionRecordTTL.isPresent()) {
                 missionRecordTtlRepository.deleteById(optionalRecord.get().getId());
                 missionRecordRepository.deleteById(optionalRecord.get().getId());
-                continue;
             }
-
-            throw new CustomException(ErrorCode.MISSION_STATUS_MISMATCH);
         }
     }
 
