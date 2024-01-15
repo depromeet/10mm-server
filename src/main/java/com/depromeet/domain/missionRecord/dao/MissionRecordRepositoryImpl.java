@@ -30,7 +30,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     }
 
     @Override
-    public boolean existsByMissionIdAndToday(Long missionId) {
+    public boolean isCompletedMissionExistsToday(Long missionId) {
         LocalDate now = LocalDate.now();
         MissionRecord missionRecordFetchOne =
                 jpaQueryFactory

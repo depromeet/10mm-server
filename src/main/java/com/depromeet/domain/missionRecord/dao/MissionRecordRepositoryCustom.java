@@ -8,5 +8,5 @@ public interface MissionRecordRepositoryCustom {
 
     List<MissionRecord> findAllByMissionIdAndYearMonth(Long missionId, YearMonth yearMonth);
 
-    boolean existsByMissionIdAndToday(Long missionId);
+    boolean isCompletedMissionExistsToday(Long missionId);
 }

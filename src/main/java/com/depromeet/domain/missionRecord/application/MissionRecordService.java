@@ -61,7 +61,7 @@ public class MissionRecordService {
     }
 
     private void validateMissionRecordExistsToday(Long missionId) {
-        if (missionRecordRepository.existsByMissionIdAndToday(missionId)) {
+        if (missionRecordRepository.isCompletedMissionExistsToday(missionId)) {
             throw new CustomException(ErrorCode.MISSION_RECORD_ALREADY_EXISTS_TODAY);
         }
     }
