@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.depromeet.DatabaseCleaner;
+import com.depromeet.domain.member.dao.MemberRepository;
+import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
@@ -15,6 +17,7 @@ import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindAllResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
+import com.depromeet.global.security.PrincipalDetails;
 import com.depromeet.global.util.MemberUtil;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
@@ -25,6 +28,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +40,7 @@ class MissionServiceTest {
 
     @Autowired private MissionService missionService;
     @Autowired private MissionRepository missionRepository;
+    @Autowired private MemberRepository memberRepository;
     @Autowired private DatabaseCleaner databaseCleaner;
     @Autowired private EntityManager entityManager;
     @Autowired private MemberUtil memberUtil;
@@ -41,7 +48,13 @@ class MissionServiceTest {
     @BeforeEach
     void setUp() {
         databaseCleaner.execute();
-        missionRepository.deleteAll();
+        PrincipalDetails principal = new PrincipalDetails(1L, "USER");
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(
+                        principal, "password", principal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        Member guestMember = Member.createGuestMember("username", "password");
+        memberRepository.save(guestMember);
     }
 
     @Test

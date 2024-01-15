@@ -23,12 +23,16 @@ import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordCreateResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
+import com.depromeet.global.security.PrincipalDetails;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
@@ -44,6 +48,11 @@ class ImageServiceTest {
     @BeforeEach
     void setUp() {
         databaseCleaner.execute();
+        PrincipalDetails principal = new PrincipalDetails(1L, "USER");
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(
+                        principal, "password", principal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Nested
