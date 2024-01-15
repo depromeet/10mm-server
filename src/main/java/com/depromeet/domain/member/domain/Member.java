@@ -103,8 +103,12 @@ public class Member extends BaseTimeEntity {
                 .build();
     }
 
-    public void updateLastLoginAt(LocalDateTime lastLoginAt) {
-        this.lastLoginAt = lastLoginAt;
+    public void updateMemberStatus(MemberStatus memberStatus) {
+        this.status = memberStatus;
+    }
+
+    public void updateLastLoginAt() {
+        this.lastLoginAt = LocalDateTime.now();
     }
 
     public void register(String nickname) {
@@ -115,8 +119,16 @@ public class Member extends BaseTimeEntity {
         this.role = MemberRole.USER;
     }
 
+
     public void updateProfile(Profile profile) {
         this.profile = profile;
+    }
+  
+    public void withdrawal() {
+        if (this.status == MemberStatus.DELETED) {
+            throw new CustomException(ErrorCode.MEMBER_ALREADY_DELETED);
+        }
+        this.status = MemberStatus.DELETED;
     }
 
     private void validateRegisterAvailable() {
