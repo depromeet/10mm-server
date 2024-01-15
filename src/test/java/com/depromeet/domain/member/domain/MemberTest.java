@@ -22,7 +22,7 @@ class MemberTest {
     @Test
     void 회원가입시_초기_상태는_NORMAL이다() {
         // given
-        Member member = Member.createGuestMember(new OauthInfo("testProvider", "testProviderId"));
+        Member member = Member.createGuestMember(OauthInfo.createOauthInfo("testProvider", "testProviderId"));
 
         // when
         MemberStatus status = member.getStatus();
@@ -34,7 +34,7 @@ class MemberTest {
     @Test
     void 회원가입시_초기_역할은_GUEST이다() {
         // given
-        Member member = Member.createGuestMember(new OauthInfo("testProvider", "testProviderId"));
+        Member member = Member.createGuestMember(OauthInfo.createOauthInfo("testProvider", "testProviderId"));
 
         // when
         MemberRole role = member.getRole();
@@ -46,7 +46,7 @@ class MemberTest {
     @Test
     void 회원가입시_초기_공개여부는_PUBLIC이다() {
         // given
-        Member member = Member.createGuestMember(new OauthInfo("testProvider", "testProviderId"));
+        Member member = Member.createGuestMember(OauthInfo.createOauthInfo("testProvider", "testProviderId"));
 
         // when
         MemberVisibility visibility = member.getVisibility();
@@ -71,7 +71,7 @@ class MemberTest {
     @Test
     void 회원가입시_게스트멤버의_닉네임이_설정된다() {
         // given
-        Member member = Member.createGuestMember(new OauthInfo("testProvider", "testProviderId"));
+        Member member = Member.createGuestMember(OauthInfo.createOauthInfo("testProvider", "testProviderId"));
 
         // when
         member.register("testNickname");
@@ -83,7 +83,7 @@ class MemberTest {
     @Test
     void 회원가입시_게스트멤버는_일반멤버로_변경된다() {
         // given
-        Member member = Member.createGuestMember(new OauthInfo("testProvider", "testProviderId"));
+        Member member = Member.createGuestMember(OauthInfo.createOauthInfo("testProvider", "testProviderId"));
 
         // when
         member.register("testNickname");
