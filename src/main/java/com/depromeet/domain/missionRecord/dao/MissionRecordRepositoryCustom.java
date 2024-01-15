@@ -10,5 +10,5 @@ public interface MissionRecordRepositoryCustom {
 
     boolean isCompletedMissionExistsToday(Long missionId);
 
-	List<MissionRecord> findSummaryMissionRecord();
+	List<MissionRecord> findSummaryMissionRecord(Long memberId);
 }

@@ -47,7 +47,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     }
 
 	@Override
-	public List<MissionRecord> findSummaryMissionRecord() {
+	public List<MissionRecord> findSummaryMissionRecord(Long memberId) {
 		jpaQueryFactory.selectFrom(missionRecord);
 
 	}
