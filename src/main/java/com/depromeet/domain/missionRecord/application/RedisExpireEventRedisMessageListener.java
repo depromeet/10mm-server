@@ -24,14 +24,11 @@ public class RedisExpireEventRedisMessageListener implements MessageListener {
         if (!patternStr.equals(RedisExpireEventConstants.REDIS_EXPIRE_EVENT_PATTERN.getValue())) {
             return;
         }
-        String event = message.toString().split(":")[1];
-
-        if (!event.startsWith(
-                RedisExpireEventConstants.EXPIRE_EVENT_IMAGE_UPLOAD_TIME_END.getValue())) {
+        String redisEntityName = message.toString().split(":")[0];
+        if (!redisEntityName.equals("MissionRecordTtl")) {
             return;
         }
-
-        Long missionRecordId = Long.valueOf(event.split("_")[6]);
+        Long missionRecordId = Long.parseLong(message.toString().split(":")[1]);
         missionRecordRepository.deleteById(missionRecordId);
     }
 }

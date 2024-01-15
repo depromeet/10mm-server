@@ -6,7 +6,6 @@ import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.dao.MissionRecordTtlRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
-import com.depromeet.domain.missionRecord.domain.MissionRecordTTL;
 import com.depromeet.domain.missionRecord.domain.MissionRecordTtl;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordUpdateRequest;
@@ -14,7 +13,6 @@ import com.depromeet.domain.missionRecord.dto.response.MissionRecordCreateRespon
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindOneResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordUpdateResponse;
-import com.depromeet.global.common.constants.RedisExpireEventConstants;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -57,9 +55,7 @@ public class MissionRecordService {
         MissionRecord createdMissionRecord = missionRecordRepository.save(missionRecord);
         missionRecordTTLRepository.save(
                 MissionRecordTtl.createMissionRecordTtl(
-                        RedisExpireEventConstants.EXPIRE_EVENT_IMAGE_UPLOAD_TIME_END.getValue()
-                                + createdMissionRecord.getId(),
-                        expirationTime));
+                        createdMissionRecord.getId(), expirationTime, request.finishedAt()));
         return MissionRecordCreateResponse.from(createdMissionRecord.getId());
     }
 
