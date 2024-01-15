@@ -4,16 +4,15 @@ import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
-import com.depromeet.domain.missionRecord.dao.MissionRecordTTLRepository;
+import com.depromeet.domain.missionRecord.dao.MissionRecordTtlRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
-import com.depromeet.domain.missionRecord.domain.MissionRecordTTL;
+import com.depromeet.domain.missionRecord.domain.MissionRecordTtl;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordUpdateRequest;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordCreateResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindOneResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordUpdateResponse;
-import com.depromeet.global.common.constants.RedisExpireEventConstants;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -33,7 +32,7 @@ public class MissionRecordService {
     private final MemberUtil memberUtil;
     private final MissionRepository missionRepository;
     private final MissionRecordRepository missionRecordRepository;
-    private final MissionRecordTTLRepository missionRecordTTLRepository;
+    private final MissionRecordTtlRepository missionRecordTTLRepository;
 
     public MissionRecordCreateResponse createMissionRecord(MissionRecordCreateRequest request) {
         final Mission mission = findMissionById(request.missionId());
@@ -55,10 +54,8 @@ public class MissionRecordService {
                         .getSeconds();
         MissionRecord createdMissionRecord = missionRecordRepository.save(missionRecord);
         missionRecordTTLRepository.save(
-                MissionRecordTTL.createMissionRecordTTL(
-                        RedisExpireEventConstants.EXPIRE_EVENT_IMAGE_UPLOAD_TIME_END.getValue()
-                                + createdMissionRecord.getId(),
-                        expirationTime));
+                MissionRecordTtl.createMissionRecordTtl(
+                        createdMissionRecord.getId(), expirationTime, request.finishedAt()));
         return MissionRecordCreateResponse.from(createdMissionRecord.getId());
     }
 

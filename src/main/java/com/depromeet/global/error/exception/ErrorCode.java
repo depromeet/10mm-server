@@ -31,6 +31,8 @@ public enum ErrorCode {
 
     // Mission
     MISSION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 미션을 찾을 수 없습니다."),
+    MISSION_VISIBILITY_NULL(HttpStatus.BAD_REQUEST, "미션 공개 여부가 null입니다."),
+    MISSION_STATUS_MISMATCH(HttpStatus.INTERNAL_SERVER_ERROR, "미션 상태 중 매치되지 않는 미션이 있습니다."),
 
     // MissionRecord
     MISSION_RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 미션 기록을 찾을 수 없습니다."),
