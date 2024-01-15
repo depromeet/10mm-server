@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,5 +54,13 @@ public class AuthController {
             @Valid @RequestBody UsernamePasswordRequest request) {
         TokenPairResponse response = authService.loginMember(request);
         return ResponseEntity.ok(response);
+    }
+
+    // TODO: 테스트 코드 작성 필요
+    @Operation(summary = "회원 탈퇴", description = "회원탈퇴를 진행합니다.")
+    @DeleteMapping("/withdrawal")
+    public ResponseEntity<Void> memberWithdrawal(@Valid @RequestBody UsernameCheckRequest request) {
+        authService.withdrawal(request);
+        return ResponseEntity.ok().build();
     }
 }

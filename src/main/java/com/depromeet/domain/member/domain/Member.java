@@ -103,6 +103,10 @@ public class Member extends BaseTimeEntity {
                 .build();
     }
 
+    public void updateMemberStatus(MemberStatus memberStatus) {
+        this.status = memberStatus;
+    }
+
     public void updateLastLoginAt(LocalDateTime lastLoginAt) {
         this.lastLoginAt = lastLoginAt;
     }
@@ -113,6 +117,10 @@ public class Member extends BaseTimeEntity {
         // TODO: profileImageUrl이 항상 null이 되는 문제 해결
         this.profile = new Profile(nickname, null);
         this.role = MemberRole.USER;
+    }
+
+    public void withdrawal(MemberStatus memberStatus) {
+        this.status = memberStatus;
     }
 
     private void validateRegisterAvailable() {

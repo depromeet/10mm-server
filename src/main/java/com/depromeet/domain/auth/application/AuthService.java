@@ -1,5 +1,6 @@
 package com.depromeet.domain.auth.application;
 
+import com.depromeet.domain.auth.dao.RefreshTokenRepository;
 import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
 import com.depromeet.domain.auth.dto.request.UsernameCheckRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
@@ -7,9 +8,11 @@ import com.depromeet.domain.auth.dto.response.TokenPairResponse;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.MemberRole;
+import com.depromeet.domain.member.domain.MemberStatus;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +29,7 @@ public class AuthService {
     private final MemberUtil memberUtil;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenService jwtTokenService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public void registerMember(MemberRegisterRequest request) {
         final Member member = memberUtil.getCurrentMember();
@@ -57,6 +61,12 @@ public class AuthService {
         validateNotGuestMember(member);
         validatePasswordMatches(member, request.password());
 
+        final LocalDateTime today = LocalDateTime.now();
+
+        // TODO: 해당 테스트 케이스 코드 작성 필요
+        member.updateMemberStatus(MemberStatus.NORMAL);
+        member.updateLastLoginAt(today);
+
         return getLoginResponse(member);
     }
 
@@ -84,5 +94,15 @@ public class AuthService {
         if (memberRepository.existsByUsername(request.username())) {
             throw new CustomException(ErrorCode.MEMBER_ALREADY_REGISTERED);
         }
+    }
+
+    public void withdrawal(UsernameCheckRequest request) {
+        final Member member =
+                memberRepository
+                        .findByUsername(request.username())
+                        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        refreshTokenRepository.deleteById(member.getId());
+        member.withdrawal(MemberStatus.DELETED);
     }
 }
