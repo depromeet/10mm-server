@@ -45,7 +45,7 @@ public class MissionController {
         return missionService.findOneMission(missionId);
     }
 
-    @Operation(summary = "미션 리스트 조회", description = "미션 리스트를 조회합니다. (무한 스크롤)")
+    @Operation(summary = "미션 리스트 조회", description = "미션 리스트를 조회합니다.")
     @GetMapping
     public List<MissionFindAllResponse> missionFindAll() {
         return missionService.findAllMission();
