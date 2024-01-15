@@ -144,7 +144,8 @@ class MissionControllerTest {
         int size = 3;
         long lastId = 4;
         LocalDateTime ttlFinishedAt = LocalDateTime.now().plusMinutes(10);
-        Member member = Member.createNormalMember(Profile.createProfile("testNickname", "testImageUrl"));
+        Member member =
+                Member.createNormalMember(Profile.createProfile("testNickname", "testImageUrl"));
         LocalDateTime missionStartedAt = LocalDateTime.of(2023, 12, 1, 1, 5, 0);
         LocalDateTime missionFinishedAt = missionStartedAt.plusWeeks(2);
         Mission mission =

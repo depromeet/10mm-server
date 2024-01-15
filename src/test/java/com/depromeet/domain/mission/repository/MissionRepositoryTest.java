@@ -38,7 +38,8 @@ class MissionRepositoryTest {
     @BeforeEach
     void setUp() {
         missionRepository.deleteAll();
-        Member member = Member.createNormalMember(Profile.createProfile("testNickname", "testImageUrl"));
+        Member member =
+                Member.createNormalMember(Profile.createProfile("testNickname", "testImageUrl"));
         saveMember = memberRepository.save(member);
     }
 

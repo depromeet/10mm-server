@@ -18,9 +18,6 @@ public class OauthInfo {
     }
 
     public static OauthInfo createOauthInfo(String oauthId, String oauthProvider) {
-        return OauthInfo.builder()
-                .oauthId(oauthId)
-                .oauthProvider(oauthProvider)
-                .build();
+        return OauthInfo.builder().oauthId(oauthId).oauthProvider(oauthProvider).build();
     }
 }

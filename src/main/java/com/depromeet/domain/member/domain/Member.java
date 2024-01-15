@@ -119,11 +119,10 @@ public class Member extends BaseTimeEntity {
         this.role = MemberRole.USER;
     }
 
-
     public void updateProfile(Profile profile) {
         this.profile = profile;
     }
-  
+
     public void withdrawal() {
         if (this.status == MemberStatus.DELETED) {
             throw new CustomException(ErrorCode.MEMBER_ALREADY_DELETED);

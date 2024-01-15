@@ -74,7 +74,8 @@ class ImageServiceTest {
         void 미션이_존재하지_않는다면_예외를_발생시킨다() {
             // given
             memberRepository.save(
-                    Member.createNormalMember(Profile.createProfile("testNickname", "testImageUrl")));
+                    Member.createNormalMember(
+                            Profile.createProfile("testNickname", "testImageUrl")));
             MissionRecordImageCreateRequest request =
                     new MissionRecordImageCreateRequest(192L, ImageFileExtension.JPEG);
 
@@ -136,7 +137,8 @@ class ImageServiceTest {
         void 입력_값이_정상이라면_예외가_발생하지_않는다() {
             // given
             memberRepository.save(
-                    Member.createNormalMember(Profile.createProfile("testNickname", "testImageUrl")));
+                    Member.createNormalMember(
+                            Profile.createProfile("testNickname", "testImageUrl")));
             MissionCreateRequest missionCreateRequest =
                     new MissionCreateRequest(
                             "testMissionName",
@@ -173,7 +175,8 @@ class ImageServiceTest {
             // given
             Member member =
                     memberRepository.save(
-                            Member.createNormalMember(Profile.createProfile("testNickname", "testImageUrl")));
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname", "testImageUrl")));
             MissionCreateRequest missionCreateRequest =
                     new MissionCreateRequest(
                             "testMissionName",
@@ -234,7 +237,8 @@ class ImageServiceTest {
         void 미션이_존재하지_않는다면_예외를_발생시킨다() {
             // given
             memberRepository.save(
-                    Member.createNormalMember(Profile.createProfile("testNickname", "testImageUrl")));
+                    Member.createNormalMember(
+                            Profile.createProfile("testNickname", "testImageUrl")));
             MissionRecordImageUploadCompleteRequest request =
                     new MissionRecordImageUploadCompleteRequest(
                             192L, ImageFileExtension.JPEG, "testRemark");
@@ -250,7 +254,8 @@ class ImageServiceTest {
             // given
             Member member =
                     memberRepository.save(
-                            Member.createNormalMember(Profile.createProfile("testNickname", "testImageUrl")));
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname", "testImageUrl")));
             MissionCreateRequest missionCreateRequest =
                     new MissionCreateRequest(
                             "testMissionName",

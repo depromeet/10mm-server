@@ -17,9 +17,6 @@ public class Profile {
     }
 
     public static Profile createProfile(String nickname, String profileImageUrl) {
-        return Profile.builder()
-                .nickname(nickname)
-                .profileImageUrl(profileImageUrl)
-                .build();
+        return Profile.builder().nickname(nickname).profileImageUrl(profileImageUrl).build();
     }
 }
