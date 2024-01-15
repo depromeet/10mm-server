@@ -112,7 +112,6 @@ public class MissionService {
         missionRepository.deleteById(missionId);
     }
 
-    @Transactional(readOnly = true)
     public void deleteInProgressMission() {
         Member currentMember = memberUtil.getCurrentMember();
         final LocalDate today = LocalDate.now();
