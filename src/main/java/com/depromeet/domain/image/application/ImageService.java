@@ -74,17 +74,10 @@ public class ImageService {
         validateMissionRecordUserMismatch(mission, currentMember);
 
         String imageUrl =
-                storageProperties.endpoint()
-                        + "/"
-                        + storageProperties.bucket()
-                        + "/"
-                        + springEnvironmentUtil.getCurrentProfile()
-                        + "/"
-                        + ImageType.MISSION_RECORD.getValue()
-                        + "/"
-                        + request.missionRecordId()
-                        + "/image."
-                        + request.imageFileExtension().getUploadExtension();
+                createImageUrl(
+                        ImageType.MISSION_RECORD,
+                        request.missionRecordId(),
+                        request.imageFileExtension());
         missionRecord.updateUploadStatusComplete(request.remark(), imageUrl);
     }
 
@@ -111,17 +104,10 @@ public class ImageService {
         final Member currentMember = memberUtil.getCurrentMember();
 
         String imageUrl =
-                storageProperties.endpoint()
-                        + "/"
-                        + storageProperties.bucket()
-                        + "/"
-                        + springEnvironmentUtil.getCurrentProfile()
-                        + "/"
-                        + ImageType.MEMBER_PROFILE.getValue()
-                        + "/"
-                        + currentMember.getId()
-                        + "/image."
-                        + request.imageFileExtension().getUploadExtension();
+                createImageUrl(
+                        ImageType.MEMBER_PROFILE,
+                        currentMember.getId(),
+                        request.imageFileExtension());
         currentMember.updateProfile(Profile.createProfile(request.nickname(), imageUrl));
     }
 
@@ -134,6 +120,21 @@ public class ImageService {
     private String createFileName(
             ImageType imageType, Long targetId, ImageFileExtension imageFileExtension) {
         return springEnvironmentUtil.getCurrentProfile()
+                + "/"
+                + imageType.getValue()
+                + "/"
+                + targetId
+                + "/image."
+                + imageFileExtension.getUploadExtension();
+    }
+
+    private String createImageUrl(
+            ImageType imageType, Long targetId, ImageFileExtension imageFileExtension) {
+        return storageProperties.endpoint()
+                + "/"
+                + storageProperties.bucket()
+                + "/"
+                + springEnvironmentUtil.getCurrentProfile()
                 + "/"
                 + imageType.getValue()
                 + "/"
