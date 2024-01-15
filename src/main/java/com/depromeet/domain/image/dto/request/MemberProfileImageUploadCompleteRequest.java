@@ -8,4 +8,4 @@ public record MemberProfileImageUploadCompleteRequest(
         @NotNull(message = "이미지 파일의 확장자는 비워둘 수 없습니다.")
                 @Schema(description = "이미지 파일의 확장자", defaultValue = "JPEG")
                 ImageFileExtension imageFileExtension,
-        String nickname) {}
+        @Schema(description = "닉네임", defaultValue = "당근조이") String nickname) {}
