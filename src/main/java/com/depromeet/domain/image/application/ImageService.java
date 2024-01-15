@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.depromeet.domain.image.domain.ImageFileExtension;
 import com.depromeet.domain.image.domain.ImageType;
+import com.depromeet.domain.image.dto.request.MemberProfileImageCreateRequest;
 import com.depromeet.domain.image.dto.request.MissionRecordImageCreateRequest;
 import com.depromeet.domain.image.dto.request.MissionRecordImageUploadCompleteRequest;
 import com.depromeet.domain.image.dto.response.PresignedUrlResponse;
@@ -63,12 +64,6 @@ public class ImageService {
         return PresignedUrlResponse.from(presignedUrl);
     }
 
-    private MissionRecord findMissionRecordById(Long request) {
-        return missionRecordRepository
-                .findById(request)
-                .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
-    }
-
     public void uploadCompleteMissionRecord(MissionRecordImageUploadCompleteRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
         MissionRecord missionRecord = findMissionRecordById(request.missionRecordId());
@@ -89,6 +84,31 @@ public class ImageService {
                         + "/image."
                         + request.imageFileExtension().getUploadExtension();
         missionRecord.updateUploadStatusComplete(request.remark(), imageUrl);
+    }
+
+    public PresignedUrlResponse createMemberProfilePresignedUrl(
+            MemberProfileImageCreateRequest request) {
+        final Member currentMember = memberUtil.getCurrentMember();
+
+        String fileName =
+                createFileName(
+                        ImageType.MEMBER_PROFILE,
+                        currentMember.getId(),
+                        request.imageFileExtension());
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+                createGeneratePreSignedUrlRequest(
+                        storageProperties.bucket(),
+                        fileName,
+                        request.imageFileExtension().getUploadExtension());
+
+        String presignedUrl = amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
+        return PresignedUrlResponse.from(presignedUrl);
+    }
+
+    private MissionRecord findMissionRecordById(Long request) {
+        return missionRecordRepository
+                .findById(request)
+                .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
     }
 
     private String createFileName(
