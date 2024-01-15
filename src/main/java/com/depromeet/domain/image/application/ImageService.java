@@ -60,9 +60,7 @@ public class ImageService {
         String presignedUrl = amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
 
         missionRecord.updateUploadStatusPending();
-        missionRecordTtlRepository.deleteById(
-                RedisExpireEventConstants.EXPIRE_EVENT_IMAGE_UPLOAD_TIME_END.getValue()
-                        + request.missionRecordId());
+        missionRecordTtlRepository.deleteById(request.missionRecordId());
         return PresignedUrlResponse.from(presignedUrl);
     }
 
