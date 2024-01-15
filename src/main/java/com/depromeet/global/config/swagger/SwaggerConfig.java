@@ -60,13 +60,21 @@ public class SwaggerConfig {
     private Components authSetting() {
         return new Components()
                 .addSecuritySchemes(
-                        "bearer auth",
+                        "accessToken",
                         new SecurityScheme()
                                 .type(Type.HTTP)
                                 .scheme("bearer")
                                 .bearerFormat("JWT")
                                 .in(In.HEADER)
-                                .name("Authorization Token"));
+                                .name("Authorization"))
+                .addSecuritySchemes(
+                        "refreshToken",
+                        new SecurityScheme()
+                                .type(Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")
+                                .in(In.HEADER)
+                                .name("Refresh-Token"));
     }
 
     private Info swaggerInfo() {
