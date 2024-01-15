@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
-import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -53,19 +52,6 @@ class MemberTest {
 
         // then
         assertEquals(MemberVisibility.PUBLIC, visibility);
-    }
-
-    @Test
-    void 마지막_로그인_시간을_업데이트한다() {
-        // given
-        Member member = Member.createNormalMember(profile);
-        LocalDateTime lastLoginAt = LocalDateTime.of(2024, 1, 10, 0, 0);
-
-        // when
-        member.updateLastLoginAt(lastLoginAt);
-
-        // then
-        assertEquals(lastLoginAt, member.getLastLoginAt());
     }
 
     @Test

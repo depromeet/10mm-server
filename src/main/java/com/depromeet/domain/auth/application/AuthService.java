@@ -1,12 +1,12 @@
 package com.depromeet.domain.auth.application;
 
 import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
-import com.depromeet.domain.auth.dto.request.UsernameCheckRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
 import com.depromeet.domain.auth.dto.response.TokenPairResponse;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.MemberRole;
+import com.depromeet.domain.member.domain.MemberStatus;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -56,6 +56,9 @@ public class AuthService {
 
         validateNotGuestMember(member);
         validatePasswordMatches(member, request.password());
+        validateNormalMember(member);
+
+        member.updateLastLoginAt();
 
         return getLoginResponse(member);
     }
@@ -63,6 +66,12 @@ public class AuthService {
     private void validateNotGuestMember(Member member) {
         if (member.getRole() == MemberRole.GUEST) {
             throw new CustomException(ErrorCode.GUEST_MEMBER_REQUIRES_REGISTRATION);
+        }
+    }
+
+    private void validateNormalMember(Member member) {
+        if (member.getStatus() != MemberStatus.NORMAL) {
+            throw new CustomException(ErrorCode.MEMBER_INVALID_NORMAL);
         }
     }
 
@@ -77,12 +86,5 @@ public class AuthService {
         String refreshToken = jwtTokenService.createRefreshToken(member.getId());
 
         return TokenPairResponse.from(accessToken, refreshToken);
-    }
-
-    @Transactional(readOnly = true)
-    public void checkUsername(UsernameCheckRequest request) {
-        if (memberRepository.existsByUsername(request.username())) {
-            throw new CustomException(ErrorCode.MEMBER_ALREADY_REGISTERED);
-        }
     }
 }
