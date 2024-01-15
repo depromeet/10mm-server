@@ -1,4 +1,4 @@
-package com.depromeet.domain.missionRecord.service;
+package com.depromeet.domain.missionRecord.application;
 
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.dao.MissionRepository;

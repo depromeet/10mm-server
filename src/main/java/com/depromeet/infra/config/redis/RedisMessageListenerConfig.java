@@ -1,6 +1,6 @@
 package com.depromeet.infra.config.redis;
 
-import com.depromeet.domain.missionRecord.service.RedisExpireEventRedisMessageListener;
+import com.depromeet.domain.missionRecord.application.RedisExpireEventRedisMessageListener;
 import com.depromeet.global.common.constants.RedisExpireEventConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
