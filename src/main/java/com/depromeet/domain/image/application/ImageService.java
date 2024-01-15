@@ -15,7 +15,6 @@ import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.dao.MissionRecordTtlRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
-import com.depromeet.global.common.constants.RedisExpireEventConstants;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;

@@ -15,7 +15,6 @@ import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindAllResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
-import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.util.MemberUtil;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
@@ -26,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Slice;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -76,8 +76,7 @@ public class MissionService {
 
             // 레디스에 미션기록의 인증사진 인증 대기시간 값이 존재하면 REQUIRED
             Optional<MissionRecordTtl> missionRecordTTL =
-                    missionRecordTtlRepository.findById(
-                            optionalRecord.get().getId());
+                    missionRecordTtlRepository.findById(optionalRecord.get().getId());
 
             if (missionRecordTTL.isPresent()) {
                 results.add(

@@ -19,15 +19,14 @@ import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
+import com.depromeet.domain.mission.dto.response.*;
 import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
-import com.depromeet.domain.mission.dto.response.*;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.security.JwtAuthenticationFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -148,25 +147,23 @@ class MissionControllerTest {
         Member member = Member.createNormalMember(new Profile("testNickname", "testImageUrl"));
         LocalDateTime missionStartedAt = LocalDateTime.of(2023, 12, 1, 1, 5, 0);
         LocalDateTime missionFinishedAt = missionStartedAt.plusWeeks(2);
-        Mission mission = Mission.createMission("testMissionName_1", "testMissionContent_1", 1, MissionCategory.STUDY, MissionVisibility.ALL, missionStartedAt, missionFinishedAt, member);
+        Mission mission =
+                Mission.createMission(
+                        "testMissionName_1",
+                        "testMissionContent_1",
+                        1,
+                        MissionCategory.STUDY,
+                        MissionVisibility.ALL,
+                        missionStartedAt,
+                        missionFinishedAt,
+                        member);
 
         List<MissionFindAllResponse> missionList =
                 Arrays.asList(
-                        MissionFindAllResponse.of(
-                                mission,
-                                MissionStatus.NONE,
-                                ttlFinishedAt),
-                        MissionFindAllResponse.of(
-                                mission,
-                                MissionStatus.COMPLETED,
-                                ttlFinishedAt),
-                        MissionFindAllResponse.of(
-                                mission,
-                                MissionStatus.REQUIRED,
-                                ttlFinishedAt)
-                        );
-        given(missionService.findAllMission())
-                .willReturn(missionList);
+                        MissionFindAllResponse.of(mission, MissionStatus.NONE, ttlFinishedAt),
+                        MissionFindAllResponse.of(mission, MissionStatus.COMPLETED, ttlFinishedAt),
+                        MissionFindAllResponse.of(mission, MissionStatus.REQUIRED, ttlFinishedAt));
+        given(missionService.findAllMission()).willReturn(missionList);
 
         // when, then
         ResultActions perform =
