@@ -61,7 +61,7 @@ public class MissionService {
                 missionUpdateRequest.name(),
                 missionUpdateRequest.content(),
                 missionUpdateRequest.visibility());
-        return new MissionUpdateResponse(mission);
+        return MissionUpdateResponse.from(mission);
     }
 
     public void deleteMission(Long missionId) {

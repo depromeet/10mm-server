@@ -2,6 +2,8 @@ package com.depromeet.domain.member.domain;
 
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.mission.domain.Mission;
+import com.depromeet.global.error.exception.CustomException;
+import com.depromeet.global.error.exception.ErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -32,6 +34,8 @@ public class Member extends BaseTimeEntity {
 
     @Embedded private Profile profile;
 
+    @Embedded private OauthInfo oauthInfo;
+
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
@@ -49,15 +53,26 @@ public class Member extends BaseTimeEntity {
     @Builder(access = AccessLevel.PRIVATE)
     private Member(
             Profile profile,
+            OauthInfo oauthInfo,
             MemberStatus status,
             MemberRole role,
             MemberVisibility visibility,
             LocalDateTime lastLoginAt) {
         this.profile = profile;
+        this.oauthInfo = oauthInfo;
         this.status = status;
         this.role = role;
         this.visibility = visibility;
         this.lastLoginAt = lastLoginAt;
+    }
+
+    public static Member createGuestMember(OauthInfo oauthInfo) {
+        return Member.builder()
+                .oauthInfo(oauthInfo)
+                .status(MemberStatus.NORMAL)
+                .role(MemberRole.GUEST)
+                .visibility(MemberVisibility.PUBLIC)
+                .build();
     }
 
     public static Member createNormalMember(Profile profile) {
@@ -68,5 +83,23 @@ public class Member extends BaseTimeEntity {
                 .visibility(MemberVisibility.PUBLIC)
                 .lastLoginAt(LocalDateTime.now())
                 .build();
+    }
+
+    public void updateLastLoginAt(LocalDateTime lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
+    }
+
+    public void register(String nickname) {
+        validateRegisterAvailable();
+        // TODO: Profile 클래스를 제거하고 Member 클래스 필드로 변경
+        // TODO: profileImageUrl이 항상 null이 되는 문제 해결
+        this.profile = new Profile(nickname, null);
+        this.role = MemberRole.USER;
+    }
+
+    private void validateRegisterAvailable() {
+        if (role != MemberRole.GUEST) {
+            throw new CustomException(ErrorCode.MEMBER_ALREADY_REGISTERED);
+        }
     }
 }

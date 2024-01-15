@@ -21,6 +21,7 @@ import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
+import com.depromeet.global.security.JwtAuthenticationFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.List;
@@ -36,14 +37,12 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-@WebMvcTest(controllers = MissionController.class)
+@WebMvcTest(MissionController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@MockBean(JpaMetamodelMappingContext.class)
-@ActiveProfiles("test")
+@MockBean({JpaMetamodelMappingContext.class, JwtAuthenticationFilter.class})
 class MissionControllerTest {
 
     @Autowired private MockMvc mockMvc;
@@ -211,14 +210,7 @@ class MissionControllerTest {
         MissionUpdateRequest updateRequest =
                 new MissionUpdateRequest(
                         "testMissionName", "testMissionContent", MissionVisibility.NONE);
-        given(missionService.updateMission(any(), any()))
-                .willReturn(
-                        new MissionUpdateResponse(
-                                1L,
-                                "testMissionName",
-                                "testMissionContent",
-                                MissionCategory.STUDY,
-                                MissionVisibility.FOLLOWER));
+        given(missionService.updateMission(any(), any())).willReturn(new MissionUpdateResponse(1L));
 
         // expected
         ResultActions perform =
@@ -231,8 +223,7 @@ class MissionControllerTest {
 
         perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.missionId").exists())
-                .andExpect(
-                        jsonPath("$.data.visibility").value(MissionVisibility.FOLLOWER.toString()))
+                .andExpect(jsonPath("$.data.missionId").value(1L))
                 .andDo(print());
     }
 
@@ -241,14 +232,7 @@ class MissionControllerTest {
         // given
         MissionUpdateRequest updateRequest =
                 new MissionUpdateRequest(null, "testMissionContent", MissionVisibility.NONE);
-        given(missionService.updateMission(any(), any()))
-                .willReturn(
-                        new MissionUpdateResponse(
-                                1L,
-                                null,
-                                "testMissionContent",
-                                MissionCategory.STUDY,
-                                MissionVisibility.FOLLOWER));
+        given(missionService.updateMission(any(), any())).willReturn(new MissionUpdateResponse(1L));
 
         // expected
         ResultActions perform =

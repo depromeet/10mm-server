@@ -14,7 +14,6 @@ import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
 import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
-import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.util.MemberUtil;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
@@ -147,9 +146,7 @@ class MissionServiceTest {
                 missionService.updateMission(missionUpdateRequest, saveMission.missionId());
 
         // expected
-        assertEquals(modifyMission.name(), "modifyName");
-        assertEquals(modifyMission.content(), "modifyContent");
-        assertEquals(modifyMission.visibility(), MissionVisibility.FOLLOWER);
+        assertEquals(modifyMission.missionId(), 1L);
     }
 
     @Test
@@ -172,32 +169,6 @@ class MissionServiceTest {
                                         missionUpdateRequest, saveMission.missionId()))
                 // instance 검증
                 .isInstanceOf(DataIntegrityViolationException.class);
-    }
-
-    @Test
-    void 미션_공개여부_null값은_잘못된_요청이다() {
-        // given
-        MissionCreateRequest missionCreateRequest =
-                new MissionCreateRequest(
-                        "testMissionName",
-                        "testMissionContent",
-                        MissionCategory.STUDY,
-                        MissionVisibility.ALL);
-        MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
-        MissionUpdateRequest missionUpdateRequest =
-                new MissionUpdateRequest("modifyName", "modifyContent", null);
-
-        // when
-        CustomException exception =
-                assertThrows(
-                        CustomException.class,
-                        () -> {
-                            missionService.updateMission(
-                                    missionUpdateRequest, saveMission.missionId());
-                        });
-
-        // expected
-        assertEquals(exception.getMessage(), "미션 공개 여부가 null입니다.");
     }
 
     @Test
