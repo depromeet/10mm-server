@@ -5,17 +5,20 @@ import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
-import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
-import com.depromeet.domain.mission.dto.response.MissionFindResponse;
-import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
+import com.depromeet.domain.mission.dto.response.*;
+import com.depromeet.domain.missionRecord.dao.MissionRecordTTLRepository;
+import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
+import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import com.depromeet.domain.missionRecord.domain.MissionRecordTtl;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MissionService {
 
     private final MissionRepository missionRepository;
+    private final MissionRecordTTLRepository missionRecordTTLRepository;
     private final MemberUtil memberUtil;
 
     public MissionCreateResponse createMission(MissionCreateRequest missionCreateRequest) {
@@ -43,12 +47,57 @@ public class MissionService {
     }
 
     @Transactional(readOnly = true) // 읽기 전용 트랜잭션 설정. 읽기 전용으로 설정한다.
-    public Slice<MissionFindResponse> findAllMission(int size, Long lastId) {
-        PageRequest pageRequest = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
-        Slice<Mission> mappedMissions =
-                missionRepository.findAllMission(
-                        memberUtil.getCurrentMember(), pageRequest, lastId);
-        return mappedMissions.map(MissionFindResponse::from);
+    public List<MissionFindAllResponse> findAllMission() {
+        Member currentMember = memberUtil.getCurrentMember();
+        LocalDate localDate = LocalDate.now();
+
+        List<Mission> missions = missionRepository.findMissionsWithRecords(currentMember.getId());
+
+        List<MissionFindAllResponse> results = new ArrayList<>();
+        for (Mission mission : missions) {
+            List<MissionRecord> records = mission.getMissionRecords();
+
+            Optional<MissionRecord> optionalRecord =
+                    records.stream()
+                            .filter(
+                                    record -> {
+                                        System.out.println(record.getStartedAt().toLocalDate());
+                                        return record.getStartedAt()
+                                                .toLocalDate()
+                                                .equals(localDate);
+                                    })
+                            .findFirst();
+
+            // 당일 수행한 미션기록이 없으면 NONE
+            if (optionalRecord.isEmpty()) {
+                results.add(MissionFindAllResponse.of(mission, MissionStatus.NONE, null));
+                continue;
+            }
+
+            // 당일 수행한 미션기록의 인증사진이 존재하면 COMPLETE
+            if (optionalRecord.get().getUploadStatus() == ImageUploadStatus.COMPLETE) {
+                results.add(MissionFindAllResponse.of(mission, MissionStatus.COMPLETED, null));
+                continue;
+            }
+
+            // 레디스에 미션기록의 인증사진 인증 대기시간 값이 존재하면 REQUIRED
+            Optional<MissionRecordTtl> missionRecordTTL =
+                    missionRecordTTLRepository.findById(
+                            optionalRecord.get().getId());
+
+            if (missionRecordTTL.isPresent()) {
+                results.add(
+                        MissionFindAllResponse.of(
+                                mission,
+                                MissionStatus.REQUIRED,
+                                missionRecordTTL.get().getTtlFinishedAt()));
+                continue;
+            }
+
+            throw new CustomException(ErrorCode.MISSION_STATUS_MISMATCH);
+        }
+
+        return results;
     }
 
     public MissionUpdateResponse updateMission(
