@@ -2,7 +2,7 @@ package com.depromeet.global.security;
 
 import static com.depromeet.global.common.constants.SecurityConstants.TOKEN_ROLE_NAME;
 
-import com.depromeet.domain.auth.dto.AccessToken;
+import com.depromeet.domain.auth.dto.response.AccessToken;
 import com.depromeet.domain.member.domain.MemberRole;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;

@@ -1,4 +1,4 @@
-package com.depromeet.global.config.security;
+package com.depromeet.global.security;
 
 import java.util.Collection;
 import java.util.Collections;

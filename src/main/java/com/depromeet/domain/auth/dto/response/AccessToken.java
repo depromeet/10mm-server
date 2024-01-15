@@ -1,4 +1,4 @@
-package com.depromeet.domain.auth.dto;
+package com.depromeet.domain.auth.dto.response;
 
 import com.depromeet.domain.member.domain.MemberRole;
 

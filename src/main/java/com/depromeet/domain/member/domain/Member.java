@@ -47,6 +47,10 @@ public class Member extends BaseTimeEntity {
 
     private LocalDateTime lastLoginAt;
 
+    private String username;
+
+    private String password;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Mission> missions = new ArrayList<>();
 
@@ -57,18 +61,32 @@ public class Member extends BaseTimeEntity {
             MemberStatus status,
             MemberRole role,
             MemberVisibility visibility,
-            LocalDateTime lastLoginAt) {
+            LocalDateTime lastLoginAt,
+            String username,
+            String password) {
         this.profile = profile;
         this.oauthInfo = oauthInfo;
         this.status = status;
         this.role = role;
         this.visibility = visibility;
         this.lastLoginAt = lastLoginAt;
+        this.username = username;
+        this.password = password;
     }
 
     public static Member createGuestMember(OauthInfo oauthInfo) {
         return Member.builder()
                 .oauthInfo(oauthInfo)
+                .status(MemberStatus.NORMAL)
+                .role(MemberRole.GUEST)
+                .visibility(MemberVisibility.PUBLIC)
+                .build();
+    }
+
+    public static Member createGuestMember(String username, String password) {
+        return Member.builder()
+                .username(username)
+                .password(password)
                 .status(MemberStatus.NORMAL)
                 .role(MemberRole.GUEST)
                 .visibility(MemberVisibility.PUBLIC)

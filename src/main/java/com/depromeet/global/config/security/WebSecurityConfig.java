@@ -22,7 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -39,6 +39,7 @@ public class WebSecurityConfig {
     //    private final CustomOidcAuthenticationFailureHandler
     // customOidcAuthenticationFailureHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
     //    private final CustomRequestEntityConverterV2 customRequestEntityConverterV2;
 
     @Value("${swagger.user}")
@@ -65,7 +66,8 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.formLogin(AbstractHttpConfigurer::disable)
+        http.httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
                 .cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(
@@ -95,6 +97,10 @@ public class WebSecurityConfig {
                                 .permitAll()
                                 .requestMatchers("/10mm-actuator/**")
                                 .permitAll() // 액추에이터
+                                .requestMatchers("/auth/register")
+                                .authenticated() // 소셜 로그인 임시 토큰으로 인증
+                                .requestMatchers("/auth/**")
+                                .permitAll() // 임시 회원가입 / 로그인은 토큰 필요 X
                                 .requestMatchers("/v1/**")
                                 .permitAll() // 임시로 모든 요청 허용
                                 .requestMatchers("/oauth2/**")
@@ -124,7 +130,8 @@ public class WebSecurityConfig {
         //                                .successHandler(customOidcAuthenticationSuccessHandler)
         //                                .failureHandler(customOidcAuthenticationFailureHandler));
 
-        http.addFilterAfter(jwtAuthenticationFilter, LogoutFilter.class);
+        //        http.addFilterAfter(jwtAuthenticationFilter, LogoutFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
