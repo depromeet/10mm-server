@@ -79,7 +79,7 @@ public class AuthService {
         return TokenPairResponse.from(accessToken, refreshToken);
     }
 
-	@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public void checkUsername(UsernameCheckRequest request) {
         if (memberRepository.existsByUsername(request.username())) {
             throw new CustomException(ErrorCode.MEMBER_ALREADY_REGISTERED);
