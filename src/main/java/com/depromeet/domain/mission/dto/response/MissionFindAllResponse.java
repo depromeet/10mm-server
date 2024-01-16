@@ -16,10 +16,12 @@ public record MissionFindAllResponse(
         @Schema(description = "미션 아카이빙 상태", defaultValue = "NONE") ArchiveStatus archiveStatus,
         @Schema(description = "미션 정렬 값", defaultValue = "1") Integer sort,
         @Schema(description = "미션 상태", defaultValue = "1") MissionStatus missionStatus,
-        @Schema(description = "인증 TTL 종료 시간", defaultValue = "NONE") LocalDateTime ttlFinishedAt) {
+        @Schema(description = "인증 TTL 종료 시간", defaultValue = "NONE") LocalDateTime ttlFinishedAt,
+        @Schema(description = "인증필요인경우 recordId", defaultValue = "1") Long missionRecordId)
+{
 
     public static MissionFindAllResponse of(
-            Mission mission, MissionStatus missionStatus, LocalDateTime ttlFinishedAt) {
+            Mission mission, MissionStatus missionStatus, LocalDateTime ttlFinishedAt, Long missionRecordId) {
         return new MissionFindAllResponse(
                 mission.getId(),
                 mission.getName(),
@@ -29,6 +31,8 @@ public record MissionFindAllResponse(
                 mission.getArchiveStatus(),
                 mission.getSort(),
                 missionStatus,
-                ttlFinishedAt);
+                ttlFinishedAt,
+                missionRecordId
+                );
     }
 }
