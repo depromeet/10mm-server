@@ -102,12 +102,14 @@ public class ImageService {
 
     public void uploadCompleteMemberProfile(MemberProfileImageUploadCompleteRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
-
-        String imageUrl =
-                createImageUrl(
-                        ImageType.MEMBER_PROFILE,
-                        currentMember.getId(),
-                        request.imageFileExtension());
+        String imageUrl = null;
+        if (request.imageFileExtension() != null) {
+            imageUrl =
+                    createImageUrl(
+                            ImageType.MEMBER_PROFILE,
+                            currentMember.getId(),
+                            request.imageFileExtension());
+        }
         currentMember.updateProfile(Profile.createProfile(request.nickname(), imageUrl));
     }
 
