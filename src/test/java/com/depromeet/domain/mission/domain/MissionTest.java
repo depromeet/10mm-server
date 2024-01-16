@@ -14,7 +14,7 @@ class MissionTest {
 
     @BeforeEach
     void setUp() {
-        Profile profile = new Profile("testNickname", "testProfileImageUrl");
+        Profile profile = Profile.createProfile("testNickname", "testProfileImageUrl");
         member = Member.createNormalMember(profile);
     }
 

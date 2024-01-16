@@ -7,10 +7,13 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.depromeet.domain.image.domain.ImageFileExtension;
 import com.depromeet.domain.image.domain.ImageType;
+import com.depromeet.domain.image.dto.request.MemberProfileImageCreateRequest;
+import com.depromeet.domain.image.dto.request.MemberProfileImageUploadCompleteRequest;
 import com.depromeet.domain.image.dto.request.MissionRecordImageCreateRequest;
 import com.depromeet.domain.image.dto.request.MissionRecordImageUploadCompleteRequest;
 import com.depromeet.domain.image.dto.response.PresignedUrlResponse;
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.dao.MissionRecordTtlRepository;
@@ -63,12 +66,6 @@ public class ImageService {
         return PresignedUrlResponse.from(presignedUrl);
     }
 
-    private MissionRecord findMissionRecordById(Long request) {
-        return missionRecordRepository
-                .findById(request)
-                .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
-    }
-
     public void uploadCompleteMissionRecord(MissionRecordImageUploadCompleteRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
         MissionRecord missionRecord = findMissionRecordById(request.missionRecordId());
@@ -77,23 +74,67 @@ public class ImageService {
         validateMissionRecordUserMismatch(mission, currentMember);
 
         String imageUrl =
-                storageProperties.endpoint()
-                        + "/"
-                        + storageProperties.bucket()
-                        + "/"
-                        + springEnvironmentUtil.getCurrentProfile()
-                        + "/"
-                        + ImageType.MISSION_RECORD.getValue()
-                        + "/"
-                        + request.missionRecordId()
-                        + "/image."
-                        + request.imageFileExtension().getUploadExtension();
+                createImageUrl(
+                        ImageType.MISSION_RECORD,
+                        request.missionRecordId(),
+                        request.imageFileExtension());
         missionRecord.updateUploadStatusComplete(request.remark(), imageUrl);
+    }
+
+    public PresignedUrlResponse createMemberProfilePresignedUrl(
+            MemberProfileImageCreateRequest request) {
+        final Member currentMember = memberUtil.getCurrentMember();
+
+        String fileName =
+                createFileName(
+                        ImageType.MEMBER_PROFILE,
+                        currentMember.getId(),
+                        request.imageFileExtension());
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+                createGeneratePreSignedUrlRequest(
+                        storageProperties.bucket(),
+                        fileName,
+                        request.imageFileExtension().getUploadExtension());
+
+        String presignedUrl = amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
+        return PresignedUrlResponse.from(presignedUrl);
+    }
+
+    public void uploadCompleteMemberProfile(MemberProfileImageUploadCompleteRequest request) {
+        final Member currentMember = memberUtil.getCurrentMember();
+
+        String imageUrl =
+                createImageUrl(
+                        ImageType.MEMBER_PROFILE,
+                        currentMember.getId(),
+                        request.imageFileExtension());
+        currentMember.updateProfile(Profile.createProfile(request.nickname(), imageUrl));
+    }
+
+    private MissionRecord findMissionRecordById(Long request) {
+        return missionRecordRepository
+                .findById(request)
+                .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
     }
 
     private String createFileName(
             ImageType imageType, Long targetId, ImageFileExtension imageFileExtension) {
         return springEnvironmentUtil.getCurrentProfile()
+                + "/"
+                + imageType.getValue()
+                + "/"
+                + targetId
+                + "/image."
+                + imageFileExtension.getUploadExtension();
+    }
+
+    private String createImageUrl(
+            ImageType imageType, Long targetId, ImageFileExtension imageFileExtension) {
+        return storageProperties.endpoint()
+                + "/"
+                + storageProperties.bucket()
+                + "/"
+                + springEnvironmentUtil.getCurrentProfile()
                 + "/"
                 + imageType.getValue()
                 + "/"

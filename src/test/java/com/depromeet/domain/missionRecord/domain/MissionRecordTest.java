@@ -20,7 +20,7 @@ class MissionRecordTest {
 
     @Nested
     class 미션기록_생성_시 {
-        Profile profile = new Profile("testNickname", "testProfileImageUrl");
+        Profile profile = Profile.createProfile("testNickname", "testProfileImageUrl");
         Member member = Member.createNormalMember(profile);
         LocalDateTime missionStartedAt = LocalDateTime.of(2023, 12, 1, 1, 5, 0);
         LocalDateTime missionFinishedAt = missionStartedAt.plusWeeks(2);
