@@ -10,6 +10,7 @@ import com.depromeet.domain.member.domain.MemberStatus;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,19 +34,21 @@ public class AuthService {
     }
 
     public TokenPairResponse registerWithUsernameAndPassword(UsernamePasswordRequest request) {
-        validateUniqueUsername(request.username());
+        Optional<Member> member = memberRepository.findByUsername(request.username());
 
-        String encodedPassword = passwordEncoder.encode(request.password());
-        final Member member = Member.createGuestMember(request.username(), encodedPassword);
-
-        Member savedMember = memberRepository.save(member);
-        return getLoginResponse(savedMember);
-    }
-
-    private void validateUniqueUsername(String username) {
-        if (memberRepository.existsByUsername(username)) {
-            throw new CustomException(ErrorCode.MEMBER_ALREADY_REGISTERED);
+        // 첫 회원가입
+        if (member.isEmpty()) {
+            String encodedPassword = passwordEncoder.encode(request.password());
+            final Member savedMember =
+                    Member.createGuestMember(request.username(), encodedPassword);
+            memberRepository.save(savedMember);
+            return getLoginResponse(savedMember);
         }
+
+        // 토큰 만료된, 이미 임시 회원가입한 게스트 회원
+        Member existMember = member.get();
+        validatePasswordMatches(existMember, request.password());
+        return getLoginResponse(existMember);
     }
 
     public TokenPairResponse loginMember(UsernamePasswordRequest request) {
