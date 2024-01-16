@@ -6,7 +6,6 @@ import com.depromeet.domain.missionRecord.dto.request.MissionRecordUpdateRequest
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordCreateResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindOneResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindResponse;
-import com.depromeet.domain.missionRecord.dto.response.MissionRecordSummaryResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordUpdateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,12 +45,6 @@ public class MissionRecordController {
             @RequestParam("yearMonth") YearMonth yearMonth) {
         return missionRecordService.findAllMissionRecord(missionId, yearMonth);
     }
-
-	@Operation(summary = "미션 전체 현황", description = "미션 전체 현황을 조회합니다.")
-	@GetMapping("/summary")
-	public MissionRecordSummaryResponse missionRecordFindSummary() {
-		return missionRecordService.findSummaryMissionRecord();
-	}
 
     @Operation(summary = "미션 기록 단건 수정", description = "미션 기록을 수정합니다.")
     @PutMapping("/{recordId}")

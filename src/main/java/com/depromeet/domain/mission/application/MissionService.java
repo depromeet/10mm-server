@@ -10,6 +10,7 @@ import com.depromeet.domain.missionRecord.dao.MissionRecordTtlRepository;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.domain.MissionRecordTtl;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordSummaryResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,6 +93,51 @@ public class MissionService {
         }
 
         return results;
+    }
+
+    @Transactional(readOnly = true)
+    public MissionRecordSummaryResponse findSummaryMissionRecord() {
+        final Member member = memberUtil.getCurrentMember();
+        List<Mission> summaryMissions = missionRepository.findMissionsWithRecords(member.getId());
+
+        long stack = 0;
+
+        AtomicLong sumDuration = new AtomicLong();
+
+        long recordTotalSize = 0;
+        long countCompleteSize = 0;
+
+        for (Mission mission : summaryMissions) {
+            recordTotalSize += mission.getMissionRecords().size();
+            countCompleteSize +=
+                    mission.getMissionRecords().stream()
+                            .filter(
+                                    missionRecord ->
+                                            missionRecord.getUploadStatus()
+                                                    == ImageUploadStatus.COMPLETE)
+                            .count();
+
+            // 번개 stack
+            stack +=
+                    mission.getMissionRecords().stream()
+                            .mapToLong(
+                                    missionRecord -> {
+                                        long minutes = missionRecord.getDuration().toMinutes();
+                                        sumDuration.addAndGet(
+                                                missionRecord.getDuration().toSeconds());
+                                        return minutes / 10;
+                                    })
+                            .sum();
+        }
+
+        long totalMissionHour = sumDuration.get() / 3600;
+        long totalMissionMinute = (sumDuration.get() % 3600) / 60;
+
+        // 소수점 첫째자리까지
+        double totalMissionAttainRate =
+                Math.round((double) countCompleteSize / recordTotalSize * 100) / 100.0;
+        return MissionRecordSummaryResponse.from(
+                stack, totalMissionHour, totalMissionMinute, totalMissionAttainRate);
     }
 
     public MissionUpdateResponse updateMission(
