@@ -23,12 +23,16 @@ import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordCreateResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
+import com.depromeet.global.security.PrincipalDetails;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
@@ -44,6 +48,11 @@ class ImageServiceTest {
     @BeforeEach
     void setUp() {
         databaseCleaner.execute();
+        PrincipalDetails principal = new PrincipalDetails(1L, "USER");
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(
+                        principal, "password", principal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Nested
@@ -65,7 +74,8 @@ class ImageServiceTest {
         void 미션이_존재하지_않는다면_예외를_발생시킨다() {
             // given
             memberRepository.save(
-                    Member.createNormalMember(new Profile("testNickname", "testImageUrl")));
+                    Member.createNormalMember(
+                            Profile.createProfile("testNickname", "testImageUrl")));
             MissionRecordImageCreateRequest request =
                     new MissionRecordImageCreateRequest(192L, ImageFileExtension.JPEG);
 
@@ -127,7 +137,8 @@ class ImageServiceTest {
         void 입력_값이_정상이라면_예외가_발생하지_않는다() {
             // given
             memberRepository.save(
-                    Member.createNormalMember(new Profile("testNickname", "testImageUrl")));
+                    Member.createNormalMember(
+                            Profile.createProfile("testNickname", "testImageUrl")));
             MissionCreateRequest missionCreateRequest =
                     new MissionCreateRequest(
                             "testMissionName",
@@ -164,7 +175,8 @@ class ImageServiceTest {
             // given
             Member member =
                     memberRepository.save(
-                            Member.createNormalMember(new Profile("testNickname", "testImageUrl")));
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname", "testImageUrl")));
             MissionCreateRequest missionCreateRequest =
                     new MissionCreateRequest(
                             "testMissionName",
@@ -225,7 +237,8 @@ class ImageServiceTest {
         void 미션이_존재하지_않는다면_예외를_발생시킨다() {
             // given
             memberRepository.save(
-                    Member.createNormalMember(new Profile("testNickname", "testImageUrl")));
+                    Member.createNormalMember(
+                            Profile.createProfile("testNickname", "testImageUrl")));
             MissionRecordImageUploadCompleteRequest request =
                     new MissionRecordImageUploadCompleteRequest(
                             192L, ImageFileExtension.JPEG, "testRemark");
@@ -241,7 +254,8 @@ class ImageServiceTest {
             // given
             Member member =
                     memberRepository.save(
-                            Member.createNormalMember(new Profile("testNickname", "testImageUrl")));
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname", "testImageUrl")));
             MissionCreateRequest missionCreateRequest =
                     new MissionCreateRequest(
                             "testMissionName",

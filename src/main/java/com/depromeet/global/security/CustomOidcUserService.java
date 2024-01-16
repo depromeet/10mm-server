@@ -44,9 +44,6 @@ public class CustomOidcUserService extends OidcUserService {
     }
 
     private OauthInfo extractOauthInfo(OidcUser oidcUser) {
-        return OauthInfo.builder()
-                .oauthId(oidcUser.getName())
-                .oauthProvider(oidcUser.getIssuer().toString())
-                .build();
+        return OauthInfo.createOauthInfo(oidcUser.getName(), oidcUser.getIssuer().toString());
     }
 }

@@ -5,6 +5,8 @@ services:
     image: ${NCP_CONTAINER_REGISTRY}/server-spring:${NCP_IMAGE_TAG}
     container_name: server-spring
     restart: always
+    environment:
+      - TZ=Asia/Seoul
     network_mode: host
     env_file:
       - .env
