@@ -109,7 +109,7 @@ public class MissionRecordService {
     }
 
     public void deleteInProgressMissionRecord() {
-        Member currentMember = memberUtil.getCurrentMember();
+        final Member currentMember = memberUtil.getCurrentMember();
         final LocalDate today = LocalDate.now();
 
         List<Mission> missions = missionRepository.findMissionsWithRecords(currentMember.getId());
