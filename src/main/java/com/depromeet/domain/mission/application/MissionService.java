@@ -64,13 +64,13 @@ public class MissionService {
 
             // 당일 수행한 미션기록이 없으면 NONE
             if (optionalRecord.isEmpty()) {
-                results.add(MissionFindAllResponse.of(mission, MissionStatus.NONE, null));
+                results.add(MissionFindAllResponse.of(mission, MissionStatus.NONE, null, null));
                 continue;
             }
 
             // 당일 수행한 미션기록의 인증사진이 존재하면 COMPLETE
             if (optionalRecord.get().getUploadStatus() == ImageUploadStatus.COMPLETE) {
-                results.add(MissionFindAllResponse.of(mission, MissionStatus.COMPLETED, null));
+                results.add(MissionFindAllResponse.of(mission, MissionStatus.COMPLETED, null, null));
                 continue;
             }
 
@@ -83,7 +83,8 @@ public class MissionService {
                         MissionFindAllResponse.of(
                                 mission,
                                 MissionStatus.REQUIRED,
-                                missionRecordTTL.get().getTtlFinishedAt()));
+                                missionRecordTTL.get().getTtlFinishedAt(),
+                                optionalRecord.get().getId()));
                 continue;
             }
 
