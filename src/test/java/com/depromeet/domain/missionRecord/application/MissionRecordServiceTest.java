@@ -12,9 +12,8 @@ import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.util.SecurityUtil;
-
 import jakarta.persistence.EntityManager;
-
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,8 +22,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @SpringBootTest
 @Transactional
