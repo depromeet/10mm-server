@@ -21,7 +21,6 @@ public class MemberService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberUtil memberUtil;
 
-
     @Transactional(readOnly = true)
     public MemberFindOneResponse findMemberInfo() {
         final Member currentMember = memberUtil.getCurrentMember();

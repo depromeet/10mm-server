@@ -4,7 +4,6 @@ import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.MemberRole;
 import com.depromeet.domain.member.domain.MemberStatus;
 import com.depromeet.domain.member.domain.MemberVisibility;
-
 import java.time.LocalDateTime;
 
 public record MemberFindOneResponse(
@@ -16,8 +15,7 @@ public record MemberFindOneResponse(
         MemberVisibility memberVisibility,
         String username,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
-) {
+        LocalDateTime updatedAt) {
     public static MemberFindOneResponse from(Member member) {
         return new MemberFindOneResponse(
                 member.getId(),
@@ -28,7 +26,6 @@ public record MemberFindOneResponse(
                 member.getVisibility(),
                 member.getUsername(),
                 member.getCreatedAt(),
-                member.getUpdatedAt()
-        );
+                member.getUpdatedAt());
     }
 }
