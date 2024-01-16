@@ -32,7 +32,7 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_id")
     private Long id;
 
-    @Embedded private Profile profile;
+    @Embedded private Profile profile = Profile.createProfile("", "");
 
     @Embedded private OauthInfo oauthInfo;
 
