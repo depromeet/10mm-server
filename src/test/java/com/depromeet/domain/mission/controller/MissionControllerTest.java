@@ -163,7 +163,8 @@ class MissionControllerTest {
                 Arrays.asList(
                         MissionFindAllResponse.of(mission, MissionStatus.NONE, null, null),
                         MissionFindAllResponse.of(mission, MissionStatus.COMPLETED, null, null),
-                        MissionFindAllResponse.of(mission, MissionStatus.REQUIRED, ttlFinishedAt, null));
+                        MissionFindAllResponse.of(
+                                mission, MissionStatus.REQUIRED, ttlFinishedAt, null));
         given(missionService.findAllMission()).willReturn(missionList);
 
         // when, then
