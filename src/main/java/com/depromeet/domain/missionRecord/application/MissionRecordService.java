@@ -17,14 +17,19 @@ import com.depromeet.domain.missionRecord.dto.response.MissionRecordUpdateRespon
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
+
+import jakarta.persistence.EntityManager;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +41,7 @@ public class MissionRecordService {
     private final MissionRepository missionRepository;
     private final MissionRecordRepository missionRecordRepository;
     private final MissionRecordTtlRepository missionRecordTtlRepository;
+    private final EntityManager entityManager;
 
     public MissionRecordCreateResponse createMissionRecord(MissionRecordCreateRequest request) {
         final Mission mission = findMissionById(request.missionId());
@@ -138,7 +144,7 @@ public class MissionRecordService {
 
             if (missionRecordTTL.isPresent()) {
                 missionRecordTtlRepository.deleteById(optionalRecord.get().getId());
-                missionRecordRepository.deleteByMissionRecordId(optionalRecord.get().getId());
+                mission.getMissionRecords().remove(optionalRecord.get()); // use orphanRemoval
             }
         }
     }
