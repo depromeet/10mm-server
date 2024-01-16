@@ -39,7 +39,7 @@ public class CookieUtil {
                         .maxAge(jwtProperties.refreshTokenExpirationTime())
                         .secure(true)
                         .sameSite(sameSite)
-                        .httpOnly(true)
+                        .httpOnly(false)
                         .build();
 
         HttpHeaders headers = new HttpHeaders();
