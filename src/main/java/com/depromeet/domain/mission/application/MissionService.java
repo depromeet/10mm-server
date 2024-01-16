@@ -104,18 +104,19 @@ public class MissionService {
 
         AtomicLong sumDuration = new AtomicLong();
 
-        long totalSize = summaryMissions.size();
-        long completeSize = 0;
+        long totalMissionSize = summaryMissions.size();
+        long completeMissionSize = 0;
 
         for (Mission mission : summaryMissions) {
-            completeSize +=
+			completeMissionSize +=
+				mission.getMissionRecords().isEmpty() ||
                     mission.getMissionRecords().stream()
                                     .allMatch(
                                             missionRecord ->
                                                     missionRecord.getUploadStatus()
-                                                            == ImageUploadStatus.COMPLETE)
-                            ? 1
-                            : 0;
+                                                            != ImageUploadStatus.COMPLETE)
+                            ? 0
+                            : 1;
 
             // 번개 stack
             symbolStack +=
@@ -138,7 +139,7 @@ public class MissionService {
         long totalMissionMinute = (sumDuration.get() % 3600) / 60;
 
         // 소수점 첫 째 자리까지
-        double totalMissionAttainRate = Math.round((double) completeSize / totalSize * 1000) / 10.0;
+        double totalMissionAttainRate = Math.round((double) completeMissionSize / totalMissionSize * 1000) / 10.0;
 
         return MissionRecordSummaryResponse.from(
                 symbolStack, totalMissionHour, totalMissionMinute, totalMissionAttainRate);

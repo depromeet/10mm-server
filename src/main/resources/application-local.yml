@@ -4,7 +4,7 @@ spring:
       on-profile: "local"
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: ${SHOW_SQL:true}
     properties:
       hibernate:
