@@ -44,6 +44,11 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
         return missionRecordFetchOne != null;
     }
 
+    @Override
+    public void deleteByMissionRecordId(Long missionRecordId) {
+        jpaQueryFactory.delete(missionRecord).where(missionRecord.id.eq(missionRecordId)).execute();
+    }
+
     private BooleanExpression missionIdEq(Long missionId) {
         return missionRecord.mission.id.eq(missionId);
     }
