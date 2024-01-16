@@ -145,10 +145,12 @@ public class WebSecurityConfig {
                 configuration.addAllowedOriginPattern(UrlConstants.PROD_DOMAIN_URL.getValue());
                 break;
                 // TODO: 프론트 모바일에서 웹뷰 테스트를 위해 임시 주석 처리
-//            case "dev":
-//                configuration.addAllowedOriginPattern(UrlConstants.DEV_DOMAIN_URL.getValue());
-//                configuration.addAllowedOriginPattern(UrlConstants.LOCAL_DOMAIN_URL.getValue());
-//                break;
+                //            case "dev":
+                //
+                // configuration.addAllowedOriginPattern(UrlConstants.DEV_DOMAIN_URL.getValue());
+                //
+                // configuration.addAllowedOriginPattern(UrlConstants.LOCAL_DOMAIN_URL.getValue());
+                //                break;
             default:
                 configuration.addAllowedOriginPattern("*");
                 break;
