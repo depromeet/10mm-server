@@ -100,26 +100,30 @@ public class MissionService {
         final Member member = memberUtil.getCurrentMember();
         List<Mission> summaryMissions = missionRepository.findMissionsWithRecords(member.getId());
 
-        long stack = 0;
+        long symbolStack = 0;
 
         AtomicLong sumDuration = new AtomicLong();
 
-        long recordTotalSize = 0;
-        long countCompleteSize = 0;
+        long totalSize = summaryMissions.size();
+        long completeSize = 0;
 
         for (Mission mission : summaryMissions) {
-            recordTotalSize += mission.getMissionRecords().size();
-            countCompleteSize +=
+            completeSize +=
+                    mission.getMissionRecords().stream()
+                                    .allMatch(
+                                            missionRecord ->
+                                                    missionRecord.getUploadStatus()
+                                                            == ImageUploadStatus.COMPLETE)
+                            ? 1
+                            : 0;
+
+            // 번개 stack
+            symbolStack +=
                     mission.getMissionRecords().stream()
                             .filter(
                                     missionRecord ->
                                             missionRecord.getUploadStatus()
                                                     == ImageUploadStatus.COMPLETE)
-                            .count();
-
-            // 번개 stack
-            stack +=
-                    mission.getMissionRecords().stream()
                             .mapToLong(
                                     missionRecord -> {
                                         long minutes = missionRecord.getDuration().toMinutes();
@@ -129,15 +133,15 @@ public class MissionService {
                                     })
                             .sum();
         }
-
+        // 합산한 시간의 시간과 분 구하기
         long totalMissionHour = sumDuration.get() / 3600;
         long totalMissionMinute = (sumDuration.get() % 3600) / 60;
 
-        // 소수점 첫째자리까지
-        double totalMissionAttainRate =
-                Math.round((double) countCompleteSize / recordTotalSize * 100) / 100.0;
+        // 소수점 첫 째 자리까지
+        double totalMissionAttainRate = Math.round((double) completeSize / totalSize * 1000) / 10.0;
+
         return MissionRecordSummaryResponse.from(
-                stack, totalMissionHour, totalMissionMinute, totalMissionAttainRate);
+                symbolStack, totalMissionHour, totalMissionMinute, totalMissionAttainRate);
     }
 
     public MissionUpdateResponse updateMission(
