@@ -4,6 +4,7 @@ import static com.depromeet.global.common.constants.SecurityConstants.*;
 
 import com.depromeet.domain.auth.application.JwtTokenService;
 import com.depromeet.domain.auth.dto.response.AccessToken;
+import com.depromeet.global.util.CookieUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtTokenService;
+    private final CookieUtil cookieUtil;
 
     @Override
     protected void doFilterInternal(
@@ -50,22 +52,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // ATK 만료되었고 RTK 만료되지 않았으면 RTK로 ATK, RTK 재발급
         if (isAccessTokenExpired && !isRefreshTokenExpired) {
             accessToken = jwtTokenService.reissueAccessToken(refreshToken);
-            jwtTokenService.reissueRefreshToken(refreshToken);
+            refreshToken = jwtTokenService.reissueRefreshToken(refreshToken);
         }
 
         // ATK 만료되지 않았고 RTK 만료되었으면 ATK로 ATK, RTK 재발급
         if (!isAccessTokenExpired && isRefreshTokenExpired) {
             AccessToken accessTokenDto = jwtTokenService.parseAccessToken(accessToken);
             accessToken = jwtTokenService.reissueAccessToken(accessTokenDto);
-            jwtTokenService.reissueRefreshToken(accessTokenDto);
+            refreshToken = jwtTokenService.reissueRefreshToken(accessTokenDto);
         }
 
         // ATK, RTK 둘 다 만료되지 않았으면 RTK 재발급
         if (!isAccessTokenExpired && !isRefreshTokenExpired) {
             AccessToken accessTokenDto = jwtTokenService.parseAccessToken(accessToken);
-            jwtTokenService.reissueRefreshToken(accessTokenDto);
+            refreshToken = jwtTokenService.reissueRefreshToken(accessTokenDto);
         }
 
+        cookieUtil.addTokenCookies(response, accessToken, refreshToken);
         Authentication authentication = jwtTokenService.getAuthentication(accessToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
