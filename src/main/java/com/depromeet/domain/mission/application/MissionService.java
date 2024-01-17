@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,14 +96,12 @@ public class MissionService {
         return results;
     }
 
-	public Slice<MissionFindResponse> findAllArchivedMission(int size, Long lastId) {
-		Member currentMember = memberUtil.getCurrentMember();
-		Slice<Mission> mappedMissions =
-			missionRepository.findAllArchivedMission(
-				currentMember.getId(), size, lastId);
-		return mappedMissions.map(MissionFindResponse::from); // MissionFindAllResponse 로 매핑(map 메소드 사용)
-	}
-
+    public Slice<MissionFindResponse> findAllFinishedMission(int size, Long lastId) {
+        Member currentMember = memberUtil.getCurrentMember();
+        Slice<Mission> mappedMissions =
+                missionRepository.findAllFinishedMission(currentMember.getId(), size, lastId);
+        return mappedMissions.map(MissionFindResponse::from);
+    }
 
     public MissionUpdateResponse updateMission(
             MissionUpdateRequest missionUpdateRequest, Long missionId) {

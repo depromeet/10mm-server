@@ -3,11 +3,12 @@ package com.depromeet.domain.mission.dao;
 import static com.depromeet.domain.mission.domain.QMission.*;
 import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 
-import com.depromeet.domain.mission.domain.ArchiveStatus;
 import com.depromeet.domain.mission.domain.Mission;
+import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -33,11 +34,14 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     }
 
     @Override
-    public Slice<Mission> findAllArchivedMission(Long memberId, int size, Long lastId) {
+    public Slice<Mission> findAllFinishedMission(Long memberId, int size, Long lastId) {
         JPAQuery<Mission> query =
                 jpaQueryFactory
                         .selectFrom(mission)
-                        .where(ltMissionId(lastId), memberIdEq(memberId), isArchived())
+                        .where(
+                                ltMissionId(lastId),
+                                memberIdEq(memberId),
+                                uploadStatusCompleteMissionEq().or(finishedAtLessThanNow()))
                         .orderBy(mission.id.desc())
                         .limit(size + 1);
 
@@ -46,20 +50,25 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
         return checkLastPage(size, missions);
     }
 
-	// 미션의 사용자 id 조건 검증 메서드
+    // 미션의 사용자 id 조건 검증 메서드
     private BooleanExpression memberIdEq(Long memberId) {
         return memberId == null ? null : mission.member.id.eq(memberId);
     }
 
-	// lastId보다 작은 미션 id 찾는 조건 메서드 (lastId 가 있다면 마지막 요청)
+    // lastId보다 작은 미션 id 찾는 조건 메서드 (lastId 가 있다면 마지막 요청)
     private BooleanExpression ltMissionId(Long lastId) {
         return lastId == null ? null : mission.id.lt(lastId);
     }
 
-	// 종료 미션 검증
-	private BooleanExpression isArchived() {
-		return mission.archiveStatus.eq(ArchiveStatus.ARCHIVED);
-	}
+    // finishedAt이 현 시간보다 큰 미션 검증 메서드 (미션 종료 시간 검증)
+    private BooleanExpression finishedAtLessThanNow() {
+        return mission.finishedAt.lt(LocalDateTime.now());
+    }
+
+    // 종료 미션 검증
+    private BooleanExpression uploadStatusCompleteMissionEq() {
+        return missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE);
+    }
 
     // 무한 스크롤 방식 처리하는 메서드
     private Slice<Mission> checkLastPage(int size, List<Mission> result) {
@@ -71,7 +80,7 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
             hasNext = true;
             result.remove(size);
         }
-		Pageable pageable = Pageable.unpaged();
+        Pageable pageable = Pageable.unpaged();
         return new SliceImpl<>(result, pageable, hasNext);
     }
 }

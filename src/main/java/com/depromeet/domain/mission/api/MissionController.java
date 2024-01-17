@@ -55,11 +55,10 @@ public class MissionController {
 
     @Operation(summary = "종료미션 보관함", description = "종료된 미션 리스트를 조회합니다.")
     @GetMapping("/archive")
-    public Slice<MissionFindAllResponse> missionFindAllArchive(
-		@RequestParam int size, @RequestParam(required = false) Long lastId
-	) {
-		return missionService.findAllArchivedMission(size, lastId);
-	}
+    public Slice<MissionFindResponse> missionFindAllFinished(
+            @RequestParam int size, @RequestParam(required = false) Long lastId) {
+        return missionService.findAllFinishedMission(size, lastId);
+    }
 
     @Operation(summary = "미션 단건 수정", description = "단건 미션을 수정합니다.")
     @PutMapping("/{missionId}")
