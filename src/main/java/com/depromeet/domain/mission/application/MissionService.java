@@ -100,27 +100,29 @@ public class MissionService {
     @Transactional(readOnly = true)
     public MissionRecordSummaryResponse findSummaryMissionRecord() {
         final Member member = memberUtil.getCurrentMember();
-        List<Mission> summaryMissions = missionRepository.findMissionsWithRecords(member.getId());
+        List<Mission> missions = missionRepository.findMissionsWithRecords(member.getId());
 
+        // 번개 stack 누적할 변수 선언
         long symbolStack = 0;
-
+        // Duration을 AtomicLong으로 선언하여 내부 stream 함수에서 second 값을 누적할 sumDuration 선언
         AtomicLong sumDuration = new AtomicLong();
 
-        long totalMissionSize = summaryMissions.size();
+        long totalMissionSize = missions.size();
         long completeMissionSize = 0;
 
-        for (Mission mission : summaryMissions) {
-			completeMissionSize +=
-				mission.getMissionRecords().isEmpty() ||
-                    mission.getMissionRecords().stream()
-                                    .allMatch(
-                                            missionRecord ->
-                                                    missionRecord.getUploadStatus()
-                                                            != ImageUploadStatus.COMPLETE)
+        for (Mission mission : missions) {
+            // 완료된 미션 갯수 누적
+            completeMissionSize +=
+                    mission.getMissionRecords().isEmpty()
+                                    || mission.getMissionRecords().stream()
+                                            .allMatch(
+                                                    missionRecord ->
+                                                            missionRecord.getUploadStatus()
+                                                                    != ImageUploadStatus.COMPLETE)
                             ? 0
                             : 1;
 
-            // 번개 stack
+            // 번개 stack 누적
             symbolStack +=
                     mission.getMissionRecords().stream()
                             .filter(
@@ -136,12 +138,20 @@ public class MissionService {
                                     })
                             .sum();
         }
-        // 합산한 시간의 시간과 분 구하기
+
+        /* 합산한 시간의 시간과 분 구하기
+         * 시간 : 초 / 3600
+         * 분 : (초 % 3600) / 60
+         */
         long totalMissionHour = sumDuration.get() / 3600;
         long totalMissionMinute = (sumDuration.get() % 3600) / 60;
 
-        // 소수점 첫 째 자리까지
-        double totalMissionAttainRate = Math.round((double) completeMissionSize / totalMissionSize * 1000) / 10.0;
+        /* 달성률
+        계산식: (완료된 미션 수 / 전체 미션 수 * 1000.0) / 10.0
+        소수점 첫 째 자리까지
+         */
+        double totalMissionAttainRate =
+                Math.round((double) completeMissionSize / totalMissionSize * 1000) / 10.0;
 
         return MissionRecordSummaryResponse.from(
                 symbolStack, totalMissionHour, totalMissionMinute, totalMissionAttainRate);
