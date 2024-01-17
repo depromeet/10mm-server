@@ -46,7 +46,7 @@ class MissionRecordServiceTest {
         member = Member.createGuestMember(OauthInfo.createOauthInfo("test", "test"));
         memberRepository.save(member);
 
-        Mission mission =
+        mission =
                 Mission.createMission(
                         "test",
                         "test",
