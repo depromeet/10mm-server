@@ -4,10 +4,12 @@ import com.depromeet.domain.auth.application.AuthService;
 import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
 import com.depromeet.domain.auth.dto.response.TokenPairResponse;
+import com.depromeet.global.util.CookieUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final CookieUtil cookieUtil;
 
     @Operation(summary = "회원가입", description = "회원가입을 진행합니다.")
     @PostMapping("/register")
@@ -35,7 +38,12 @@ public class AuthController {
     public ResponseEntity<TokenPairResponse> memberTempRegister(
             @Valid @RequestBody UsernamePasswordRequest request) {
         TokenPairResponse response = authService.registerWithUsernameAndPassword(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        String accessToken = response.accessToken();
+        String refreshToken = response.refreshToken();
+        HttpHeaders tokenHeaders = cookieUtil.generateTokenCookies(accessToken, refreshToken);
+
+        return ResponseEntity.status(HttpStatus.CREATED).headers(tokenHeaders).body(response);
     }
 
     @Operation(summary = "로그인", description = "토큰 발급을 위해 로그인을 진행합니다.")
@@ -43,6 +51,11 @@ public class AuthController {
     public ResponseEntity<TokenPairResponse> memberLogin(
             @Valid @RequestBody UsernamePasswordRequest request) {
         TokenPairResponse response = authService.loginMember(request);
-        return ResponseEntity.ok(response);
+
+        String accessToken = response.accessToken();
+        String refreshToken = response.refreshToken();
+        HttpHeaders tokenHeaders = cookieUtil.generateTokenCookies(accessToken, refreshToken);
+
+        return ResponseEntity.ok().headers(tokenHeaders).body(response);
     }
 }
