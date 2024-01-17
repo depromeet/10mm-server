@@ -138,7 +138,7 @@ public class MissionRecordService {
 
             if (missionRecordTTL.isPresent()) {
                 missionRecordTtlRepository.deleteById(optionalRecord.get().getId());
-                missionRecordRepository.deleteById(optionalRecord.get().getId());
+                mission.getMissionRecords().remove(optionalRecord.get()); // use orphanRemoval
             }
         }
     }
