@@ -2,6 +2,7 @@ package com.depromeet.domain.member.api;
 
 import com.depromeet.domain.auth.dto.request.UsernameCheckRequest;
 import com.depromeet.domain.member.application.MemberService;
+import com.depromeet.domain.member.dto.request.NicknameCheckRequest;
 import com.depromeet.domain.member.dto.response.MemberFindOneResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +30,14 @@ public class MemberController {
     public ResponseEntity<Void> memberUsernameCheck(
             @Valid @RequestBody UsernameCheckRequest request) {
         memberService.checkUsername(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복 체크를 진행합니다.")
+    @PostMapping("/check-nickname")
+    public ResponseEntity<Void> memberNicknameCheck(
+            @Valid @RequestBody NicknameCheckRequest request) {
+        memberService.checkNickname(request);
         return ResponseEntity.ok().build();
     }
 
