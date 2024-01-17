@@ -37,7 +37,6 @@ public class MissionRecordService {
     private final MissionRepository missionRepository;
     private final MissionRecordRepository missionRecordRepository;
     private final MissionRecordTtlRepository missionRecordTtlRepository;
-    private final EntityManager entityManager;
 
     public MissionRecordCreateResponse createMissionRecord(MissionRecordCreateRequest request) {
         final Mission mission = findMissionById(request.missionId());
