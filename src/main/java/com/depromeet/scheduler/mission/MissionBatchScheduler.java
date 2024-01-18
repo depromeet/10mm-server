@@ -1,4 +1,4 @@
-package com.depromeet.domain.batch.cron.mission.scheduler;
+package com.depromeet.scheduler.mission;
 
 import com.depromeet.domain.mission.application.MissionService;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +14,8 @@ public class MissionBatchScheduler {
 
     // 자정에 schedule 실행
     @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
-    public void updateCompleteDurationStatus() {
+    public void updateFinishedDurationStatus() {
         log.info("DurationStatus Update batch execute");
-        missionService.updateCompleteDurationStatus();
+        missionService.updateFinishedDurationStatus();
     }
 }

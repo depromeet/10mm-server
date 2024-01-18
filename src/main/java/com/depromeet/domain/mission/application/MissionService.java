@@ -133,8 +133,8 @@ public class MissionService {
                 member);
     }
 
-    public void updateCompleteDurationStatus() {
-        final LocalDate today = LocalDate.now();
-        missionRepository.updateMissionDurationStatusComplete(today);
+    public void updateFinishedDurationStatus() {
+        final LocalDateTime today = LocalDateTime.now();
+        missionRepository.updateFinishedDurationStatus(today);
     }
 }
