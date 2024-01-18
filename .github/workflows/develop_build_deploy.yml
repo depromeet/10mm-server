@@ -72,7 +72,7 @@ jobs:
         with:
           host: ${{ secrets.NCP_HOST }}
           username: ${{ secrets.NCP_USERNAME }}
-          password: ${{ secrets.NCP_PRIVATE_KEY }}
+          key: ${{ secrets.NCP_PRIVATE_KEY }}
           port: ${{ secrets.NCP_PORT }}
           source: docker-compose.yaml
           target: /home/tenminute/
