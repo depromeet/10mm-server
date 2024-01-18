@@ -134,6 +134,7 @@ public class MissionService {
     }
 
     public void updateCompleteDurationStatus() {
-        missionRepository.updateMissionDurationStatusComplete();
+        final LocalDate today = LocalDate.now();
+        missionRepository.updateMissionDurationStatusComplete(today);
     }
 }
