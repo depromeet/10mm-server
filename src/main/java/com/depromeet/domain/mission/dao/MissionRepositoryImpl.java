@@ -43,7 +43,7 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                                 memberIdEq(memberId),
                                 uploadStatusCompleteMissionEq().or(finishedAtLessThanNow()))
                         .orderBy(mission.id.desc())
-                        .limit(size + 1);
+                        .limit((long) size + 1);
 
         List<Mission> missions = query.fetch();
 
