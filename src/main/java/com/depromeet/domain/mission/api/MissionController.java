@@ -54,7 +54,7 @@ public class MissionController {
     }
 
     @Operation(summary = "종료미션 보관함", description = "종료된 미션 리스트를 조회합니다.")
-    @GetMapping("/archive")
+    @GetMapping("/finished")
     public Slice<MissionFindResponse> missionFindAllFinished(
             @RequestParam int size, @RequestParam(required = false) Long lastId) {
         return missionService.findAllFinishedMission(size, lastId);

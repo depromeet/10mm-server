@@ -38,6 +38,8 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
         JPAQuery<Mission> query =
                 jpaQueryFactory
                         .selectFrom(mission)
+						.leftJoin(mission.missionRecords, missionRecord)
+						.fetchJoin()
                         .where(
                                 ltMissionId(lastId),
                                 memberIdEq(memberId),
@@ -46,7 +48,6 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                         .limit((long) size + 1);
 
         List<Mission> missions = query.fetch();
-
         return checkLastPage(size, missions);
     }
 
