@@ -14,6 +14,7 @@ import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.mission.api.MissionController;
 import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.domain.ArchiveStatus;
+import com.depromeet.domain.mission.domain.DurationStatus;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
@@ -121,6 +122,7 @@ class MissionControllerTest {
                                 "testMissionContent",
                                 MissionCategory.STUDY,
                                 MissionVisibility.ALL,
+								DurationStatus.IN_PROGRESS,
                                 ArchiveStatus.NONE,
                                 1));
 

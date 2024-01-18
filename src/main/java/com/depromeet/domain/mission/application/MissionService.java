@@ -132,4 +132,8 @@ public class MissionService {
                 startedAt.plusWeeks(2),
                 member);
     }
+
+	public void updateCompleteDurationStatus() {
+		missionRepository.updateMissionDurationStatusComplete();
+	}
 }
