@@ -38,8 +38,8 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
         JPAQuery<Mission> query =
                 jpaQueryFactory
                         .selectFrom(mission)
-						.leftJoin(mission.missionRecords, missionRecord)
-						.fetchJoin()
+                        .leftJoin(mission.missionRecords, missionRecord)
+                        .fetchJoin()
                         .where(
                                 ltMissionId(lastId),
                                 memberIdEq(memberId),
