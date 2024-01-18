@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface MissionRepository extends JpaRepository<Mission, Long>, MissionRepositoryCustom {
     Mission findTopByMemberOrderBySortDesc(Member member);
 
-	@Modifying
-	@Query(value = "update Mission m set m.durationStatus='FINISHED' where m.finishedAt <= NOW()")
-	void updateMissionDurationStatusComplete();
+    @Modifying
+    @Query(value = "update Mission m set m.durationStatus='FINISHED' where m.finishedAt <= NOW()")
+    void updateMissionDurationStatusComplete();
 }

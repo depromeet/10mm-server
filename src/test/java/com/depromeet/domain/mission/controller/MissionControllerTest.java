@@ -122,7 +122,7 @@ class MissionControllerTest {
                                 "testMissionContent",
                                 MissionCategory.STUDY,
                                 MissionVisibility.ALL,
-								DurationStatus.IN_PROGRESS,
+                                DurationStatus.IN_PROGRESS,
                                 ArchiveStatus.NONE,
                                 1));
 

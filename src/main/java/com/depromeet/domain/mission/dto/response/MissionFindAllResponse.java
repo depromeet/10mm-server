@@ -14,7 +14,8 @@ public record MissionFindAllResponse(
         @Schema(description = "미션 내용", defaultValue = "default content") String content,
         @Schema(description = "미션 카테고리", defaultValue = "STUDY") MissionCategory category,
         @Schema(description = "미션 공개여부", defaultValue = "ALL") MissionVisibility visibility,
-        @Schema(description = "미션 진행 여부", defaultValue = "IN_PROGRESS") DurationStatus durationStatus,
+        @Schema(description = "미션 진행 여부", defaultValue = "IN_PROGRESS")
+                DurationStatus durationStatus,
         @Schema(description = "미션 아카이빙 상태", defaultValue = "NONE") ArchiveStatus archiveStatus,
         @Schema(description = "미션 정렬 값", defaultValue = "1") Integer sort,
         @Schema(description = "미션 상태", defaultValue = "1") MissionStatus missionStatus,
@@ -32,7 +33,7 @@ public record MissionFindAllResponse(
                 mission.getContent(),
                 mission.getCategory(),
                 mission.getVisibility(),
-				mission.getDurationStatus(),
+                mission.getDurationStatus(),
                 mission.getArchiveStatus(),
                 mission.getSort(),
                 missionStatus,

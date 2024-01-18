@@ -133,7 +133,7 @@ public class MissionService {
                 member);
     }
 
-	public void updateCompleteDurationStatus() {
-		missionRepository.updateMissionDurationStatusComplete();
-	}
+    public void updateCompleteDurationStatus() {
+        missionRepository.updateMissionDurationStatusComplete();
+    }
 }

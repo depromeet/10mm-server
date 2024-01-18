@@ -6,8 +6,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum DurationStatus {
-	IN_PROGRESS("진행 중"),
-	FINISHED("종료");
+    IN_PROGRESS("진행 중"),
+    FINISHED("종료");
 
-	private final String value;
+    private final String value;
 }
