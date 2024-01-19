@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -104,47 +103,43 @@ public class MissionService {
 
         // 번개 stack 누적할 변수 선언
         long symbolStack = 0;
-        // Duration을 AtomicLong으로 선언하여 내부 stream 함수에서 second 값을 누적할 sumDuration 선언
-        AtomicLong sumDuration = new AtomicLong();
 
         long totalMissionSize = missions.size();
         long completeMissionSize = 0;
 
-        for (Mission mission : missions) {
-            // 완료된 미션 갯수 누적
-            completeMissionSize +=
-                    mission.getMissionRecords().isEmpty()
-                                    || mission.getMissionRecords().stream()
-                                            .allMatch(
-                                                    missionRecord ->
-                                                            missionRecord.getUploadStatus()
-                                                                    != ImageUploadStatus.COMPLETE)
-                            ? 0
-                            : 1;
+        // Duration을 초로 바꾸고 합산
+        long sumDuration =
+                missions.stream()
+                        .flatMap(mission -> mission.getMissionRecords().stream())
+                        .filter(
+                                missionRecord ->
+                                        missionRecord.getUploadStatus()
+                                                == ImageUploadStatus.COMPLETE)
+                        .mapToLong(missionRecord -> missionRecord.getDuration().toSeconds())
+                        .reduce(0, Long::sum);
 
-            // 번개 stack 누적
-            symbolStack +=
-                    mission.getMissionRecords().stream()
-                            .filter(
-                                    missionRecord ->
-                                            missionRecord.getUploadStatus()
-                                                    == ImageUploadStatus.COMPLETE)
-                            .mapToLong(
-                                    missionRecord -> {
-                                        long minutes = missionRecord.getDuration().toMinutes();
-                                        sumDuration.addAndGet(
-                                                missionRecord.getDuration().toSeconds());
-                                        return minutes / 10;
-                                    })
-                            .sum();
-        }
+        symbolStack = sumDuration / 600;
+        // 완료된 미션 갯수 누적
+        completeMissionSize =
+                missions.stream()
+                        .filter(
+                                mission ->
+                                        !mission.getMissionRecords().isEmpty()
+                                                && mission.getMissionRecords().stream()
+                                                        .allMatch(
+                                                                missionRecord ->
+                                                                        missionRecord
+                                                                                        .getUploadStatus()
+                                                                                == ImageUploadStatus
+                                                                                        .COMPLETE))
+                        .count();
 
         /* 합산한 시간의 시간과 분 구하기
          * 시간 : 초 / 3600
          * 분 : (초 % 3600) / 60
          */
-        long totalMissionHour = sumDuration.get() / 3600;
-        long totalMissionMinute = (sumDuration.get() % 3600) / 60;
+        long totalMissionHour = sumDuration / 3600;
+        long totalMissionMinute = (sumDuration % 3600) / 60;
 
         /* 달성률
         계산식: (완료된 미션 수 / 전체 미션 수 * 1000.0) / 10.0
