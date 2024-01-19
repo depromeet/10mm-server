@@ -1,10 +1,9 @@
 name: production Build And Deploy
 
 on:
-  pull_request:
-    branches: [ "develop" ]
-#  push:
-#    branches: [ "develop" ]
+  push:
+    tags:
+      - v*.*.*
 
 jobs:
   build:
