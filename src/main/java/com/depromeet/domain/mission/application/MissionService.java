@@ -194,4 +194,9 @@ public class MissionService {
                 startedAt.plusWeeks(2),
                 member);
     }
+
+    public void updateFinishedDurationStatus() {
+        final LocalDateTime today = LocalDateTime.now().withSecond(0).withNano(0);
+        missionRepository.updateFinishedDurationStatus(today);
+    }
 }
