@@ -47,6 +47,9 @@ public class Mission extends BaseTimeEntity {
     private Integer sort;
 
     @Enumerated(EnumType.STRING)
+    private DurationStatus durationStatus;
+
+    @Enumerated(EnumType.STRING)
     private ArchiveStatus archiveStatus;
 
     @Enumerated(EnumType.STRING)
@@ -71,6 +74,7 @@ public class Mission extends BaseTimeEntity {
             String name,
             String content,
             Integer sort,
+            DurationStatus durationStatus,
             ArchiveStatus archiveStatus,
             MissionCategory category,
             MissionVisibility visibility,
@@ -80,6 +84,7 @@ public class Mission extends BaseTimeEntity {
         this.name = name;
         this.content = content;
         this.sort = sort;
+        this.durationStatus = durationStatus;
         this.archiveStatus = archiveStatus;
         this.category = category;
         this.visibility = visibility;
@@ -101,6 +106,7 @@ public class Mission extends BaseTimeEntity {
                 .name(name)
                 .content(content)
                 .sort(sort)
+                .durationStatus(DurationStatus.IN_PROGRESS)
                 .archiveStatus(ArchiveStatus.NONE)
                 .category(category)
                 .visibility(visibility)
