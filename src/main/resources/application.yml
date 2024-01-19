@@ -11,7 +11,7 @@ spring:
       - security
 
 swagger:
-  version: 0.0.1
+  version: ${SWAGGER_VERSION:0.0.1}
   user: ${SWAGGER_USER:default}
   password: ${SWAGGER_PASSWORD:default}
 springdoc:
