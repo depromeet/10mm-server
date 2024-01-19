@@ -29,9 +29,9 @@ jobs:
           distribution: ${{ matrix.distribution }}
 
       # 이미지 태그 설정
-      - name: Set up image-tag by GITHUB_SHA
+      - name: Set up image-tag by Releases Tag
         id: image-tag
-        run: echo "value=$(echo ${GITHUB_SHA::7})" >> $GITHUB_OUTPUT
+        run: echo "value=$(cut -d'v' -f2 <<< ${GITHUB_REF#refs/*/})" >> $GITHUB_OUTPUT
 
       # test 돌릴때 레디스 필요
       - name: Start containers
