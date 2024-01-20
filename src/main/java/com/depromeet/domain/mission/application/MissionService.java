@@ -104,7 +104,8 @@ public class MissionService {
         // 번개 stack 누적할 변수 선언
         long symbolStack = 0;
 
-        long totalMissionSize = missions.size();
+        long totalMissionRecordSize =
+                missions.stream().mapToLong(mission -> mission.getMissionRecords().size()).sum();
         long completeMissionSize = 0;
 
         // Duration을 초로 바꾸고 합산
@@ -119,19 +120,15 @@ public class MissionService {
                         .reduce(0, Long::sum);
 
         symbolStack = sumDuration / 600;
+
         // 완료된 미션 갯수 누적
         completeMissionSize =
                 missions.stream()
+                        .flatMap(mission -> mission.getMissionRecords().stream())
                         .filter(
-                                mission ->
-                                        !mission.getMissionRecords().isEmpty()
-                                                && mission.getMissionRecords().stream()
-                                                        .allMatch(
-                                                                missionRecord ->
-                                                                        missionRecord
-                                                                                        .getUploadStatus()
-                                                                                == ImageUploadStatus
-                                                                                        .COMPLETE))
+                                missionRecord ->
+                                        missionRecord.getUploadStatus()
+                                                == ImageUploadStatus.COMPLETE)
                         .count();
 
         /* 합산한 시간의 시간과 분 구하기
@@ -146,7 +143,7 @@ public class MissionService {
         소수점 첫 째 자리까지
          */
         double totalMissionAttainRate =
-                Math.round((double) completeMissionSize / totalMissionSize * 1000) / 10.0;
+                Math.round((double) completeMissionSize / totalMissionRecordSize * 1000) / 10.0;
 
         return MissionRecordSummaryResponse.from(
                 symbolStack, totalMissionHour, totalMissionMinute, totalMissionAttainRate);
