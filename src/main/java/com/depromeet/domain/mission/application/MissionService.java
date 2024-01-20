@@ -100,7 +100,7 @@ public class MissionService {
     public MissionRecordSummaryResponse findSummaryMissionRecord() {
         final Member member = memberUtil.getCurrentMember();
         List<Mission> missions = missionRepository.findMissionsWithRecords(member.getId());
-        List<MissionRecord> missionRecords =
+        List<MissionRecord> completedMissionRecords =
                 missions.stream()
                         .flatMap(mission -> mission.getMissionRecords().stream())
                         .filter(
@@ -111,7 +111,7 @@ public class MissionService {
 
         // 번개 stack 누적할 변수 선언
         long symbolStack =
-                missionRecords.stream()
+                completedMissionRecords.stream()
                         .mapToLong(missionRecord -> missionRecord.getDuration().toMinutes() / 10)
                         .sum();
 
@@ -120,7 +120,7 @@ public class MissionService {
 
         // Duration을 초로 바꾸고 합산
         long sumDuration =
-                missionRecords.stream()
+                completedMissionRecords.stream()
                         .mapToLong(missionRecord -> missionRecord.getDuration().toSeconds())
                         .reduce(0, Long::sum);
 
@@ -133,7 +133,7 @@ public class MissionService {
 
         // 달성률 계산
         double totalMissionAttainRate =
-                calculateMissionAttainRate(missionRecords.size(), totalMissionRecordSize);
+                calculateMissionAttainRate(completedMissionRecords.size(), totalMissionRecordSize);
 
         return MissionRecordSummaryResponse.from(
                 symbolStack, totalMissionHour, totalMissionMinute, totalMissionAttainRate);
