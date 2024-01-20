@@ -10,6 +10,7 @@ import com.depromeet.domain.missionRecord.dao.MissionRecordTtlRepository;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.domain.MissionRecordTtl;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordSummaryResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -93,6 +94,57 @@ public class MissionService {
         }
 
         return results;
+    }
+
+    @Transactional(readOnly = true)
+    public MissionRecordSummaryResponse findSummaryMissionRecord() {
+        final Member member = memberUtil.getCurrentMember();
+        List<Mission> missions = missionRepository.findMissionsWithRecords(member.getId());
+        List<MissionRecord> completedMissionRecords =
+                missions.stream()
+                        .flatMap(mission -> mission.getMissionRecords().stream())
+                        .filter(
+                                missionRecord ->
+                                        missionRecord.getUploadStatus()
+                                                == ImageUploadStatus.COMPLETE)
+                        .toList();
+
+        // 번개 stack 누적할 변수 선언
+        long symbolStack =
+                completedMissionRecords.stream()
+                        .mapToLong(missionRecord -> missionRecord.getDuration().toMinutes() / 10)
+                        .sum();
+
+        long totalMissionRecordSize =
+                missions.stream().mapToLong(mission -> mission.getMissionRecords().size()).sum();
+
+        // Duration을 초로 바꾸고 합산
+        long sumDuration =
+                completedMissionRecords.stream()
+                        .mapToLong(missionRecord -> missionRecord.getDuration().toSeconds())
+                        .reduce(0, Long::sum);
+
+        /* 합산한 시간의 시간과 분 구하기
+         * 시간 : 초 / 3600
+         * 분 : (초 % 3600) / 60
+         */
+        long totalMissionHour = sumDuration / 3600;
+        long totalMissionMinute = totalMissionHour / 60;
+
+        // 달성률 계산
+        double totalMissionAttainRate =
+                calculateMissionAttainRate(completedMissionRecords.size(), totalMissionRecordSize);
+
+        return MissionRecordSummaryResponse.from(
+                symbolStack, totalMissionHour, totalMissionMinute, totalMissionAttainRate);
+    }
+
+    /* 달성률
+    계산식: (완료된 미션 수 / 전체 미션 수 * 1000.0) / 10.0
+    소수점 첫 째 자리까지
+     */
+    private double calculateMissionAttainRate(long completeSize, long totalSize) {
+        return Math.round((double) completeSize / totalSize * 1000) / 10.0;
     }
 
     public MissionUpdateResponse updateMission(
