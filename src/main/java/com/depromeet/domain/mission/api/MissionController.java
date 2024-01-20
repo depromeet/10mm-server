@@ -7,6 +7,7 @@ import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindAllResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordSummaryResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -51,6 +52,12 @@ public class MissionController {
     @GetMapping
     public List<MissionFindAllResponse> missionFindAll() {
         return missionService.findAllMission();
+    }
+
+    @Operation(summary = "미션 전체 현황", description = "미션 전체 현황을 조회합니다.")
+    @GetMapping("/summary")
+    public MissionRecordSummaryResponse missionRecordFindSummary() {
+        return missionService.findSummaryMissionRecord();
     }
 
     @Operation(summary = "종료미션 보관함", description = "종료된 미션 리스트를 조회합니다.")
