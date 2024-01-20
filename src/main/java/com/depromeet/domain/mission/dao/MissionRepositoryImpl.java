@@ -3,6 +3,7 @@ package com.depromeet.domain.mission.dao;
 import static com.depromeet.domain.mission.domain.QMission.*;
 import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 
+import com.depromeet.domain.mission.domain.DurationStatus;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -31,6 +32,17 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                         .orderBy(mission.id.desc())
                         .fetchJoin();
         return query.fetch();
+    }
+
+    @Override
+    public void updateFinishedDurationStatus(LocalDateTime today) {
+        jpaQueryFactory
+                .update(mission)
+                .set(mission.durationStatus, DurationStatus.FINISHED)
+                .where(
+                        mission.finishedAt.loe(today),
+                        mission.durationStatus.ne(DurationStatus.FINISHED))
+                .execute();
     }
 
     @Override
