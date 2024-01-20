@@ -119,7 +119,15 @@ public class MissionService {
                         .mapToLong(missionRecord -> missionRecord.getDuration().toSeconds())
                         .reduce(0, Long::sum);
 
-        symbolStack = sumDuration / 600;
+        symbolStack =
+                missions.stream()
+                        .flatMap(mission -> mission.getMissionRecords().stream())
+                        .filter(
+                                missionRecord ->
+                                        missionRecord.getUploadStatus()
+                                                == ImageUploadStatus.COMPLETE)
+                        .mapToLong(missionRecord -> missionRecord.getDuration().toMinutes() / 10)
+                        .sum();
 
         // 완료된 미션 갯수 누적
         completeMissionSize =
