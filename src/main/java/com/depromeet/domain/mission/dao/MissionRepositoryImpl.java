@@ -55,7 +55,8 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                         .where(
                                 ltMissionId(lastId),
                                 memberIdEq(memberId),
-                                uploadStatusCompleteMissionEq().or(finishedAtLessThanNow()))
+                                uploadStatusCompleteMissionEq(),
+                                durationStatusFinishedEq())
                         .orderBy(mission.id.desc())
                         .limit((long) size + 1);
 
@@ -73,14 +74,13 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
         return lastId == null ? null : mission.id.lt(lastId);
     }
 
-    // finishedAt이 현 시간보다 큰 미션 검증 메서드 (미션 종료 시간 검증)
-    private BooleanExpression finishedAtLessThanNow() {
-        return mission.finishedAt.lt(LocalDateTime.now());
-    }
-
     // 종료 미션 검증
     private BooleanExpression uploadStatusCompleteMissionEq() {
         return missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE);
+    }
+
+    private BooleanExpression durationStatusFinishedEq() {
+        return mission.durationStatus.eq(DurationStatus.FINISHED);
     }
 
     // 무한 스크롤 방식 처리하는 메서드
