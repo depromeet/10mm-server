@@ -9,10 +9,14 @@ import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
 import com.depromeet.domain.auth.dto.response.SocialLoginResponse;
 import com.depromeet.domain.auth.dto.response.TokenPairResponse;
 import com.depromeet.global.util.CookieUtil;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,7 +68,7 @@ public class AuthController {
     @Operation(
             summary = "소셜 로그인",
             description = "소셜 로그인 후 토큰을 발급합니다. 가입하지 않은 유저인 경우 임시 회원가입을 진행합니다.")
-    @GetMapping("/social-login")
+    @PostMapping("/social-login")
     public ResponseEntity<SocialLoginResponse> memberSocialLogin(
             @RequestParam OauthProvider provider, @Valid @RequestBody IdTokenRequest request) {
 
