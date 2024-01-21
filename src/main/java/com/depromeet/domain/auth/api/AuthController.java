@@ -1,7 +1,6 @@
 package com.depromeet.domain.auth.api;
 
 import com.depromeet.domain.auth.application.AuthService;
-import com.depromeet.domain.auth.application.IdTokenVerifier;
 import com.depromeet.domain.auth.domain.OauthProvider;
 import com.depromeet.domain.auth.dto.request.IdTokenRequest;
 import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
@@ -26,7 +25,6 @@ public class AuthController {
 
     private final AuthService authService;
     private final CookieUtil cookieUtil;
-    private final IdTokenVerifier idTokenVerifier;
 
     @Operation(summary = "회원가입", description = "회원가입을 진행합니다.")
     @PostMapping("/register")
