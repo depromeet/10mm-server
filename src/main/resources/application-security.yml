@@ -6,4 +6,4 @@ jwt:
   issuer: ${JWT_ISSUER:}
 
 oidc:
-  nonce: ${NONCE_SECRET}
+  nonce: ${NONCE_SECRET:}
