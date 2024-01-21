@@ -47,9 +47,6 @@ public class MemberRelation extends BaseTimeEntity {
     }
 
     public static MemberRelation createMemberRelation(Member follower, Member following) {
-        return MemberRelation.builder()
-                .follower(follower)
-                .following(following)
-                .build();
+        return MemberRelation.builder().follower(follower).following(following).build();
     }
 }
