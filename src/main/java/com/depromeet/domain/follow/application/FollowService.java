@@ -23,20 +23,14 @@ public class FollowService {
 
     public void createFollow(FollowCreateRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
-        Member targetMember =
-                memberRepository
-                        .findById(request.targetId())
-                        .orElseThrow(
-                                () ->
-                                        new CustomException(
-                                                ErrorCode.FOLLOW_TARGET_MEMBER_NOT_FOUND));
+        Member targetMember = getTargetMember(request.targetId());
 
-        memberRelationRepository
-                .findByFollowerIdAndFollowingId(currentMember.getId(), targetMember.getId())
-                .ifPresent(
-                        relation -> {
-                            throw new CustomException(ErrorCode.FOLLOW_ALREADY_EXIST);
-                        });
+        boolean existMemberRelation =
+                memberRelationRepository.existsByFollowerIdAndFollowingId(
+                        currentMember.getId(), targetMember.getId());
+        if (existMemberRelation) {
+            throw new CustomException(ErrorCode.FOLLOW_ALREADY_EXIST);
+        }
 
         MemberRelation memberRelation =
                 MemberRelation.createMemberRelation(currentMember, targetMember);
@@ -45,13 +39,7 @@ public class FollowService {
 
     public void deleteFollow(FollowDeleteRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
-        Member targetMember =
-                memberRepository
-                        .findById(request.targetId())
-                        .orElseThrow(
-                                () ->
-                                        new CustomException(
-                                                ErrorCode.FOLLOW_TARGET_MEMBER_NOT_FOUND));
+        Member targetMember = getTargetMember(request.targetId());
 
         MemberRelation memberRelation =
                 memberRelationRepository
@@ -59,5 +47,16 @@ public class FollowService {
                         .orElseThrow(() -> new CustomException(ErrorCode.FOLLOW_NOT_EXIST));
 
         memberRelationRepository.delete(memberRelation);
+    }
+
+    private Member getTargetMember(Long targetId) {
+        Member targetMember =
+                memberRepository
+                        .findById(targetId)
+                        .orElseThrow(
+                                () ->
+                                        new CustomException(
+                                                ErrorCode.FOLLOW_TARGET_MEMBER_NOT_FOUND));
+        return targetMember;
     }
 }
