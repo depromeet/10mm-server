@@ -26,5 +26,7 @@ jobs:
           script: |
             echo "${{ secrets.NCP_SECRET_KEY }}" | docker login -u "${{ secrets.NCP_ACCESS_KEY }}" --password-stdin "${{ secrets.NCP_CONTAINER_REGISTRY }}"
             docker pull ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ github.event.inputs.commit_hash }}
+            SWAGGER_VERSION=${{ env.NCP_IMAGE_TAG }}
+            sed -i "s/SWAGGER_VERSION=.*/SWAGGER_VERSION=$SWAGGER_VERSION/" .env
             docker compose -f /home/tenminute/docker-compose.yaml up -d
             docker image prune -a -f
