@@ -1,4 +1,4 @@
-package com.depromeet.domain.relation.domain;
+package com.depromeet.domain.follow.domain;
 
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.member.domain.Member;
@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,4 +38,15 @@ public class MemberRelation extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name = "following_id")
     private Member following;
+
+    @Builder(access = AccessLevel.PRIVATE)
+    private MemberRelation(Long id, Member follower, Member following) {
+        this.id = id;
+        this.follower = follower;
+        this.following = following;
+    }
+
+    public static MemberRelation createMemberRelation(Member follower, Member following) {
+        return MemberRelation.builder().follower(follower).following(following).build();
+    }
 }
