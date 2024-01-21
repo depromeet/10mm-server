@@ -9,6 +9,8 @@ public final class SecurityConstants {
     public static final String REGISTER_REQUIRED_HEADER = "Registration-Required";
     public static final String KAKAO_JWK_URL = "https://kauth.kakao.com/.well-known/jwks.json";
     public static final String APPLE_JWK_URL = "https://appleid.apple.com/auth/keys";
+    public static final String KAKAO_ISSUER = "https://kauth.kakao.com";
+    public static final String APPLE_ISSUER = "https://appleid.apple.com";
 
     private SecurityConstants() {}
 }
