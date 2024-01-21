@@ -46,6 +46,11 @@ public enum ErrorCode {
     MISSION_RECORD_UPLOAD_STATUS_IS_NOT_PENDING(
             HttpStatus.BAD_REQUEST, "미션 기록의 이미지 업로드 상태가 PENDING이 아닙니다."),
     MISSION_RECORD_ALREADY_EXISTS_TODAY(HttpStatus.BAD_REQUEST, "오늘 이미 작성 된 미션 기록이 존재합니다."),
+
+    // Follow
+    FOLLOW_TARGET_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "타겟 유저을 찾을 수 없습니다."),
+    FOLLOW_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 팔로우 중인 회원입니다."),
+    FOLLOW_NOT_EXIST(HttpStatus.BAD_REQUEST, "팔로우 중인 회원만 팔로우 취소가 가능합니다."),
     ;
 
     private final HttpStatus status;
