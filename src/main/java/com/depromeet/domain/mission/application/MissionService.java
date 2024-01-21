@@ -129,7 +129,7 @@ public class MissionService {
          * 분 : (초 % 3600) / 60
          */
         long totalMissionHour = sumDuration / 3600;
-        long totalMissionMinute = totalMissionHour / 60;
+        long totalMissionMinute = (sumDuration % 3600) / 60;
 
         // 달성률 계산
         double totalMissionAttainRate =
