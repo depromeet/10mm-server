@@ -189,4 +189,10 @@ public class MissionService {
         final LocalDateTime today = LocalDateTime.now().withSecond(0).withNano(0);
         missionRepository.updateFinishedDurationStatus(today);
     }
+
+	public List<MissionFindAllResponse> findAllFollowMissions(String nickname) {
+		final Member member = memberUtil.getMemberByNickname(nickname);
+		List<Mission> missions = missionRepository.findMissionsWithRecords(member.getId());
+		return null;
+	}
 }
