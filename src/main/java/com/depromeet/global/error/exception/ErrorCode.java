@@ -30,6 +30,7 @@ public enum ErrorCode {
     MEMBER_ALREADY_DELETED(HttpStatus.NOT_FOUND, "이미 탈퇴한 회원입니다."),
     PASSWORD_NOT_MATCHES(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
     GUEST_MEMBER_REQUIRES_REGISTRATION(HttpStatus.UNAUTHORIZED, "게스트 회원은 회원가입을 먼저 진행해야 합니다."),
+    ID_TOKEN_VERIFICATION_FAILED(HttpStatus.UNAUTHORIZED, "ID 토큰 검증에 실패했습니다."),
 
     // Mission
     MISSION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 미션을 찾을 수 없습니다."),

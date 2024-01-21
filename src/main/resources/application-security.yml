@@ -4,3 +4,6 @@ jwt:
   access-token-expiration-time: ${JWT_ACCESS_TOKEN_EXPIRATION_TIME:7200}
   refresh-token-expiration-time: ${JWT_REFRESH_TOKEN_EXPIRATION_TIME:604800}
   issuer: ${JWT_ISSUER:}
+
+oidc:
+  nonce: ${NONCE_SECRET}
