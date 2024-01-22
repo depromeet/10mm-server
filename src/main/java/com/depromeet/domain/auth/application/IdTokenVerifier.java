@@ -4,9 +4,11 @@ import com.depromeet.domain.auth.domain.OauthProvider;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.infra.config.oidc.OidcProperties;
-
-import lombok.RequiredArgsConstructor;
-
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.Map;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -15,29 +17,27 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.Map;
-
 @Component
-@RequiredArgsConstructor
 public class IdTokenVerifier {
 
     private final OidcProperties oidcProperties;
-    private final Map<OauthProvider, PropertyBinder> properties =
-            Map.of(
-                    OauthProvider.KAKAO,
-                    new PropertyBinder(
-                            buildDecoder(oidcProperties.kakao().jwkSetUri()),
-                            oidcProperties.kakao().issuer(),
-                            oidcProperties.kakao().audience()),
-                    OauthProvider.APPLE,
-                    new PropertyBinder(
-                            buildDecoder(oidcProperties.apple().jwkSetUri()),
-                            oidcProperties.apple().issuer(),
-                            oidcProperties.apple().audience()));
+    private final Map<OauthProvider, PropertyBinder> properties;
+
+    public IdTokenVerifier(OidcProperties oidcProperties) {
+        this.oidcProperties = oidcProperties;
+        this.properties =
+                Map.of(
+                        OauthProvider.KAKAO,
+                        new PropertyBinder(
+                                buildDecoder(oidcProperties.kakao().jwkSetUri()),
+                                oidcProperties.kakao().issuer(),
+                                oidcProperties.kakao().audience()),
+                        OauthProvider.APPLE,
+                        new PropertyBinder(
+                                buildDecoder(oidcProperties.apple().jwkSetUri()),
+                                oidcProperties.apple().issuer(),
+                                oidcProperties.apple().audience()));
+    }
 
     private JwtDecoder buildDecoder(String jwkUrl) {
         return NimbusJwtDecoder.withJwkSetUri(jwkUrl).build();
