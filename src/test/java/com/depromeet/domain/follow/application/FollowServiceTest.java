@@ -8,6 +8,9 @@ import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.follow.dto.request.FollowCreateRequest;
 import com.depromeet.domain.follow.dto.request.FollowDeleteRequest;
+import com.depromeet.domain.follow.dto.response.FollowFindMeInfoResponse;
+import com.depromeet.domain.follow.dto.response.FollowFindTargetInfoResponse;
+import com.depromeet.domain.follow.dto.response.FollowStatus;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
@@ -186,6 +189,183 @@ class FollowServiceTest {
 
             // then
             assertEquals(0, memberRelationRepository.count());
+        }
+    }
+
+    @Nested
+    class 타인의_팔로우_카운트를_확인할_때 {
+        @Test
+        void 로그인된_회원이_존재하지_않는다면_예외를_발생시킨다() {
+            // given
+            Long targetId = 2L;
+
+            // when, then
+            assertThatThrownBy(() -> followService.findTargetFollowInfo(targetId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void 타겟회원이_존재하지_않는다면_예외를_발생시킨다() {
+            // given
+            Long targetId = 2L;
+            memberRepository.save(
+                    Member.createNormalMember(
+                            Profile.createProfile("testNickname1", "testImageUrl1")));
+
+            // when, then
+            assertThatThrownBy(() -> followService.findTargetFollowInfo(targetId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.FOLLOW_TARGET_MEMBER_NOT_FOUND.getMessage());
+        }
+
+        @Nested
+        class 타겟유저가_나를_팔로우하고_있고 {
+            @Test
+            void 나도_팔로우하고있는_경우에_FollowStatus가_FOLLOWING로_반환된다() {
+                // given
+                Member currentMember =
+                        memberRepository.save(
+                                Member.createNormalMember(
+                                        Profile.createProfile("testNickname1", "testImageUrl1")));
+                Member targetMember =
+                        memberRepository.save(
+                                Member.createNormalMember(
+                                        Profile.createProfile("testNickname2", "testImageUrl2")));
+                memberRelationRepository.save(
+                        MemberRelation.createMemberRelation(targetMember, currentMember));
+                memberRelationRepository.save(
+                        MemberRelation.createMemberRelation(currentMember, targetMember));
+
+                // when
+                FollowFindTargetInfoResponse response =
+                        followService.findTargetFollowInfo(targetMember.getId());
+
+                // then
+                assertEquals(FollowStatus.FOLLOWING, response.followStatus());
+            }
+
+            @Test
+            void 나는_타겟유저를_팔로우하지_않는_경우에_FollowStatus가_FOLLOWED_BY_ME로_반환된다() {
+                // given
+                Member currentMember =
+                        memberRepository.save(
+                                Member.createNormalMember(
+                                        Profile.createProfile("testNickname1", "testImageUrl1")));
+                Member targetMember =
+                        memberRepository.save(
+                                Member.createNormalMember(
+                                        Profile.createProfile("testNickname2", "testImageUrl2")));
+                memberRelationRepository.save(
+                        MemberRelation.createMemberRelation(targetMember, currentMember));
+
+                // when
+                FollowFindTargetInfoResponse response =
+                        followService.findTargetFollowInfo(targetMember.getId());
+
+                // then
+                assertEquals(FollowStatus.FOLLOWED_BY_ME, response.followStatus());
+            }
+        }
+
+        @Nested
+        class 타겟유저가_나를_팔로우_하지_않고 {
+            @Test
+            void 나는_팔로우하고있는_경우에_FollowStatus가_FOLLOWING로_반환된다() {
+                // given
+                Member currentMember =
+                        memberRepository.save(
+                                Member.createNormalMember(
+                                        Profile.createProfile("testNickname1", "testImageUrl1")));
+                Member targetMember =
+                        memberRepository.save(
+                                Member.createNormalMember(
+                                        Profile.createProfile("testNickname2", "testImageUrl2")));
+                memberRelationRepository.save(
+                        MemberRelation.createMemberRelation(currentMember, targetMember));
+
+                // when
+                FollowFindTargetInfoResponse response =
+                        followService.findTargetFollowInfo(targetMember.getId());
+
+                // then
+                assertEquals(FollowStatus.FOLLOWING, response.followStatus());
+            }
+
+            @Test
+            void 나도_팔로우하지_않는_경우에_FollowStatus가_NOT_FOLLOWING로_반환된다() {
+                // given
+                Member currentMember =
+                        memberRepository.save(
+                                Member.createNormalMember(
+                                        Profile.createProfile("testNickname1", "testImageUrl1")));
+                Member targetMember =
+                        memberRepository.save(
+                                Member.createNormalMember(
+                                        Profile.createProfile("testNickname2", "testImageUrl2")));
+
+                // when
+                FollowFindTargetInfoResponse response =
+                        followService.findTargetFollowInfo(targetMember.getId());
+
+                // then
+                assertEquals(FollowStatus.NOT_FOLLOWING, response.followStatus());
+            }
+        }
+
+        @Test
+        void 정상적이라면_타겟유저의_정보가_정상적으로_조회된다() {
+            Member currentMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname1", "testImageUrl1")));
+            Member targetMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname2", "testImageUrl2")));
+            memberRelationRepository.save(
+                    MemberRelation.createMemberRelation(targetMember, currentMember));
+
+            // when
+            FollowFindTargetInfoResponse response =
+                    followService.findTargetFollowInfo(targetMember.getId());
+
+            // then
+            assertEquals(FollowStatus.FOLLOWED_BY_ME, response.followStatus());
+            assertEquals(1L, response.followingCount());
+            assertEquals(0L, response.followerCount());
+        }
+    }
+
+    @Nested
+    class 나의_팔로우_카운트를_확인할_때 {
+        @Test
+        void 로그인된_회원이_존재하지_않는다면_예외를_발생시킨다() {
+            // when, then
+            assertThatThrownBy(() -> followService.findMeFollowInfo())
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void 정상적이라면_나의_정보가_정상적으로_조회된다() {
+            Member currentMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname1", "testImageUrl1")));
+            Member targetMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname2", "testImageUrl2")));
+            memberRelationRepository.save(
+                    MemberRelation.createMemberRelation(targetMember, currentMember));
+
+            // when
+            FollowFindMeInfoResponse response = followService.findMeFollowInfo();
+
+            // then
+            assertEquals(0L, response.followingCount());
+            assertEquals(1L, response.followerCount());
         }
     }
 }
