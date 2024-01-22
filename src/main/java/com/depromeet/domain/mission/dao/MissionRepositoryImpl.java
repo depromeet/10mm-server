@@ -5,7 +5,6 @@ import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 
 import com.depromeet.domain.mission.domain.DurationStatus;
 import com.depromeet.domain.mission.domain.Mission;
-import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
