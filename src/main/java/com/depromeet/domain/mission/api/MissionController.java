@@ -55,7 +55,7 @@ public class MissionController {
     }
 
     @Operation(summary = "친구 미션 목록 조회", description = "친구 미션 목록을 조회합니다.")
-    @GetMapping("/friend")
+    @GetMapping("/follow")
     public FollowMissionFindAllResponse followMissionFindAll(
             @RequestParam("nickname") String nickname) {
         return missionService.findAllFollowMissions(nickname);
