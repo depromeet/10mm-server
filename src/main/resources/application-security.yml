@@ -6,4 +6,12 @@ jwt:
   issuer: ${JWT_ISSUER:}
 
 oidc:
-  nonce: ${NONCE_SECRET:}
+  nonce: ${OIDC_NONCE_SECRET:}
+  kakao:
+    jwk-set-uri: https://kauth.kakao.com/.well-known/jwks.json
+    issuer: https://kauth.kakao.com
+    audience: ${KAKAO_AUDIENCE:}
+  apple:
+    jwk-set-uri: https://appleid.apple.com/auth/keys
+    issuer: https://appleid.apple.com
+    audience: ${APPLE_AUDIENCE:}
