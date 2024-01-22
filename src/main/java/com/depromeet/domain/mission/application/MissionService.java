@@ -159,16 +159,20 @@ public class MissionService {
                             .filter(record -> record.getStartedAt().toLocalDate().equals(today))
                             .findFirst();
 
-            // 당일 수행한 미션기록이 없으면 NONE
-            if (optionalRecord.isEmpty()) {
-                findAllResponses.add(MissionFindAllResponse.from(mission, MissionStatus.NONE));
-                continue;
+            // 기본 값 NONE으로 지정 후
+            MissionStatus missionStatus = MissionStatus.NONE;
+            Long missionRecordId = null;
+            if (optionalRecord.isPresent()) {
+                missionRecordId = optionalRecord.get().getId();
+
+                // 당일 수행한 미션 기록의 인증 사진이 존재하면 COMPLETE
+                if (optionalRecord.get().getUploadStatus() == ImageUploadStatus.COMPLETE) {
+                    missionStatus = MissionStatus.COMPLETED;
+                }
             }
 
-            // 당일 수행한 미션기록의 인증사진이 존재하면 COMPLETE
-            if (optionalRecord.get().getUploadStatus() == ImageUploadStatus.COMPLETE) {
-                findAllResponses.add(MissionFindAllResponse.from(mission, MissionStatus.COMPLETED));
-            }
+            findAllResponses.add(
+                    MissionFindAllResponse.of(mission, missionStatus, null, missionRecordId));
         }
 
         // 완료된 미션이 상단으로
