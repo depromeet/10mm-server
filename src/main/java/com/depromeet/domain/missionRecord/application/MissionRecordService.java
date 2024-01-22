@@ -19,6 +19,7 @@ import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
@@ -83,7 +84,10 @@ public class MissionRecordService {
                 missionRecordRepository
                         .findById(recordId)
                         .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
-        return MissionRecordFindOneResponse.from(missionRecord);
+        long sinceDay =
+                Duration.between(missionRecord.getMission().getStartedAt(), LocalDateTime.now())
+                        .toDays();
+        return MissionRecordFindOneResponse.of(missionRecord, sinceDay);
     }
 
     @Transactional(readOnly = true)
