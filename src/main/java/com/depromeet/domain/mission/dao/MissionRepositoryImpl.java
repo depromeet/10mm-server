@@ -55,9 +55,8 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                         .where(
                                 ltMissionId(lastId),
                                 memberIdEq(memberId),
-                                uploadStatusCompleteMissionEq(),
                                 durationStatusFinishedEq())
-                        .orderBy(mission.id.desc())
+                        .orderBy(mission.finishedAt.desc())
                         .limit((long) size + 1);
 
         List<Mission> missions = query.fetch();
@@ -72,11 +71,6 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     // lastId보다 작은 미션 id 찾는 조건 메서드 (lastId 가 있다면 마지막 요청)
     private BooleanExpression ltMissionId(Long lastId) {
         return lastId == null ? null : mission.id.lt(lastId);
-    }
-
-    // 종료 미션 검증
-    private BooleanExpression uploadStatusCompleteMissionEq() {
-        return missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE);
     }
 
     private BooleanExpression durationStatusFinishedEq() {
