@@ -40,4 +40,19 @@ public record MissionFindAllResponse(
                 ttlFinishedAt,
                 missionRecordId);
     }
+
+    public static MissionFindAllResponse from(Mission mission, MissionStatus missionStatus) {
+        return new MissionFindAllResponse(
+                mission.getId(),
+                mission.getName(),
+                mission.getContent(),
+                mission.getCategory(),
+                mission.getVisibility(),
+                mission.getDurationStatus(),
+                mission.getArchiveStatus(),
+                mission.getSort(),
+                missionStatus,
+                null,
+                null);
+    }
 }

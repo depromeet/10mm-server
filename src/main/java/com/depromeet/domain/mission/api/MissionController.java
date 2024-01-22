@@ -3,6 +3,7 @@ package com.depromeet.domain.mission.api;
 import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
+import com.depromeet.domain.mission.dto.response.FollowMissionFindAllResponse;
 import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindAllResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
@@ -53,11 +54,12 @@ public class MissionController {
         return missionService.findAllMission();
     }
 
-	@Operation(summary = "친구 미션 목록 조회", description = "친구 미션 목록을 조회합니다.")
-	@GetMapping("/feed")
-	public List<MissionFindAllResponse> followMissionFindAll(@RequestParam("nickname") String nickname) {
-		return missionService.findAllFollowMissions(nickname);
-	}
+    @Operation(summary = "친구 미션 목록 조회", description = "친구 미션 목록을 조회합니다.")
+    @GetMapping("/friend")
+    public FollowMissionFindAllResponse followMissionFindAll(
+            @RequestParam("nickname") String nickname) {
+        return missionService.findAllFollowMissions(nickname);
+    }
 
     @Operation(summary = "미션 전체 현황", description = "미션 전체 현황을 조회합니다.")
     @GetMapping("/summary")

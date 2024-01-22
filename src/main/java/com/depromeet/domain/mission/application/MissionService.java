@@ -1,5 +1,6 @@
 package com.depromeet.domain.mission.application;
 
+import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
@@ -17,6 +18,7 @@ import com.depromeet.global.util.MemberUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class MissionService {
 
     private final MissionRepository missionRepository;
     private final MissionRecordTtlRepository missionRecordTtlRepository;
+    private final MemberRelationRepository memberRelationRepository;
     private final MemberUtil memberUtil;
 
     public MissionCreateResponse createMission(MissionCreateRequest missionCreateRequest) {
@@ -49,7 +52,7 @@ public class MissionService {
 
     @Transactional(readOnly = true) // 읽기 전용 트랜잭션 설정. 읽기 전용으로 설정한다.
     public List<MissionFindAllResponse> findAllMission() {
-        Member currentMember = memberUtil.getCurrentMember();
+        final Member currentMember = memberUtil.getCurrentMember();
         final LocalDate today = LocalDate.now();
 
         List<Mission> missions = missionRepository.findMissionsWithRecords(currentMember.getId());
@@ -100,20 +103,10 @@ public class MissionService {
     public MissionRecordSummaryResponse findSummaryMissionRecord() {
         final Member member = memberUtil.getCurrentMember();
         List<Mission> missions = missionRepository.findMissionsWithRecords(member.getId());
-        List<MissionRecord> completedMissionRecords =
-                missions.stream()
-                        .flatMap(mission -> mission.getMissionRecords().stream())
-                        .filter(
-                                missionRecord ->
-                                        missionRecord.getUploadStatus()
-                                                == ImageUploadStatus.COMPLETE)
-                        .toList();
+        List<MissionRecord> completedMissionRecords = findCompletedMissionRecords(missions);
 
         // 번개 stack 누적할 변수 선언
-        long symbolStack =
-                completedMissionRecords.stream()
-                        .mapToLong(missionRecord -> missionRecord.getDuration().toMinutes() / 10)
-                        .sum();
+        long symbolStack = symbolStackCalculate(completedMissionRecords);
 
         long totalMissionRecordSize =
                 missions.stream().mapToLong(mission -> mission.getMissionRecords().size()).sum();
@@ -139,12 +132,51 @@ public class MissionService {
                 symbolStack, totalMissionHour, totalMissionMinute, totalMissionAttainRate);
     }
 
-    /* 달성률
-    계산식: (완료된 미션 수 / 전체 미션 수 * 1000.0) / 10.0
-    소수점 첫 째 자리까지
-     */
-    private double calculateMissionAttainRate(long completeSize, long totalSize) {
-        return Math.round((double) completeSize / totalSize * 1000) / 10.0;
+    // 친구 미션 목록
+    public FollowMissionFindAllResponse findAllFollowMissions(String nickname) {
+        final Member followingMember = memberUtil.getMemberByNickname(nickname);
+        final Member currentMember = memberUtil.getCurrentMember();
+        final LocalDate today = LocalDate.now();
+
+        boolean existMemberRelation =
+                memberRelationRepository.existsByFollowerIdAndFollowingId(
+                        currentMember.getId(), followingMember.getId());
+
+        List<Mission> missions =
+                missionRepository.findMissionsWithRecordsByRelations(
+                        followingMember.getId(), existMemberRelation);
+
+        List<MissionRecord> completedMissionRecords = findCompletedMissionRecords(missions);
+        // 번개 stack 누적할 변수 선언
+        long symbolStack = symbolStackCalculate(completedMissionRecords);
+
+        List<MissionFindAllResponse> findAllResponses = new ArrayList<>();
+        for (Mission mission : missions) {
+            List<MissionRecord> records = mission.getMissionRecords();
+
+            Optional<MissionRecord> optionalRecord =
+                    records.stream()
+                            .filter(record -> record.getStartedAt().toLocalDate().equals(today))
+                            .findFirst();
+
+            // 당일 수행한 미션기록이 없으면 NONE
+            if (optionalRecord.isEmpty()) {
+                findAllResponses.add(MissionFindAllResponse.from(mission, MissionStatus.NONE));
+                continue;
+            }
+
+            // 당일 수행한 미션기록의 인증사진이 존재하면 COMPLETE
+            if (optionalRecord.get().getUploadStatus() == ImageUploadStatus.COMPLETE) {
+                findAllResponses.add(MissionFindAllResponse.from(mission, MissionStatus.COMPLETED));
+            }
+        }
+
+        // 완료된 미션이 상단으로
+        findAllResponses.sort(
+                Comparator.comparing(
+                        response -> response.missionStatus() == MissionStatus.COMPLETED ? 0 : 1));
+
+        return FollowMissionFindAllResponse.from(symbolStack, findAllResponses);
     }
 
     public MissionUpdateResponse updateMission(
@@ -185,14 +217,33 @@ public class MissionService {
                 member);
     }
 
+    /* 달성률
+    계산식: (완료된 미션 수 / 전체 미션 수 * 1000.0) / 10.0
+    소수점 첫 째 자리까지
+     */
+    private double calculateMissionAttainRate(long completeSize, long totalSize) {
+        return Math.round((double) completeSize / totalSize * 1000) / 10.0;
+    }
+
     public void updateFinishedDurationStatus() {
         final LocalDateTime today = LocalDateTime.now().withSecond(0).withNano(0);
         missionRepository.updateFinishedDurationStatus(today);
     }
 
-	public List<MissionFindAllResponse> findAllFollowMissions(String nickname) {
-		final Member member = memberUtil.getMemberByNickname(nickname);
-		List<Mission> missions = missionRepository.findMissionsWithRecords(member.getId());
-		return null;
-	}
+    // 번개 stack 누적 메서드
+    public long symbolStackCalculate(List<MissionRecord> missionRecords) {
+        return missionRecords.stream()
+                .mapToLong(missionRecord -> missionRecord.getDuration().toMinutes() / 10)
+                .sum();
+    }
+
+    // 업로드 완료 미션 기록 리스트
+    public List<MissionRecord> findCompletedMissionRecords(List<Mission> missions) {
+        return missions.stream()
+                .flatMap(mission -> mission.getMissionRecords().stream())
+                .filter(
+                        missionRecord ->
+                                missionRecord.getUploadStatus() == ImageUploadStatus.COMPLETE)
+                .toList();
+    }
 }
