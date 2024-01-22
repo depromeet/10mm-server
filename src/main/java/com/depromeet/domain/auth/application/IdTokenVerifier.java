@@ -4,12 +4,9 @@ import com.depromeet.domain.auth.domain.OauthProvider;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.infra.config.oidc.OidcProperties;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -17,6 +14,12 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -27,12 +30,12 @@ public class IdTokenVerifier {
             Map.of(
                     OauthProvider.KAKAO,
                     new PropertyBinder(
-                            buildDecoder(oidcProperties.kakao().jwkSetUrl()),
+                            buildDecoder(oidcProperties.kakao().jwkSetUri()),
                             oidcProperties.kakao().issuer(),
                             oidcProperties.kakao().audience()),
                     OauthProvider.APPLE,
                     new PropertyBinder(
-                            buildDecoder(oidcProperties.apple().jwkSetUrl()),
+                            buildDecoder(oidcProperties.apple().jwkSetUri()),
                             oidcProperties.apple().issuer(),
                             oidcProperties.apple().audience()));
 
