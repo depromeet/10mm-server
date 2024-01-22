@@ -140,7 +140,7 @@ public class MissionService {
 
         boolean existMemberRelation =
                 memberRelationRepository.existsByFollowerIdAndFollowingId(
-                        currentMember.getId(), followingMember.getId());
+                        followingMember.getId(), currentMember.getId());
 
         List<Mission> missions =
                 missionRepository.findMissionsWithRecordsByRelations(
