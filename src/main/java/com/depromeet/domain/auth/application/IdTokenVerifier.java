@@ -1,51 +1,74 @@
 package com.depromeet.domain.auth.application;
 
-import static com.depromeet.global.common.constants.SecurityConstants.APPLE_JWK_URL;
-import static com.depromeet.global.common.constants.SecurityConstants.KAKAO_JWK_URL;
-
 import com.depromeet.domain.auth.domain.OauthProvider;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
+import com.depromeet.infra.config.oidc.OidcProperties;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class IdTokenVerifier {
 
-    private static final Map<OauthProvider, JwtDecoder> decoders =
+    private final OidcProperties oidcProperties;
+    private final Map<OauthProvider, PropertyBinder> properties =
             Map.of(
-                    OauthProvider.KAKAO, buildDecoder(KAKAO_JWK_URL),
-                    OauthProvider.APPLE, buildDecoder(APPLE_JWK_URL));
+                    OauthProvider.KAKAO,
+                    new PropertyBinder(
+                            buildDecoder(oidcProperties.kakao().jwkSetUrl()),
+                            oidcProperties.kakao().issuer(),
+                            oidcProperties.kakao().audience()),
+                    OauthProvider.APPLE,
+                    new PropertyBinder(
+                            buildDecoder(oidcProperties.apple().jwkSetUrl()),
+                            oidcProperties.apple().issuer(),
+                            oidcProperties.apple().audience()));
 
-    @Value("${oidc.nonce}")
-    private String targetNonce;
-
-    private static JwtDecoder buildDecoder(String jwkSetUri) {
-        SignatureAlgorithm algorithm = SignatureAlgorithm.RS256;
-        return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).jwsAlgorithm(algorithm).build();
+    private JwtDecoder buildDecoder(String jwkUrl) {
+        return NimbusJwtDecoder.withJwkSetUri(jwkUrl).build();
     }
 
     public OidcUser getOidcUser(String idToken, OauthProvider provider) {
         Jwt jwt = getJwt(idToken, provider);
         OidcIdToken oidcIdToken = getOidcIdToken(jwt);
+        validateIssuer(oidcIdToken, provider);
+        validateAudience(oidcIdToken, provider);
         validateNonce(oidcIdToken);
         return new DefaultOidcUser(null, oidcIdToken);
     }
 
+    private void validateAudience(OidcIdToken oidcIdToken, OauthProvider provider) {
+        String idTokenAudience = oidcIdToken.getAudience().get(0);
+        String targetAudience = properties.get(provider).audience();
+
+        if (idTokenAudience == null || !idTokenAudience.equals(targetAudience)) {
+            throw new CustomException(ErrorCode.ID_TOKEN_VERIFICATION_FAILED);
+        }
+    }
+
+    private void validateIssuer(OidcIdToken oidcIdToken, OauthProvider provider) {
+        String idTokenIssuer = oidcIdToken.getIssuer().toString();
+        String targetIssuer = properties.get(provider).issuer();
+
+        if (idTokenIssuer == null || !idTokenIssuer.equals(targetIssuer)) {
+            throw new CustomException(ErrorCode.ID_TOKEN_VERIFICATION_FAILED);
+        }
+    }
+
     private Jwt getJwt(String idToken, OauthProvider provider) {
-        JwtDecoder decoder = decoders.get(provider);
+        JwtDecoder decoder = properties.get(provider).decoder();
         return decoder.decode(idToken);
     }
 
@@ -56,7 +79,7 @@ public class IdTokenVerifier {
 
     private void validateNonce(OidcIdToken idToken) {
         String idTokenNonceHash = idToken.getNonce();
-        String targetNonceHash = getNonceHash(targetNonce);
+        String targetNonceHash = getNonceHash(oidcProperties.nonce());
 
         if (idTokenNonceHash == null || !idTokenNonceHash.equals(targetNonceHash)) {
             throw new CustomException(ErrorCode.ID_TOKEN_VERIFICATION_FAILED);
@@ -72,4 +95,6 @@ public class IdTokenVerifier {
             throw new CustomException(ErrorCode.ID_TOKEN_VERIFICATION_FAILED);
         }
     }
+
+    record PropertyBinder(JwtDecoder decoder, String issuer, String audience) {}
 }
