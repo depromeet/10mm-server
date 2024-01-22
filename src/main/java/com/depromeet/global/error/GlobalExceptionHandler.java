@@ -89,7 +89,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    /** enum type 일치하지 않아 binding 못할 경우 발생 주로 @RequestParam enum으로 binding 못했을 경우 발생 */
+    /** PathVariable, RequestParam, RequestHeader, RequestBody 에서 타입이 일치하지 않을 경우 발생 */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<GlobalResponse> handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException e) {
