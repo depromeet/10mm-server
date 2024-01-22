@@ -64,7 +64,8 @@ public class AuthController {
             description = "소셜 로그인 후 토큰을 발급합니다. 가입하지 않은 유저인 경우 임시 회원가입을 진행합니다.")
     @PostMapping("/social-login")
     public ResponseEntity<SocialLoginResponse> memberSocialLogin(
-            @RequestParam OauthProvider provider, @Valid @RequestBody IdTokenRequest request) {
+            @RequestParam(name = "provider") OauthProvider provider,
+            @Valid @RequestBody IdTokenRequest request) {
 
         SocialLoginResponse response = authService.socialLoginMember(request, provider);
 
