@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MissionRecordService {
     private static final int EXPIRATION_TIME = 10;
+    private static final int DAYS_ADJUSTMENT = 1;
 
     private final MemberUtil memberUtil;
     private final MissionRepository missionRepository;
@@ -87,7 +88,7 @@ public class MissionRecordService {
         long sinceDay =
                 Duration.between(missionRecord.getMission().getStartedAt(), LocalDateTime.now())
                                 .toDays()
-                        + 1;
+                        + DAYS_ADJUSTMENT;
         return MissionRecordFindOneResponse.of(missionRecord, sinceDay);
     }
 
