@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
@@ -54,9 +55,9 @@ public class IdTokenVerifier {
 
     private void validateAudience(OidcIdToken oidcIdToken, OauthProvider provider) {
         String idTokenAudience = oidcIdToken.getAudience().get(0);
-        String targetAudience = properties.get(provider).audience();
+        List<String> targetAudiences = properties.get(provider).audience();
 
-        if (idTokenAudience == null || !idTokenAudience.equals(targetAudience)) {
+        if (idTokenAudience == null || !targetAudiences.contains(idTokenAudience)) {
             throw new CustomException(ErrorCode.ID_TOKEN_VERIFICATION_FAILED);
         }
     }
@@ -99,5 +100,5 @@ public class IdTokenVerifier {
         }
     }
 
-    record PropertyBinder(JwtDecoder decoder, String issuer, String audience) {}
+    record PropertyBinder(JwtDecoder decoder, String issuer, List<String> audience) {}
 }

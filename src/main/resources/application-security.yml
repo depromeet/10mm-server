@@ -10,8 +10,11 @@ oidc:
   kakao:
     jwk-set-uri: https://kauth.kakao.com/.well-known/jwks.json
     issuer: https://kauth.kakao.com
-    audience: ${KAKAO_AUDIENCE:}
+    audience:
+      - ${KAKAO_REST_APP_KEY:}
+      - ${KAKAO_NATIVE_APP_KEY:}
   apple:
     jwk-set-uri: https://appleid.apple.com/auth/keys
     issuer: https://appleid.apple.com
-    audience: ${APPLE_AUDIENCE:}
+    audience:
+      - ${APPLE_SERVICE_ID:}
