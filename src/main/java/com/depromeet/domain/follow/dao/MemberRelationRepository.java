@@ -8,4 +8,8 @@ public interface MemberRelationRepository extends JpaRepository<MemberRelation, 
     Optional<MemberRelation> findBySourceIdAndTargetId(Long sourceId, Long targetId);
 
     boolean existsBySourceIdAndTargetId(Long sourceId, Long targetId);
+
+    Long countBySourceId(Long sourceId);
+
+    Long countByTargetId(Long targetId);
 }
