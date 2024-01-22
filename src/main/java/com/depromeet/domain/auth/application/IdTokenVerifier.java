@@ -4,12 +4,7 @@ import com.depromeet.domain.auth.domain.OauthProvider;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.infra.config.oidc.OidcProperties;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
+
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -17,6 +12,13 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class IdTokenVerifier {
@@ -82,8 +84,9 @@ public class IdTokenVerifier {
     }
 
     private void validateNonce(OidcIdToken idToken) {
+        // TODO: 랜덤 nonce 사용하도록 개선
         String idTokenNonceHash = idToken.getNonce();
-        String targetNonceHash = getNonceHash(oidcProperties.nonce());
+        String targetNonceHash = oidcProperties.nonce();
 
         if (idTokenNonceHash == null || !idTokenNonceHash.equals(targetNonceHash)) {
             throw new CustomException(ErrorCode.ID_TOKEN_VERIFICATION_FAILED);
