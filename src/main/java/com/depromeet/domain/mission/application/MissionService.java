@@ -176,7 +176,7 @@ public class MissionService {
                 Comparator.comparing(
                         response -> response.missionStatus() == MissionStatus.COMPLETED ? 0 : 1));
 
-        return FollowMissionFindAllResponse.from(symbolStack, findAllResponses);
+        return FollowMissionFindAllResponse.of(symbolStack, findAllResponses);
     }
 
     public MissionUpdateResponse updateMission(

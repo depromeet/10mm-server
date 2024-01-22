@@ -6,7 +6,7 @@ import java.util.List;
 public record FollowMissionFindAllResponse(
         @Schema(description = "번개 수", defaultValue = "1") long symbolStack,
         @Schema(description = "친구 미션 목록") List<MissionFindAllResponse> followMissions) {
-    public static FollowMissionFindAllResponse from(
+    public static FollowMissionFindAllResponse of(
             long symbolStack, List<MissionFindAllResponse> followMissions) {
         return new FollowMissionFindAllResponse(symbolStack, followMissions);
     }
