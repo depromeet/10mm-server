@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
         uniqueConstraints = {
             @UniqueConstraint(
                     name = "member_relation_uk",
-                    columnNames = {"follower_id", "following_id"})
+                    columnNames = {"source_id", "target_id"})
         })
 public class MemberRelation extends BaseTimeEntity {
     @Id
@@ -32,21 +32,21 @@ public class MemberRelation extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "follower_id")
-    private Member follower;
+    @JoinColumn(name = "source_id")
+    private Member source;
 
     @ManyToOne
-    @JoinColumn(name = "following_id")
-    private Member following;
+    @JoinColumn(name = "target_id")
+    private Member target;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private MemberRelation(Long id, Member follower, Member following) {
+    private MemberRelation(Long id, Member source, Member target) {
         this.id = id;
-        this.follower = follower;
-        this.following = following;
+        this.source = source;
+        this.target = target;
     }
 
-    public static MemberRelation createMemberRelation(Member follower, Member following) {
-        return MemberRelation.builder().follower(follower).following(following).build();
+    public static MemberRelation createMemberRelation(Member source, Member target) {
+        return MemberRelation.builder().source(source).target(target).build();
     }
 }

@@ -26,7 +26,7 @@ public class FollowService {
         Member targetMember = getTargetMember(request.targetId());
 
         boolean existMemberRelation =
-                memberRelationRepository.existsByFollowerIdAndFollowingId(
+                memberRelationRepository.existsBySourceIdAndTargetId(
                         currentMember.getId(), targetMember.getId());
         if (existMemberRelation) {
             throw new CustomException(ErrorCode.FOLLOW_ALREADY_EXIST);
@@ -43,7 +43,7 @@ public class FollowService {
 
         MemberRelation memberRelation =
                 memberRelationRepository
-                        .findByFollowerIdAndFollowingId(currentMember.getId(), targetMember.getId())
+                        .findBySourceIdAndTargetId(currentMember.getId(), targetMember.getId())
                         .orElseThrow(() -> new CustomException(ErrorCode.FOLLOW_NOT_EXIST));
 
         memberRelationRepository.delete(memberRelation);

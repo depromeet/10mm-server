@@ -113,10 +113,10 @@ class FollowServiceTest {
             assertEquals(1, memberRelationRepository.count());
             assertEquals(
                     currentMember.getId(),
-                    memberRelationRepository.findAll().get(0).getFollower().getId());
+                    memberRelationRepository.findAll().get(0).getSource().getId());
             assertEquals(
                     targetMember.getId(),
-                    memberRelationRepository.findAll().get(0).getFollowing().getId());
+                    memberRelationRepository.findAll().get(0).getTarget().getId());
         }
     }
 
