@@ -18,3 +18,15 @@ oidc:
     issuer: https://appleid.apple.com
     audience:
       - ${APPLE_SERVICE_ID:}
+
+oauth:
+  nonce: ${OIDC_NONCE_SECRET:}
+  audience:
+    KAKAO:
+      - key: ${KAKAO_REST_APP_KEY:}
+        type: WEB
+      - key: ${KAKAO_NATIVE_APP_KEY:}
+        type: APP
+    APPLE:
+      - key: ${APPLE_SERVICE_ID:}
+        type: ALL
