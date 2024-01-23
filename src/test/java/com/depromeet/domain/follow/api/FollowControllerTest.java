@@ -2,8 +2,7 @@ package com.depromeet.domain.follow.api;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -11,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.depromeet.domain.follow.application.FollowService;
 import com.depromeet.domain.follow.dto.request.FollowCreateRequest;
 import com.depromeet.domain.follow.dto.request.FollowDeleteRequest;
+import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.security.JwtAuthenticationFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
@@ -102,6 +102,55 @@ class FollowControllerTest {
                             delete("/follows")
                                     .contentType(APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success").value(true))
+                    .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                    .andDo(print());
+        }
+    }
+
+    @Nested
+    class 타인의_팔로우_카운트를_확인할_때 {
+        @Test
+        void targetId_타입이_일치하지_않은경우_예외가_발생한다() throws Exception {
+            // given
+            String targetId = "targetId";
+
+            // when, then
+            mockMvc.perform(get("/follows/{targetId}", targetId))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                    .andExpect(
+                            jsonPath("$.data.errorClassName")
+                                    .value("MethodArgumentTypeMismatchException"))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(ErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH.getMessage()))
+                    .andDo(print());
+        }
+
+        @Test
+        void 입력_값이_정상이라면_예외가_발생하지_않는다() throws Exception {
+            // given
+            Long targetId = 215L;
+
+            // when, then
+            mockMvc.perform(get("/follows/{targetId}", targetId))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success").value(true))
+                    .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                    .andDo(print());
+        }
+    }
+
+    @Nested
+    class 나의_팔로우_카운트를_확인할_때 {
+
+        @Test
+        void 입력_값이_정상이라면_예외가_발생하지_않는다() throws Exception {
+            // when, then
+            mockMvc.perform(get("/follows/me"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.success").value(true))
                     .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
