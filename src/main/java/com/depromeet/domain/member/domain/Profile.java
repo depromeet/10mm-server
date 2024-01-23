@@ -19,4 +19,9 @@ public class Profile {
     public static Profile createProfile(String nickname, String profileImageUrl) {
         return Profile.builder().nickname(nickname).profileImageUrl(profileImageUrl).build();
     }
+
+    // TODO: 이미지 업로드 로직 개선후 timestamp 제거
+    public String getProfileImageUrl() {
+        return profileImageUrl + "?timestamp=" + System.currentTimeMillis();
+    }
 }

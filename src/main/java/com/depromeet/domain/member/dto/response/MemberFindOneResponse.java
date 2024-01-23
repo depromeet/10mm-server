@@ -20,10 +20,7 @@ public record MemberFindOneResponse(
         return new MemberFindOneResponse(
                 member.getId(),
                 member.getProfile().getNickname(),
-                // TODO: 이미지 업로드 로직 개선후 timestamp 제거
-                member.getProfile().getProfileImageUrl()
-                        + "?timestamp="
-                        + System.currentTimeMillis(),
+                member.getProfile().getProfileImageUrl(),
                 member.getStatus(),
                 member.getRole(),
                 member.getVisibility(),
