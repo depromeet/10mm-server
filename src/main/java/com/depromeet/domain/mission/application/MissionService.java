@@ -133,9 +133,9 @@ public class MissionService {
     }
 
     // 친구 미션 목록
-    public FollowMissionFindAllResponse findAllFollowMissions(Long memberId) {
+    public FollowMissionFindAllResponse findAllFollowMissions(Long targetId) {
         final Member sourceMember = memberUtil.getCurrentMember();
-        final Member targetMember = memberUtil.getMemberByMemberId(memberId);
+        final Member targetMember = memberUtil.getMemberByMemberId(targetId);
         final LocalDate today = LocalDate.now();
 
         boolean existMemberRelation =

@@ -54,9 +54,9 @@ public class MissionController {
     }
 
     @Operation(summary = "친구 미션 목록 조회", description = "친구 미션 목록을 조회합니다.")
-    @GetMapping("/follow/{memberId}")
-    public FollowMissionFindAllResponse followMissionFindAll(@PathVariable Long memberId) {
-        return missionService.findAllFollowMissions(memberId);
+    @GetMapping("/follow/{targetId}")
+    public FollowMissionFindAllResponse followMissionFindAll(@PathVariable Long targetId) {
+        return missionService.findAllFollowMissions(targetId);
     }
 
     @Operation(summary = "미션 전체 현황", description = "미션 전체 현황을 조회합니다.")
