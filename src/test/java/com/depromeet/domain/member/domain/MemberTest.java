@@ -23,7 +23,8 @@ class MemberTest {
         // given
         Member member =
                 Member.createGuestMember(
-                        OauthInfo.createOauthInfo("testProvider", "testProviderId"));
+                        OauthInfo.createOauthInfo("testProvider", "testProviderId"),
+                        "testNickname");
 
         // when
         MemberStatus status = member.getStatus();
@@ -37,7 +38,8 @@ class MemberTest {
         // given
         Member member =
                 Member.createGuestMember(
-                        OauthInfo.createOauthInfo("testProvider", "testProviderId"));
+                        OauthInfo.createOauthInfo("testProvider", "testProviderId"),
+                        "testNickname");
 
         // when
         MemberRole role = member.getRole();
@@ -51,7 +53,8 @@ class MemberTest {
         // given
         Member member =
                 Member.createGuestMember(
-                        OauthInfo.createOauthInfo("testProvider", "testProviderId"));
+                        OauthInfo.createOauthInfo("testProvider", "testProviderId"),
+                        "testNickname");
 
         // when
         MemberVisibility visibility = member.getVisibility();
@@ -65,7 +68,8 @@ class MemberTest {
         // given
         Member member =
                 Member.createGuestMember(
-                        OauthInfo.createOauthInfo("testProvider", "testProviderId"));
+                        OauthInfo.createOauthInfo("testProvider", "testProviderId"),
+                        "testNickname");
 
         // when
         member.register("testNickname");
@@ -79,7 +83,8 @@ class MemberTest {
         // given
         Member member =
                 Member.createGuestMember(
-                        OauthInfo.createOauthInfo("testProvider", "testProviderId"));
+                        OauthInfo.createOauthInfo("testProvider", "testProviderId"),
+                        "testNickname");
 
         // when
         member.register("testNickname");
