@@ -22,6 +22,9 @@ public class Profile {
 
     // TODO: 이미지 업로드 로직 개선후 timestamp 제거
     public String getProfileImageUrl() {
+        if (profileImageUrl == null) {
+            return null;
+        }
         return profileImageUrl + "?timestamp=" + System.currentTimeMillis();
     }
 }
