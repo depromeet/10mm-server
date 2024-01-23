@@ -20,9 +20,9 @@ public class MemberUtil {
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    public Member getMemberByNickname(String nickname) {
+    public Member getMemberByMemberId(Long memberId) {
         return memberRepository
-                .findByProfileNickname(nickname)
+                .findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 }

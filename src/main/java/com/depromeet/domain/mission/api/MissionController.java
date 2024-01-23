@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "2. [미션]", description = "미션 관련 API입니다.")
@@ -55,10 +54,9 @@ public class MissionController {
     }
 
     @Operation(summary = "친구 미션 목록 조회", description = "친구 미션 목록을 조회합니다.")
-    @GetMapping("/follow")
-    public FollowMissionFindAllResponse followMissionFindAll(
-            @RequestParam("nickname") String nickname) {
-        return missionService.findAllFollowMissions(nickname);
+    @GetMapping("/follow/{targetId}")
+    public FollowMissionFindAllResponse followMissionFindAll(@PathVariable Long targetId) {
+        return missionService.findAllFollowMissions(targetId);
     }
 
     @Operation(summary = "미션 전체 현황", description = "미션 전체 현황을 조회합니다.")
