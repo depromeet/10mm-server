@@ -140,11 +140,11 @@ public class MissionService {
 
         boolean existMemberRelation =
                 memberRelationRepository.existsBySourceIdAndTargetId(
-					sourceMember.getId(), targetMember.getId());
+                        sourceMember.getId(), targetMember.getId());
 
         List<Mission> missions =
                 missionRepository.findMissionsWithRecordsByRelations(
-					targetMember.getId(), existMemberRelation);
+                        targetMember.getId(), existMemberRelation);
 
         List<MissionRecord> completedMissionRecords = findCompletedMissionRecords(missions);
         // 번개 stack 누적할 변수 선언
