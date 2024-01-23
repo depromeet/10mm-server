@@ -3,6 +3,7 @@ package com.depromeet.domain.mission.api;
 import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
+import com.depromeet.domain.mission.dto.response.FollowMissionFindAllResponse;
 import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindAllResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "2. [미션]", description = "미션 관련 API입니다.")
@@ -50,6 +52,13 @@ public class MissionController {
     @GetMapping
     public List<MissionFindAllResponse> missionFindAll() {
         return missionService.findAllMission();
+    }
+
+    @Operation(summary = "친구 미션 목록 조회", description = "친구 미션 목록을 조회합니다.")
+    @GetMapping("/follow")
+    public FollowMissionFindAllResponse followMissionFindAll(
+            @RequestParam("nickname") String nickname) {
+        return missionService.findAllFollowMissions(nickname);
     }
 
     @Operation(summary = "미션 전체 현황", description = "미션 전체 현황을 조회합니다.")

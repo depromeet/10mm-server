@@ -19,4 +19,10 @@ public class MemberUtil {
                 .findById(securityUtil.getCurrentMemberId())
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
+
+    public Member getMemberByNickname(String nickname) {
+        return memberRepository
+                .findByProfileNickname(nickname)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    }
 }
