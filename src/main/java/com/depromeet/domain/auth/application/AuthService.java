@@ -117,9 +117,20 @@ public class AuthService {
     }
 
     private Member saveAsGuest(OidcUser oidcUser) {
+
         OauthInfo oauthInfo = extractOauthInfo(oidcUser);
-        Member guest = Member.createGuestMember(oauthInfo);
+        String nickname = generateRandomNickname();
+        Member guest = Member.createGuestMember(oauthInfo, nickname);
         return memberRepository.save(guest);
+    }
+
+    private String generateRandomNickname() {
+        while (true) {
+            String nickname = nicknameGenerationStrategy.generate();
+            if (!memberRepository.existsByProfileNickname(nickname)) {
+                return nickname;
+            }
+        }
     }
 
     private OauthInfo extractOauthInfo(OidcUser oidcUser) {
