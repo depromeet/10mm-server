@@ -19,6 +19,7 @@ import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MissionRecordService {
     private static final int EXPIRATION_TIME = 10;
+    private static final int DAYS_ADJUSTMENT = 1;
 
     private final MemberUtil memberUtil;
     private final MissionRepository missionRepository;
@@ -83,7 +85,11 @@ public class MissionRecordService {
                 missionRecordRepository
                         .findById(recordId)
                         .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
-        return MissionRecordFindOneResponse.from(missionRecord);
+        long sinceDay =
+                Duration.between(missionRecord.getMission().getStartedAt(), LocalDateTime.now())
+                                .toDays()
+                        + DAYS_ADJUSTMENT;
+        return MissionRecordFindOneResponse.of(missionRecord, sinceDay);
     }
 
     @Transactional(readOnly = true)
