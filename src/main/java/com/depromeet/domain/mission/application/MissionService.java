@@ -139,7 +139,7 @@ public class MissionService {
         final LocalDate today = LocalDate.now();
 
         boolean existMemberRelation =
-                memberRelationRepository.existsByFollowerIdAndFollowingId(
+                memberRelationRepository.existsBySourceIdAndTargetId(
                         followingMember.getId(), currentMember.getId());
 
         List<Mission> missions =
