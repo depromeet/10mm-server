@@ -134,17 +134,17 @@ public class MissionService {
 
     // 친구 미션 목록
     public FollowMissionFindAllResponse findAllFollowMissions(String nickname) {
-        final Member followingMember = memberUtil.getMemberByNickname(nickname);
-        final Member currentMember = memberUtil.getCurrentMember();
+        final Member sourceMember = memberUtil.getMemberByNickname(nickname);
+        final Member targetMember = memberUtil.getCurrentMember();
         final LocalDate today = LocalDate.now();
 
         boolean existMemberRelation =
                 memberRelationRepository.existsBySourceIdAndTargetId(
-                        followingMember.getId(), currentMember.getId());
+					sourceMember.getId(), targetMember.getId());
 
         List<Mission> missions =
                 missionRepository.findMissionsWithRecordsByRelations(
-                        followingMember.getId(), existMemberRelation);
+					targetMember.getId(), existMemberRelation);
 
         List<MissionRecord> completedMissionRecords = findCompletedMissionRecords(missions);
         // 번개 stack 누적할 변수 선언
