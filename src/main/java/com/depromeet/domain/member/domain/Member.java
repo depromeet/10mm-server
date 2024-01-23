@@ -76,6 +76,7 @@ public class Member extends BaseTimeEntity {
 
     public static Member createGuestMember(OauthInfo oauthInfo, String nickname) {
         return Member.builder()
+                .profile(Profile.createProfile(nickname, null))
                 .oauthInfo(oauthInfo)
                 .status(MemberStatus.NORMAL)
                 .role(MemberRole.GUEST)
