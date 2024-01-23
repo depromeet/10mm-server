@@ -5,7 +5,11 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberRelationRepository extends JpaRepository<MemberRelation, Long> {
-    Optional<MemberRelation> findByFollowerIdAndFollowingId(Long followerId, Long followingId);
+    Optional<MemberRelation> findBySourceIdAndTargetId(Long sourceId, Long targetId);
 
-    boolean existsByFollowerIdAndFollowingId(Long followerId, Long followingId);
+    boolean existsBySourceIdAndTargetId(Long sourceId, Long targetId);
+
+    Long countBySourceId(Long sourceId);
+
+    Long countByTargetId(Long targetId);
 }
