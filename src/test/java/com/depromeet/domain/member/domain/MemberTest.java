@@ -103,4 +103,7 @@ class MemberTest {
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.MEMBER_ALREADY_REGISTERED.getMessage());
     }
+
+    @Test
+    void 이미_프로필사진이_존재할때_회원가입해도_프로필사진이_변경되지_않는다() {}
 }
