@@ -55,7 +55,7 @@ public class IdTokenVerifier {
 
     private void validateAudience(OidcIdToken oidcIdToken, OauthProvider provider) {
         String idTokenAudience = oidcIdToken.getAudience().get(0);
-        List<String> targetAudiences = properties.get(provider).audience();
+        List<String> targetAudiences = properties.get(provider).audiences();
 
         if (idTokenAudience == null || !targetAudiences.contains(idTokenAudience)) {
             throw new CustomException(ErrorCode.ID_TOKEN_VERIFICATION_FAILED);
@@ -101,5 +101,5 @@ public class IdTokenVerifier {
         }
     }
 
-    record PropertyBinder(JwtDecoder decoder, String issuer, List<String> audience) {}
+    record PropertyBinder(JwtDecoder decoder, String issuer, List<String> audiences) {}
 }
