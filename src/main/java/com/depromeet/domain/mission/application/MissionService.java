@@ -134,8 +134,8 @@ public class MissionService {
 
     // 친구 미션 목록
     public FollowMissionFindAllResponse findAllFollowMissions(String nickname) {
-        final Member sourceMember = memberUtil.getMemberByNickname(nickname);
-        final Member targetMember = memberUtil.getCurrentMember();
+        final Member sourceMember = memberUtil.getCurrentMember();
+        final Member targetMember = memberUtil.getMemberByNickname(nickname);
         final LocalDate today = LocalDate.now();
 
         boolean existMemberRelation =
@@ -162,13 +162,11 @@ public class MissionService {
             // 기본 값 NONE으로 지정 후
             MissionStatus missionStatus = MissionStatus.NONE;
             Long missionRecordId = null;
-            if (optionalRecord.isPresent()) {
+            // 당일 수행한 미션 기록의 인증 사진이 존재하면 COMPLETE
+            if (optionalRecord.isPresent()
+                    && (optionalRecord.get().getUploadStatus() == ImageUploadStatus.COMPLETE)) {
                 missionRecordId = optionalRecord.get().getId();
-
-                // 당일 수행한 미션 기록의 인증 사진이 존재하면 COMPLETE
-                if (optionalRecord.get().getUploadStatus() == ImageUploadStatus.COMPLETE) {
-                    missionStatus = MissionStatus.COMPLETED;
-                }
+                missionStatus = MissionStatus.COMPLETED;
             }
 
             findAllResponses.add(
