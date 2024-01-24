@@ -3,8 +3,6 @@ name: develop Build And Deploy
 on:
   push:
     branches: [ "develop" ]
-  pull_request:
-    branches: [ "develop" ]
 
 jobs:
   build:
@@ -79,17 +77,6 @@ jobs:
           remote_key: ${{ secrets.NCP_PRIVATE_KEY }}
           path: docker-compose.yaml
           remote_path: /home/tenminute/
-
-      # 서버로 docker-compose 파일 전송
-#      - name: Copy docker-compose.yml to NCP Server
-#        uses: appleboy/scp-action@v0.1.4
-#        with:
-#          host: ${{ secrets.NCP_HOST }}
-#          username: ${{ secrets.NCP_USERNAME }}
-#          key: ${{ secrets.NCP_PRIVATE_KEY }}
-#          port: ${{ secrets.NCP_PORT }}
-#          source: docker-compose.yaml
-#          target: /home/tenminute/
 
       # 슬랙으로 빌드 스캔 결과 전송
       - name: Send to slack
