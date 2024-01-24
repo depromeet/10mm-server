@@ -24,45 +24,11 @@ public class MemberRelationRepositoryImpl implements MemberRelationRepositoryCus
                 .leftJoin(memberRelation.target, member)
                 .leftJoin(memberRelation.target.missions, mission)
                 .leftJoin(mission.missionRecords, missionRecord)
-                .where(memberRelation.source.id.eq(memberId))
+                .where(sourceIdEq(memberId))
                 .fetch();
     }
 
     private BooleanExpression sourceIdEq(Long sourceId) {
         return memberRelation.source.id.eq(sourceId);
     }
-
-    //    @Override
-    //    public List<Member> findFollowedMemberList(Long memberId) {
-    //        List<Member> memberRelations = jpaQueryFactory
-    //                .selectFrom(member)
-    //                .join(memberRelation.follower)
-    //
-    //                .leftJoin(memberRelation.following, member)
-    //                .fetchJoin()
-    //                .leftJoin(memberRelation.following.missions, mission)
-    //                .on(member.id.eq(mission.member.id))
-    //                .leftJoin(mission.missionRecords, missionRecord)
-    //                .on(mission.id.eq(missionRecord.mission.id))
-    //                .where(memberRelation.follower.id.eq(memberId))
-    //                .orderBy(orderByTest().desc())
-    //                .fetch();
-    //
-    //        return memberRelations;
-    //    }
-    //
-    //    private DateTimeExpression<LocalDateTime> orderByTest() {
-    //        LocalDate now = LocalDate.now();
-    //        return new CaseBuilder().when(
-    //                memberRelation.following.id.isNotNull()
-    //                        .and(Expressions.dateTemplate(LocalDate.class, "DATE_FORMAT({0},
-    // %Y-%m-%d)",missionRecord.startedAt).eq(now))
-    //                )
-    //                .then(missionRecord.startedAt)
-    //                .otherwise(memberRelation.createdAt);
-    //    }
-    //
-    //    private BooleanExpression followerIdEq(Long memberId) {
-    //        return memberId == null ? null : memberRelation.follower.id.eq(memberId);
-    //    }
 }
