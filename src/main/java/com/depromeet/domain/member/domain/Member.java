@@ -74,8 +74,9 @@ public class Member extends BaseTimeEntity {
         this.password = password;
     }
 
-    public static Member createGuestMember(OauthInfo oauthInfo) {
+    public static Member createGuestMember(OauthInfo oauthInfo, String nickname) {
         return Member.builder()
+                .profile(Profile.createProfile(nickname, null))
                 .oauthInfo(oauthInfo)
                 .status(MemberStatus.NORMAL)
                 .role(MemberRole.GUEST)
@@ -111,6 +112,7 @@ public class Member extends BaseTimeEntity {
         validateRegisterAvailable();
         // TODO: Profile 클래스를 제거하고 Member 클래스 필드로 변경
         // TODO: profileImageUrl이 항상 null이 되는 문제 해결
+        // TODO: Profile.createProfile에서 url에 null이 아닌 this.profile.getProfileImageUrl()을 넣어야 함
         this.profile = Profile.createProfile(nickname, null);
         this.role = MemberRole.USER;
     }
