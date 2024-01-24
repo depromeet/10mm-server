@@ -93,8 +93,13 @@ public class FollowService {
         List<MemberRelation> followedMemberList =
                 memberRelationRepository.findAllBySourceId(currentMember.getId());
 
+        // 결과를 반환하는 List
         List<FollowedMemberResponse> result = new ArrayList<>();
+
+        // 당일 미션 기록이 존재하여 미션기록의 순서로 정렬이 될 회원들이 담길 Map
         Map<Member, LocalDateTime> sortedByMemberMissionRecordMap = new HashMap<>();
+
+        // 당일 미션 기록이 존재하지 않아서 팔로우 시간 순서로 정렬이 될 회원들이 담길 Map
         Map<Member, LocalDateTime> sortedByMemberRelationMap = new HashMap<>();
 
         for (MemberRelation memberRelation : followedMemberList) {
@@ -104,6 +109,7 @@ public class FollowService {
             for (Mission mission : targetMemberMissions) {
                 List<MissionRecord> targetMemberMissionRecords = mission.getMissionRecords();
 
+                // 완료한 미션기록이고 오늘인 미션기록 찾기
                 Optional<MissionRecord> optionalMissionRecord =
                         targetMemberMissionRecords.stream()
                                 .filter(
@@ -112,6 +118,8 @@ public class FollowService {
                                                                 == ImageUploadStatus.COMPLETE
                                                         && isToday(record.getStartedAt()))
                                 .max(Comparator.comparing(MissionRecord::getStartedAt));
+
+                // 있다면 미션 기록들 중에서 시간비교를 해야하기 때문에 sortedByMemberMissionRecordMap에 저장
                 if (optionalMissionRecord.isPresent()) {
                     isTargetMemberHasMissionTodayComplete = true;
                     sortedByMemberMissionRecordMap.put(
@@ -119,13 +127,19 @@ public class FollowService {
                     break;
                 }
             }
+
+            // 없다면 팔로우 시간 순서로 비교 해야하기 때문에 sortedByMemberRelationMap에 저장
             if (!isTargetMemberHasMissionTodayComplete) {
                 sortedByMemberRelationMap.put(targetMember, memberRelation.getCreatedAt());
             }
         }
+
+        // (정렬조건 1번째) 당일 미션 기록이 존재하는 회원들 먼저 result에 저장
         sortedByMemberMissionRecordMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
                 .forEach(entry -> result.add(FollowedMemberResponse.of(entry.getKey())));
+
+        // (정렬조건 2번째) 미션 기록이 존재하지 않는 회원들은 팔로우 시간으로 result에 저장
         sortedByMemberRelationMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
                 .forEach(entry -> result.add(FollowedMemberResponse.of(entry.getKey())));
