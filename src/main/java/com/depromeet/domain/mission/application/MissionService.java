@@ -132,6 +132,7 @@ public class MissionService {
         long totalMissionMinute = (sumDuration % 3600) / 60;
 
         // 달성률 계산
+        // TODO: 달성률 계산에 따른 테스트 코드 추가
         double totalMissionAttainRate =
                 calculateMissionAttainRate(completedMissionRecords.size(), totalMissionDay);
 
