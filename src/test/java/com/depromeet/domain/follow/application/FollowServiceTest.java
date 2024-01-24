@@ -11,12 +11,22 @@ import com.depromeet.domain.follow.dto.request.FollowDeleteRequest;
 import com.depromeet.domain.follow.dto.response.FollowFindMeInfoResponse;
 import com.depromeet.domain.follow.dto.response.FollowFindTargetInfoResponse;
 import com.depromeet.domain.follow.dto.response.FollowStatus;
+import com.depromeet.domain.follow.dto.response.MemberFollowedResponse;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
+import com.depromeet.domain.mission.dao.MissionRepository;
+import com.depromeet.domain.mission.domain.Mission;
+import com.depromeet.domain.mission.domain.MissionCategory;
+import com.depromeet.domain.mission.domain.MissionVisibility;
+import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
+import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.security.PrincipalDetails;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,6 +43,8 @@ class FollowServiceTest {
     @Autowired private DatabaseCleaner databaseCleaner;
     @Autowired private MemberRepository memberRepository;
     @Autowired private MemberRelationRepository memberRelationRepository;
+    @Autowired private MissionRepository missionRepository;
+    @Autowired private MissionRecordRepository missionRecordRepository;
     @Autowired private FollowService followService;
 
     @BeforeEach
@@ -366,6 +378,122 @@ class FollowServiceTest {
             // then
             assertEquals(0L, response.followingCount());
             assertEquals(1L, response.followerCount());
+        }
+    }
+
+    @Nested
+    class 내가_팔로우한_유저_정보_리스트를_조회할_때 {
+        @Test
+        void 로그인된_회원이_존재하지_않는다면_예외를_발생시킨다() {
+            // when, then
+            assertThatThrownBy(() -> followService.findAllFollowedMember())
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void 내가_팔로우한_사람이_없다면_빈_리스트가_조회된다() {
+            // given
+            memberRepository.save(
+                    Member.createNormalMember(
+                            Profile.createProfile("testNickname1", "testImageUrl1")));
+
+            // when
+            List<MemberFollowedResponse> response = followService.findAllFollowedMember();
+
+            // then
+            assertEquals(0, response.size());
+        }
+
+        @Test
+        void 팔로우한_유저가_당일_미션을_완수하였다면_미션을_완수하지_않은_유저보다_먼저_조회된다() {
+            // given
+            Member currentMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("currentMember", "currentMember")));
+            Member targetMember1 =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("targetMember1", "targetMember1")));
+            Member targetMember2 =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("targetMember2", "targetMember2")));
+
+            LocalDateTime today = LocalDateTime.now();
+            LocalDateTime missionStartedAt = today;
+            LocalDateTime missionFinishedAt = today.plusWeeks(2);
+            Mission mission =
+                    missionRepository.save(
+                            Mission.createMission(
+                                    "testMissionName",
+                                    "testMissionContent",
+                                    1,
+                                    MissionCategory.ETC,
+                                    MissionVisibility.ALL,
+                                    missionStartedAt,
+                                    missionFinishedAt,
+                                    targetMember2));
+
+            LocalDateTime missionRecordStartedAt = today;
+            LocalDateTime missionRecordFinishedAt =
+                    missionRecordStartedAt.plusMinutes(32).plusSeconds(14);
+            Duration duration = Duration.ofMinutes(32).plusSeconds(14);
+
+            MissionRecord missionRecord =
+                    missionRecordRepository.save(
+                            MissionRecord.createMissionRecord(
+                                    duration,
+                                    missionRecordStartedAt,
+                                    missionRecordFinishedAt,
+                                    mission));
+            missionRecord.updateUploadStatusPending();
+            missionRecord.updateUploadStatusComplete("remark", "imageUrl");
+            missionRecordRepository.save(missionRecord);
+
+            memberRelationRepository.save(
+                    MemberRelation.createMemberRelation(currentMember, targetMember1));
+            memberRelationRepository.save(
+                    MemberRelation.createMemberRelation(currentMember, targetMember2));
+
+            // when
+            List<MemberFollowedResponse> response = followService.findAllFollowedMember();
+
+            // then
+            assertEquals(2, response.size());
+            assertEquals("targetMember2", response.get(0).nickname());
+            assertEquals("targetMember1", response.get(1).nickname());
+        }
+
+        @Test
+        void 팔로우한_유저가_당일_미션을_완수하지_않았다면_팔로우_시간_기준으로_조회된다() {
+            // given
+            Member currentMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("currentMember", "currentMember")));
+            Member targetMember1 =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("targetMember1", "targetMember1")));
+            Member targetMember2 =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("targetMember2", "targetMember2")));
+
+            memberRelationRepository.save(
+                    MemberRelation.createMemberRelation(currentMember, targetMember1));
+            memberRelationRepository.save(
+                    MemberRelation.createMemberRelation(currentMember, targetMember2));
+
+            // when
+            List<MemberFollowedResponse> response = followService.findAllFollowedMember();
+
+            // then
+            assertEquals(2, response.size());
+            assertEquals("targetMember1", response.get(0).nickname());
+            assertEquals("targetMember2", response.get(1).nickname());
         }
     }
 }
