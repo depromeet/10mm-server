@@ -4,6 +4,7 @@ import com.depromeet.domain.auth.dto.request.UsernameCheckRequest;
 import com.depromeet.domain.member.application.MemberService;
 import com.depromeet.domain.member.dto.request.NicknameCheckRequest;
 import com.depromeet.domain.member.dto.response.MemberFindOneResponse;
+import com.depromeet.domain.member.dto.response.MemberSocialInfoResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -47,5 +48,12 @@ public class MemberController {
     public ResponseEntity<Void> memberWithdrawal(@Valid @RequestBody UsernameCheckRequest request) {
         memberService.withdrawal(request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "소셜 로그인 정보 조회하기", description = "소셜 로그인 정보를 조회합니다.")
+    @GetMapping("/me/social")
+    public ResponseEntity<MemberSocialInfoResponse> memberSocialInfoFind() {
+        MemberSocialInfoResponse response = memberService.findMemberSocialInfo();
+        return ResponseEntity.ok(response);
     }
 }

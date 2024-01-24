@@ -6,6 +6,7 @@ import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.dto.request.NicknameCheckRequest;
 import com.depromeet.domain.member.dto.response.MemberFindOneResponse;
+import com.depromeet.domain.member.dto.response.MemberSocialInfoResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -50,5 +51,17 @@ public class MemberService {
 
         refreshTokenRepository.deleteById(member.getId());
         member.withdrawal();
+    }
+
+    public MemberSocialInfoResponse findMemberSocialInfo() {
+        final Member currentMember = memberUtil.getCurrentMember();
+        validateSocialInfoNotNull(currentMember);
+        return MemberSocialInfoResponse.from(currentMember);
+    }
+
+    private void validateSocialInfoNotNull(Member member) {
+        if (member.getOauthInfo() == null) {
+            throw new CustomException(ErrorCode.MEMBER_SOCIAL_INFO_NOT_FOUND);
+        }
     }
 }

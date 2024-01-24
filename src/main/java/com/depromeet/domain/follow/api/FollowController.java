@@ -5,9 +5,11 @@ import com.depromeet.domain.follow.dto.request.FollowCreateRequest;
 import com.depromeet.domain.follow.dto.request.FollowDeleteRequest;
 import com.depromeet.domain.follow.dto.response.FollowFindMeInfoResponse;
 import com.depromeet.domain.follow.dto.response.FollowFindTargetInfoResponse;
+import com.depromeet.domain.follow.dto.response.MemberFollowedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,5 +47,13 @@ public class FollowController {
     @Operation(summary = "나의 팔로우 카운트 확인", description = "나의 팔로잉/팔로워 카운트를 확인합니다.")
     public FollowFindMeInfoResponse followFindMe() {
         return followService.findMeFollowInfo();
+    }
+
+    @GetMapping("/members")
+    @Operation(
+            summary = "내가 팔로우 한 유저 정보(id, 닉네임, 프로필) 리스트 조회",
+            description = "팔로우 한 유저들 정보를 조회합니다.")
+    public List<MemberFollowedResponse> followedUserFindAll() {
+        return followService.findAllFollowedMember();
     }
 }

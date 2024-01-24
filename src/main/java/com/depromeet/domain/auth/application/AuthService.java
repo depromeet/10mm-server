@@ -1,5 +1,6 @@
 package com.depromeet.domain.auth.application;
 
+import com.depromeet.domain.auth.application.nickname.NicknameGenerationStrategy;
 import com.depromeet.domain.auth.domain.OauthProvider;
 import com.depromeet.domain.auth.dto.request.IdTokenRequest;
 import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
@@ -13,7 +14,6 @@ import com.depromeet.domain.member.domain.MemberStatus;
 import com.depromeet.domain.member.domain.OauthInfo;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
-import com.depromeet.global.security.CustomOidcUser;
 import com.depromeet.global.util.MemberUtil;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +34,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenService jwtTokenService;
     private final IdTokenVerifier idTokenVerifier;
+    private final NicknameGenerationStrategy nicknameGenerationStrategy;
 
     public void registerMember(MemberRegisterRequest request) {
         final Member member = memberUtil.getCurrentMember();
@@ -99,18 +100,14 @@ public class AuthService {
     }
 
     public SocialLoginResponse socialLoginMember(IdTokenRequest request, OauthProvider provider) {
-        OidcUser oidcUser = getOidcUser(request.idToken(), provider);
-        Member member = fetchOrCreate(oidcUser);
-        TokenPairResponse loginResponse = getLoginResponse(member);
-        boolean isGuest = member.getRole() == MemberRole.GUEST;
-        return SocialLoginResponse.from(loginResponse, isGuest);
-    }
-
-    private OidcUser getOidcUser(String idToken, OauthProvider provider) {
-        OidcUser oidcUser = idTokenVerifier.getOidcUser(idToken, provider);
+        OidcUser oidcUser = idTokenVerifier.getOidcUser(request.idToken(), provider);
         Member member = fetchOrCreate(oidcUser);
         member.updateLastLoginAt();
-        return new CustomOidcUser(oidcUser, member.getId(), member.getRole());
+
+        TokenPairResponse loginResponse = getLoginResponse(member);
+        boolean isGuest = member.getRole() == MemberRole.GUEST;
+
+        return SocialLoginResponse.from(loginResponse, isGuest);
     }
 
     private Member fetchOrCreate(OidcUser oidcUser) {
@@ -120,12 +117,24 @@ public class AuthService {
     }
 
     private Member saveAsGuest(OidcUser oidcUser) {
+
         OauthInfo oauthInfo = extractOauthInfo(oidcUser);
-        Member guest = Member.createGuestMember(oauthInfo);
+        String nickname = generateRandomNickname();
+        Member guest = Member.createGuestMember(oauthInfo, nickname);
         return memberRepository.save(guest);
     }
 
+    private String generateRandomNickname() {
+        while (true) {
+            String nickname = nicknameGenerationStrategy.generate();
+            if (!memberRepository.existsByProfileNickname(nickname)) {
+                return nickname;
+            }
+        }
+    }
+
     private OauthInfo extractOauthInfo(OidcUser oidcUser) {
-        return OauthInfo.createOauthInfo(oidcUser.getName(), oidcUser.getIssuer().toString());
+        return OauthInfo.createOauthInfo(
+                oidcUser.getName(), oidcUser.getIssuer().toString(), oidcUser.getEmail());
     }
 }
