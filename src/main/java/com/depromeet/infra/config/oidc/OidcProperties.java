@@ -8,14 +8,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "oauth")
 public record OidcProperties(String nonce, Map<OauthProvider, List<Audience>> audience) {
-    record Audience(String key, AudienceType type) {}
-
-    public enum AudienceType {
-        WEB,
-        APP,
-        ALL
-    }
-
     public List<String> getAudiences(OauthProvider provider) {
         return audience.get(provider).stream().map(Audience::key).toList();
     }
@@ -27,4 +19,20 @@ public record OidcProperties(String nonce, Map<OauthProvider, List<Audience>> au
                 .map(Audience::key)
                 .orElseThrow();
     }
+
+    public String getAppleAppAudience() {
+        return audience.get(OauthProvider.APPLE).stream()
+                .filter(audience -> audience.type() == AudienceType.APP)
+                .findFirst()
+                .map(Audience::key)
+                .orElseThrow();
+    }
+
+    public enum AudienceType {
+        WEB,
+        APP,
+        ALL
+    }
+
+    record Audience(String key, AudienceType type) {}
 }

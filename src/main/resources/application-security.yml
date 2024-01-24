@@ -28,5 +28,7 @@ oauth:
       - key: ${KAKAO_NATIVE_APP_KEY:}
         type: APP
     APPLE:
-      - key: ${APPLE_SERVICE_ID:}
-        type: ALL
+      - key: ${APPLE_WEB_ID:}
+        type: WEB
+      - key: ${APPLE_APP_ID:}
+        type: APP
