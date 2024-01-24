@@ -23,7 +23,7 @@ class MemberTest {
         // given
         Member member =
                 Member.createGuestMember(
-                        OauthInfo.createOauthInfo("testProvider", "testProviderId"),
+                        OauthInfo.createOauthInfo("testProvider", "testProviderId", "testEmail"),
                         "testNickname");
 
         // when
@@ -38,7 +38,7 @@ class MemberTest {
         // given
         Member member =
                 Member.createGuestMember(
-                        OauthInfo.createOauthInfo("testProvider", "testProviderId"),
+                        OauthInfo.createOauthInfo("testProvider", "testProviderId", "testEmail"),
                         "testNickname");
 
         // when
@@ -53,7 +53,7 @@ class MemberTest {
         // given
         Member member =
                 Member.createGuestMember(
-                        OauthInfo.createOauthInfo("testProvider", "testProviderId"),
+                        OauthInfo.createOauthInfo("testProvider", "testProviderId", "testEmail"),
                         "testNickname");
 
         // when
@@ -68,7 +68,7 @@ class MemberTest {
         // given
         Member member =
                 Member.createGuestMember(
-                        OauthInfo.createOauthInfo("testProvider", "testProviderId"),
+                        OauthInfo.createOauthInfo("testProvider", "testProviderId", "testEmail"),
                         "testNickname");
 
         // when
@@ -83,7 +83,7 @@ class MemberTest {
         // given
         Member member =
                 Member.createGuestMember(
-                        OauthInfo.createOauthInfo("testProvider", "testProviderId"),
+                        OauthInfo.createOauthInfo("testProvider", "testProviderId", "testEmail"),
                         "testNickname");
 
         // when
