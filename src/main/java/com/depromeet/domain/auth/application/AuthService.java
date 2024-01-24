@@ -134,6 +134,7 @@ public class AuthService {
     }
 
     private OauthInfo extractOauthInfo(OidcUser oidcUser) {
-        return OauthInfo.createOauthInfo(oidcUser.getName(), oidcUser.getIssuer().toString());
+        return OauthInfo.createOauthInfo(
+                oidcUser.getName(), oidcUser.getIssuer().toString(), oidcUser.getEmail());
     }
 }
