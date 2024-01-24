@@ -15,6 +15,7 @@ import com.depromeet.domain.missionRecord.dto.response.MissionRecordSummaryRespo
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -104,13 +105,19 @@ public class MissionService {
         final Member member = memberUtil.getCurrentMember();
         List<Mission> missions = missionRepository.findMissionsWithRecords(member.getId());
         List<MissionRecord> completedMissionRecords = findCompletedMissionRecords(missions);
+        final LocalDateTime today = LocalDateTime.now();
 
         // 번개 stack 누적할 변수 선언
         long symbolStack = symbolStackCalculate(completedMissionRecords);
 
-        long totalMissionRecordSize =
-                missions.stream().mapToLong(mission -> mission.getMissionRecords().size()).sum();
-
+		// 미션 수행 일수 계산으로 (today - 생성알자) 일수 계산하여 AttainRate에 활용
+        long totalMissionDay =
+                missions.stream()
+                        .mapToLong(
+                                mission ->
+                                        Duration.between(mission.getStartedAt().minusDays(1), today)
+                                                .toDays())
+                        .sum();
         // Duration을 초로 바꾸고 합산
         long sumDuration =
                 completedMissionRecords.stream()
@@ -126,7 +133,7 @@ public class MissionService {
 
         // 달성률 계산
         double totalMissionAttainRate =
-                calculateMissionAttainRate(completedMissionRecords.size(), totalMissionRecordSize);
+                calculateMissionAttainRate(completedMissionRecords.size(), totalMissionDay);
 
         return MissionRecordSummaryResponse.from(
                 symbolStack, totalMissionHour, totalMissionMinute, totalMissionAttainRate);
