@@ -7,11 +7,17 @@ import com.depromeet.domain.follow.dto.request.FollowDeleteRequest;
 import com.depromeet.domain.follow.dto.response.FollowFindMeInfoResponse;
 import com.depromeet.domain.follow.dto.response.FollowFindTargetInfoResponse;
 import com.depromeet.domain.follow.dto.response.FollowStatus;
+import com.depromeet.domain.follow.dto.response.FollowedMemberResponse;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.mission.domain.Mission;
+import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
+import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
+import java.time.LocalDateTime;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +58,7 @@ public class FollowService {
         memberRelationRepository.delete(memberRelation);
     }
 
+    @Transactional(readOnly = true)
     public FollowFindTargetInfoResponse findTargetFollowInfo(Long targetId) {
         final Member currentMember = memberUtil.getCurrentMember();
         final Member targetMember = getTargetMember(targetId);
@@ -70,6 +77,7 @@ public class FollowService {
         return FollowFindTargetInfoResponse.of(followingCount, followerCount, followStatus);
     }
 
+    @Transactional(readOnly = true)
     public FollowFindMeInfoResponse findMeFollowInfo() {
         final Member currentMember = memberUtil.getCurrentMember();
 
@@ -77,6 +85,57 @@ public class FollowService {
         Long followerCount = memberRelationRepository.countByTargetId(currentMember.getId());
 
         return FollowFindMeInfoResponse.of(followingCount, followerCount);
+    }
+
+    @Transactional(readOnly = true) // TODO: 로직 개선 필요
+    public List<FollowedMemberResponse> findAllFollowedMember() {
+        final Member currentMember = memberUtil.getCurrentMember();
+        List<MemberRelation> followedMemberList =
+                memberRelationRepository.findAllBySourceId(currentMember.getId());
+
+        List<FollowedMemberResponse> result = new ArrayList<>();
+        Map<Member, LocalDateTime> sortedByMemberMissionRecordMap = new HashMap<>();
+        Map<Member, LocalDateTime> sortedByMemberRelationMap = new HashMap<>();
+
+        for (MemberRelation memberRelation : followedMemberList) {
+            Member targetMember = memberRelation.getTarget();
+            List<Mission> targetMemberMissions = targetMember.getMissions();
+            boolean isTargetMemberHasMissionTodayComplete = false;
+            for (Mission mission : targetMemberMissions) {
+                List<MissionRecord> targetMemberMissionRecords = mission.getMissionRecords();
+
+                Optional<MissionRecord> optionalMissionRecord =
+                        targetMemberMissionRecords.stream()
+                                .filter(
+                                        record ->
+                                                record.getUploadStatus()
+                                                                == ImageUploadStatus.COMPLETE
+                                                        && isToday(record.getStartedAt()))
+                                .max(Comparator.comparing(MissionRecord::getStartedAt));
+                if (optionalMissionRecord.isPresent()) {
+                    isTargetMemberHasMissionTodayComplete = true;
+                    sortedByMemberMissionRecordMap.put(
+                            targetMember, optionalMissionRecord.get().getStartedAt());
+                    break;
+                }
+            }
+            if (!isTargetMemberHasMissionTodayComplete) {
+                sortedByMemberRelationMap.put(targetMember, memberRelation.getCreatedAt());
+            }
+        }
+        sortedByMemberMissionRecordMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue())
+                .forEach(entry -> result.add(FollowedMemberResponse.of(entry.getKey())));
+        sortedByMemberRelationMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue())
+                .forEach(entry -> result.add(FollowedMemberResponse.of(entry.getKey())));
+
+        return result;
+    }
+
+    private boolean isToday(LocalDateTime dateTime) {
+        LocalDateTime today = LocalDateTime.now();
+        return dateTime.toLocalDate().isEqual(today.toLocalDate());
     }
 
     private FollowStatus determineFollowStatus(boolean isFollowing, boolean isFollowedByMe) {
