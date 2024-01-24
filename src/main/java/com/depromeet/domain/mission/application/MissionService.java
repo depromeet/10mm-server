@@ -110,7 +110,7 @@ public class MissionService {
         // 번개 stack 누적할 변수 선언
         long symbolStack = symbolStackCalculate(completedMissionRecords);
 
-		// 미션 수행 일수 계산으로 (today - 생성알자) 일수 계산하여 AttainRate에 활용
+        // 미션 수행 일수 계산으로 (today - 생성알자) 일수 계산하여 AttainRate에 활용
         long totalMissionDay =
                 missions.stream()
                         .mapToLong(
