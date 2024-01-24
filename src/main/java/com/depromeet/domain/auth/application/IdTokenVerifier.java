@@ -70,8 +70,8 @@ public class IdTokenVerifier {
         String idTokenNonce = idToken.getNonce();
         String targetNonce = oidcProperties.nonce();
 
-        // 카카오 앱 토큰의 경우 라이브러리 문제로 nonce 검증 생략
-        if (isKakaoAppToken(idToken, provider)) {
+        // 카카오, 애플 앱 토큰의 경우 라이브러리 문제로 nonce 검증 생략
+        if (isKakaoAppToken(idToken, provider) || isAppleAppToken(idToken, provider)) {
             return;
         }
 
@@ -83,5 +83,10 @@ public class IdTokenVerifier {
     private boolean isKakaoAppToken(OidcIdToken idToken, OauthProvider provider) {
         return provider == OauthProvider.KAKAO
                 && idToken.getAudience().contains(oidcProperties.getKakaoAppAudience());
+    }
+
+    private boolean isAppleAppToken(OidcIdToken idToken, OauthProvider provider) {
+        return provider == OauthProvider.APPLE
+                && idToken.getAudience().contains(oidcProperties.getAppleAppAudience());
     }
 }
