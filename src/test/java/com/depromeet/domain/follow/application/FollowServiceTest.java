@@ -11,7 +11,7 @@ import com.depromeet.domain.follow.dto.request.FollowDeleteRequest;
 import com.depromeet.domain.follow.dto.response.FollowFindMeInfoResponse;
 import com.depromeet.domain.follow.dto.response.FollowFindTargetInfoResponse;
 import com.depromeet.domain.follow.dto.response.FollowStatus;
-import com.depromeet.domain.follow.dto.response.FollowedMemberResponse;
+import com.depromeet.domain.follow.dto.response.MemberFollowedResponse;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
@@ -399,7 +399,7 @@ class FollowServiceTest {
                             Profile.createProfile("testNickname1", "testImageUrl1")));
 
             // when
-            List<FollowedMemberResponse> response = followService.findAllFollowedMember();
+            List<MemberFollowedResponse> response = followService.findAllFollowedMember();
 
             // then
             assertEquals(0, response.size());
@@ -458,7 +458,7 @@ class FollowServiceTest {
                     MemberRelation.createMemberRelation(currentMember, targetMember2));
 
             // when
-            List<FollowedMemberResponse> response = followService.findAllFollowedMember();
+            List<MemberFollowedResponse> response = followService.findAllFollowedMember();
 
             // then
             assertEquals(2, response.size());
@@ -488,7 +488,7 @@ class FollowServiceTest {
                     MemberRelation.createMemberRelation(currentMember, targetMember2));
 
             // when
-            List<FollowedMemberResponse> response = followService.findAllFollowedMember();
+            List<MemberFollowedResponse> response = followService.findAllFollowedMember();
 
             // then
             assertEquals(2, response.size());

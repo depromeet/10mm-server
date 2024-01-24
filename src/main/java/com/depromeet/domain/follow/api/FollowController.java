@@ -5,7 +5,7 @@ import com.depromeet.domain.follow.dto.request.FollowCreateRequest;
 import com.depromeet.domain.follow.dto.request.FollowDeleteRequest;
 import com.depromeet.domain.follow.dto.response.FollowFindMeInfoResponse;
 import com.depromeet.domain.follow.dto.response.FollowFindTargetInfoResponse;
-import com.depromeet.domain.follow.dto.response.FollowedMemberResponse;
+import com.depromeet.domain.follow.dto.response.MemberFollowedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -53,7 +53,7 @@ public class FollowController {
     @Operation(
             summary = "내가 팔로우 한 유저 정보(id, 닉네임, 프로필) 리스트 조회",
             description = "팔로우 한 유저들 정보를 조회합니다.")
-    public List<FollowedMemberResponse> followedUserFindAll() {
+    public List<MemberFollowedResponse> followedUserFindAll() {
         return followService.findAllFollowedMember();
     }
 }

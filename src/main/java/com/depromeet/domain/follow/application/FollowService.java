@@ -7,7 +7,7 @@ import com.depromeet.domain.follow.dto.request.FollowDeleteRequest;
 import com.depromeet.domain.follow.dto.response.FollowFindMeInfoResponse;
 import com.depromeet.domain.follow.dto.response.FollowFindTargetInfoResponse;
 import com.depromeet.domain.follow.dto.response.FollowStatus;
-import com.depromeet.domain.follow.dto.response.FollowedMemberResponse;
+import com.depromeet.domain.follow.dto.response.MemberFollowedResponse;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.domain.Mission;
@@ -88,13 +88,13 @@ public class FollowService {
     }
 
     @Transactional(readOnly = true) // TODO: 로직 개선 필요
-    public List<FollowedMemberResponse> findAllFollowedMember() {
+    public List<MemberFollowedResponse> findAllFollowedMember() {
         final Member currentMember = memberUtil.getCurrentMember();
         List<MemberRelation> followedMemberList =
                 memberRelationRepository.findAllBySourceId(currentMember.getId());
 
         // 결과를 반환하는 List
-        List<FollowedMemberResponse> result = new ArrayList<>();
+        List<MemberFollowedResponse> result = new ArrayList<>();
 
         // 당일 미션 기록이 존재하여 미션기록의 순서로 정렬이 될 회원들이 담길 Map
         Map<Member, LocalDateTime> sortedByMemberMissionRecordMap = new HashMap<>();
@@ -137,12 +137,12 @@ public class FollowService {
         // (정렬조건 1번째) 당일 미션 기록이 존재하는 회원들 먼저 result에 저장
         sortedByMemberMissionRecordMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
-                .forEach(entry -> result.add(FollowedMemberResponse.of(entry.getKey())));
+                .forEach(entry -> result.add(MemberFollowedResponse.of(entry.getKey())));
 
         // (정렬조건 2번째) 미션 기록이 존재하지 않는 회원들은 팔로우 시간으로 result에 저장
         sortedByMemberRelationMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
-                .forEach(entry -> result.add(FollowedMemberResponse.of(entry.getKey())));
+                .forEach(entry -> result.add(MemberFollowedResponse.of(entry.getKey())));
 
         return result;
     }
