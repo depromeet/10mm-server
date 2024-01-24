@@ -157,4 +157,17 @@ class FollowControllerTest {
                     .andDo(print());
         }
     }
+
+    @Nested
+    class 내가_팔로우한_유저_정보_리스트를_조회할_때 {
+        @Test
+        void 입력_값이_정상이라면_예외가_발생하지_않는다() throws Exception {
+            // when, then
+            mockMvc.perform(get("/follows/members"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success").value(true))
+                    .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                    .andDo(print());
+        }
+    }
 }
