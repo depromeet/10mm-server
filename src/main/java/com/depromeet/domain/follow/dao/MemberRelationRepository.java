@@ -1,6 +1,7 @@
 package com.depromeet.domain.follow.dao;
 
 import com.depromeet.domain.follow.domain.MemberRelation;
+import com.depromeet.domain.member.domain.Member;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +17,8 @@ public interface MemberRelationRepository
     Long countByTargetId(Long targetId);
 
     List<MemberRelation> findAllBySourceId(Long memberId);
+
+    List<MemberRelation> findAllBySourceIdAndTargetIn(Long sourceId, List<Member> targetIds);
+
+    List<MemberRelation> findAllByTargetId(Long targetId);
 }

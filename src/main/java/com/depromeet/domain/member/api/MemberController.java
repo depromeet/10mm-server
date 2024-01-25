@@ -4,10 +4,12 @@ import com.depromeet.domain.auth.dto.request.UsernameCheckRequest;
 import com.depromeet.domain.member.application.MemberService;
 import com.depromeet.domain.member.dto.request.NicknameCheckRequest;
 import com.depromeet.domain.member.dto.response.MemberFindOneResponse;
+import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.member.dto.response.MemberSocialInfoResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +42,12 @@ public class MemberController {
             @Valid @RequestBody NicknameCheckRequest request) {
         memberService.checkNickname(request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "닉네임으로 회원 검색", description = "닉네임으로 회원을 검색합니다.")
+    @GetMapping("/search")
+    public List<MemberSearchResponse> memberNicknameSearch(@RequestParam String nickname) {
+        return memberService.searchMemberNickname(nickname);
     }
 
     // TODO: 테스트 코드 작성 필요
