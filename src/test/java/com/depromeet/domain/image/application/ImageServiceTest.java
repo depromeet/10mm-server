@@ -57,18 +57,17 @@ class ImageServiceTest {
 
     @Nested
     class 미션_기록_이미지_PresignedUrl을_생성할_때 {
-        // TODO: MemberUtil insertMockMemberIfNotExist메서드 제거 후 주석해제 예정
-        // @Test
-        // void 회원이_존재하지_않는다면_예외를_발생시킨다() {
-        // 	// given
-        // 	MissionRecordImageCreateRequest request =
-        // 		new MissionRecordImageCreateRequest(192L, ImageFileExtension.JPEG);
-        //
-        // 	// when, then
-        // 	assertThatThrownBy(() -> imageService.createMissionRecordPresignedUrl(request))
-        // 		.isInstanceOf(CustomException.class)
-        // 		.hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
-        // }
+         @Test
+         void 회원이_존재하지_않는다면_예외를_발생시킨다() {
+         	// given
+         	MissionRecordImageCreateRequest request =
+         		new MissionRecordImageCreateRequest(192L, ImageFileExtension.JPEG);
+
+         	// when, then
+         	assertThatThrownBy(() -> imageService.createMissionRecordPresignedUrl(request))
+         		.isInstanceOf(CustomException.class)
+         		.hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
+         }
 
         @Test
         void 미션이_존재하지_않는다면_예외를_발생시킨다() {
@@ -84,54 +83,6 @@ class ImageServiceTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.MISSION_RECORD_NOT_FOUND.getMessage());
         }
-
-        //        TODO: SecurityUtil setMockAuthentication메서드 제거 후 주석해제 예정
-        //        @Test
-        //        void 미션을_생성한_유저와_로그인_유저가_일치하지_않는다면_예외를_발생시킨다() {
-        //            // given
-        //            memberRepository.save(
-        //                    Member.createNormalMember(new Profile("testNickname",
-        // "testImageUrl")));
-        //            MissionCreateRequest missionCreateRequest =
-        //                    new MissionCreateRequest(
-        //                            "testMissionName",
-        //                            "testMissionContent",
-        //                            MissionCategory.STUDY,
-        //                            MissionVisibility.ALL);
-        //            MissionCreateResponse missionCreateResponse =
-        //                    missionService.createMission(missionCreateRequest);
-        //
-        //            SecurityContextHolder.clearContext();
-        //            PrincipalDetails principal = new PrincipalDetails(2L, "USER");
-        //            Authentication authentication =
-        //                    new UsernamePasswordAuthenticationToken(
-        //                            principal, "password", principal.getAuthorities());
-        //            SecurityContextHolder.getContext().setAuthentication(authentication);
-        //
-        //
-        //            LocalDateTime missionRecordStartedAt = LocalDateTime.of(2023, 12, 15, 1, 5,
-        // 0);
-        //            LocalDateTime missionRecordFinishedAt =
-        //                    missionRecordStartedAt.plusMinutes(32).plusSeconds(14);
-        //            MissionRecordCreateRequest missionRecordCreateRequest =
-        //                    new MissionRecordCreateRequest(
-        //                            missionCreateResponse.missionId(),
-        //                            missionRecordStartedAt,
-        //                            missionRecordFinishedAt,
-        //                            32,
-        //                            14);
-        //            Long missionRecord =
-        //                    missionRecordService.createMissionRecord(missionRecordCreateRequest);
-        //            MissionRecordImageCreateRequest request =
-        //                    new MissionRecordImageCreateRequest(missionRecord,
-        // ImageFileExtension.JPEG);
-        //
-        //            // when, then
-        //            assertThatThrownBy(() ->
-        // imageService.createMissionRecordPresignedUrl(request))
-        //                    .isInstanceOf(CustomException.class)
-        //                    .hasMessage(ErrorCode.MISSION_RECORD_USER_MISMATCH.getMessage());
-        //        }
 
         @Test
         void 입력_값이_정상이라면_예외가_발생하지_않는다() {
@@ -209,29 +160,27 @@ class ImageServiceTest {
 
             // then
             assertThat(missionRecordPresignedUrl.presignedUrl())
-                    .contains(
+                    .containsPattern(
                             String.format(
-                                    "/local/mission_record/%s/image.jpeg",
+                                    "/local/mission_record/%s/.*\\.jpeg",
                                     missionRecordCreateResponse.missionId()));
         }
     }
 
     @Nested
     class 미션_기록_이미지_업로드_완료_처리할_때 {
+         @Test
+         void 회원이_존재하지_않는다면_예외를_발생시킨다() {
+            // given
+             MissionRecordImageUploadCompleteRequest request =
+                new MissionRecordImageUploadCompleteRequest(192L, ImageFileExtension.JPEG,
+ "testRemark");
 
-        // TODO: MemberUtil insertMockMemberIfNotExist메서드 제거 후 주석해제 예정
-        //         @Test
-        //         void 회원이_존재하지_않는다면_예외를_발생시킨다() {
-        //         	// given
-        //             MissionRecordImageUploadCompleteRequest request =
-        //         		new MissionRecordImageUploadCompleteRequest(192L, ImageFileExtension.JPEG,
-        // "testRemark");
-        //
-        //         	// when, then
-        //         	assertThatThrownBy(() -> imageService.uploadCompleteMissionRecord(request))
-        //         		.isInstanceOf(CustomException.class)
-        //         		.hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
-        //         }
+            // when, then
+            assertThatThrownBy(() -> imageService.uploadCompleteMissionRecord(request))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
+         }
 
         @Test
         void 미션이_존재하지_않는다면_예외를_발생시킨다() {
@@ -299,9 +248,9 @@ class ImageServiceTest {
             assertThat(missionRecord.getUploadStatus()).isEqualTo(ImageUploadStatus.COMPLETE);
             assertThat(missionRecord.getRemark()).isEqualTo("testRemark");
             assertThat(missionRecord.getImageUrl())
-                    .contains(
+                    .containsPattern(
                             String.format(
-                                    "/local/mission_record/%s/image.jpeg",
+                                    "/local/mission_record/%s/.*\\.jpeg",
                                     missionRecordCreateResponse.missionId()));
         }
     }
