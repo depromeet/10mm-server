@@ -189,16 +189,16 @@ public class MissionService {
         return FollowMissionFindAllResponse.of(symbolStack, findAllResponses);
     }
 
-	@Transactional(readOnly = true)
-	public MissionSymbolStackResponse findMissionSymbolStack(Long memberId) {
-		final Member currentMember = memberUtil.getMemberByMemberId(memberId);
-		List<Mission> missions = missionRepository.findMissionsWithRecords(currentMember.getId());
-		List<MissionRecord> completedMissionRecords = findCompletedMissionRecords(missions);
+    @Transactional(readOnly = true)
+    public MissionSymbolStackResponse findMissionSymbolStack(Long memberId) {
+        final Member currentMember = memberUtil.getMemberByMemberId(memberId);
+        List<Mission> missions = missionRepository.findMissionsWithRecords(currentMember.getId());
+        List<MissionRecord> completedMissionRecords = findCompletedMissionRecords(missions);
 
-		// 번개 stack 누적할 변수 선언
-		long symbolStack = symbolStackCalculate(completedMissionRecords);
-		return MissionSymbolStackResponse.of(symbolStack);
-	}
+        // 번개 stack 누적할 변수 선언
+        long symbolStack = symbolStackCalculate(completedMissionRecords);
+        return MissionSymbolStackResponse.of(symbolStack);
+    }
 
     public MissionUpdateResponse updateMission(
             MissionUpdateRequest missionUpdateRequest, Long missionId) {
@@ -267,6 +267,4 @@ public class MissionService {
                                 missionRecord.getUploadStatus() == ImageUploadStatus.COMPLETE)
                 .toList();
     }
-
-
 }
