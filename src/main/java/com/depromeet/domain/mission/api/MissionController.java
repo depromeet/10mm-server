@@ -7,6 +7,7 @@ import com.depromeet.domain.mission.dto.response.FollowMissionFindAllResponse;
 import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindAllResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
+import com.depromeet.domain.mission.dto.response.MissionSymbolStackResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordSummaryResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +15,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+
+import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -64,6 +67,12 @@ public class MissionController {
     public MissionRecordSummaryResponse missionRecordFindSummary() {
         return missionService.findSummaryMissionRecord();
     }
+
+	@Operation(summary = "번개 스택 조회", description = "완료한 미션 대상으로 번개 스택을 조회합니다.")
+	@GetMapping("/symbol/{memberId}")
+	public MissionSymbolStackResponse missionSymbolStackFind(@PathVariable Long memberId) {
+		return missionService.findMissionSymbolStack(memberId);
+	}
 
     @Operation(summary = "미션 단건 수정", description = "단건 미션을 수정합니다.")
     @PutMapping("/{missionId}")

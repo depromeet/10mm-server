@@ -256,4 +256,14 @@ public class MissionService {
                                 missionRecord.getUploadStatus() == ImageUploadStatus.COMPLETE)
                 .toList();
     }
+
+	public MissionSymbolStackResponse findMissionSymbolStack(Long memberId) {
+		final Member currentMember = memberUtil.getMemberByMemberId(memberId);
+		List<Mission> missions = missionRepository.findMissionsWithRecords(currentMember.getId());
+		List<MissionRecord> completedMissionRecords = findCompletedMissionRecords(missions);
+
+		// 번개 stack 누적할 변수 선언
+		long symbolStack = symbolStackCalculate(completedMissionRecords);
+		return MissionSymbolStackResponse.of(symbolStack);
+	}
 }
