@@ -57,17 +57,17 @@ class ImageServiceTest {
 
     @Nested
     class 미션_기록_이미지_PresignedUrl을_생성할_때 {
-         @Test
-         void 회원이_존재하지_않는다면_예외를_발생시킨다() {
-         	// given
-         	MissionRecordImageCreateRequest request =
-         		new MissionRecordImageCreateRequest(192L, ImageFileExtension.JPEG);
+        @Test
+        void 회원이_존재하지_않는다면_예외를_발생시킨다() {
+            // given
+            MissionRecordImageCreateRequest request =
+                    new MissionRecordImageCreateRequest(192L, ImageFileExtension.JPEG);
 
-         	// when, then
-         	assertThatThrownBy(() -> imageService.createMissionRecordPresignedUrl(request))
-         		.isInstanceOf(CustomException.class)
-         		.hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
-         }
+            // when, then
+            assertThatThrownBy(() -> imageService.createMissionRecordPresignedUrl(request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
+        }
 
         @Test
         void 미션이_존재하지_않는다면_예외를_발생시킨다() {
@@ -169,18 +169,18 @@ class ImageServiceTest {
 
     @Nested
     class 미션_기록_이미지_업로드_완료_처리할_때 {
-         @Test
-         void 회원이_존재하지_않는다면_예외를_발생시킨다() {
+        @Test
+        void 회원이_존재하지_않는다면_예외를_발생시킨다() {
             // given
-             MissionRecordImageUploadCompleteRequest request =
-                new MissionRecordImageUploadCompleteRequest(192L, ImageFileExtension.JPEG,
- "testRemark");
+            MissionRecordImageUploadCompleteRequest request =
+                    new MissionRecordImageUploadCompleteRequest(
+                            192L, ImageFileExtension.JPEG, "testRemark");
 
             // when, then
             assertThatThrownBy(() -> imageService.uploadCompleteMissionRecord(request))
-                .isInstanceOf(CustomException.class)
-                .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
-         }
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
+        }
 
         @Test
         void 미션이_존재하지_않는다면_예외를_발생시킨다() {

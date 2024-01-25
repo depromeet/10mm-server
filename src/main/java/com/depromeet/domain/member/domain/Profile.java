@@ -8,8 +8,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Profile {
     private String nickname;
-    @Getter
-    private String profileImageUrl;
+    @Getter private String profileImageUrl;
 
     @Builder(access = AccessLevel.PRIVATE)
     private Profile(String nickname, String profileImageUrl) {

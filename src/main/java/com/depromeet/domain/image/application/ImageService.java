@@ -28,7 +28,6 @@ import com.depromeet.global.util.SpringEnvironmentUtil;
 import com.depromeet.infra.config.storage.StorageProperties;
 import java.util.Date;
 import java.util.UUID;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,7 +70,12 @@ public class ImageService {
 
         missionRecord.updateUploadStatusPending();
         missionRecordTtlRepository.deleteById(request.missionRecordId());
-        imageRepository.save(Image.createImage(ImageType.MISSION_RECORD, request.missionRecordId(), imageKey, request.imageFileExtension()));
+        imageRepository.save(
+                Image.createImage(
+                        ImageType.MISSION_RECORD,
+                        request.missionRecordId(),
+                        imageKey,
+                        request.imageFileExtension()));
         return PresignedUrlResponse.from(presignedUrl);
     }
 
@@ -82,7 +86,11 @@ public class ImageService {
         Mission mission = missionRecord.getMission();
         validateMissionRecordUserMismatch(mission, currentMember);
 
-        Image image = findImage(ImageType.MISSION_RECORD, request.missionRecordId(), request.imageFileExtension());
+        Image image =
+                findImage(
+                        ImageType.MISSION_RECORD,
+                        request.missionRecordId(),
+                        request.imageFileExtension());
         String imageUrl =
                 createReadImageUrl(
                         ImageType.MISSION_RECORD,
@@ -117,7 +125,11 @@ public class ImageService {
         final Member currentMember = memberUtil.getCurrentMember();
         String imageUrl = null;
         if (request.imageFileExtension() != null) {
-            Image image = findImage(ImageType.MEMBER_PROFILE, currentMember.getId(), request.imageFileExtension());
+            Image image =
+                    findImage(
+                            ImageType.MEMBER_PROFILE,
+                            currentMember.getId(),
+                            request.imageFileExtension());
             imageUrl =
                     createReadImageUrl(
                             ImageType.MEMBER_PROFILE,
@@ -128,8 +140,10 @@ public class ImageService {
         currentMember.updateProfile(Profile.createProfile(request.nickname(), imageUrl));
     }
 
-    private Image findImage(ImageType imageType, Long targetId, ImageFileExtension imageFileExtension) {
-        return imageRepository.queryImageKey(imageType, targetId, imageFileExtension)
+    private Image findImage(
+            ImageType imageType, Long targetId, ImageFileExtension imageFileExtension) {
+        return imageRepository
+                .queryImageKey(imageType, targetId, imageFileExtension)
                 .orElseThrow(() -> new CustomException(ErrorCode.IMAGE_KEY_NOT_FOUND));
     }
 
@@ -144,7 +158,10 @@ public class ImageService {
     }
 
     private String createFileName(
-            ImageType imageType, Long targetId, String imageKey, ImageFileExtension imageFileExtension) {
+            ImageType imageType,
+            Long targetId,
+            String imageKey,
+            ImageFileExtension imageFileExtension) {
         return springEnvironmentUtil.getCurrentProfile()
                 + "/"
                 + imageType.getValue()
@@ -157,7 +174,10 @@ public class ImageService {
     }
 
     private String createUploadImageUrl(
-            ImageType imageType, Long targetId, String imageKey, ImageFileExtension imageFileExtension) {
+            ImageType imageType,
+            Long targetId,
+            String imageKey,
+            ImageFileExtension imageFileExtension) {
         return storageProperties.endpoint()
                 + "/"
                 + storageProperties.bucket()
@@ -174,7 +194,10 @@ public class ImageService {
     }
 
     private String createReadImageUrl(
-            ImageType imageType, Long targetId, String imageKey, ImageFileExtension imageFileExtension) {
+            ImageType imageType,
+            Long targetId,
+            String imageKey,
+            ImageFileExtension imageFileExtension) {
         return UrlConstants.IMAGE_DOMAIN_URL.getValue()
                 + "/"
                 + springEnvironmentUtil.getCurrentProfile()
