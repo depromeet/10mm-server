@@ -4,8 +4,10 @@ import com.depromeet.domain.auth.dao.RefreshTokenRepository;
 import com.depromeet.domain.auth.dto.request.UsernameCheckRequest;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
+import com.depromeet.domain.image.domain.ImageFileExtension;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.member.dto.request.NicknameCheckRequest;
 import com.depromeet.domain.member.dto.response.MemberFindOneResponse;
 import com.depromeet.domain.member.dto.response.MemberSearchResponse;
@@ -35,7 +37,18 @@ public class MemberService {
     @Transactional(readOnly = true)
     public MemberFindOneResponse findMemberInfo() {
         final Member currentMember = memberUtil.getCurrentMember();
-        return MemberFindOneResponse.from(currentMember);
+
+        // TODO: 이미지 확장자 정보 같이 넘겨주는 작업 추가 (24.01.26)
+        // 이미지 업로드와 닉네임 변경 분리 후 제거 예정
+        ImageFileExtension imageFileExtension = null;
+        Profile profile = currentMember.getProfile();
+        if (profile.getProfileImageUrl() != null) {
+            String profileImageUrl = profile.getProfileImageUrl();
+            String extension = profileImageUrl.substring(profileImageUrl.lastIndexOf(".") + 1);
+            System.out.println("extension = " + extension);
+            imageFileExtension = ImageFileExtension.of(extension);
+        }
+        return MemberFindOneResponse.of(currentMember, imageFileExtension);
     }
 
     @Transactional(readOnly = true)
