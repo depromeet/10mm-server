@@ -21,6 +21,7 @@ public class Image extends BaseTimeEntity {
 
     private Long targetId;
 
+    @Column(length = 36)
     private String imageKey;
 
     @Enumerated(EnumType.STRING)
