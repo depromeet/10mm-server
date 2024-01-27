@@ -28,6 +28,12 @@ public class MemberController {
         return memberService.findMemberInfo();
     }
 
+    @Operation(summary = "회원 정보 확인", description = "로그인 된 회원의 정보를 확인합니다.")
+    @GetMapping("/{targetId}")
+    public MemberFindOneResponse targetInfo(@PathVariable Long targetId) {
+        return memberService.findTargetInfo(targetId);
+    }
+
     @Operation(summary = "아이디 중복 체크", description = "아이디 중복 체크를 진행합니다.")
     @PostMapping("/check-username")
     public ResponseEntity<Void> memberUsernameCheck(
