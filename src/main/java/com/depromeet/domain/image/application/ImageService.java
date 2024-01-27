@@ -118,6 +118,12 @@ public class ImageService {
                         request.imageFileExtension().getUploadExtension());
 
         String presignedUrl = amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
+        imageRepository.save(
+                Image.createImage(
+                        ImageType.MEMBER_PROFILE,
+                        currentMember.getId(),
+                        imageKey,
+                        request.imageFileExtension()));
         return PresignedUrlResponse.from(presignedUrl);
     }
 
