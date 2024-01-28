@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  backend:
+    image: ${NCP_CONTAINER_REGISTRY}/server-spring:${NCP_IMAGE_TAG}
+    container_name: server-spring
+    restart: always
+    environment:
+      - TZ=Asia/Seoul
+    network_mode: host
+    env_file:
+      - .env
+  redis:
+    image: "redis:alpine"
+    container_name: redis
+    ports:
+      - "6379:6379"
+    environment:
+      - TZ=Asia/Seoul
+    network_mode: "host"

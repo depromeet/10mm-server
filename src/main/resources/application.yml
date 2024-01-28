@@ -1,0 +1,32 @@
+spring:
+  profiles:
+    group:
+      test: "test"
+      local: "local, datasource"
+      dev: "dev, datasource, actuator"
+      prod: "prod, datasource, actuator"
+    include:
+      - redis
+      - storage
+      - security
+
+swagger:
+  version: 0.0.1
+  user: ${SWAGGER_USER:default}
+  password: ${SWAGGER_PASSWORD:default}
+springdoc:
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /swagger-ui
+    disable-swagger-default-url: true
+    display-request-duration: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+    syntax-highlight:
+      theme: none
+    urls-primary-name: 10MM API DOCS
+
+logging:
+  level:
+    com.depromeet.domain.*.api.*: debug

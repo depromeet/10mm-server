@@ -1,0 +1,44 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            authorization-grant-type: authorization_code
+            client-id: ${KAKAO_CLIENT_ID:default}
+            client-secret: ${KAKAO_CLIENT_SECRET:default}
+            redirect-uri: ${KAKAO_REDIRECT_URI:default}
+            client-name: Kakao
+            client-authentication-method: client_secret_post
+            scope:
+              - openid
+              - account_email
+          apple:
+            authorization-grant-type: authorization_code
+            client-id: ${APPLE_CLIENT_ID:default}
+            client-secret: ${APPLE_PRIVATE_KEY:default}|${APPLE_KEY_ID:default}|${APPLE_TEAM_ID:default}
+            redirect-uri: ${APPLE_REDIRECT_URI:default}
+            client-name: apple
+            scope:
+              - openid
+              - name
+              - email
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v1/oidc/userinfo
+            user-name-attribute: sub
+            jwk-set-uri: https://kauth.kakao.com/.well-known/jwks.json
+          apple:
+            authorization-uri: https://appleid.apple.com/auth/authorize?response_mode=form_post
+            token-uri: https://appleid.apple.com/auth/token
+            user-name-attribute: sub
+            jwk-set-uri: https://appleid.apple.com/auth/keys
+
+jwt:
+  access-token-secret: ${JWT_ACCESS_TOKEN_SECRET:}
+  refresh-token-secret: ${JWT_REFRESH_TOKEN_SECRET:}
+  access-token-expiration-time: ${JWT_ACCESS_TOKEN_EXPIRATION_TIME:7200}
+  refresh-token-expiration-time: ${JWT_REFRESH_TOKEN_EXPIRATION_TIME:604800}
+  issuer: ${JWT_ISSUER:}
