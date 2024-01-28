@@ -84,16 +84,6 @@ public class Member extends BaseTimeEntity {
                 .build();
     }
 
-    public static Member createNormalMember(String username, String password) {
-        return Member.builder()
-                .username(username)
-                .password(password)
-                .status(MemberStatus.NORMAL)
-                .role(MemberRole.USER)
-                .visibility(MemberVisibility.PUBLIC)
-                .build();
-    }
-
     @Deprecated
     public static Member createNormalMember(Profile profile) {
         return Member.builder()

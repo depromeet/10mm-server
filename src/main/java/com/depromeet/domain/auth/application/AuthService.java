@@ -13,13 +13,16 @@ import com.depromeet.domain.member.domain.OauthInfo;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
-import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -34,14 +37,14 @@ public class AuthService {
     private final IdTokenVerifier idTokenVerifier;
     private final NicknameGenerationStrategy nicknameGenerationStrategy;
 
+    @Deprecated
     public TokenPairResponse registerWithUsernameAndPassword(UsernamePasswordRequest request) {
         Optional<Member> member = memberRepository.findByUsername(request.username());
 
         // 첫 회원가입
         if (member.isEmpty()) {
             String encodedPassword = passwordEncoder.encode(request.password());
-            final Member savedMember =
-                    Member.createNormalMember(request.username(), encodedPassword);
+            final Member savedMember = Member.createNormalMember(null, null); // do nothing
             memberRepository.save(savedMember);
             return getLoginResponse(savedMember);
         }
