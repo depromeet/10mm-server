@@ -23,7 +23,8 @@ class MemberTest {
         // given
         Member member =
                 Member.createGuestMember(
-                        OauthInfo.createOauthInfo("testProvider", "testProviderId"));
+                        OauthInfo.createOauthInfo("testProvider", "testProviderId", "testEmail"),
+                        "testNickname");
 
         // when
         MemberStatus status = member.getStatus();
@@ -37,7 +38,8 @@ class MemberTest {
         // given
         Member member =
                 Member.createGuestMember(
-                        OauthInfo.createOauthInfo("testProvider", "testProviderId"));
+                        OauthInfo.createOauthInfo("testProvider", "testProviderId", "testEmail"),
+                        "testNickname");
 
         // when
         MemberRole role = member.getRole();
@@ -51,7 +53,8 @@ class MemberTest {
         // given
         Member member =
                 Member.createGuestMember(
-                        OauthInfo.createOauthInfo("testProvider", "testProviderId"));
+                        OauthInfo.createOauthInfo("testProvider", "testProviderId", "testEmail"),
+                        "testNickname");
 
         // when
         MemberVisibility visibility = member.getVisibility();
@@ -65,7 +68,8 @@ class MemberTest {
         // given
         Member member =
                 Member.createGuestMember(
-                        OauthInfo.createOauthInfo("testProvider", "testProviderId"));
+                        OauthInfo.createOauthInfo("testProvider", "testProviderId", "testEmail"),
+                        "testNickname");
 
         // when
         member.register("testNickname");
@@ -79,7 +83,8 @@ class MemberTest {
         // given
         Member member =
                 Member.createGuestMember(
-                        OauthInfo.createOauthInfo("testProvider", "testProviderId"));
+                        OauthInfo.createOauthInfo("testProvider", "testProviderId", "testEmail"),
+                        "testNickname");
 
         // when
         member.register("testNickname");
@@ -98,4 +103,7 @@ class MemberTest {
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.MEMBER_ALREADY_REGISTERED.getMessage());
     }
+
+    @Test
+    void 이미_프로필사진이_존재할때_회원가입해도_프로필사진이_변경되지_않는다() {}
 }

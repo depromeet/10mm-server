@@ -19,4 +19,10 @@ public class MemberUtil {
                 .findById(securityUtil.getCurrentMemberId())
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
+
+    public Member getMemberByMemberId(Long memberId) {
+        return memberRepository
+                .findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    }
 }

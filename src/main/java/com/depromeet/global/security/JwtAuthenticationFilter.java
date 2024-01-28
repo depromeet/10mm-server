@@ -31,9 +31,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        // TODO: 쿠키 방식으로 변경 시 아래 로직 수정 필요
         String accessToken = extractAccessToken(request);
         String refreshToken = extractRefreshToken(request);
 
+        // TODO: 엑세스 토큰 없더라도 쿠키의 리프레시 토큰으로 재발급하도록 수정 필요
         // ATK, RTK 둘 중 하나라도 빈 상태로 오면 통과
         if (accessToken == null || refreshToken == null) {
             filterChain.doFilter(request, response);

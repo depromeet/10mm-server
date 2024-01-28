@@ -1,12 +1,17 @@
 package com.depromeet.domain.auth.application;
 
+import com.depromeet.domain.auth.application.nickname.NicknameGenerationStrategy;
+import com.depromeet.domain.auth.domain.OauthProvider;
+import com.depromeet.domain.auth.dto.request.IdTokenRequest;
 import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
+import com.depromeet.domain.auth.dto.response.SocialLoginResponse;
 import com.depromeet.domain.auth.dto.response.TokenPairResponse;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.MemberRole;
 import com.depromeet.domain.member.domain.MemberStatus;
+import com.depromeet.domain.member.domain.OauthInfo;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -14,6 +19,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +33,8 @@ public class AuthService {
     private final MemberUtil memberUtil;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenService jwtTokenService;
+    private final IdTokenVerifier idTokenVerifier;
+    private final NicknameGenerationStrategy nicknameGenerationStrategy;
 
     public void registerMember(MemberRegisterRequest request) {
         final Member member = memberUtil.getCurrentMember();
@@ -89,5 +97,44 @@ public class AuthService {
         String refreshToken = jwtTokenService.createRefreshToken(member.getId());
 
         return TokenPairResponse.from(accessToken, refreshToken);
+    }
+
+    public SocialLoginResponse socialLoginMember(IdTokenRequest request, OauthProvider provider) {
+        OidcUser oidcUser = idTokenVerifier.getOidcUser(request.idToken(), provider);
+        Member member = fetchOrCreate(oidcUser);
+        member.updateLastLoginAt();
+
+        TokenPairResponse loginResponse = getLoginResponse(member);
+        boolean isGuest = member.getRole() == MemberRole.GUEST;
+
+        return SocialLoginResponse.from(loginResponse, isGuest);
+    }
+
+    private Member fetchOrCreate(OidcUser oidcUser) {
+        return memberRepository
+                .findByOauthInfo(extractOauthInfo(oidcUser))
+                .orElseGet(() -> saveAsGuest(oidcUser));
+    }
+
+    private Member saveAsGuest(OidcUser oidcUser) {
+
+        OauthInfo oauthInfo = extractOauthInfo(oidcUser);
+        String nickname = generateRandomNickname();
+        Member guest = Member.createGuestMember(oauthInfo, nickname);
+        return memberRepository.save(guest);
+    }
+
+    private String generateRandomNickname() {
+        while (true) {
+            String nickname = nicknameGenerationStrategy.generate();
+            if (!memberRepository.existsByProfileNickname(nickname)) {
+                return nickname;
+            }
+        }
+    }
+
+    private OauthInfo extractOauthInfo(OidcUser oidcUser) {
+        return OauthInfo.createOauthInfo(
+                oidcUser.getName(), oidcUser.getIssuer().toString(), oidcUser.getEmail());
     }
 }

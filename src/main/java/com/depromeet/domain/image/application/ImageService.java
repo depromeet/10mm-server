@@ -5,6 +5,8 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.depromeet.domain.image.dao.ImageRepository;
+import com.depromeet.domain.image.domain.Image;
 import com.depromeet.domain.image.domain.ImageFileExtension;
 import com.depromeet.domain.image.domain.ImageType;
 import com.depromeet.domain.image.dto.request.MemberProfileImageCreateRequest;
@@ -18,12 +20,14 @@ import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.dao.MissionRecordTtlRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import com.depromeet.global.common.constants.UrlConstants;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
 import com.depromeet.global.util.SpringEnvironmentUtil;
 import com.depromeet.infra.config.storage.StorageProperties;
 import java.util.Date;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +42,7 @@ public class ImageService {
     private final AmazonS3 amazonS3;
     private final MissionRecordRepository missionRecordRepository;
     private final MissionRecordTtlRepository missionRecordTtlRepository;
+    private final ImageRepository imageRepository;
 
     public PresignedUrlResponse createMissionRecordPresignedUrl(
             MissionRecordImageCreateRequest request) {
@@ -48,10 +53,12 @@ public class ImageService {
         Mission mission = missionRecord.getMission();
         validateMissionRecordUserMismatch(mission, currentMember);
 
+        String imageKey = generateUUID();
         String fileName =
                 createFileName(
                         ImageType.MISSION_RECORD,
                         request.missionRecordId(),
+                        imageKey,
                         request.imageFileExtension());
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
                 createGeneratePreSignedUrlRequest(
@@ -63,6 +70,12 @@ public class ImageService {
 
         missionRecord.updateUploadStatusPending();
         missionRecordTtlRepository.deleteById(request.missionRecordId());
+        imageRepository.save(
+                Image.createImage(
+                        ImageType.MISSION_RECORD,
+                        request.missionRecordId(),
+                        imageKey,
+                        request.imageFileExtension()));
         return PresignedUrlResponse.from(presignedUrl);
     }
 
@@ -73,10 +86,16 @@ public class ImageService {
         Mission mission = missionRecord.getMission();
         validateMissionRecordUserMismatch(mission, currentMember);
 
-        String imageUrl =
-                createImageUrl(
+        Image image =
+                findImage(
                         ImageType.MISSION_RECORD,
                         request.missionRecordId(),
+                        request.imageFileExtension());
+        String imageUrl =
+                createReadImageUrl(
+                        ImageType.MISSION_RECORD,
+                        request.missionRecordId(),
+                        image.getImageKey(),
                         request.imageFileExtension());
         missionRecord.updateUploadStatusComplete(request.remark(), imageUrl);
     }
@@ -85,10 +104,12 @@ public class ImageService {
             MemberProfileImageCreateRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
 
+        String imageKey = generateUUID();
         String fileName =
                 createFileName(
                         ImageType.MEMBER_PROFILE,
                         currentMember.getId(),
+                        imageKey,
                         request.imageFileExtension());
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
                 createGeneratePreSignedUrlRequest(
@@ -97,6 +118,12 @@ public class ImageService {
                         request.imageFileExtension().getUploadExtension());
 
         String presignedUrl = amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
+        imageRepository.save(
+                Image.createImage(
+                        ImageType.MEMBER_PROFILE,
+                        currentMember.getId(),
+                        imageKey,
+                        request.imageFileExtension()));
         return PresignedUrlResponse.from(presignedUrl);
     }
 
@@ -104,13 +131,30 @@ public class ImageService {
         final Member currentMember = memberUtil.getCurrentMember();
         String imageUrl = null;
         if (request.imageFileExtension() != null) {
-            imageUrl =
-                    createImageUrl(
+            Image image =
+                    findImage(
                             ImageType.MEMBER_PROFILE,
                             currentMember.getId(),
                             request.imageFileExtension());
+            imageUrl =
+                    createReadImageUrl(
+                            ImageType.MEMBER_PROFILE,
+                            currentMember.getId(),
+                            image.getImageKey(),
+                            request.imageFileExtension());
         }
         currentMember.updateProfile(Profile.createProfile(request.nickname(), imageUrl));
+    }
+
+    private Image findImage(
+            ImageType imageType, Long targetId, ImageFileExtension imageFileExtension) {
+        return imageRepository
+                .queryImageKey(imageType, targetId, imageFileExtension)
+                .orElseThrow(() -> new CustomException(ErrorCode.IMAGE_KEY_NOT_FOUND));
+    }
+
+    private String generateUUID() {
+        return UUID.randomUUID().toString();
     }
 
     private MissionRecord findMissionRecordById(Long request) {
@@ -120,18 +164,26 @@ public class ImageService {
     }
 
     private String createFileName(
-            ImageType imageType, Long targetId, ImageFileExtension imageFileExtension) {
+            ImageType imageType,
+            Long targetId,
+            String imageKey,
+            ImageFileExtension imageFileExtension) {
         return springEnvironmentUtil.getCurrentProfile()
                 + "/"
                 + imageType.getValue()
                 + "/"
                 + targetId
-                + "/image."
+                + "/"
+                + imageKey
+                + "."
                 + imageFileExtension.getUploadExtension();
     }
 
-    private String createImageUrl(
-            ImageType imageType, Long targetId, ImageFileExtension imageFileExtension) {
+    private String createUploadImageUrl(
+            ImageType imageType,
+            Long targetId,
+            String imageKey,
+            ImageFileExtension imageFileExtension) {
         return storageProperties.endpoint()
                 + "/"
                 + storageProperties.bucket()
@@ -141,7 +193,27 @@ public class ImageService {
                 + imageType.getValue()
                 + "/"
                 + targetId
-                + "/image."
+                + "/"
+                + imageKey
+                + "."
+                + imageFileExtension.getUploadExtension();
+    }
+
+    private String createReadImageUrl(
+            ImageType imageType,
+            Long targetId,
+            String imageKey,
+            ImageFileExtension imageFileExtension) {
+        return UrlConstants.IMAGE_DOMAIN_URL.getValue()
+                + "/"
+                + springEnvironmentUtil.getCurrentProfile()
+                + "/"
+                + imageType.getValue()
+                + "/"
+                + targetId
+                + "/"
+                + imageKey
+                + "."
                 + imageFileExtension.getUploadExtension();
     }
 

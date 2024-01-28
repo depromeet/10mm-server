@@ -23,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -33,14 +34,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class WebSecurityConfig {
 
     private final SpringEnvironmentUtil springEnvironmentUtil;
-    //    private final CustomOidcUserService customOidcUserService;
-    //    private final CustomOidcAuthenticationSuccessHandler
-    // customOidcAuthenticationSuccessHandler;
-    //    private final CustomOidcAuthenticationFailureHandler
-    // customOidcAuthenticationFailureHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    //    private final CustomRequestEntityConverterV2 customRequestEntityConverterV2;
 
     @Value("${swagger.user}")
     private String swaggerUser;
@@ -100,7 +94,7 @@ public class WebSecurityConfig {
                                 .requestMatchers("/auth/register")
                                 .authenticated() // 소셜 로그인 임시 토큰으로 인증
                                 .requestMatchers("/auth/**")
-                                .permitAll() // 임시 회원가입 / 로그인은 토큰 필요 X
+                                .permitAll() // 임시 회원가입 / 로그인 + OAuth2 로그인
                                 .requestMatchers("/v1/**")
                                 .permitAll() // 임시로 모든 요청 허용
                                 .requestMatchers("/oauth2/**")
@@ -110,27 +104,7 @@ public class WebSecurityConfig {
                                 .authenticated());
         //        .permitAll());
 
-        // TODO: 소셜 로그인은 별도 처리
-
-        //        http.oauth2Login(
-        //                oauth2 ->
-        //                        oauth2.tokenEndpoint(
-        //                                        tokenEndpoint ->
-        //                                                tokenEndpoint.accessTokenResponseClient(
-        //
-        // customAccessTokenResponseClient()))
-        //                                .userInfoEndpoint(
-        //                                        userInfo ->
-        // userInfo.oidcUserService(customOidcUserService))
-        //                                .successHandler(customOidcAuthenticationSuccessHandler)
-        //                                .failureHandler(customOidcAuthenticationFailureHandler)
-        //                                .userInfoEndpoint(
-        //                                        userInfo ->
-        // userInfo.oidcUserService(customOidcUserService))
-        //                                .successHandler(customOidcAuthenticationSuccessHandler)
-        //                                .failureHandler(customOidcAuthenticationFailureHandler));
-
-        //        http.addFilterAfter(jwtAuthenticationFilter, LogoutFilter.class);
+        http.addFilterAfter(jwtAuthenticationFilter, LogoutFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -165,13 +139,4 @@ public class WebSecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
-    // TODO: 소셜 로그인 추가 시 빈으로 등록
-
-    //    public DefaultAuthorizationCodeTokenResponseClient customAccessTokenResponseClient() {
-    //        DefaultAuthorizationCodeTokenResponseClient client =
-    //                new DefaultAuthorizationCodeTokenResponseClient();
-    //        client.setRequestEntityConverter(customRequestEntityConverterV2);
-    //        return client;
-    //    }
 }

@@ -13,6 +13,8 @@ public enum UrlConstants {
     PROD_DOMAIN_URL("https://www.10mm.today"),
     DEV_DOMAIN_URL("https://www.dev.10mm.today"),
     LOCAL_DOMAIN_URL("http://localhost:3000"),
+
+    IMAGE_DOMAIN_URL("https://image.10mm.today"),
     ;
 
     private String value;
