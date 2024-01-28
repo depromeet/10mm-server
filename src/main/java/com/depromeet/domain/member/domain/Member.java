@@ -94,6 +94,7 @@ public class Member extends BaseTimeEntity {
                 .build();
     }
 
+    @Deprecated
     public static Member createNormalMember(Profile profile) {
         return Member.builder()
                 .profile(profile)
