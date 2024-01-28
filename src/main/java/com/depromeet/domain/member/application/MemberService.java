@@ -145,7 +145,6 @@ public class MemberService {
         if (profile.getProfileImageUrl() != null) {
             String profileImageUrl = profile.getProfileImageUrl();
             String extension = profileImageUrl.substring(profileImageUrl.lastIndexOf(".") + 1);
-            log.info("extension = {}", extension);
             imageFileExtension = ImageFileExtension.of(extension);
         }
         return imageFileExtension;
