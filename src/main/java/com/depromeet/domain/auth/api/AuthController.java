@@ -34,6 +34,7 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @Deprecated
     @Operation(summary = "아이디/비밀번호 임시 회원가입", description = "아이디/비밀번호 임시 회원가입을 진행합니다.")
     @PostMapping("/temp-register")
     public ResponseEntity<TokenPairResponse> memberTempRegister(
@@ -47,6 +48,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).headers(tokenHeaders).body(response);
     }
 
+    @Deprecated
     @Operation(summary = "로그인", description = "토큰 발급을 위해 로그인을 진행합니다.")
     @PostMapping("/login")
     public ResponseEntity<TokenPairResponse> memberLogin(
