@@ -37,10 +37,10 @@ class MemberUtilTest {
                 new UsernamePasswordAuthenticationToken(
                         principal, "password", principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        Member guestMember =
+        Member member =
                 Member.createNormalMember(
                         OauthInfo.createOauthInfo("test", "test", "test"), "test");
-        Member savedMember = memberRepository.save(guestMember);
+        Member savedMember = memberRepository.save(member);
         // when
         Member currentMember = memberUtil.getCurrentMember();
         // then

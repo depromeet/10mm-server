@@ -104,15 +104,15 @@ public class AuthService {
     private Member fetchOrCreate(OidcUser oidcUser) {
         return memberRepository
                 .findByOauthInfo(extractOauthInfo(oidcUser))
-                .orElseGet(() -> saveAsGuest(oidcUser));
+                .orElseGet(() -> saveMember(oidcUser));
     }
 
-    private Member saveAsGuest(OidcUser oidcUser) {
+    private Member saveMember(OidcUser oidcUser) {
 
         OauthInfo oauthInfo = extractOauthInfo(oidcUser);
         String nickname = generateRandomNickname();
-        Member guest = Member.createNormalMember(oauthInfo, nickname);
-        return memberRepository.save(guest);
+        Member member = Member.createNormalMember(oauthInfo, nickname);
+        return memberRepository.save(member);
     }
 
     private String generateRandomNickname() {

@@ -54,9 +54,9 @@ class MissionServiceTest {
                 new UsernamePasswordAuthenticationToken(
                         principal, null, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        Member guestMember =
+        Member member =
                 Member.createNormalMember(OauthInfo.createOauthInfo(null, null, null), "nickname");
-        memberRepository.save(guestMember);
+        memberRepository.save(member);
     }
 
     @Test
