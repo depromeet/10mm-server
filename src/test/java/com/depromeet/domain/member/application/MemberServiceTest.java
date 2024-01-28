@@ -49,9 +49,8 @@ class MemberServiceTest {
     }
 
     private void saveAndRegisterMember(OauthInfo oauthInfo) {
-        Member member = Member.createGuestMember(oauthInfo, "testNickname");
+        Member member = Member.createNormalMember(oauthInfo, "testNickname");
         memberRepository.save(member);
-        member.register("testNickname");
         PrincipalDetails principalDetails = new PrincipalDetails(1L, "USER");
         Authentication authentication =
                 new UsernamePasswordAuthenticationToken(

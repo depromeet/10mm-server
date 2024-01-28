@@ -8,7 +8,6 @@ import com.depromeet.domain.auth.dto.response.SocialLoginResponse;
 import com.depromeet.domain.auth.dto.response.TokenPairResponse;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
-import com.depromeet.domain.member.domain.MemberRole;
 import com.depromeet.domain.member.domain.MemberStatus;
 import com.depromeet.domain.member.domain.OauthInfo;
 import com.depromeet.global.error.exception.CustomException;
@@ -42,7 +41,7 @@ public class AuthService {
         if (member.isEmpty()) {
             String encodedPassword = passwordEncoder.encode(request.password());
             final Member savedMember =
-                    Member.createGuestMember(request.username(), encodedPassword);
+                    Member.createNormalMember(request.username(), encodedPassword);
             memberRepository.save(savedMember);
             return getLoginResponse(savedMember);
         }
@@ -68,10 +67,9 @@ public class AuthService {
         return getLoginResponse(member);
     }
 
+    @Deprecated
     private void validateNotGuestMember(Member member) {
-        if (member.getRole() == MemberRole.GUEST) {
-            throw new CustomException(ErrorCode.GUEST_MEMBER_REQUIRES_REGISTRATION);
-        }
+        // do nothing
     }
 
     private void validateNormalMember(Member member) {
@@ -99,9 +97,8 @@ public class AuthService {
         member.updateLastLoginAt();
 
         TokenPairResponse loginResponse = getLoginResponse(member);
-        boolean isGuest = member.getRole() == MemberRole.GUEST;
 
-        return SocialLoginResponse.from(loginResponse, isGuest);
+        return SocialLoginResponse.from(loginResponse);
     }
 
     private Member fetchOrCreate(OidcUser oidcUser) {
@@ -114,7 +111,7 @@ public class AuthService {
 
         OauthInfo oauthInfo = extractOauthInfo(oidcUser);
         String nickname = generateRandomNickname();
-        Member guest = Member.createGuestMember(oauthInfo, nickname);
+        Member guest = Member.createNormalMember(oauthInfo, nickname);
         return memberRepository.save(guest);
     }
 

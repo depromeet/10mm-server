@@ -74,22 +74,22 @@ public class Member extends BaseTimeEntity {
         this.password = password;
     }
 
-    public static Member createGuestMember(OauthInfo oauthInfo, String nickname) {
+    public static Member createNormalMember(OauthInfo oauthInfo, String nickname) {
         return Member.builder()
                 .profile(Profile.createProfile(nickname, null))
                 .oauthInfo(oauthInfo)
                 .status(MemberStatus.NORMAL)
-                .role(MemberRole.GUEST)
+                .role(MemberRole.USER)
                 .visibility(MemberVisibility.PUBLIC)
                 .build();
     }
 
-    public static Member createGuestMember(String username, String password) {
+    public static Member createNormalMember(String username, String password) {
         return Member.builder()
                 .username(username)
                 .password(password)
                 .status(MemberStatus.NORMAL)
-                .role(MemberRole.GUEST)
+                .role(MemberRole.USER)
                 .visibility(MemberVisibility.PUBLIC)
                 .build();
     }
@@ -117,11 +117,5 @@ public class Member extends BaseTimeEntity {
             throw new CustomException(ErrorCode.MEMBER_ALREADY_DELETED);
         }
         this.status = MemberStatus.DELETED;
-    }
-
-    private void validateRegisterAvailable() {
-        if (role != MemberRole.GUEST) {
-            throw new CustomException(ErrorCode.MEMBER_ALREADY_REGISTERED);
-        }
     }
 }

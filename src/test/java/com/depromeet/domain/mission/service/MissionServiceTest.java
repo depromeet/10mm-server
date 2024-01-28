@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.depromeet.DatabaseCleaner;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.member.domain.OauthInfo;
 import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
@@ -51,9 +52,10 @@ class MissionServiceTest {
         PrincipalDetails principal = new PrincipalDetails(1L, "USER");
         Authentication authentication =
                 new UsernamePasswordAuthenticationToken(
-                        principal, "password", principal.getAuthorities());
+                        principal, null, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        Member guestMember = Member.createGuestMember("username", "password");
+        Member guestMember =
+                Member.createNormalMember(OauthInfo.createOauthInfo(null, null, null), "nickname");
         memberRepository.save(guestMember);
     }
 
