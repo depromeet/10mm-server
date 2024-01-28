@@ -108,15 +108,6 @@ public class Member extends BaseTimeEntity {
         this.lastLoginAt = LocalDateTime.now();
     }
 
-    public void register(String nickname) {
-        validateRegisterAvailable();
-        // TODO: Profile 클래스를 제거하고 Member 클래스 필드로 변경
-        // TODO: profileImageUrl이 항상 null이 되는 문제 해결
-        // TODO: Profile.createProfile에서 url에 null이 아닌 this.profile.getProfileImageUrl()을 넣어야 함
-        this.profile = Profile.createProfile(nickname, null);
-        this.role = MemberRole.USER;
-    }
-
     public void updateProfile(Profile profile) {
         this.profile = profile;
     }

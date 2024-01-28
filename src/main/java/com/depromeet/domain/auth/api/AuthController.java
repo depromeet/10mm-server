@@ -26,10 +26,11 @@ public class AuthController {
     private final AuthService authService;
     private final CookieUtil cookieUtil;
 
-    @Operation(summary = "회원가입", description = "회원가입을 진행합니다.")
+    @Deprecated
+    @Operation(summary = "회원가입", description = "회원가입을 진행합니다. (현재 사용하지 않습니다.)")
     @PostMapping("/register")
     public ResponseEntity<Void> memberRegister(@Valid @RequestBody MemberRegisterRequest request) {
-        authService.registerMember(request);
+        // do nothing
         return ResponseEntity.ok().build();
     }
 
