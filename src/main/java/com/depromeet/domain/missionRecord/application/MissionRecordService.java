@@ -10,10 +10,7 @@ import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.domain.MissionRecordTtl;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordUpdateRequest;
-import com.depromeet.domain.missionRecord.dto.response.MissionRecordCreateResponse;
-import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindOneResponse;
-import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindResponse;
-import com.depromeet.domain.missionRecord.dto.response.MissionRecordUpdateResponse;
+import com.depromeet.domain.missionRecord.dto.response.*;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -93,11 +90,14 @@ public class MissionRecordService {
     }
 
     @Transactional(readOnly = true)
-    public List<MissionRecordFindResponse> findAllMissionRecord(
-            Long missionId, YearMonth yearMonth) {
+    public MissionRecordCalendarResponse findAllMissionRecord(Long missionId, YearMonth yearMonth) {
         List<MissionRecord> missionRecords =
                 missionRecordRepository.findAllByMissionIdAndYearMonth(missionId, yearMonth);
-        return missionRecords.stream().map(MissionRecordFindResponse::from).toList();
+        List<MissionRecordFindResponse> missionRecordFindResponses =
+                missionRecords.stream().map(MissionRecordFindResponse::from).toList();
+        Mission mission = findMissionById(missionId);
+        return MissionRecordCalendarResponse.of(
+                mission.getStartedAt(), mission.getFinishedAt(), missionRecordFindResponses);
     }
 
     public MissionRecordUpdateResponse updateMissionRecord(
