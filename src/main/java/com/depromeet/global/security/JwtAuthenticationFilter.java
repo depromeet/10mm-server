@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -76,8 +77,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             AccessTokenDto accessToken = reissuedAccessToken.get(); // 재발급된 AT
             RefreshTokenDto refreshToken =
                     jwtTokenService.createRefreshTokenDto(refreshTokenDto.memberId());
-            cookieUtil.addTokenCookies(
-                    response, accessToken.tokenValue(), refreshToken.tokenValue());
+
+            // 쿠키에 재발급된 AT, RT 저장
+            HttpHeaders httpHeaders =
+                    cookieUtil.generateTokenCookies(
+                            accessToken.tokenValue(), refreshToken.tokenValue());
+            response.addHeader(
+                    HttpHeaders.SET_COOKIE, httpHeaders.getFirst(ACCESS_TOKEN_COOKIE_NAME));
+            response.addHeader(
+                    HttpHeaders.SET_COOKIE, httpHeaders.getFirst(REFRESH_TOKEN_COOKIE_NAME));
+
             setAuthenticationToContext(accessToken.memberId(), accessToken.memberRole());
         }
 

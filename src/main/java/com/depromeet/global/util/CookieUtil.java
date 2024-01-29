@@ -3,7 +3,6 @@ package com.depromeet.global.util;
 import static com.depromeet.global.common.constants.SecurityConstants.ACCESS_TOKEN_COOKIE_NAME;
 import static com.depromeet.global.common.constants.SecurityConstants.REFRESH_TOKEN_COOKIE_NAME;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -14,12 +13,6 @@ import org.springframework.stereotype.Component;
 public class CookieUtil {
 
     private final SpringEnvironmentUtil springEnvironmentUtil;
-
-    public void addTokenCookies(
-            HttpServletResponse response, String accessToken, String refreshToken) {
-        HttpHeaders headers = generateTokenCookies(accessToken, refreshToken);
-        headers.forEach((key, value) -> response.addHeader(key, value.get(0)));
-    }
 
     public HttpHeaders generateTokenCookies(String accessToken, String refreshToken) {
 
