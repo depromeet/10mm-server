@@ -7,7 +7,7 @@ import com.depromeet.domain.auth.domain.RefreshToken;
 import com.depromeet.domain.auth.dto.AccessTokenDto;
 import com.depromeet.domain.auth.dto.RefreshTokenDto;
 import com.depromeet.domain.member.domain.MemberRole;
-import com.depromeet.global.security.JwtUtil;
+import com.depromeet.global.util.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;

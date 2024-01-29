@@ -1,4 +1,4 @@
-package com.depromeet.global.security;
+package com.depromeet.global.util;
 
 import static com.depromeet.global.common.constants.SecurityConstants.TOKEN_ROLE_NAME;
 
