@@ -7,7 +7,7 @@ import com.depromeet.domain.auth.domain.RefreshToken;
 import com.depromeet.domain.auth.dto.AccessTokenDto;
 import com.depromeet.domain.auth.dto.RefreshTokenDto;
 import com.depromeet.domain.member.domain.MemberRole;
-import com.depromeet.global.security.JwtTokenProvider;
+import com.depromeet.global.security.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -17,31 +17,31 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class JwtTokenService {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
 
     public String createAccessToken(Long memberId, MemberRole memberRole) {
-        return jwtTokenProvider.generateAccessToken(memberId, memberRole);
+        return jwtUtil.generateAccessToken(memberId, memberRole);
     }
 
     public AccessTokenDto createAccessTokenDto(Long memberId, MemberRole memberRole) {
-        return jwtTokenProvider.generateAccessTokenDto(memberId, memberRole);
+        return jwtUtil.generateAccessTokenDto(memberId, memberRole);
     }
 
     public String createRefreshToken(Long memberId) {
-        String token = jwtTokenProvider.generateRefreshToken(memberId);
+        String token = jwtUtil.generateRefreshToken(memberId);
         RefreshToken refreshToken =
                 RefreshToken.builder()
                         .memberId(memberId)
                         .token(token)
-                        .ttl(jwtTokenProvider.getRefreshTokenExpirationTime())
+                        .ttl(jwtUtil.getRefreshTokenExpirationTime())
                         .build();
         refreshTokenRepository.save(refreshToken);
         return token;
     }
 
     public RefreshTokenDto createRefreshTokenDto(Long memberId) {
-        RefreshTokenDto refreshTokenDto = jwtTokenProvider.generateRefreshTokenDto(memberId);
+        RefreshTokenDto refreshTokenDto = jwtUtil.generateRefreshTokenDto(memberId);
         saveRefreshTokenToRedis(memberId, refreshTokenDto.tokenValue(), refreshTokenDto.ttl());
         return refreshTokenDto;
     }
@@ -59,7 +59,7 @@ public class JwtTokenService {
 
     public AccessTokenDto retrieveAccessToken(String accessTokenValue) {
         try {
-            return jwtTokenProvider.parseAccessToken(accessTokenValue);
+            return jwtUtil.parseAccessToken(accessTokenValue);
         } catch (Exception e) {
             return null;
         }
@@ -91,7 +91,7 @@ public class JwtTokenService {
 
     private RefreshTokenDto parseRefreshToken(String refreshTokenValue) {
         try {
-            return jwtTokenProvider.parseRefreshToken(refreshTokenValue);
+            return jwtUtil.parseRefreshToken(refreshTokenValue);
         } catch (Exception e) {
             return null;
         }
@@ -100,7 +100,7 @@ public class JwtTokenService {
     public AccessTokenDto reissueAccessTokenIfExpired(String accessTokenValue) {
         // AT가 만료된 경우 AT 재발급, 만료되지 않은 경우 null 반환
         try {
-            jwtTokenProvider.parseAccessToken(accessTokenValue);
+            jwtUtil.parseAccessToken(accessTokenValue);
             return null;
         } catch (ExpiredJwtException e) {
             Long memberId = Long.parseLong(e.getClaims().getSubject());
