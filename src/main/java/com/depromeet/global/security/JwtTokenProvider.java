@@ -2,7 +2,8 @@ package com.depromeet.global.security;
 
 import static com.depromeet.global.common.constants.SecurityConstants.TOKEN_ROLE_NAME;
 
-import com.depromeet.domain.auth.dto.response.AccessToken;
+import com.depromeet.domain.auth.dto.AccessTokenDto;
+import com.depromeet.domain.auth.dto.RefreshTokenDto;
 import com.depromeet.domain.member.domain.MemberRole;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
@@ -29,6 +30,14 @@ public class JwtTokenProvider {
         return buildAccessToken(memberId, memberRole, issuedAt, expiredAt);
     }
 
+    public AccessTokenDto generateAccessTokenDto(Long memberId, MemberRole memberRole) {
+        Date issuedAt = new Date();
+        Date expiredAt =
+                new Date(issuedAt.getTime() + jwtProperties.accessTokenExpirationMilliTime());
+        String tokenValue = buildAccessToken(memberId, memberRole, issuedAt, expiredAt);
+        return new AccessTokenDto(memberId, memberRole, tokenValue);
+    }
+
     public String generateRefreshToken(Long memberId) {
         Date issuedAt = new Date();
         Date expiredAt =
@@ -36,8 +45,14 @@ public class JwtTokenProvider {
         return buildRefreshToken(memberId, issuedAt, expiredAt);
     }
 
-    public AccessToken parseAccessToken(String token) {
-        Jws<Claims> claims = getClaims(token, getAccessTokenKey());
+    public RefreshTokenDto generateRefreshTokenDto(Long memberId) {
+        Date issuedAt = new Date();
+        Date expiredAt =
+                new Date(issuedAt.getTime() + jwtProperties.refreshTokenExpirationMilliTime());
+        String tokenValue = buildRefreshToken(memberId, issuedAt, expiredAt);
+        return new RefreshTokenDto(
+                memberId, tokenValue, jwtProperties.refreshTokenExpirationTime());
+    }
 
         try {
             validateDefaultClaims(claims);
