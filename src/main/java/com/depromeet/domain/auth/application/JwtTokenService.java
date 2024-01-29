@@ -2,6 +2,8 @@ package com.depromeet.domain.auth.application;
 
 import com.depromeet.domain.auth.dao.RefreshTokenRepository;
 import com.depromeet.domain.auth.domain.RefreshToken;
+import com.depromeet.domain.auth.dto.AccessTokenDto;
+import com.depromeet.domain.auth.dto.RefreshTokenDto;
 import com.depromeet.domain.auth.dto.response.AccessToken;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
@@ -9,6 +11,7 @@ import com.depromeet.domain.member.domain.MemberRole;
 import com.depromeet.global.security.JwtTokenProvider;
 import com.depromeet.global.security.PrincipalDetails;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,6 +30,10 @@ public class JwtTokenService {
         return jwtTokenProvider.generateAccessToken(memberId, memberRole);
     }
 
+    public AccessTokenDto createAccessTokenDto(Long memberId, MemberRole memberRole) {
+        return jwtTokenProvider.generateAccessTokenDto(memberId, memberRole);
+    }
+
     public String createRefreshToken(Long memberId) {
         String token = jwtTokenProvider.generateRefreshToken(memberId);
         RefreshToken refreshToken =
@@ -37,6 +44,23 @@ public class JwtTokenService {
                         .build();
         refreshTokenRepository.save(refreshToken);
         return token;
+    }
+
+    public RefreshTokenDto createRefreshTokenDto(Long memberId) {
+        RefreshTokenDto refreshTokenDto = jwtTokenProvider.generateRefreshTokenDto(memberId);
+        saveRefreshTokenToRedis(memberId, refreshTokenDto.tokenValue(), refreshTokenDto.ttl());
+        return refreshTokenDto;
+    }
+
+    private void saveRefreshTokenToRedis(
+            Long memberId, String refreshTokenDto, Long refreshTokenDto1) {
+        RefreshToken refreshToken =
+                RefreshToken.builder()
+                        .memberId(memberId)
+                        .token(refreshTokenDto)
+                        .ttl(refreshTokenDto1)
+                        .build();
+        refreshTokenRepository.save(refreshToken);
     }
 
     public String reissueAccessToken(String refreshToken) {
