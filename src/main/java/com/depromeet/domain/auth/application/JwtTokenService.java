@@ -1,21 +1,16 @@
 package com.depromeet.domain.auth.application;
 
+import static com.depromeet.global.common.constants.SecurityConstants.TOKEN_ROLE_NAME;
+
 import com.depromeet.domain.auth.dao.RefreshTokenRepository;
 import com.depromeet.domain.auth.domain.RefreshToken;
 import com.depromeet.domain.auth.dto.AccessTokenDto;
 import com.depromeet.domain.auth.dto.RefreshTokenDto;
-import com.depromeet.domain.auth.dto.response.AccessToken;
-import com.depromeet.domain.member.dao.MemberRepository;
-import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.MemberRole;
 import com.depromeet.global.security.JwtTokenProvider;
-import com.depromeet.global.security.PrincipalDetails;
-import java.util.NoSuchElementException;
+import io.jsonwebtoken.ExpiredJwtException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,7 +18,6 @@ import org.springframework.stereotype.Service;
 public class JwtTokenService {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
     public String createAccessToken(Long memberId, MemberRole memberRole) {
@@ -103,49 +97,5 @@ public class JwtTokenService {
         }
     }
 
-    public String reissueAccessToken(String refreshToken) {
-        Member member = getMemberFrom(refreshToken);
-        return createAccessToken(member.getId(), member.getRole());
-    }
-
-    public String reissueAccessToken(AccessToken accessToken) {
-        return createAccessToken(accessToken.memberId(), accessToken.memberRole());
-    }
-
-    public String reissueRefreshToken(String refreshToken) {
-        Member member = getMemberFrom(refreshToken);
-        return createRefreshToken(member.getId());
-    }
-
-    public String reissueRefreshToken(AccessToken accessToken) {
-        return createRefreshToken(accessToken.memberId());
-    }
-
-    private Member getMemberFrom(String refreshToken) throws NoSuchElementException {
-        RefreshTokenDto refreshTokenDto = jwtTokenProvider.parseRefreshToken(refreshToken);
-        return memberRepository.findById(refreshTokenDto.memberId()).orElseThrow();
-    }
-
-    public Authentication getAuthentication(String accessToken) {
-        AccessTokenDto parsedAccessToken = jwtTokenProvider.parseAccessToken(accessToken);
-
-        UserDetails userDetails =
-                new PrincipalDetails(
-                        parsedAccessToken.memberId(), parsedAccessToken.memberRole().name());
-
-        return new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities());
-    }
-
-    public boolean isAccessTokenExpired(String accessToken) {
-        return jwtTokenProvider.isAccessTokenExpired(accessToken);
-    }
-
-    public boolean isRefreshTokenExpired(String refreshToken) {
-        return jwtTokenProvider.isRefreshTokenExpired(refreshToken);
-    }
-
-    public AccessToken parseAccessToken(String accessToken) {
-        return jwtTokenProvider.parseAccessToken(accessToken);
     }
 }
