@@ -38,7 +38,7 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                 jpaQueryFactory
                         .selectFrom(mission)
                         .leftJoin(mission.missionRecords, missionRecord)
-                        .where(memberIdEq(memberId), durationStatusNotInFinished())
+                        .where(memberIdEq(memberId), durationStatusInProgress())
                         .orderBy(mission.id.desc())
                         .fetchJoin();
         return query.fetch();
@@ -79,7 +79,7 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                 : mission.visibility.in(MissionVisibility.ALL);
     }
 
-    private BooleanExpression durationStatusNotInFinished() {
-        return mission.durationStatus.notIn(DurationStatus.FINISHED);
+    private BooleanExpression durationStatusInProgress() {
+        return mission.durationStatus.in(DurationStatus.IN_PROGRESS);
     }
 }
