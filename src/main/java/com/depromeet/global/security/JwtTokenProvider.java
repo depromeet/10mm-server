@@ -114,13 +114,11 @@ public class JwtTokenProvider {
     }
 
     private Jws<Claims> getClaims(String token, Key key) {
-        try {
-            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-        } catch (ExpiredJwtException e) {
-            throw new CustomException(ErrorCode.EXPIRED_JWT_TOKEN);
-        } catch (Exception e) {
-            throw new CustomException(ErrorCode.INVALID_JWT_TOKEN);
-        }
+        return Jwts.parserBuilder()
+                .requireIssuer(jwtProperties.issuer())
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token);
     }
 
     private String buildAccessToken(
