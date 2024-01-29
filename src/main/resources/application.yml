@@ -30,3 +30,6 @@ springdoc:
 logging:
   level:
     com.depromeet.domain.*.api.*: debug
+
+fcm:
+  certification: ${FCM_CERTIFICATION:}
