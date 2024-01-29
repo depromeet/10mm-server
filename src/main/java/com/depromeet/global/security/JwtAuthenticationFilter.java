@@ -37,8 +37,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        String accessTokenHeaderValue = request.getHeader(ACCESS_TOKEN_HEADER);
         String accessTokenValue = extractAccessTokenFromCookie(request);
         String refreshTokenValue = extractRefreshTokenFromCookie(request);
+
+        // 헤더에 AT가 있으면 우선적으로 검증
+        if (accessTokenHeaderValue != null) {
+            AccessTokenDto accessTokenDto =
+                    jwtTokenService.retrieveAccessToken(accessTokenHeaderValue);
+            if (accessTokenDto != null) {
+                setAuthenticationToContext(accessTokenDto.memberId(), accessTokenDto.memberRole());
+                filterChain.doFilter(request, response);
+                return;
+            }
+        }
 
         // 쿠키에서 가져올 때 AT와 RT 중 하나라도 없으면 실패
         if (accessTokenValue == null || refreshTokenValue == null) {
