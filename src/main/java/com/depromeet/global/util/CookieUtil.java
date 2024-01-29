@@ -3,7 +3,6 @@ package com.depromeet.global.util;
 import static com.depromeet.global.common.constants.SecurityConstants.ACCESS_TOKEN_COOKIE_NAME;
 import static com.depromeet.global.common.constants.SecurityConstants.REFRESH_TOKEN_COOKIE_NAME;
 
-import com.depromeet.infra.config.jwt.JwtProperties;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
 public class CookieUtil {
 
     private final SpringEnvironmentUtil springEnvironmentUtil;
-    private final JwtProperties jwtProperties;
 
     public void addTokenCookies(
             HttpServletResponse response, String accessToken, String refreshToken) {
@@ -30,7 +28,6 @@ public class CookieUtil {
         ResponseCookie accessTokenCookie =
                 ResponseCookie.from(ACCESS_TOKEN_COOKIE_NAME, accessToken)
                         .path("/")
-                        .maxAge(jwtProperties.accessTokenExpirationTime())
                         .secure(true)
                         .sameSite(sameSite)
                         .httpOnly(false)
@@ -39,7 +36,6 @@ public class CookieUtil {
         ResponseCookie refreshTokenCookie =
                 ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
                         .path("/")
-                        .maxAge(jwtProperties.refreshTokenExpirationTime())
                         .secure(true)
                         .sameSite(sameSite)
                         .httpOnly(false)
