@@ -97,5 +97,16 @@ public class JwtTokenService {
         }
     }
 
+    public AccessTokenDto reissueAccessTokenIfExpired(String accessTokenValue) {
+        // AT가 만료된 경우 AT 재발급, 만료되지 않은 경우 null 반환
+        try {
+            jwtTokenProvider.parseAccessToken(accessTokenValue);
+            return null;
+        } catch (ExpiredJwtException e) {
+            Long memberId = Long.parseLong(e.getClaims().getSubject());
+            MemberRole memberRole =
+                    MemberRole.valueOf(e.getClaims().get(TOKEN_ROLE_NAME, String.class));
+            return createAccessTokenDto(memberId, memberRole);
+        }
     }
 }
