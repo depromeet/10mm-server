@@ -12,7 +12,6 @@ import com.depromeet.domain.image.domain.ImageFileExtension;
 import com.depromeet.domain.image.dto.request.MissionRecordImageCreateRequest;
 import com.depromeet.domain.image.dto.request.MissionRecordImageUploadCompleteRequest;
 import com.depromeet.domain.image.dto.response.PresignedUrlResponse;
-import com.depromeet.global.security.JwtAuthenticationFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.awt.*;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(ImageController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@MockBean({JpaMetamodelMappingContext.class, JwtAuthenticationFilter.class})
+@MockBean({JpaMetamodelMappingContext.class})
 class ImageControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
