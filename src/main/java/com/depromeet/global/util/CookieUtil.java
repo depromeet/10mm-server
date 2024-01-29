@@ -1,5 +1,8 @@
 package com.depromeet.global.util;
 
+import static com.depromeet.global.common.constants.SecurityConstants.ACCESS_TOKEN_COOKIE_NAME;
+import static com.depromeet.global.common.constants.SecurityConstants.REFRESH_TOKEN_COOKIE_NAME;
+
 import com.depromeet.infra.config.jwt.JwtProperties;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +28,7 @@ public class CookieUtil {
         String sameSite = determineSameSitePolicy();
 
         ResponseCookie accessTokenCookie =
-                ResponseCookie.from("accessToken", accessToken)
+                ResponseCookie.from(ACCESS_TOKEN_COOKIE_NAME, accessToken)
                         .path("/")
                         .maxAge(jwtProperties.accessTokenExpirationTime())
                         .secure(true)
@@ -34,7 +37,7 @@ public class CookieUtil {
                         .build();
 
         ResponseCookie refreshTokenCookie =
-                ResponseCookie.from("refreshToken", refreshToken)
+                ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
                         .path("/")
                         .maxAge(jwtProperties.refreshTokenExpirationTime())
                         .secure(true)
