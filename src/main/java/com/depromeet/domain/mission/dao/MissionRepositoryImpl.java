@@ -33,7 +33,7 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     }
 
     @Override
-    public List<Mission> findProgressMissionsWithRecords(Long memberId) {
+    public List<Mission> findInProgressMissionsWithRecords(Long memberId) {
         JPAQuery<Mission> query =
                 jpaQueryFactory
                         .selectFrom(mission)

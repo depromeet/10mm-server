@@ -167,7 +167,8 @@ class MissionRepositoryTest {
                                                 saveMember)));
 
         // when
-        List<Mission> missionList = missionRepository.findMissionsWithRecords(saveMember.getId());
+        List<Mission> missionList =
+                missionRepository.findInProgressMissionsWithRecords(saveMember.getId());
 
         // then
         assertThat(missionList.size()).isEqualTo(4);
