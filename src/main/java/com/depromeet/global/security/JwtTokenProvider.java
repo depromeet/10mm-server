@@ -54,24 +54,35 @@ public class JwtTokenProvider {
                 memberId, tokenValue, jwtProperties.refreshTokenExpirationTime());
     }
 
+    public AccessTokenDto parseAccessToken(String token) throws ExpiredJwtException {
+        // 토큰 파싱하여 성공하면 AccessTokenDto 반환, 실패하면 null 반환
+        // 만료된 토큰인 경우에만 ExpiredJwtException 발생
         try {
-            validateDefaultClaims(claims);
-            return new AccessToken(
+            Jws<Claims> claims = getClaims(token, getAccessTokenKey());
+
+            return new AccessTokenDto(
                     Long.parseLong(claims.getBody().getSubject()),
-                    MemberRole.valueOf(claims.getBody().get(TOKEN_ROLE_NAME, String.class)));
+                    MemberRole.valueOf(claims.getBody().get(TOKEN_ROLE_NAME, String.class)),
+                    token);
+        } catch (ExpiredJwtException e) {
+            throw e;
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.INVALID_ACCESS_TOKEN);
+            return null;
         }
     }
 
-    public Long parseRefreshToken(String token) {
-        Jws<Claims> claims = getClaims(token, getRefreshTokenKey());
-
+    public RefreshTokenDto parseRefreshToken(String token) throws ExpiredJwtException {
         try {
-            validateDefaultClaims(claims);
-            return Long.parseLong(claims.getBody().getSubject()); // returns memberId
+            Jws<Claims> claims = getClaims(token, getRefreshTokenKey());
+
+            return new RefreshTokenDto(
+                    Long.parseLong(claims.getBody().getSubject()),
+                    token,
+                    jwtProperties.refreshTokenExpirationTime());
+        } catch (ExpiredJwtException e) {
+            throw e;
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+            return null;
         }
     }
 
