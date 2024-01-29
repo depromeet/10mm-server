@@ -86,8 +86,7 @@ public class MissionRecordService {
                         .findById(recordId)
                         .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
         long sinceDay =
-                Duration.between(missionRecord.getStartedAt(), LocalDateTime.now())
-                                .toDays()
+                Duration.between(missionRecord.getStartedAt(), LocalDateTime.now()).toDays()
                         + DAYS_ADJUSTMENT;
         return MissionRecordFindOneResponse.of(missionRecord, sinceDay);
     }
