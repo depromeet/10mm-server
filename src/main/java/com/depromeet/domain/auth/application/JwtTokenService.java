@@ -122,12 +122,12 @@ public class JwtTokenService {
     }
 
     private Member getMemberFrom(String refreshToken) throws NoSuchElementException {
-        Long memberId = jwtTokenProvider.parseRefreshToken(refreshToken);
-        return memberRepository.findById(memberId).orElseThrow();
+        RefreshTokenDto refreshTokenDto = jwtTokenProvider.parseRefreshToken(refreshToken);
+        return memberRepository.findById(refreshTokenDto.memberId()).orElseThrow();
     }
 
     public Authentication getAuthentication(String accessToken) {
-        AccessToken parsedAccessToken = jwtTokenProvider.parseAccessToken(accessToken);
+        AccessTokenDto parsedAccessToken = jwtTokenProvider.parseAccessToken(accessToken);
 
         UserDetails userDetails =
                 new PrincipalDetails(
