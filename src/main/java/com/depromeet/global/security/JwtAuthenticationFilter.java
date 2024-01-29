@@ -7,6 +7,7 @@ import com.depromeet.domain.auth.dto.response.AccessToken;
 import com.depromeet.global.util.CookieUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.WebUtils;
 
 @Slf4j
 @Component
@@ -32,8 +34,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         // TODO: 쿠키 방식으로 변경 시 아래 로직 수정 필요
-        String accessToken = extractAccessToken(request);
-        String refreshToken = extractRefreshToken(request);
+        String accessToken = extractAccessTokenFromCookie(request);
+        String refreshToken = extractRefreshTokenFromCookie(request);
 
         // TODO: 엑세스 토큰 없더라도 쿠키의 리프레시 토큰으로 재발급하도록 수정 필요
         // ATK, RTK 둘 중 하나라도 빈 상태로 오면 통과
@@ -88,6 +90,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return Optional.ofNullable(request.getHeader(ACCESS_TOKEN_HEADER))
                 .filter(token -> token.startsWith(TOKEN_PREFIX))
                 .map(token -> token.replace(TOKEN_PREFIX, ""))
+                .orElse(null);
+    }
+
+    private String extractAccessTokenFromCookie(HttpServletRequest request) {
+        return Optional.ofNullable(WebUtils.getCookie(request, ACCESS_TOKEN_COOKIE_NAME))
+                .map(Cookie::getValue)
+                .orElse(null);
+    }
+
+    private String extractRefreshTokenFromCookie(HttpServletRequest request) {
+        return Optional.ofNullable(WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME))
+                .map(Cookie::getValue)
                 .orElse(null);
     }
 }
