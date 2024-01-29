@@ -83,20 +83,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    private String extractRefreshToken(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(REFRESH_TOKEN_HEADER))
-                .filter(token -> token.startsWith(TOKEN_PREFIX))
-                .map(token -> token.replace(TOKEN_PREFIX, ""))
-                .orElse(null);
-    }
-
-    private String extractAccessToken(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(ACCESS_TOKEN_HEADER))
-                .filter(token -> token.startsWith(TOKEN_PREFIX))
-                .map(token -> token.replace(TOKEN_PREFIX, ""))
-                .orElse(null);
-    }
-
     private String extractAccessTokenFromCookie(HttpServletRequest request) {
         return Optional.ofNullable(WebUtils.getCookie(request, ACCESS_TOKEN_COOKIE_NAME))
                 .map(Cookie::getValue)
