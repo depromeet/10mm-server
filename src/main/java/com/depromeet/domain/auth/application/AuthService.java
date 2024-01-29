@@ -3,13 +3,11 @@ package com.depromeet.domain.auth.application;
 import com.depromeet.domain.auth.application.nickname.NicknameGenerationStrategy;
 import com.depromeet.domain.auth.domain.OauthProvider;
 import com.depromeet.domain.auth.dto.request.IdTokenRequest;
-import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
 import com.depromeet.domain.auth.dto.response.SocialLoginResponse;
 import com.depromeet.domain.auth.dto.response.TokenPairResponse;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
-import com.depromeet.domain.member.domain.MemberRole;
 import com.depromeet.domain.member.domain.MemberStatus;
 import com.depromeet.domain.member.domain.OauthInfo;
 import com.depromeet.global.error.exception.CustomException;
@@ -36,19 +34,14 @@ public class AuthService {
     private final IdTokenVerifier idTokenVerifier;
     private final NicknameGenerationStrategy nicknameGenerationStrategy;
 
-    public void registerMember(MemberRegisterRequest request) {
-        final Member member = memberUtil.getCurrentMember();
-        member.register(request.nickname());
-    }
-
+    @Deprecated
     public TokenPairResponse registerWithUsernameAndPassword(UsernamePasswordRequest request) {
         Optional<Member> member = memberRepository.findByUsername(request.username());
 
         // 첫 회원가입
         if (member.isEmpty()) {
             String encodedPassword = passwordEncoder.encode(request.password());
-            final Member savedMember =
-                    Member.createGuestMember(request.username(), encodedPassword);
+            final Member savedMember = Member.createNormalMember(null, null); // do nothing
             memberRepository.save(savedMember);
             return getLoginResponse(savedMember);
         }
@@ -74,10 +67,9 @@ public class AuthService {
         return getLoginResponse(member);
     }
 
+    @Deprecated
     private void validateNotGuestMember(Member member) {
-        if (member.getRole() == MemberRole.GUEST) {
-            throw new CustomException(ErrorCode.GUEST_MEMBER_REQUIRES_REGISTRATION);
-        }
+        // do nothing
     }
 
     private void validateNormalMember(Member member) {
@@ -105,23 +97,22 @@ public class AuthService {
         member.updateLastLoginAt();
 
         TokenPairResponse loginResponse = getLoginResponse(member);
-        boolean isGuest = member.getRole() == MemberRole.GUEST;
 
-        return SocialLoginResponse.from(loginResponse, isGuest);
+        return SocialLoginResponse.from(loginResponse);
     }
 
     private Member fetchOrCreate(OidcUser oidcUser) {
         return memberRepository
                 .findByOauthInfo(extractOauthInfo(oidcUser))
-                .orElseGet(() -> saveAsGuest(oidcUser));
+                .orElseGet(() -> saveMember(oidcUser));
     }
 
-    private Member saveAsGuest(OidcUser oidcUser) {
+    private Member saveMember(OidcUser oidcUser) {
 
         OauthInfo oauthInfo = extractOauthInfo(oidcUser);
         String nickname = generateRandomNickname();
-        Member guest = Member.createGuestMember(oauthInfo, nickname);
-        return memberRepository.save(guest);
+        Member member = Member.createNormalMember(oauthInfo, nickname);
+        return memberRepository.save(member);
     }
 
     private String generateRandomNickname() {

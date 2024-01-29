@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.depromeet.DatabaseCleaner;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.member.domain.OauthInfo;
 import com.depromeet.global.security.PrincipalDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,8 +37,10 @@ class MemberUtilTest {
                 new UsernamePasswordAuthenticationToken(
                         principal, "password", principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        Member guestMember = Member.createGuestMember("username", "password");
-        Member savedMember = memberRepository.save(guestMember);
+        Member member =
+                Member.createNormalMember(
+                        OauthInfo.createOauthInfo("test", "test", "test"), "test");
+        Member savedMember = memberRepository.save(member);
         // when
         Member currentMember = memberUtil.getCurrentMember();
         // then
