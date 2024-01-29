@@ -57,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // AT가 만료된 경우 AT 재발급, 만료되지 않은 경우 null 반환
         Optional<AccessTokenDto> reissuedAccessToken =
-                Optional.ofNullable(jwtTokenService.reissueAccessTokenIfExpired(refreshTokenValue));
+                Optional.ofNullable(jwtTokenService.reissueAccessTokenIfExpired(accessTokenValue));
         // RT 유효하면 파싱, 유효하지 않으면 null 반환
         RefreshTokenDto refreshTokenDto = jwtTokenService.retrieveRefreshToken(refreshTokenValue);
 
@@ -65,7 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (reissuedAccessToken.isPresent() && refreshTokenDto != null) {
             AccessTokenDto accessToken = reissuedAccessToken.get(); // 재발급된 AT
             RefreshTokenDto refreshToken =
-                    jwtTokenService.createRefreshToken(refreshTokenDto.memberId());
+                    jwtTokenService.createRefreshTokenDto(refreshTokenDto.memberId());
             cookieUtil.addTokenCookies(
                     response, accessToken.tokenValue(), refreshToken.tokenValue());
             setAuthenticationToContext(accessToken.memberId(), accessToken.memberRole());
