@@ -32,6 +32,18 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
         return query.fetch();
     }
 
+    @Override
+    public List<Mission> findProgressMissionsWithRecords(Long memberId) {
+        JPAQuery<Mission> query =
+                jpaQueryFactory
+                        .selectFrom(mission)
+                        .leftJoin(mission.missionRecords, missionRecord)
+                        .where(memberIdEq(memberId), durationStatusNotInFinished())
+                        .orderBy(mission.id.desc())
+                        .fetchJoin();
+        return query.fetch();
+    }
+
     // 친구 미션 목록
     @Override
     public List<Mission> findMissionsWithRecordsByRelations(
@@ -65,5 +77,9 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
         return existsRelations
                 ? mission.visibility.in(MissionVisibility.FOLLOWER, MissionVisibility.ALL)
                 : mission.visibility.in(MissionVisibility.ALL);
+    }
+
+    private BooleanExpression durationStatusNotInFinished() {
+        return mission.durationStatus.notIn(DurationStatus.FINISHED);
     }
 }
