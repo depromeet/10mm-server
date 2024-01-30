@@ -85,22 +85,25 @@ public class MemberService {
                 }
             }
 
-            if (existRelation) {
-                Optional<MemberRelation> optionalMemberRelation =
-                        memberRelationByTargetId.stream()
-                                .filter(
-                                        memberRelation ->
-                                                member.getId()
-                                                        .equals(memberRelation.getSource().getId()))
-                                .findFirst();
-                if (optionalMemberRelation.isPresent()) {
-                    response.add(MemberSearchResponse.toFollowedByMeResponse(member));
-                    continue;
-                }
-
+            if (existRelation) { // 닉네임 검색한 애들 중 내가 팔로우한 애라면
                 response.add(MemberSearchResponse.toFollowingResponse(member));
                 continue;
             }
+
+            // 내가 팔로우를 하지 않았을 때
+            Optional<MemberRelation> optionalMemberRelation =
+                    memberRelationByTargetId.stream()
+                            .filter(
+                                    memberRelation ->
+                                            member.getId()
+                                                    .equals(memberRelation.getSource().getId()))
+                            .findFirst();
+            if (optionalMemberRelation.isPresent()) { // 상대방만 나를 팔로우 하고 있을  때
+                response.add(MemberSearchResponse.toFollowedByMeResponse(member));
+                continue;
+            }
+
+            // 아니라면 서로 팔로우가 아닌 상태
             response.add(MemberSearchResponse.toNotFollowingResponse(member));
         }
         response =
