@@ -9,6 +9,7 @@ import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.member.dto.request.NicknameCheckRequest;
+import com.depromeet.domain.member.dto.request.NicknameUpdateRequest;
 import com.depromeet.domain.member.dto.response.MemberFindOneResponse;
 import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.member.dto.response.MemberSocialInfoResponse;
@@ -59,7 +60,11 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public void checkNickname(NicknameCheckRequest request) {
-        if (memberRepository.existsByProfileNickname(request.nickname())) {
+        validateNicknameNotDuplicate(request.nickname());
+    }
+
+    private void validateNicknameNotDuplicate(String nickname) {
+        if (memberRepository.existsByProfileNickname(nickname)) {
             throw new CustomException(ErrorCode.MEMBER_ALREADY_NICKNAME);
         }
     }
@@ -139,6 +144,12 @@ public class MemberService {
         if (member.getOauthInfo() == null) {
             throw new CustomException(ErrorCode.MEMBER_SOCIAL_INFO_NOT_FOUND);
         }
+    }
+
+    public void updateMemberNickname(NicknameUpdateRequest reqest) {
+        final Member currentMember = memberUtil.getCurrentMember();
+        validateNicknameNotDuplicate(reqest.nickname());
+        currentMember.updateNickname(reqest.nickname());
     }
 
     private ImageFileExtension getImageFileExtension(Profile profile) {
