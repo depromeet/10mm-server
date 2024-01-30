@@ -9,6 +9,7 @@ import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.member.dto.request.NicknameCheckRequest;
+import com.depromeet.domain.member.dto.request.UpdateFcmTokenRequest;
 import com.depromeet.domain.member.dto.response.MemberFindOneResponse;
 import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.member.dto.response.MemberSocialInfoResponse;
@@ -152,4 +153,18 @@ public class MemberService {
         }
         return imageFileExtension;
     }
+
+	public MemberFindOneResponse updateAppAlarm() {
+		final Member currentMember = memberUtil.getCurrentMember();
+		ImageFileExtension imageFileExtension = getImageFileExtension(currentMember.getProfile());
+		currentMember.toggleAppAlarmState(currentMember.getFcmInfo());
+		return MemberFindOneResponse.of(currentMember, imageFileExtension);
+	}
+
+	public MemberFindOneResponse updateFcmToken(UpdateFcmTokenRequest updateFcmTokenRequest) {
+		final Member currentMember = memberUtil.getCurrentMember();
+		ImageFileExtension imageFileExtension = getImageFileExtension(currentMember.getProfile());
+		currentMember.updateFcmToken(currentMember.getFcmInfo(), updateFcmTokenRequest.fcmToken());
+		return MemberFindOneResponse.of(currentMember, imageFileExtension);
+	}
 }

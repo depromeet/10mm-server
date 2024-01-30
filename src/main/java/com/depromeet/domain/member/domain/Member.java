@@ -4,8 +4,11 @@ import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
+import com.google.storage.v2.WriteObjectRequest;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -35,6 +38,8 @@ public class Member extends BaseTimeEntity {
     @Embedded private Profile profile = Profile.createProfile("", "");
 
     @Embedded private OauthInfo oauthInfo;
+
+	@Embedded private FcmInfo fcmInfo;
 
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
@@ -108,5 +113,14 @@ public class Member extends BaseTimeEntity {
             throw new CustomException(ErrorCode.MEMBER_ALREADY_DELETED);
         }
         this.status = MemberStatus.DELETED;
+		this.fcmInfo = FcmInfo.deleteToken();
     }
+
+	public void toggleAppAlarmState(FcmInfo fcmState) {
+		fcmInfo = FcmInfo.toggleAlarm(fcmState);
+	}
+
+	public void updateFcmToken(FcmInfo fcmState, String fcmToken) {
+		fcmInfo = FcmInfo.updateToken(fcmState, fcmToken);
+	}
 }

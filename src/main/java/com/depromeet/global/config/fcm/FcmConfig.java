@@ -30,7 +30,7 @@ public class FcmConfig {
                                 .build();
                 FirebaseApp.initializeApp(options);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
