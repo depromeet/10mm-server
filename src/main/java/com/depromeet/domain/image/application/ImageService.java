@@ -146,6 +146,27 @@ public class ImageService {
         currentMember.updateProfile(Profile.createProfile(request.nickname(), imageUrl));
     }
 
+    public void uploadCompleteMemberProfileV2(MemberProfileImageUploadCompleteRequest request) {
+        final Member currentMember = memberUtil.getCurrentMember();
+        String imageUrl = null;
+        if (request.imageFileExtension() != null) {
+            Image image =
+                    findImage(
+                            ImageType.MEMBER_PROFILE,
+                            currentMember.getId(),
+                            request.imageFileExtension());
+            imageUrl =
+                    createReadImageUrl(
+                            ImageType.MEMBER_PROFILE,
+                            currentMember.getId(),
+                            image.getImageKey(),
+                            request.imageFileExtension());
+        }
+        // 닉네임 변경은 무시됩니다 (현재 닉네임을 그대로 사용)
+        String currentNickname = currentMember.getProfile().getNickname();
+        currentMember.updateProfile(Profile.createProfile(currentNickname, imageUrl));
+    }
+
     private Image findImage(
             ImageType imageType, Long targetId, ImageFileExtension imageFileExtension) {
         return imageRepository

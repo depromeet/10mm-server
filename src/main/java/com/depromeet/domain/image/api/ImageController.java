@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,5 +51,15 @@ public class ImageController {
     public void memberProfileUploaded(
             @Valid @RequestBody MemberProfileImageUploadCompleteRequest request) {
         imageService.uploadCompleteMemberProfile(request);
+    }
+
+    @Operation(
+            summary = "회원 프로필 이미지 업로드 완료처리 V2",
+            description = "V1과 동일합니다. 단, 요청 바디에 닉네임을 넣더라도 무시됩니다.")
+    @PostMapping("/members/me/upload-complete/v2")
+    public ResponseEntity<Void> memberProfileUploadedV2(
+            @Valid @RequestBody MemberProfileImageUploadCompleteRequest request) {
+        imageService.uploadCompleteMemberProfileV2(request);
+        return ResponseEntity.ok().build();
     }
 }
