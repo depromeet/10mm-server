@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class PrincipalDetails implements UserDetails {
 
     private final Long memberId;
+    // TODO: MemberRole을 사용하도록 수정
     private final String role;
 
     @Override

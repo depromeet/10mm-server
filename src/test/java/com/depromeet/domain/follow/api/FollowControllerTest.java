@@ -11,7 +11,6 @@ import com.depromeet.domain.follow.application.FollowService;
 import com.depromeet.domain.follow.dto.request.FollowCreateRequest;
 import com.depromeet.domain.follow.dto.request.FollowDeleteRequest;
 import com.depromeet.global.error.exception.ErrorCode;
-import com.depromeet.global.security.JwtAuthenticationFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(FollowController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@MockBean({JpaMetamodelMappingContext.class, JwtAuthenticationFilter.class})
+@MockBean({JpaMetamodelMappingContext.class})
 class FollowControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;

@@ -2,9 +2,11 @@ package com.depromeet.global.config.security;
 
 import static org.springframework.security.config.Customizer.*;
 
+import com.depromeet.domain.auth.application.JwtTokenService;
 import com.depromeet.global.common.constants.SwaggerUrlConstants;
 import com.depromeet.global.common.constants.UrlConstants;
 import com.depromeet.global.security.*;
+import com.depromeet.global.util.CookieUtil;
 import com.depromeet.global.util.SpringEnvironmentUtil;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -34,7 +35,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class WebSecurityConfig {
 
     private final SpringEnvironmentUtil springEnvironmentUtil;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtTokenService jwtTokenService;
+    private final CookieUtil cookieUtil;
 
     @Value("${swagger.user}")
     private String swaggerUser;
@@ -104,8 +106,9 @@ public class WebSecurityConfig {
                                 .authenticated());
         //        .permitAll());
 
-        http.addFilterAfter(jwtAuthenticationFilter, LogoutFilter.class);
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(
+                jwtAuthenticationFilter(jwtTokenService, cookieUtil),
+                UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -138,5 +141,11 @@ public class WebSecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(
+            JwtTokenService jwtTokenService, CookieUtil cookieUtil) {
+        return new JwtAuthenticationFilter(jwtTokenService, cookieUtil);
     }
 }

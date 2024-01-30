@@ -234,9 +234,7 @@ class MemberServiceTest {
             memberRelationRepository.save(
                     MemberRelation.createMemberRelation(currentMember, searchMember1));
 
-            // 도모와 재현이는 맞팔로우
-            memberRelationRepository.save(
-                    MemberRelation.createMemberRelation(currentMember, searchMember2));
+            // 재현이가 도모만 팔로우
             memberRelationRepository.save(
                     MemberRelation.createMemberRelation(searchMember2, currentMember));
 
@@ -253,7 +251,7 @@ class MemberServiceTest {
             // 도모만 윤범이를 팔로우하고있다.
             assertEquals(FollowStatus.FOLLOWING, responses.get(1).followStatus());
 
-            // 도모는 재현이와 맞팔로우 관계이다.
+            // 재현이만 도모를 팔로우하고있다.
             assertEquals(FollowStatus.FOLLOWED_BY_ME, responses.get(2).followStatus());
         }
     }
