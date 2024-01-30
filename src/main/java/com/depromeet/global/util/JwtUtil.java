@@ -5,8 +5,6 @@ import static com.depromeet.global.common.constants.SecurityConstants.TOKEN_ROLE
 import com.depromeet.domain.auth.dto.AccessTokenDto;
 import com.depromeet.domain.auth.dto.RefreshTokenDto;
 import com.depromeet.domain.member.domain.MemberRole;
-import com.depromeet.global.error.exception.CustomException;
-import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.infra.config.jwt.JwtProperties;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -83,32 +81,6 @@ public class JwtUtil {
             throw e;
         } catch (Exception e) {
             return null;
-        }
-    }
-
-    // TODO: ATK와 RTK의 유효성 검증을 한 번에 할 수 있도록 리팩토링
-    // TODO: 인증 사이클 당 2회의 토큰 파싱이 발생하는 이슈 개선
-    public boolean isAccessTokenExpired(String token) {
-        try {
-            parseAccessToken(token);
-            return false;
-        } catch (CustomException e) {
-            if (e.getErrorCode() == ErrorCode.EXPIRED_JWT_TOKEN) {
-                return true;
-            }
-            throw e;
-        }
-    }
-
-    public boolean isRefreshTokenExpired(String token) {
-        try {
-            parseRefreshToken(token);
-            return false;
-        } catch (CustomException e) {
-            if (e.getErrorCode() == ErrorCode.EXPIRED_JWT_TOKEN) {
-                return true;
-            }
-            throw e;
         }
     }
 
