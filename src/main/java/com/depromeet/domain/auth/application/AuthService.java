@@ -94,7 +94,7 @@ public class AuthService {
     public SocialLoginResponse socialLoginMember(LoginRequest request, OauthProvider provider) {
         OidcUser oidcUser = idTokenVerifier.getOidcUser(request.idToken(), provider);
         Member member = fetchOrCreate(oidcUser);
-		member.updateFcmToken(member.getFcmInfo(), request.fcmToken());
+        member.updateFcmToken(member.getFcmInfo(), request.fcmToken());
         member.updateLastLoginAt();
 
         TokenPairResponse loginResponse = getLoginResponse(member);
