@@ -146,6 +146,12 @@ public class MemberService {
         }
     }
 
+    public void updateMemberNickname(NicknameUpdateRequest reqest) {
+        final Member currentMember = memberUtil.getCurrentMember();
+        validateNicknameNotDuplicate(reqest.nickname());
+        currentMember.updateNickname(reqest.nickname());
+    }
+
     private ImageFileExtension getImageFileExtension(Profile profile) {
         // TODO: 이미지 확장자 정보 같이 넘겨주는 작업 추가 (24.01.26)
         // 이미지 업로드와 닉네임 변경 분리 후 제거 예정
