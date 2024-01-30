@@ -3,15 +3,11 @@ package com.depromeet.domain.missionRecord.api;
 import com.depromeet.domain.missionRecord.application.MissionRecordService;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordUpdateRequest;
-import com.depromeet.domain.missionRecord.dto.response.MissionRecordCreateResponse;
-import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindOneResponse;
-import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindResponse;
-import com.depromeet.domain.missionRecord.dto.response.MissionRecordUpdateResponse;
+import com.depromeet.domain.missionRecord.dto.response.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.YearMonth;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +36,7 @@ public class MissionRecordController {
 
     @Operation(summary = "미션 기록 조회 (캘린더 뷰)", description = "미션 기록을 조회합니다.")
     @GetMapping
-    public List<MissionRecordFindResponse> missionRecordFind(
+    public MissionRecordCalendarResponse missionRecordFind(
             @RequestParam("missionId") Long missionId,
             @RequestParam("yearMonth") YearMonth yearMonth) {
         return missionRecordService.findAllMissionRecord(missionId, yearMonth);
