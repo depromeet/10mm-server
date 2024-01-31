@@ -6,10 +6,12 @@ import com.google.firebase.FirebaseOptions;
 import jakarta.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@Slf4j
 public class FcmConfig {
 
     @Value("${fcm.certification}")
@@ -30,7 +32,7 @@ public class FcmConfig {
                 FirebaseApp.initializeApp(options);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.info("FCM initializing Exception: {}", e.getStackTrace()[0]);
         }
     }
 }
