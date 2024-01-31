@@ -4,6 +4,7 @@ import com.depromeet.domain.auth.dto.request.UsernameCheckRequest;
 import com.depromeet.domain.member.application.MemberService;
 import com.depromeet.domain.member.dto.request.NicknameCheckRequest;
 import com.depromeet.domain.member.dto.request.NicknameUpdateRequest;
+import com.depromeet.domain.member.dto.request.UpdateFcmTokenRequest;
 import com.depromeet.domain.member.dto.response.MemberFindOneResponse;
 import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.member.dto.response.MemberSocialInfoResponse;
@@ -77,6 +78,21 @@ public class MemberController {
     public ResponseEntity<Void> memberNicknameUpdate(
             @Valid @RequestBody NicknameUpdateRequest reqest) {
         memberService.updateMemberNickname(reqest);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "토글 여부 변경", description = "기존 토글 값을 변경합니다.")
+    @PatchMapping("/alarm")
+    public ResponseEntity<Void> memberToggleAppAlarmStateUpdate() {
+        memberService.toggleAppAlarm();
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "FCM 토큰 갱신", description = "FCM 토큰을 갱신합니다.")
+    @PatchMapping("/fcm-token")
+    public ResponseEntity<Void> memberFcmTokenUpdate(
+            @Valid @RequestBody UpdateFcmTokenRequest updateFcmTokenRequest) {
+        memberService.updateFcmToken(updateFcmTokenRequest);
         return ResponseEntity.ok().build();
     }
 }
