@@ -32,7 +32,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CookieUtil cookieUtil;
 
     private static String extractAccessTokenFromHeader(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(ACCESS_TOKEN_HEADER))
+        return Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
+                .filter(header -> header.startsWith(TOKEN_PREFIX))
                 .map(header -> header.replace(TOKEN_PREFIX, ""))
                 .orElse(null);
     }
