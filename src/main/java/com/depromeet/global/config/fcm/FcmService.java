@@ -11,6 +11,7 @@ public class FcmService {
     /**
      * 참고: https://firebase.google.com/support/release-notes/admin/java 위 레퍼런스에 의거하여
      * sendMulticastAsync 는 Deprecated 되어 sendEachForMulticastAsync
+     *
      * @param tokenList: 푸시 토큰 리스트
      * @param title: 알림 제목
      * @param content: 알림 내용
