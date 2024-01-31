@@ -36,7 +36,7 @@ public class Member extends BaseTimeEntity {
 
     @Embedded private OauthInfo oauthInfo;
 
-    @Embedded private FcmInfo fcmInfo;
+    @Embedded private FcmInfo fcmInfo = FcmInfo.createFcmInfo();
 
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
@@ -117,11 +117,11 @@ public class Member extends BaseTimeEntity {
     }
 
     public void toggleAppAlarmState(FcmInfo fcmState) {
-        fcmInfo = FcmInfo.toggleAlarm(fcmState);
+        this.fcmInfo = FcmInfo.toggleAlarm(fcmState);
     }
 
     public void updateFcmToken(FcmInfo fcmState, String fcmToken) {
-        fcmInfo = FcmInfo.updateToken(fcmState, fcmToken);
+        this.fcmInfo = FcmInfo.updateToken(fcmState, fcmToken);
     }
 
     public void updateNickname(String nickname) {
