@@ -120,4 +120,8 @@ public class Member extends BaseTimeEntity {
     public void updateFcmToken(FcmInfo fcmState, String fcmToken) {
         fcmInfo = FcmInfo.updateToken(fcmState, fcmToken);
     }
+
+    public void updateNickname(String nickname) {
+        this.profile = Profile.createProfile(nickname, this.profile.getProfileImageUrl());
+    }
 }

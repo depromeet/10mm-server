@@ -3,6 +3,7 @@ package com.depromeet.domain.member.api;
 import com.depromeet.domain.auth.dto.request.UsernameCheckRequest;
 import com.depromeet.domain.member.application.MemberService;
 import com.depromeet.domain.member.dto.request.NicknameCheckRequest;
+import com.depromeet.domain.member.dto.request.NicknameUpdateRequest;
 import com.depromeet.domain.member.dto.request.UpdateFcmTokenRequest;
 import com.depromeet.domain.member.dto.response.MemberFindOneResponse;
 import com.depromeet.domain.member.dto.response.MemberSearchResponse;
@@ -70,6 +71,14 @@ public class MemberController {
     public ResponseEntity<MemberSocialInfoResponse> memberSocialInfoFind() {
         MemberSocialInfoResponse response = memberService.findMemberSocialInfo();
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "회원 닉네임 변경", description = "회원 닉네임을 변경합니다.")
+    @PutMapping("/me/nickname")
+    public ResponseEntity<Void> memberNicknameUpdate(
+            @Valid @RequestBody NicknameUpdateRequest reqest) {
+        memberService.updateMemberNickname(reqest);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "알람 허용 여부", description = "알람 허용 여부를 결정합니다.")
