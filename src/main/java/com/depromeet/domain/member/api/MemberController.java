@@ -83,13 +83,13 @@ public class MemberController {
 
     @Operation(summary = "알람 허용 여부", description = "알람 허용 여부를 결정합니다.")
     @PatchMapping("/alarm")
-    public MemberFindOneResponse toggleAppAlarmState() {
+    public MemberFindOneResponse memberToggleAppAlarmStateUpdate() {
         return memberService.updateAppAlarm();
     }
 
     @Operation(summary = "FCM 토큰 갱신", description = "FCM 토큰을 갱신합니다.")
     @PatchMapping("/fcm-token")
-    public MemberFindOneResponse updateFcmToken(
+    public MemberFindOneResponse memberFcmTokenUpdate(
             @Valid @RequestBody UpdateFcmTokenRequest updateFcmTokenRequest) {
         return memberService.updateFcmToken(updateFcmTokenRequest);
     }
