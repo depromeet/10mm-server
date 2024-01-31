@@ -32,7 +32,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CookieUtil cookieUtil;
 
     private static String extractAccessTokenFromHeader(HttpServletRequest request) {
-        return request.getHeader(ACCESS_TOKEN_HEADER).replace(TOKEN_PREFIX, "");
+        return Optional.ofNullable(request.getHeader(ACCESS_TOKEN_HEADER))
+                .map(header -> header.replace(TOKEN_PREFIX, ""))
+                .orElse(null);
     }
 
     @Override
