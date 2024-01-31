@@ -81,7 +81,7 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "토글 여부 변경", description = "토글 여부를 변경합니다.")
+    @Operation(summary = "토글 여부 변경", description = "기존 토글 값을 변경합니다.")
     @PatchMapping("/alarm")
     public MemberFindOneResponse memberToggleAppAlarmStateUpdate() {
         return memberService.toggleAppAlarm();
