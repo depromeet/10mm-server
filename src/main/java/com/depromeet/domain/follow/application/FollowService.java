@@ -13,6 +13,7 @@ import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import com.depromeet.global.config.fcm.FcmService;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -29,6 +30,10 @@ public class FollowService {
     private final MemberUtil memberUtil;
     private final MemberRepository memberRepository;
     private final MemberRelationRepository memberRelationRepository;
+    private final FcmService fcmService;
+
+    private static final String PUSH_SERVICE_TITLE = "10MM";
+    private static final String PUSH_SERVICE_CONTENT = "%s님이 회원님을 팔로우하기 시작했습니다.";
 
     public void createFollow(FollowCreateRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
@@ -43,6 +48,11 @@ public class FollowService {
 
         MemberRelation memberRelation =
                 MemberRelation.createMemberRelation(currentMember, targetMember);
+
+        fcmService.sendMessageSync(
+                targetMember.getFcmInfo().getFcmToken(),
+                PUSH_SERVICE_TITLE,
+                String.format(PUSH_SERVICE_CONTENT, currentMember.getUsername()));
         memberRelationRepository.save(memberRelation);
     }
 
