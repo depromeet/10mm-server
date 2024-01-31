@@ -13,6 +13,8 @@ import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import com.depromeet.domain.notification.application.NotificationService;
+import com.depromeet.domain.notification.domain.NotificationType;
 import com.depromeet.global.config.fcm.FcmService;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class FollowService {
+    private final NotificationService notificationService;
     private final MemberUtil memberUtil;
     private final MemberRepository memberRepository;
     private final MemberRelationRepository memberRelationRepository;
@@ -53,6 +56,9 @@ public class FollowService {
                 targetMember.getFcmInfo().getFcmToken(),
                 PUSH_SERVICE_TITLE,
                 String.format(PUSH_SERVICE_CONTENT, currentMember.getUsername()));
+        notificationService.createNotification(
+                NotificationType.FOLLOW, currentMember, targetMember);
+
         memberRelationRepository.save(memberRelation);
     }
 
