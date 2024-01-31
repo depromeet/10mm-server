@@ -167,13 +167,11 @@ public class MemberService {
 
     public void toggleAppAlarm() {
         final Member currentMember = memberUtil.getCurrentMember();
-        ImageFileExtension imageFileExtension = getImageFileExtension(currentMember.getProfile());
         currentMember.toggleAppAlarmState(currentMember.getFcmInfo());
     }
 
     public void updateFcmToken(UpdateFcmTokenRequest updateFcmTokenRequest) {
         final Member currentMember = memberUtil.getCurrentMember();
-        ImageFileExtension imageFileExtension = getImageFileExtension(currentMember.getProfile());
         currentMember.updateFcmToken(currentMember.getFcmInfo(), updateFcmTokenRequest.fcmToken());
     }
 }
