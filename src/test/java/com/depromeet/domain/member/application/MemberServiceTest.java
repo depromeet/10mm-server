@@ -12,6 +12,7 @@ import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.OauthInfo;
 import com.depromeet.domain.member.domain.Profile;
+import com.depromeet.domain.member.dto.request.NicknameUpdateRequest;
 import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.member.dto.response.MemberSocialInfoResponse;
 import com.depromeet.global.error.exception.CustomException;
@@ -49,9 +50,8 @@ class MemberServiceTest {
     }
 
     private void saveAndRegisterMember(OauthInfo oauthInfo) {
-        Member member = Member.createGuestMember(oauthInfo, "testNickname");
+        Member member = Member.createNormalMember(oauthInfo, "testNickname");
         memberRepository.save(member);
-        member.register("testNickname");
         PrincipalDetails principalDetails = new PrincipalDetails(1L, "USER");
         Authentication authentication =
                 new UsernamePasswordAuthenticationToken(
@@ -235,9 +235,7 @@ class MemberServiceTest {
             memberRelationRepository.save(
                     MemberRelation.createMemberRelation(currentMember, searchMember1));
 
-            // 도모와 재현이는 맞팔로우
-            memberRelationRepository.save(
-                    MemberRelation.createMemberRelation(currentMember, searchMember2));
+            // 재현이가 도모만 팔로우
             memberRelationRepository.save(
                     MemberRelation.createMemberRelation(searchMember2, currentMember));
 
@@ -254,8 +252,49 @@ class MemberServiceTest {
             // 도모만 윤범이를 팔로우하고있다.
             assertEquals(FollowStatus.FOLLOWING, responses.get(1).followStatus());
 
-            // 도모는 재현이와 맞팔로우 관계이다.
+            // 재현이만 도모를 팔로우하고있다.
             assertEquals(FollowStatus.FOLLOWED_BY_ME, responses.get(2).followStatus());
+        }
+    }
+
+    @Nested
+    class 닉네임을_변경할떄 {
+        @Test
+        void 다른_유저와_닉네임이_중복되면_예외가_발생한다() {
+            // given
+            OauthInfo oauthInfo =
+                    OauthInfo.createOauthInfo("testOauthId", "testOauthProvider", "testEmail");
+            saveAndRegisterMember(oauthInfo);
+
+            Member anotherMember =
+                    Member.createNormalMember(
+                            OauthInfo.createOauthInfo(
+                                    "testOauthId2", "testOauthProvider2", "testEmail2"),
+                            "testNickname2");
+            memberRepository.save(anotherMember);
+
+            // when & then
+            NicknameUpdateRequest request = new NicknameUpdateRequest("testNickname2");
+            assertThatThrownBy(() -> memberService.updateMemberNickname(request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.MEMBER_ALREADY_NICKNAME.getMessage());
+        }
+
+        @Test
+        void 닉네임이_중복되지_않으면_변경된다() {
+            // given
+            OauthInfo oauthInfo =
+                    OauthInfo.createOauthInfo("testOauthId", "testOauthProvider", "testEmail");
+            saveAndRegisterMember(oauthInfo);
+
+            // when
+            NicknameUpdateRequest request = new NicknameUpdateRequest("testNickname2");
+
+            // then
+            assertDoesNotThrow(() -> memberService.updateMemberNickname(request));
+
+            Member member = memberRepository.findById(1L).get();
+            assertEquals("testNickname2", member.getProfile().getNickname());
         }
     }
 }

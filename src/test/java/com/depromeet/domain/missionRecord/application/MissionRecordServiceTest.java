@@ -44,7 +44,8 @@ class MissionRecordServiceTest {
         when(securityUtil.getCurrentMemberId()).thenReturn(1L);
 
         member =
-                Member.createGuestMember(OauthInfo.createOauthInfo("test", "test", "test"), "test");
+                Member.createNormalMember(
+                        OauthInfo.createOauthInfo("test", "test", "test"), "test");
         memberRepository.save(member);
 
         mission =

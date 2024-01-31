@@ -56,7 +56,8 @@ public class MissionService {
         final Member currentMember = memberUtil.getCurrentMember();
         final LocalDate today = LocalDate.now();
 
-        List<Mission> missions = missionRepository.findMissionsWithRecords(currentMember.getId());
+        List<Mission> missions =
+                missionRepository.findInProgressMissionsWithRecords(currentMember.getId());
 
         List<MissionFindAllResponse> results = new ArrayList<>();
         for (Mission mission : missions) {

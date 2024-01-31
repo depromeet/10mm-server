@@ -9,6 +9,7 @@ import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.member.dto.request.NicknameCheckRequest;
+import com.depromeet.domain.member.dto.request.NicknameUpdateRequest;
 import com.depromeet.domain.member.dto.response.MemberFindOneResponse;
 import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.member.dto.response.MemberSocialInfoResponse;
@@ -59,7 +60,11 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public void checkNickname(NicknameCheckRequest request) {
-        if (memberRepository.existsByProfileNickname(request.nickname())) {
+        validateNicknameNotDuplicate(request.nickname());
+    }
+
+    private void validateNicknameNotDuplicate(String nickname) {
+        if (memberRepository.existsByProfileNickname(nickname)) {
             throw new CustomException(ErrorCode.MEMBER_ALREADY_NICKNAME);
         }
     }
@@ -85,22 +90,25 @@ public class MemberService {
                 }
             }
 
-            if (existRelation) {
-                Optional<MemberRelation> optionalMemberRelation =
-                        memberRelationByTargetId.stream()
-                                .filter(
-                                        memberRelation ->
-                                                member.getId()
-                                                        .equals(memberRelation.getSource().getId()))
-                                .findFirst();
-                if (optionalMemberRelation.isPresent()) {
-                    response.add(MemberSearchResponse.toFollowedByMeResponse(member));
-                    continue;
-                }
-
+            if (existRelation) { // 닉네임 검색한 애들 중 내가 팔로우한 애라면
                 response.add(MemberSearchResponse.toFollowingResponse(member));
                 continue;
             }
+
+            // 내가 팔로우를 하지 않았을 때
+            Optional<MemberRelation> optionalMemberRelation =
+                    memberRelationByTargetId.stream()
+                            .filter(
+                                    memberRelation ->
+                                            member.getId()
+                                                    .equals(memberRelation.getSource().getId()))
+                            .findFirst();
+            if (optionalMemberRelation.isPresent()) { // 상대방만 나를 팔로우 하고 있을  때
+                response.add(MemberSearchResponse.toFollowedByMeResponse(member));
+                continue;
+            }
+
+            // 아니라면 서로 팔로우가 아닌 상태
             response.add(MemberSearchResponse.toNotFollowingResponse(member));
         }
         response =
@@ -138,6 +146,12 @@ public class MemberService {
         }
     }
 
+    public void updateMemberNickname(NicknameUpdateRequest reqest) {
+        final Member currentMember = memberUtil.getCurrentMember();
+        validateNicknameNotDuplicate(reqest.nickname());
+        currentMember.updateNickname(reqest.nickname());
+    }
+
     private ImageFileExtension getImageFileExtension(Profile profile) {
         // TODO: 이미지 확장자 정보 같이 넘겨주는 작업 추가 (24.01.26)
         // 이미지 업로드와 닉네임 변경 분리 후 제거 예정
@@ -145,7 +159,6 @@ public class MemberService {
         if (profile.getProfileImageUrl() != null) {
             String profileImageUrl = profile.getProfileImageUrl();
             String extension = profileImageUrl.substring(profileImageUrl.lastIndexOf(".") + 1);
-            log.info("extension = {}", extension);
             imageFileExtension = ImageFileExtension.of(extension);
         }
         return imageFileExtension;
