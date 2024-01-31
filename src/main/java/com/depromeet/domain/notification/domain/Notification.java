@@ -7,7 +7,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -20,16 +22,20 @@ import lombok.NoArgsConstructor;
 public class Notification extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "notification_id")
     private Long id;
 
     @Enumerated(EnumType.STRING)
     private NotificationType notificationType;
 
-    @OneToOne private Member sourceMember;
+    @OneToOne
+    @JoinColumn(name = "source_id")
+    private Member sourceMember;
 
-    @OneToOne private Member targetMember;
+    @OneToOne
+    @JoinColumn(name = "target_id")
+    private Member targetMember;
 
     @Builder(access = AccessLevel.PRIVATE)
     private Notification(
