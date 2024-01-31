@@ -32,7 +32,7 @@ public class FcmConfig {
                 FirebaseApp.initializeApp(options);
             }
         } catch (Exception e) {
-            log.info("FCM initializing Exception: {}", e.getStackTrace()[0]);
+            log.error("FCM initializing Exception: {}", e.getStackTrace()[0]);
         }
     }
 }
