@@ -165,17 +165,15 @@ public class MemberService {
         return imageFileExtension;
     }
 
-    public MemberFindOneResponse toggleAppAlarm() {
+    public void toggleAppAlarm() {
         final Member currentMember = memberUtil.getCurrentMember();
         ImageFileExtension imageFileExtension = getImageFileExtension(currentMember.getProfile());
         currentMember.toggleAppAlarmState(currentMember.getFcmInfo());
-        return MemberFindOneResponse.of(currentMember, imageFileExtension);
     }
 
-    public MemberFindOneResponse updateFcmToken(UpdateFcmTokenRequest updateFcmTokenRequest) {
+    public void updateFcmToken(UpdateFcmTokenRequest updateFcmTokenRequest) {
         final Member currentMember = memberUtil.getCurrentMember();
         ImageFileExtension imageFileExtension = getImageFileExtension(currentMember.getProfile());
         currentMember.updateFcmToken(currentMember.getFcmInfo(), updateFcmTokenRequest.fcmToken());
-        return MemberFindOneResponse.of(currentMember, imageFileExtension);
     }
 }
