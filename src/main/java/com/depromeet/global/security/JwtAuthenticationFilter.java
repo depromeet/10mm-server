@@ -31,12 +31,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenService jwtTokenService;
     private final CookieUtil cookieUtil;
 
+    private static String extractAccessTokenFromHeader(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
+                .filter(header -> header.startsWith(TOKEN_PREFIX))
+                .map(header -> header.replace(TOKEN_PREFIX, ""))
+                .orElse(null);
+    }
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String accessTokenHeaderValue = request.getHeader(ACCESS_TOKEN_HEADER);
+        String accessTokenHeaderValue = extractAccessTokenFromHeader(request);
         String accessTokenValue = extractAccessTokenFromCookie(request);
         String refreshTokenValue = extractRefreshTokenFromCookie(request);
 
