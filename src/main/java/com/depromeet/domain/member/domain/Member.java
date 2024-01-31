@@ -60,6 +60,7 @@ public class Member extends BaseTimeEntity {
     private Member(
             Profile profile,
             OauthInfo oauthInfo,
+            FcmInfo fcmInfo,
             MemberStatus status,
             MemberRole role,
             MemberVisibility visibility,
@@ -68,6 +69,7 @@ public class Member extends BaseTimeEntity {
             String password) {
         this.profile = profile;
         this.oauthInfo = oauthInfo;
+        this.fcmInfo = fcmInfo;
         this.status = status;
         this.role = role;
         this.visibility = visibility;
@@ -80,6 +82,7 @@ public class Member extends BaseTimeEntity {
         return Member.builder()
                 .profile(Profile.createProfile(nickname, null))
                 .oauthInfo(oauthInfo)
+                .fcmInfo(FcmInfo.createFcmInfo())
                 .status(MemberStatus.NORMAL)
                 .role(MemberRole.USER)
                 .visibility(MemberVisibility.PUBLIC)
@@ -110,7 +113,7 @@ public class Member extends BaseTimeEntity {
             throw new CustomException(ErrorCode.MEMBER_ALREADY_DELETED);
         }
         this.status = MemberStatus.DELETED;
-        this.fcmInfo = FcmInfo.deleteToken();
+        this.fcmInfo = FcmInfo.disableAlarm(FcmInfo.createFcmInfo());
     }
 
     public void toggleAppAlarmState(FcmInfo fcmState) {

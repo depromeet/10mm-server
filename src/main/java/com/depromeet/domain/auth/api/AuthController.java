@@ -2,7 +2,7 @@ package com.depromeet.domain.auth.api;
 
 import com.depromeet.domain.auth.application.AuthService;
 import com.depromeet.domain.auth.domain.OauthProvider;
-import com.depromeet.domain.auth.dto.request.LoginRequest;
+import com.depromeet.domain.auth.dto.request.IdTokenRequest;
 import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
 import com.depromeet.domain.auth.dto.response.SocialLoginResponse;
@@ -68,7 +68,7 @@ public class AuthController {
     @PostMapping("/social-login")
     public ResponseEntity<SocialLoginResponse> memberSocialLogin(
             @RequestParam(name = "provider") OauthProvider provider,
-            @Valid @RequestBody LoginRequest request) {
+            @Valid @RequestBody IdTokenRequest request) {
 
         SocialLoginResponse response = authService.socialLoginMember(request, provider);
 

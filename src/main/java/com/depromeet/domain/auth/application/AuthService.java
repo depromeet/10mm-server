@@ -2,7 +2,7 @@ package com.depromeet.domain.auth.application;
 
 import com.depromeet.domain.auth.application.nickname.NicknameGenerationStrategy;
 import com.depromeet.domain.auth.domain.OauthProvider;
-import com.depromeet.domain.auth.dto.request.LoginRequest;
+import com.depromeet.domain.auth.dto.request.IdTokenRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
 import com.depromeet.domain.auth.dto.response.SocialLoginResponse;
 import com.depromeet.domain.auth.dto.response.TokenPairResponse;
@@ -91,10 +91,9 @@ public class AuthService {
         return TokenPairResponse.from(accessToken, refreshToken);
     }
 
-    public SocialLoginResponse socialLoginMember(LoginRequest request, OauthProvider provider) {
+    public SocialLoginResponse socialLoginMember(IdTokenRequest request, OauthProvider provider) {
         OidcUser oidcUser = idTokenVerifier.getOidcUser(request.idToken(), provider);
         Member member = fetchOrCreate(oidcUser);
-        member.updateFcmToken(member.getFcmInfo(), request.fcmToken());
         member.updateLastLoginAt();
 
         TokenPairResponse loginResponse = getLoginResponse(member);

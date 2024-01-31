@@ -165,7 +165,7 @@ public class MemberService {
         return imageFileExtension;
     }
 
-    public MemberFindOneResponse updateAppAlarm() {
+    public MemberFindOneResponse toggleAppAlarm() {
         final Member currentMember = memberUtil.getCurrentMember();
         ImageFileExtension imageFileExtension = getImageFileExtension(currentMember.getProfile());
         currentMember.toggleAppAlarmState(currentMember.getFcmInfo());

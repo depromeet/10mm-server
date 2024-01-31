@@ -20,16 +20,23 @@ public class FcmInfo {
         this.appAlarm = appAlarm;
     }
 
+    public static FcmInfo createFcmInfo() {
+        return FcmInfo.builder().fcmToken("").appAlarm(false).build();
+    }
+
     public static FcmInfo toggleAlarm(FcmInfo fcmState) {
         return new FcmInfo(fcmState.getFcmToken(), !fcmState.getAppAlarm());
     }
 
-    public static FcmInfo deleteToken() {
-        return new FcmInfo("", false);
+    public static FcmInfo disableAlarm(FcmInfo fcmInfo) {
+        return new FcmInfo(fcmInfo.getFcmToken(), false);
+    }
+
+    public static FcmInfo deleteToken(FcmInfo fcmInfo) {
+        return new FcmInfo("", fcmInfo.getAppAlarm());
     }
 
     public static FcmInfo updateToken(FcmInfo fcmState, String fcmToken) {
-        // TODO: 푸시 알림 Toggle 기획 시 fcmState.getAppAlarm()로 변경
-        return new FcmInfo(fcmToken, true);
+        return new FcmInfo(fcmToken, fcmState.getAppAlarm());
     }
 }
