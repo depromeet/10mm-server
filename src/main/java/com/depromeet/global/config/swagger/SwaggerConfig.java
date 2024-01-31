@@ -66,15 +66,7 @@ public class SwaggerConfig {
                                 .scheme("bearer")
                                 .bearerFormat("JWT")
                                 .in(In.HEADER)
-                                .name("Authorization"))
-                .addSecuritySchemes(
-                        "refreshToken",
-                        new SecurityScheme()
-                                .type(Type.HTTP)
-                                .scheme("bearer")
-                                .bearerFormat("JWT")
-                                .in(In.HEADER)
-                                .name("Refresh-Token"));
+                                .name("Authorization"));
     }
 
     private Info swaggerInfo() {
