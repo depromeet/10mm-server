@@ -20,8 +20,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByProfileNickname(String nickname);
 
-    @Query(
-            "SELECT m FROM Member m WHERE m.profile.nickname LIKE CONCAT('%', :searchNickname, '%') escape '_' AND m.profile.nickname != :myNickname")
+	@Query(
+		"SELECT m FROM Member m WHERE m.profile.nickname LIKE CONCAT('%', :searchNickname, '%') escape '_' AND m.profile.nickname != :myNickname")
     List<Member> nicknameSearch(
             @Param("searchNickname") String searchNickname, @Param("myNickname") String myNickname);
 }
