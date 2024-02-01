@@ -73,8 +73,11 @@ public class MemberService {
     @Transactional(readOnly = true)
     public List<MemberSearchResponse> searchMemberNickname(String nickname) {
         final Member currentMember = memberUtil.getCurrentMember();
+        final String escapingNickname = escapeSpecialCharacters(nickname);
+
         List<Member> members =
-                memberRepository.nicknameSearch(nickname, currentMember.getProfile().getNickname());
+                memberRepository.nicknameSearch(
+                        escapingNickname, currentMember.getProfile().getNickname());
         List<MemberRelation> memberRelationBySourceId =
                 memberRelationRepository.findAllBySourceIdAndTargetIn(
                         currentMember.getId(), members);
@@ -173,5 +176,10 @@ public class MemberService {
     public void updateFcmToken(UpdateFcmTokenRequest updateFcmTokenRequest) {
         final Member currentMember = memberUtil.getCurrentMember();
         currentMember.updateFcmToken(currentMember.getFcmInfo(), updateFcmTokenRequest.fcmToken());
+    }
+
+    private String escapeSpecialCharacters(String nickname) {
+        // 여기서 특수문자를 '_'로 대체할 수 있도록 정규표현식을 활용하여 구현
+        return nickname.replaceAll("[^0-9a-zA-Z가-힣 ]", "_");
     }
 }
