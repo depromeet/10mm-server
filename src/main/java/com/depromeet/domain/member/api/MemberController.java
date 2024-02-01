@@ -54,7 +54,8 @@ public class MemberController {
 
     @Operation(summary = "닉네임으로 회원 검색", description = "닉네임으로 회원을 검색합니다.")
     @GetMapping("/search")
-    public List<MemberSearchResponse> memberNicknameSearch(@RequestParam(required = false) String nickname) {
+    public List<MemberSearchResponse> memberNicknameSearch(
+            @RequestParam(required = false) String nickname) {
         return memberService.searchMemberNickname(nickname);
     }
 
