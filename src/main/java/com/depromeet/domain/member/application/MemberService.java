@@ -180,6 +180,6 @@ public class MemberService {
 
     private String escapeSpecialCharacters(String nickname) {
         // 여기서 특수문자를 '_'로 대체할 수 있도록 정규표현식을 활용하여 구현
-        return nickname != null ? nickname.replaceAll("[^0-9a-zA-Z가-힣 ]", "_") : "";
+        return nickname == null ? "" : nickname.replaceAll("[^0-9a-zA-Z가-힣 ]", "_");
     }
 }
