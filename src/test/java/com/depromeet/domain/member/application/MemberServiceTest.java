@@ -182,6 +182,64 @@ class MemberServiceTest {
         }
 
         @Test
+        void 검색_키워드에_퍼센트_키워드가_들어왔을_때_NPE_무시_처리한다() {
+            // given
+            memberRepository.save(
+                    Member.createNormalMember(Profile.createProfile("도모", "도모 이미지 URL")));
+            memberRepository.save(
+                    Member.createNormalMember(Profile.createProfile("도모 바보", "testImageUrl")));
+
+            String searchNickname = "%";
+
+            // when
+            List<MemberSearchResponse> responses =
+                    memberService.searchMemberNickname(searchNickname);
+
+            // then
+            assertEquals(0, responses.size());
+        }
+
+        @Test
+        void 검색_키워드에_공백에_따른_처리만_허용한다() {
+            // given
+            memberRepository.save(Member.createNormalMember(Profile.createProfile("바보", "도모 얼굴")));
+            memberRepository.save(
+                    Member.createNormalMember(Profile.createProfile("도 모", "도모 이미지 URL")));
+            memberRepository.save(
+                    Member.createNormalMember(Profile.createProfile("도모 바보", "testImageUrl")));
+            memberRepository.save(
+                    Member.createNormalMember(Profile.createProfile(" 도모", "도모 잘생김")));
+            String searchNickname = " ";
+
+            // when
+            List<MemberSearchResponse> responses =
+                    memberService.searchMemberNickname(searchNickname);
+
+            // then
+            assertEquals(3, responses.size());
+        }
+
+        @Test
+        void 검색_키워드에_특수문자_입력_시_정규식_예외처리를_한다() {
+            // given
+            memberRepository.save(
+                    Member.createNormalMember(Profile.createProfile("#도모", "도모 이미지 URL")));
+            memberRepository.save(
+                    Member.createNormalMember(Profile.createProfile("도모 바보#", "testImageUrl")));
+
+            memberRepository.save(
+                    Member.createNormalMember(Profile.createProfile("#도모 바보#", "testImageUrl")));
+            String searchNickname = "#";
+
+            // when
+            List<MemberSearchResponse> responses =
+                    memberService.searchMemberNickname(searchNickname);
+
+            // then
+            assertEquals(0, responses.size());
+        }
+
+        @Test
         void 정렬조건은_일치하는경우_먼저보여주고_나머지는_사전순에_따른다() {
             // given
             String searchNickname = "도모";
