@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Profile {
 
-    @Pattern(regexp = "[^0-9a-zA-Z가-힣]")
+    @Pattern(regexp = "[^0-9a-zA-Z가-힣 ]")
     private String nickname;
 
     @Getter private String profileImageUrl;
