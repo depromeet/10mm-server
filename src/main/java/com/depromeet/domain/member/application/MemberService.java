@@ -62,16 +62,16 @@ public class MemberService {
     @Transactional(readOnly = true)
     public void checkNickname(NicknameCheckRequest request) {
         validateNicknameNotDuplicate(request.nickname());
-		if (validateNicknameText(request.nickname())) {
-			throw new CustomException(ErrorCode.MEMBER_INVALID_NICKNAME);
-		}
+        if (validateNicknameText(request.nickname())) {
+            throw new CustomException(ErrorCode.MEMBER_INVALID_NICKNAME);
+        }
     }
 
-	private boolean validateNicknameText(String nickname) {
-		return nickname == null || nickname.trim().isEmpty();
-	}
+    private boolean validateNicknameText(String nickname) {
+        return nickname == null || nickname.trim().isEmpty();
+    }
 
-	private void validateNicknameNotDuplicate(String nickname) {
+    private void validateNicknameNotDuplicate(String nickname) {
         if (memberRepository.existsByProfileNickname(nickname)) {
             throw new CustomException(ErrorCode.MEMBER_ALREADY_NICKNAME);
         }
