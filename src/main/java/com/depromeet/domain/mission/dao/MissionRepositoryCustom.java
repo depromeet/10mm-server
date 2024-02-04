@@ -12,5 +12,7 @@ public interface MissionRepositoryCustom {
 
     List<Mission> findMissionsWithRecordsByRelations(Long memberId, boolean existsMemberRelations);
 
+    List<Mission> findFeedAll(List<Long> sourceIds);
+
     void updateFinishedDurationStatus(LocalDateTime today);
 }

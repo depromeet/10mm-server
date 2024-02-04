@@ -1,5 +1,6 @@
 package com.depromeet.domain.mission.dao;
 
+import static com.depromeet.domain.member.domain.QMember.*;
 import static com.depromeet.domain.mission.domain.QMission.*;
 import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 
@@ -67,6 +68,19 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                         mission.finishedAt.loe(today),
                         mission.durationStatus.ne(DurationStatus.FINISHED))
                 .execute();
+    }
+
+    @Override
+    public List<Mission> findFeedAll(List<Long> sourceIds) {
+        return jpaQueryFactory
+                .selectFrom(mission)
+                .leftJoin(mission.missionRecords, missionRecord)
+                .fetchJoin()
+                .where(
+                        mission.member.id.in(sourceIds),
+                        mission.visibility.in(MissionVisibility.FOLLOWER, MissionVisibility.ALL))
+                .orderBy(missionRecord.startedAt.desc())
+                .fetch();
     }
 
     private BooleanExpression memberIdEq(Long memberId) {
