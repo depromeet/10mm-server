@@ -44,7 +44,7 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복 체크를 진행합니다.")
+    @Operation(summary = "닉네임 유효성 체크", description = "닉네임 유효성 체크를 진행합니다.")
     @PostMapping("/check-nickname")
     public ResponseEntity<Void> memberNicknameCheck(
             @Valid @RequestBody NicknameCheckRequest request) {
@@ -77,8 +77,8 @@ public class MemberController {
     @Operation(summary = "회원 닉네임 변경", description = "회원 닉네임을 변경합니다.")
     @PutMapping("/me/nickname")
     public ResponseEntity<Void> memberNicknameUpdate(
-            @Valid @RequestBody NicknameUpdateRequest reqest) {
-        memberService.updateMemberNickname(reqest);
+            @Valid @RequestBody NicknameUpdateRequest request) {
+        memberService.updateMemberNickname(request);
         return ResponseEntity.ok().build();
     }
 

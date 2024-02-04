@@ -62,9 +62,16 @@ public class MemberService {
     @Transactional(readOnly = true)
     public void checkNickname(NicknameCheckRequest request) {
         validateNicknameNotDuplicate(request.nickname());
+		if (validateNicknameText(request.nickname())) {
+			throw new CustomException(ErrorCode.MEMBER_INVALID_NICKNAME);
+		}
     }
 
-    private void validateNicknameNotDuplicate(String nickname) {
+	private boolean validateNicknameText(String nickname) {
+		return nickname == null || nickname.trim().isEmpty();
+	}
+
+	private void validateNicknameNotDuplicate(String nickname) {
         if (memberRepository.existsByProfileNickname(nickname)) {
             throw new CustomException(ErrorCode.MEMBER_ALREADY_NICKNAME);
         }
@@ -150,10 +157,10 @@ public class MemberService {
         }
     }
 
-    public void updateMemberNickname(NicknameUpdateRequest reqest) {
+    public void updateMemberNickname(NicknameUpdateRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
-        validateNicknameNotDuplicate(reqest.nickname());
-        currentMember.updateNickname(reqest.nickname());
+        validateNicknameNotDuplicate(request.nickname());
+        currentMember.updateNickname(escapeSpecialCharacters(request.nickname()));
     }
 
     private ImageFileExtension getImageFileExtension(Profile profile) {
