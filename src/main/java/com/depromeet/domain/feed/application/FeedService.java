@@ -7,6 +7,7 @@ import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionVisibility;
+import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.global.util.MemberUtil;
 import java.util.ArrayList;
@@ -15,14 +16,18 @@ import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+// TODO: Redis 사용해서 캐싱 작업 필요
 @Service
 @RequiredArgsConstructor
 public class FeedService {
     private final MemberUtil memberUtil;
     private final MissionRepository missionRepository;
+    private final MissionRecordRepository missionRecordRepository;
     private final MemberRelationRepository memberRelationRepository;
 
+    @Transactional(readOnly = true)
     public List<FeedOneResponse> findAllFeed() {
         final Member currentMember = memberUtil.getCurrentMember();
         List<Long> sourceIds =
@@ -32,20 +37,7 @@ public class FeedService {
                                 .toList());
         sourceIds.add(currentMember.getId());
 
-        List<Mission> feedAll = missionRepository.findFeedAll(sourceIds);
-
-        return feedAll.stream()
-                .flatMap(
-                        mission -> {
-                            List<MissionRecord> missionRecords = mission.getMissionRecords();
-                            return missionRecords.stream()
-                                    .filter(Objects::nonNull)
-                                    .map(
-                                            record ->
-                                                    FeedOneResponse.of(
-                                                            mission, record, mission.getMember()));
-                        })
-                .toList();
+        return missionRecordRepository.findFeedAll(sourceIds);
     }
 
     public List<FeedOneByProfileResponse> findAllFeedByTargetId(Long targetId) {

@@ -1,8 +1,14 @@
 package com.depromeet.domain.missionRecord.dao;
 
+import static com.depromeet.domain.member.domain.QMember.*;
+import static com.depromeet.domain.mission.domain.QMission.*;
 import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 
+import com.depromeet.domain.feed.dto.response.FeedOneResponse;
+import com.depromeet.domain.mission.domain.MissionVisibility;
+import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
@@ -42,6 +48,37 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                                 dayEq(now.getDayOfMonth()))
                         .fetchFirst();
         return missionRecordFetchOne != null;
+    }
+
+    @Override
+    public List<FeedOneResponse> findFeedAll(List<Long> sourceIds) {
+        return jpaQueryFactory
+                .select(
+                        Projections.constructor(
+                                FeedOneResponse.class,
+                                member.id,
+                                member.profile.nickname,
+                                member.profile.profileImageUrl,
+                                mission.id,
+                                mission.name,
+                                missionRecord.id,
+                                missionRecord.remark,
+                                missionRecord.imageUrl,
+                                missionRecord.duration,
+                                missionRecord.startedAt,
+                                missionRecord.finishedAt))
+                .from(missionRecord)
+                .leftJoin(missionRecord.mission, mission)
+                .on(mission.id.eq(missionRecord.mission.id))
+                .leftJoin(mission.member, member)
+                .on(mission.member.id.eq(missionRecord.mission.member.id))
+                .where(
+                        missionRecord.mission.member.id.in(sourceIds),
+                        missionRecord.mission.visibility.in(
+                                MissionVisibility.FOLLOWER, MissionVisibility.ALL),
+                        missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE))
+                .orderBy(missionRecord.startedAt.desc())
+                .fetch();
     }
 
     @Override

@@ -71,19 +71,12 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                 .execute();
     }
 
-    @Override
-    public List<Mission> findFeedAll(List<Long> sourceIds) {
-        return jpaQueryFactory
-                .selectFrom(mission)
-                .leftJoin(mission.missionRecords, missionRecord)
-                .fetchJoin()
-                .where(
-                        mission.member.id.in(sourceIds),
-                        mission.visibility.in(MissionVisibility.FOLLOWER, MissionVisibility.ALL),
-                        missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE))
-                .orderBy(missionRecord.startedAt.desc())
-                .fetch();
-    }
+    /*
+    1. 미션 레코드를 기준으로 한다. 그런데 여기에 미션 정보도 필요하고, 멤버 정보도 필요한 거임.
+    2. 그래서 미션 레코드를 기준으로 쿼리하되 미션을 조인하고, 멤버도 조인한다.
+    3. where 조건 필터링할 때 멤버 조인했으니까, 이 멤버가 sourceID 기반으로 한 멤버 리스트 안에 있는지 필터링만 하면 끝
+    4. 정렬은 레코드 생성순서로
+    */
 
     @Override
     public List<Mission> findFeedAllByMemberId(
