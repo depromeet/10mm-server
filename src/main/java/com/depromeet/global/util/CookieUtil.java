@@ -17,11 +17,12 @@ public class CookieUtil {
     public HttpHeaders generateTokenCookies(String accessToken, String refreshToken) {
 
         String sameSite = determineSameSitePolicy();
+        boolean secure = determineSecurePolicy();
 
         ResponseCookie accessTokenCookie =
                 ResponseCookie.from(ACCESS_TOKEN_COOKIE_NAME, accessToken)
                         .path("/")
-                        .secure(true)
+                        .secure(secure)
                         .sameSite(sameSite)
                         .httpOnly(false)
                         .build();
@@ -29,7 +30,7 @@ public class CookieUtil {
         ResponseCookie refreshTokenCookie =
                 ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
                         .path("/")
-                        .secure(true)
+                        .secure(secure)
                         .sameSite(sameSite)
                         .httpOnly(false)
                         .build();
@@ -46,5 +47,12 @@ public class CookieUtil {
             return "Strict";
         }
         return "None";
+    }
+
+    private boolean determineSecurePolicy() {
+        if (springEnvironmentUtil.isProdProfile()) {
+            return true;
+        }
+        return false;
     }
 }
