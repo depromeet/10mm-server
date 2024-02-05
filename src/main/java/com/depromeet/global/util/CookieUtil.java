@@ -17,12 +17,12 @@ public class CookieUtil {
     public HttpHeaders generateTokenCookies(String accessToken, String refreshToken) {
 
         String sameSite = determineSameSitePolicy();
-        boolean secure = determineSecurePolicy();
+        boolean isSecured = determineSecurePolicy();
 
         ResponseCookie accessTokenCookie =
                 ResponseCookie.from(ACCESS_TOKEN_COOKIE_NAME, accessToken)
                         .path("/")
-                        .secure(secure)
+                        .secure(isSecured)
                         .sameSite(sameSite)
                         .httpOnly(false)
                         .build();
@@ -30,7 +30,7 @@ public class CookieUtil {
         ResponseCookie refreshTokenCookie =
                 ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
                         .path("/")
-                        .secure(secure)
+                        .secure(isSecured)
                         .sameSite(sameSite)
                         .httpOnly(false)
                         .build();
