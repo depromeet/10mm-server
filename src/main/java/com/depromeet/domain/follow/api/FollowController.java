@@ -10,7 +10,6 @@ import com.depromeet.domain.follow.dto.response.MemberFollowedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -65,5 +64,4 @@ public class FollowController {
     public FollowListResponse followList(@PathVariable Long targetId) {
         return followService.findFollowList(targetId);
     }
-
 }

@@ -194,25 +194,32 @@ public class FollowService {
         List<MemberSearchResponse> followingList = new ArrayList<>();
         List<MemberSearchResponse> followerList = new ArrayList<>();
 
-        List<MemberRelation> targetMemberSources = memberRelationRepository.findAllBySourceId(targetMember.getId());
-        List<MemberRelation> targetMemberTargets = memberRelationRepository.findAllByTargetId(targetMember.getId());
+        List<MemberRelation> targetMemberSources =
+                memberRelationRepository.findAllBySourceId(targetMember.getId());
+        List<MemberRelation> targetMemberTargets =
+                memberRelationRepository.findAllByTargetId(targetMember.getId());
 
-        List<MemberRelation> currentMemberSources = memberRelationRepository.findAllBySourceId(currentMember.getId());
-        List<MemberRelation> currentMemberTargets = memberRelationRepository.findAllByTargetId(currentMember.getId());
+        List<MemberRelation> currentMemberSources =
+                memberRelationRepository.findAllBySourceId(currentMember.getId());
+        List<MemberRelation> currentMemberTargets =
+                memberRelationRepository.findAllByTargetId(currentMember.getId());
 
         // target 유저의 팔로잉
-        List<Member> followingMembers = targetMemberSources.stream().map(MemberRelation::getTarget).toList();
+        List<Member> followingMembers =
+                targetMemberSources.stream().map(MemberRelation::getTarget).toList();
 
         // target 유저의 팔로워
-        List<Member> followerMembers = targetMemberTargets.stream().map(MemberRelation::getSource).toList();
+        List<Member> followerMembers =
+                targetMemberTargets.stream().map(MemberRelation::getSource).toList();
 
-//        // current 유저의 팔로잉
-//        List<Member> currentFollowingMembers = currentMemberSources.stream().map(MemberRelation::getTarget).toList();
-//
-//        // current 유저의 팔로워
-//        List<Member> currentFollowerMembers = currentMemberTargets.stream()
-//            .map(MemberRelation::getSource)
-//            .toList();
+        //        // current 유저의 팔로잉
+        //        List<Member> currentFollowingMembers =
+        // currentMemberSources.stream().map(MemberRelation::getTarget).toList();
+        //
+        //        // current 유저의 팔로워
+        //        List<Member> currentFollowerMembers = currentMemberTargets.stream()
+        //            .map(MemberRelation::getSource)
+        //            .toList();
 
         // 팔로잉 리스트 구하기
         for (Member member : followingMembers) {
@@ -278,7 +285,7 @@ public class FollowService {
             followerList.add(MemberSearchResponse.toNotFollowingResponse(member));
         }
 
-        return FollowListResponse.of(targetMember.getProfile().getNickname(), followingList, followerList);
-
+        return FollowListResponse.of(
+                targetMember.getProfile().getNickname(), followingList, followerList);
     }
 }
