@@ -212,80 +212,46 @@ public class FollowService {
         List<Member> followerMembers =
                 targetMemberTargets.stream().map(MemberRelation::getSource).toList();
 
-        //        // current 유저의 팔로잉
-        //        List<Member> currentFollowingMembers =
-        // currentMemberSources.stream().map(MemberRelation::getTarget).toList();
-        //
-        //        // current 유저의 팔로워
-        //        List<Member> currentFollowerMembers = currentMemberTargets.stream()
-        //            .map(MemberRelation::getSource)
-        //            .toList();
-
         // 팔로잉 리스트 구하기
-        for (Member member : followingMembers) {
-            boolean existRelation = false;
-            for (MemberRelation memberRelation : currentMemberSources) {
-                if (member.getId().equals(memberRelation.getTarget().getId())) {
-                    existRelation = true;
-                    break;
-                }
-            }
-
-            if (existRelation) { // 조회 된 애들 중 내가 팔로우한 애라면
-                followingList.add(MemberSearchResponse.toFollowingResponse(member));
-                continue;
-            }
-
-            // 내가 팔로우를 하지 않았을 때
-            Optional<MemberRelation> optionalMemberRelation =
-                    currentMemberTargets.stream()
-                            .filter(
-                                    memberRelation ->
-                                            member.getId()
-                                                    .equals(memberRelation.getSource().getId()))
-                            .findFirst();
-            if (optionalMemberRelation.isPresent()) { // 상대방만 나를 팔로우 하고 있을  때
-                followingList.add(MemberSearchResponse.toFollowedByMeResponse(member));
-                continue;
-            }
-
-            // 아니라면 서로 팔로우가 아닌 상태
-            followingList.add(MemberSearchResponse.toNotFollowingResponse(member));
-        }
+        getFollowStatusIncludeList(followingMembers, currentMemberSources, followingList, currentMemberTargets);
 
         // 팔로워 리스트 구하기
-        for (Member member : followerMembers) {
-            boolean existRelation = false;
-            for (MemberRelation memberRelation : currentMemberSources) {
-                if (member.getId().equals(memberRelation.getTarget().getId())) {
-                    existRelation = true;
-                    break;
-                }
-            }
-
-            if (existRelation) { // 조회 된 애들 중 내가 팔로우한 애라면
-                followerList.add(MemberSearchResponse.toFollowingResponse(member));
-                continue;
-            }
-
-            // 내가 팔로우를 하지 않았을 때
-            Optional<MemberRelation> optionalMemberRelation =
-                    currentMemberTargets.stream()
-                            .filter(
-                                    memberRelation ->
-                                            member.getId()
-                                                    .equals(memberRelation.getSource().getId()))
-                            .findFirst();
-            if (optionalMemberRelation.isPresent()) { // 상대방만 나를 팔로우 하고 있을  때
-                followerList.add(MemberSearchResponse.toFollowedByMeResponse(member));
-                continue;
-            }
-
-            // 아니라면 서로 팔로우가 아닌 상태
-            followerList.add(MemberSearchResponse.toNotFollowingResponse(member));
-        }
+        getFollowStatusIncludeList(followerMembers, currentMemberSources, followerList, currentMemberTargets);
 
         return FollowListResponse.of(
                 targetMember.getProfile().getNickname(), followingList, followerList);
+    }
+
+    private static void getFollowStatusIncludeList(List<Member> targetMembers, List<MemberRelation> currentMemberSources, List<MemberSearchResponse> resultList, List<MemberRelation> currentMemberTargets) {
+        for (Member member : targetMembers) {
+            boolean existRelation = false;
+            for (MemberRelation memberRelation : currentMemberSources) {
+                if (member.getId().equals(memberRelation.getTarget().getId())) {
+                    existRelation = true;
+                    break;
+                }
+            }
+
+            if (existRelation) { // 조회 된 애들 중 내가 팔로우한 애라면
+                resultList.add(MemberSearchResponse.toFollowingResponse(member));
+                continue;
+            }
+
+            // 내가 팔로우를 하지 않았을 때
+            Optional<MemberRelation> optionalMemberRelation =
+                    currentMemberTargets.stream()
+                            .filter(
+                                    memberRelation ->
+                                            member.getId()
+                                                    .equals(memberRelation.getSource().getId()))
+                            .findFirst();
+            if (optionalMemberRelation.isPresent()) { // 상대방만 나를 팔로우 하고 있을  때
+                resultList.add(MemberSearchResponse.toFollowedByMeResponse(member));
+                continue;
+            }
+
+            // 아니라면 서로 팔로우가 아닌 상태
+            resultList.add(MemberSearchResponse.toNotFollowingResponse(member));
+        }
     }
 }
