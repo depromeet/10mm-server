@@ -213,16 +213,22 @@ public class FollowService {
                 targetMemberTargets.stream().map(MemberRelation::getSource).toList();
 
         // 팔로잉 리스트 구하기
-        getFollowStatusIncludeList(followingMembers, currentMemberSources, followingList, currentMemberTargets);
+        getFollowStatusIncludeList(
+                followingMembers, currentMemberSources, followingList, currentMemberTargets);
 
         // 팔로워 리스트 구하기
-        getFollowStatusIncludeList(followerMembers, currentMemberSources, followerList, currentMemberTargets);
+        getFollowStatusIncludeList(
+                followerMembers, currentMemberSources, followerList, currentMemberTargets);
 
         return FollowListResponse.of(
                 targetMember.getProfile().getNickname(), followingList, followerList);
     }
 
-    private static void getFollowStatusIncludeList(List<Member> targetMembers, List<MemberRelation> currentMemberSources, List<MemberSearchResponse> resultList, List<MemberRelation> currentMemberTargets) {
+    private static void getFollowStatusIncludeList(
+            List<Member> targetMembers,
+            List<MemberRelation> currentMemberSources,
+            List<MemberSearchResponse> resultList,
+            List<MemberRelation> currentMemberTargets) {
         for (Member member : targetMembers) {
             boolean existRelation = false;
             for (MemberRelation memberRelation : currentMemberSources) {
