@@ -7,6 +7,7 @@ import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 import com.depromeet.domain.mission.domain.DurationStatus;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionVisibility;
+import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -78,7 +79,23 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                 .fetchJoin()
                 .where(
                         mission.member.id.in(sourceIds),
-                        mission.visibility.in(MissionVisibility.FOLLOWER, MissionVisibility.ALL))
+                        mission.visibility.in(MissionVisibility.FOLLOWER, MissionVisibility.ALL),
+                        missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE))
+                .orderBy(missionRecord.startedAt.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<Mission> findFeedAllByMemberId(
+            Long memberId, List<MissionVisibility> visibilities) {
+        return jpaQueryFactory
+                .selectFrom(mission)
+                .leftJoin(mission.missionRecords, missionRecord)
+                .fetchJoin()
+                .where(
+                        mission.member.id.eq(memberId),
+                        mission.visibility.in(visibilities),
+                        missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE))
                 .orderBy(missionRecord.startedAt.desc())
                 .fetch();
     }

@@ -1,6 +1,7 @@
 package com.depromeet.domain.mission.dao;
 
 import com.depromeet.domain.mission.domain.Mission;
+import com.depromeet.domain.mission.domain.MissionVisibility;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,6 +14,8 @@ public interface MissionRepositoryCustom {
     List<Mission> findMissionsWithRecordsByRelations(Long memberId, boolean existsMemberRelations);
 
     List<Mission> findFeedAll(List<Long> sourceIds);
+
+    List<Mission> findFeedAllByMemberId(Long memberId, List<MissionVisibility> visibilities);
 
     void updateFinishedDurationStatus(LocalDateTime today);
 }

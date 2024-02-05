@@ -7,12 +7,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public record FeedOneResponse(
-        @Schema(description = "작성자 ID", defaultValue = "1") Long targetId,
+public record FeedOneByProfileResponse(
         @Schema(description = "미션 ID", defaultValue = "1") Long missionId,
         @Schema(description = "미션 기록 ID", defaultValue = "1") Long recordId,
         @Schema(description = "미션 이름", defaultValue = "default name") String name,
-        @Schema(description = "미션 일지 내용", defaultValue = "default remark") String remark,
         @Schema(
                         description = "미션 기록 인증 사진 Url",
                         defaultValue = "https://image.10mm.today/default.png")
@@ -25,7 +23,7 @@ public record FeedOneResponse(
                         timezone = "Asia/Seoul")
                 @Schema(
                         description = "미션 기록 시작 시간",
-                        defaultValue = "2024-01-06 00:00:00",
+                        defaultValue = "2023-01-06 00:00:00",
                         type = "string")
                 LocalDateTime startedAt,
         @JsonFormat(
@@ -37,13 +35,11 @@ public record FeedOneResponse(
                         defaultValue = "2024-01-20 00:34:00",
                         type = "string")
                 LocalDateTime finishedAt) {
-    public static FeedOneResponse of(Mission mission, MissionRecord missionRecord) {
-        return new FeedOneResponse(
-                mission.getMember().getId(),
+    public static FeedOneByProfileResponse of(Mission mission, MissionRecord missionRecord) {
+        return new FeedOneByProfileResponse(
                 mission.getId(),
                 missionRecord.getId(),
                 mission.getName(),
-                missionRecord.getRemark(),
                 missionRecord.getImageUrl(),
                 missionRecord.getDuration().toMinutes(),
                 Duration.between(missionRecord.getStartedAt(), LocalDateTime.now()).toDays() + 1,
