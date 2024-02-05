@@ -40,7 +40,10 @@ public class FeedService {
                             List<MissionRecord> missionRecords = mission.getMissionRecords();
                             return missionRecords.stream()
                                     .filter(Objects::nonNull)
-                                    .map(record -> FeedOneResponse.of(mission, record));
+                                    .map(
+                                            record ->
+                                                    FeedOneResponse.of(
+                                                            mission, record, mission.getMember()));
                         })
                 .toList();
     }

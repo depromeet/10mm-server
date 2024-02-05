@@ -1,5 +1,6 @@
 package com.depromeet.domain.feed.dto.response;
 
+import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 
 public record FeedOneResponse(
         @Schema(description = "작성자 ID", defaultValue = "1") Long targetId,
+        @Schema(description = "작성자 닉네임", defaultValue = "default nickname") String nickname,
         @Schema(description = "미션 ID", defaultValue = "1") Long missionId,
         @Schema(description = "미션 기록 ID", defaultValue = "1") Long recordId,
         @Schema(description = "미션 이름", defaultValue = "default name") String name,
@@ -37,9 +39,10 @@ public record FeedOneResponse(
                         defaultValue = "2024-01-20 00:34:00",
                         type = "string")
                 LocalDateTime finishedAt) {
-    public static FeedOneResponse of(Mission mission, MissionRecord missionRecord) {
+    public static FeedOneResponse of(Mission mission, MissionRecord missionRecord, Member member) {
         return new FeedOneResponse(
                 mission.getMember().getId(),
+                member.getProfile().getNickname(),
                 mission.getId(),
                 missionRecord.getId(),
                 mission.getName(),
