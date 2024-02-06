@@ -11,7 +11,6 @@ import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.global.util.MemberUtil;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -44,16 +43,16 @@ public class FeedService {
         Member sourceMember = memberUtil.getCurrentMember();
 
         /*
-         본인 프로필
+         본인 프로필 findFeedBySourceMember
          targetId가 본인이다.
          그렇다면 공개 여부 상관없이 full-scan
 
-         타인 프로필
+         타인 프로필 findFeedByTargetMember
          만약 sourceId와 targetId가 다르다.
          그렇다면 공개 여부에서 비공개는 exclude 한다.
          추가로 내가 타인 프로필에서 팔로잉 관계가 이뤄졌는지 여부 확인하여 팔로우 관계 여부 체크
         */
-        if (targetId != null) {
+        if (!targetId.equals(sourceMember.getId())) {
             return findFeedByTargetMember(sourceMember, targetId);
         } else {
             return findFeedBySourceMember(sourceMember);
@@ -63,8 +62,7 @@ public class FeedService {
     private List<FeedOneByProfileResponse> findFeedByTargetMember(
             Member sourceMember, Long targetId) {
         final Member targetMember = memberUtil.getMemberByMemberId(targetId);
-        List<MissionVisibility> visibilities =
-                new ArrayList<>(Arrays.asList(MissionVisibility.ALL));
+        List<MissionVisibility> visibilities = new ArrayList<>(List.of(MissionVisibility.ALL));
 
         // 팔로우 관계 true: visibility.FOLLOW and ALL, false: visibility.ALL only
         boolean existMemberRelation =

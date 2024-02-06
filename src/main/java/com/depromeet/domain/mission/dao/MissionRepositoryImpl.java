@@ -81,16 +81,21 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     @Override
     public List<Mission> findFeedAllByMemberId(
             Long memberId, List<MissionVisibility> visibilities) {
-        return jpaQueryFactory
-                .selectFrom(mission)
-                .leftJoin(mission.missionRecords, missionRecord)
-                .fetchJoin()
-                .where(
-                        mission.member.id.eq(memberId),
-                        mission.visibility.in(visibilities),
-                        missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE))
-                .orderBy(missionRecord.startedAt.desc())
-                .fetch();
+        JPAQuery<Mission> query =
+                jpaQueryFactory
+                        .selectFrom(mission)
+                        .leftJoin(mission.missionRecords, missionRecord)
+                        .fetchJoin()
+                        .where(
+                                mission.member.id.eq(memberId),
+                                missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE))
+                        .orderBy(missionRecord.startedAt.desc());
+
+        if (visibilities != null) {
+            query = query.where(mission.visibility.in(visibilities));
+        }
+
+        return query.fetch();
     }
 
     private BooleanExpression memberIdEq(Long memberId) {
