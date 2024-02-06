@@ -1,5 +1,6 @@
 package com.depromeet.global.config.security;
 
+import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.security.config.Customizer.*;
 
 import com.depromeet.domain.auth.application.JwtTokenService;
@@ -133,7 +134,7 @@ public class WebSecurityConfig {
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
-        configuration.addExposedHeader("Set-Cookie");
+        configuration.addExposedHeader(SET_COOKIE);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

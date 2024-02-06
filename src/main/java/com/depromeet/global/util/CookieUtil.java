@@ -4,6 +4,7 @@ import static com.depromeet.global.common.constants.SecurityConstants.ACCESS_TOK
 import static com.depromeet.global.common.constants.SecurityConstants.REFRESH_TOKEN_COOKIE_NAME;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ public class CookieUtil {
                         .path("/")
                         .secure(isSecured)
                         .sameSite(sameSite)
-                        .httpOnly(false)
+                        .httpOnly(true)
                         .build();
 
         ResponseCookie refreshTokenCookie =
@@ -32,7 +33,7 @@ public class CookieUtil {
                         .path("/")
                         .secure(isSecured)
                         .sameSite(sameSite)
-                        .httpOnly(false)
+                        .httpOnly(true)
                         .build();
 
         HttpHeaders headers = new HttpHeaders();
