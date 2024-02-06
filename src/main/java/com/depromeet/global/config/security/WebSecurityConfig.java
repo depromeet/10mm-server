@@ -1,5 +1,6 @@
 package com.depromeet.global.config.security;
 
+import static com.depromeet.global.common.constants.EnvironmentConstants.*;
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.security.config.Customizer.*;
 
@@ -118,17 +119,13 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        switch (springEnvironmentUtil.getCurrentProfile()) {
-            case "prod":
-                configuration.addAllowedOriginPattern(UrlConstants.PROD_DOMAIN_URL.getValue());
-                break;
-            case "dev":
-                configuration.addAllowedOriginPattern(UrlConstants.DEV_DOMAIN_URL.getValue());
-                configuration.addAllowedOriginPattern(UrlConstants.LOCAL_DOMAIN_URL.getValue());
-                break;
-            default:
-                configuration.addAllowedOriginPattern("*");
-                break;
+        if (springEnvironmentUtil.isProdProfile()) {
+            configuration.addAllowedOriginPattern(UrlConstants.PROD_DOMAIN_URL.getValue());
+        }
+
+        if (springEnvironmentUtil.isDevProfile()) {
+            configuration.addAllowedOriginPattern(UrlConstants.DEV_DOMAIN_URL.getValue());
+            configuration.addAllowedOriginPattern(UrlConstants.LOCAL_DOMAIN_URL.getValue());
         }
 
         configuration.addAllowedHeader("*");
