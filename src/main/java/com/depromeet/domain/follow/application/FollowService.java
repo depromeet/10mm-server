@@ -4,12 +4,10 @@ import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.follow.dto.request.FollowCreateRequest;
 import com.depromeet.domain.follow.dto.request.FollowDeleteRequest;
-import com.depromeet.domain.follow.dto.response.FollowFindMeInfoResponse;
-import com.depromeet.domain.follow.dto.response.FollowFindTargetInfoResponse;
-import com.depromeet.domain.follow.dto.response.FollowStatus;
-import com.depromeet.domain.follow.dto.response.MemberFollowedResponse;
+import com.depromeet.domain.follow.dto.response.*;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
@@ -187,5 +185,79 @@ public class FollowService {
                                         new CustomException(
                                                 ErrorCode.FOLLOW_TARGET_MEMBER_NOT_FOUND));
         return targetMember;
+    }
+
+    public FollowListResponse findFollowList(Long targetId) {
+        final Member currentMember = memberUtil.getCurrentMember();
+        Member targetMember = getTargetMember(targetId);
+
+        List<MemberSearchResponse> followingList = new ArrayList<>();
+        List<MemberSearchResponse> followerList = new ArrayList<>();
+
+        List<MemberRelation> targetMemberSources =
+                memberRelationRepository.findAllBySourceId(targetMember.getId());
+        List<MemberRelation> targetMemberTargets =
+                memberRelationRepository.findAllByTargetId(targetMember.getId());
+
+        List<MemberRelation> currentMemberSources =
+                memberRelationRepository.findAllBySourceId(currentMember.getId());
+        List<MemberRelation> currentMemberTargets =
+                memberRelationRepository.findAllByTargetId(currentMember.getId());
+
+        // target 유저의 팔로잉
+        List<Member> followingMembers =
+                targetMemberSources.stream().map(MemberRelation::getTarget).toList();
+
+        // target 유저의 팔로워
+        List<Member> followerMembers =
+                targetMemberTargets.stream().map(MemberRelation::getSource).toList();
+
+        // 팔로잉 리스트 구하기
+        getFollowStatusIncludeList(
+                followingMembers, currentMemberSources, followingList, currentMemberTargets);
+
+        // 팔로워 리스트 구하기
+        getFollowStatusIncludeList(
+                followerMembers, currentMemberSources, followerList, currentMemberTargets);
+
+        return FollowListResponse.of(
+                targetMember.getProfile().getNickname(), followingList, followerList);
+    }
+
+    private static void getFollowStatusIncludeList(
+            List<Member> targetMembers,
+            List<MemberRelation> currentMemberSources,
+            List<MemberSearchResponse> resultList,
+            List<MemberRelation> currentMemberTargets) {
+        for (Member member : targetMembers) {
+            boolean existRelation = false;
+            for (MemberRelation memberRelation : currentMemberSources) {
+                if (member.getId().equals(memberRelation.getTarget().getId())) {
+                    existRelation = true;
+                    break;
+                }
+            }
+
+            if (existRelation) { // 조회 된 애들 중 내가 팔로우한 애라면
+                resultList.add(MemberSearchResponse.toFollowingResponse(member));
+                continue;
+            }
+
+            // 내가 팔로우를 하지 않았을 때
+            Optional<MemberRelation> optionalMemberRelation =
+                    currentMemberTargets.stream()
+                            .filter(
+                                    memberRelation ->
+                                            member.getId()
+                                                    .equals(memberRelation.getSource().getId()))
+                            .findFirst();
+            if (optionalMemberRelation.isPresent()) { // 상대방만 나를 팔로우 하고 있을  때
+                resultList.add(MemberSearchResponse.toFollowedByMeResponse(member));
+                continue;
+            }
+
+            // 아니라면 서로 팔로우가 아닌 상태
+            resultList.add(MemberSearchResponse.toNotFollowingResponse(member));
+        }
     }
 }
