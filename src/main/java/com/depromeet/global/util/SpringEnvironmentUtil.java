@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class SpringEnvironmentUtil {
+
     private final Environment environment;
 
     public String getCurrentProfile() {
@@ -20,15 +21,15 @@ public class SpringEnvironmentUtil {
                 .orElse(LOCAL);
     }
 
-    public Boolean isProdProfile() {
+    public boolean isProdProfile() {
         return getActiveProfiles().anyMatch(PROD::equals);
     }
 
-    public Boolean isDevProfile() {
+    public boolean isDevProfile() {
         return getActiveProfiles().anyMatch(DEV::equals);
     }
 
-    public Boolean isProdAndDevProfile() {
+    public boolean isProdAndDevProfile() {
         return getActiveProfiles().anyMatch(PROD_AND_DEV::contains);
     }
 
