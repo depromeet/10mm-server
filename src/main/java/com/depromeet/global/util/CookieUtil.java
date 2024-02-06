@@ -44,9 +44,9 @@ public class CookieUtil {
 
     private String determineSameSitePolicy() {
         if (springEnvironmentUtil.isProdProfile()) {
-            return "Strict";
+            return Cookie.SameSite.STRICT.attributeValue();
         }
-        return "None";
+        return Cookie.SameSite.NONE.attributeValue();
     }
 
     private boolean determineSecurePolicy() {
