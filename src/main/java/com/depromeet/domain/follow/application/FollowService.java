@@ -187,6 +187,7 @@ public class FollowService {
         return targetMember;
     }
 
+    @Transactional(readOnly = true)
     public FollowListResponse findFollowList(Long targetId) {
         final Member currentMember = memberUtil.getCurrentMember();
         Member targetMember = getTargetMember(targetId);
