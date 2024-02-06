@@ -51,9 +51,6 @@ public class CookieUtil {
     }
 
     private boolean determineSecurePolicy() {
-        if (springEnvironmentUtil.isProdProfile()) {
-            return true;
-        }
-        return false;
+        return springEnvironmentUtil.isProdProfile();
     }
 }
