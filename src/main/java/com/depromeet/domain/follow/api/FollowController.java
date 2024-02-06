@@ -58,7 +58,6 @@ public class FollowController {
         return followService.findAllFollowedMember();
     }
 
-    // 팔로잉, 팔로워 리스트 응답
     @GetMapping("/{targetId}/list")
     @Operation(summary = "팔로잉, 팔로워 유저 리스트를 반환합니다", description = "팔로잉, 팔로워 유저들을 반환합니다.")
     public FollowListResponse followList(@PathVariable Long targetId) {
