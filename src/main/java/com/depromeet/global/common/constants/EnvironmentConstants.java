@@ -1,15 +1,13 @@
 package com.depromeet.global.common.constants;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import java.util.List;
 
-@Getter
-@AllArgsConstructor
-public enum EnvironmentConstants {
-    PROD("prod"),
-    DEV("dev"),
-    LOCAL("local"),
-    ;
+public class EnvironmentConstants {
 
-    private String value;
+    private EnvironmentConstants() {}
+
+    public static final String PROD = "prod";
+    public static final String DEV = "dev";
+    public static final String LOCAL = "local";
+    public static final List<String> PROD_AND_DEV = List.of(PROD, DEV);
 }

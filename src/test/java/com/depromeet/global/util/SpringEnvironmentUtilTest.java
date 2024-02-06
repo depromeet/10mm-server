@@ -1,6 +1,6 @@
 package com.depromeet.global.util;
 
-import static com.depromeet.global.common.constants.NewEnvironmentConstants.*;
+import static com.depromeet.global.common.constants.EnvironmentConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
