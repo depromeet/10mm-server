@@ -22,6 +22,7 @@ import org.springframework.stereotype.Repository;
 public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
+    private static final long FEED_TAB_LIMIT = 100;
 
     @Override
     public List<MissionRecord> findAllByMissionIdAndYearMonth(Long missionId, YearMonth yearMonth) {
@@ -78,6 +79,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                                 MissionVisibility.FOLLOWER, MissionVisibility.ALL),
                         missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE))
                 .orderBy(missionRecord.startedAt.desc())
+                .limit(FEED_TAB_LIMIT)
                 .fetch();
     }
 
