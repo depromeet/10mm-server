@@ -1,9 +1,9 @@
 package com.depromeet.global.util;
 
+import static com.depromeet.global.common.constants.NewEnvironmentConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
-import com.depromeet.global.common.constants.EnvironmentConstants;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,9 +17,9 @@ class SpringEnvironmentUtilTest {
 
     @InjectMocks private SpringEnvironmentUtil springEnvironmentUtil;
 
-    private final String[] PROD_ARRAY = new String[] {EnvironmentConstants.PROD.getValue()};
-    private final String[] DEV_ARRAY = new String[] {EnvironmentConstants.DEV.getValue()};
-    private final String[] LOCAL_ARRAY = new String[] {EnvironmentConstants.LOCAL.getValue()};
+    private static final String[] PROD_ARRAY = new String[] {PROD};
+    private static final String[] DEV_ARRAY = new String[] {DEV};
+    private static final String[] LOCAL_ARRAY = new String[] {LOCAL};
 
     @Test
     void 상용_환경이라면_isProdProfile은_true를_반환한다() {
@@ -88,8 +88,7 @@ class SpringEnvironmentUtilTest {
 
         // when
         // then
-        assertEquals(
-                springEnvironmentUtil.getCurrentProfile(), EnvironmentConstants.PROD.getValue());
+        assertEquals(springEnvironmentUtil.getCurrentProfile(), PROD);
     }
 
     @Test
@@ -99,8 +98,7 @@ class SpringEnvironmentUtilTest {
 
         // when
         // then
-        assertEquals(
-                springEnvironmentUtil.getCurrentProfile(), EnvironmentConstants.DEV.getValue());
+        assertEquals(springEnvironmentUtil.getCurrentProfile(), DEV);
     }
 
     @Test
@@ -110,7 +108,6 @@ class SpringEnvironmentUtilTest {
 
         // when
         // then
-        assertEquals(
-                springEnvironmentUtil.getCurrentProfile(), EnvironmentConstants.LOCAL.getValue());
+        assertEquals(springEnvironmentUtil.getCurrentProfile(), LOCAL);
     }
 }
