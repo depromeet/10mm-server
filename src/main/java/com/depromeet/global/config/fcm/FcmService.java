@@ -29,6 +29,9 @@ public class FcmService {
     }
 
     public ApiFuture<String> sendMessageSync(String token, String title, String content) {
+        if (token == null || token.isEmpty()) {
+            return null;
+        }
         Message message =
                 Message.builder()
                         .setToken(token)

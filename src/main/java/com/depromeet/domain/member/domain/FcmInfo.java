@@ -21,7 +21,7 @@ public class FcmInfo {
     }
 
     public static FcmInfo createFcmInfo() {
-        return FcmInfo.builder().fcmToken("").appAlarm(true).build();
+        return FcmInfo.builder().appAlarm(true).build();
     }
 
     public static FcmInfo toggleAlarm(FcmInfo fcmState) {
