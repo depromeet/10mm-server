@@ -8,6 +8,7 @@ import com.depromeet.domain.member.dto.request.UpdateFcmTokenRequest;
 import com.depromeet.domain.member.dto.response.MemberFindOneResponse;
 import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.member.dto.response.MemberSocialInfoResponse;
+import com.depromeet.global.util.CookieUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
+    private final CookieUtil cookieUtil;
 
     @Operation(summary = "회원 정보 확인", description = "로그인 된 회원의 정보를 확인합니다.")
     @GetMapping("/me")
@@ -64,7 +66,7 @@ public class MemberController {
     @DeleteMapping("/withdrawal")
     public ResponseEntity<Void> memberWithdrawal() {
         memberService.withdrawal();
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().headers(cookieUtil.deleteTokenCookies()).build();
     }
 
     @Operation(summary = "소셜 로그인 정보 조회하기", description = "소셜 로그인 정보를 조회합니다.")
