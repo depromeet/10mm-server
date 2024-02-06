@@ -62,8 +62,8 @@ public class MemberController {
     // TODO: 테스트 코드 작성 필요
     @Operation(summary = "회원 탈퇴", description = "회원탈퇴를 진행합니다.")
     @DeleteMapping("/withdrawal")
-    public ResponseEntity<Void> memberWithdrawal(@Valid @RequestBody UsernameCheckRequest request) {
-        memberService.withdrawal(request);
+    public ResponseEntity<Void> memberWithdrawal() {
+        memberService.withdrawal();
         return ResponseEntity.ok().build();
     }
 
