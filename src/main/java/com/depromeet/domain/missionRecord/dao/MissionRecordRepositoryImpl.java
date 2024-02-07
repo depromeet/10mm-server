@@ -91,6 +91,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                 .leftJoin(missionRecord.mission, mission)
                 .fetchJoin()
                 .where(
+                        mission.visibility.in(visibilities),
                         mission.member.id.eq(memberId),
                         missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE))
                 .orderBy(missionRecord.startedAt.desc())
