@@ -53,7 +53,7 @@ public class FollowService {
         fcmService.sendMessageSync(
                 targetMember.getFcmInfo().getFcmToken(),
                 PUSH_SERVICE_TITLE,
-                String.format(PUSH_SERVICE_CONTENT, currentMember.getUsername()));
+                String.format(PUSH_SERVICE_CONTENT, currentMember.getProfile().getNickname()));
         notificationService.createNotification(
                 NotificationType.FOLLOW, currentMember, targetMember);
 
