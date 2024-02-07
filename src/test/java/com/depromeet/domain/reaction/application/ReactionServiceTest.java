@@ -84,26 +84,31 @@ class ReactionServiceTest {
     class 리액션_생성시 {
 
         @Test
-        void 성공한다() {
+        void 내_미션기록에_추가하면_실패한다() {
             // given
             Member member = saveAndRegisterMember();
             createMissionAndMissionRecord(member);
 
             ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
 
-            // when
-            ReactionCreateResponse response = reactionService.createReaction(request);
-
-            // then
-            assertNotNull(response);
-            assertEquals(1L, response.reactionId());
+            // when & then
+            assertThrows(
+                    CustomException.class,
+                    () -> reactionService.createReaction(request),
+                    ErrorCode.REACTION_SELF_NOT_ALLOWED.getMessage());
         }
 
         @Test
-        void 같은_미션기록에_다른_회원이_리액션을_추가하면_성공한다() {
+        void 타인의_미션기록에_추가하면_성공한다() {
             // given
             Member member = saveAndRegisterMember();
             createMissionAndMissionRecord(member);
+
+            SecurityContextHolder.clearContext(); // 현재 회원 로그아웃
+
+            Member otherMember = saveAndRegisterMember(); // 다른 회원 로그인
+            createMissionAndMissionRecord(otherMember);
+
             ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
 
             // when
