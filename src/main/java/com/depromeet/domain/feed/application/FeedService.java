@@ -3,6 +3,7 @@ package com.depromeet.domain.feed.application;
 import com.depromeet.domain.feed.dto.response.FeedOneByProfileResponse;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
+import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
@@ -29,13 +30,13 @@ public class FeedService {
     @Transactional(readOnly = true)
     public List<FeedOneResponse> findAllFeed() {
         final Member currentMember = memberUtil.getCurrentMember();
-        List<Long> sourceIds =
+        List<Member> members =
                 memberRelationRepository.findAllBySourceId(currentMember.getId()).stream()
-                        .map(memberRelation -> memberRelation.getTarget().getId())
+                        .map(MemberRelation::getTarget)
                         .collect(Collectors.toList());
-        sourceIds.add(currentMember.getId());
+        members.add(currentMember);
 
-        return missionRecordRepository.findFeedAll(sourceIds);
+        return missionRecordRepository.findFeedAll(members);
     }
 
     @Transactional(readOnly = true)
