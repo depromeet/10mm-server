@@ -1,6 +1,7 @@
 package com.depromeet.domain.member.dao;
 
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.member.domain.MemberStatus;
 import com.depromeet.domain.member.domain.OauthInfo;
 import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
@@ -10,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    Optional<Member> findByOauthInfo(OauthInfo oauthInfo);
+    Optional<Member> findByOauthInfoAndStatus(OauthInfo oauthInfo, MemberStatus status);
 
     boolean existsByUsername(String username);
 

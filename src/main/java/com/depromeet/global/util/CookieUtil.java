@@ -4,6 +4,7 @@ import static com.depromeet.global.common.constants.SecurityConstants.ACCESS_TOK
 import static com.depromeet.global.common.constants.SecurityConstants.REFRESH_TOKEN_COOKIE_NAME;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
@@ -23,7 +24,7 @@ public class CookieUtil {
                         .path("/")
                         .secure(true)
                         .sameSite(sameSite)
-                        .httpOnly(false)
+                        .httpOnly(true)
                         .build();
 
         ResponseCookie refreshTokenCookie =
@@ -31,7 +32,7 @@ public class CookieUtil {
                         .path("/")
                         .secure(true)
                         .sameSite(sameSite)
-                        .httpOnly(false)
+                        .httpOnly(true)
                         .build();
 
         HttpHeaders headers = new HttpHeaders();
@@ -43,8 +44,37 @@ public class CookieUtil {
 
     private String determineSameSitePolicy() {
         if (springEnvironmentUtil.isProdProfile()) {
-            return "Strict";
+            return Cookie.SameSite.STRICT.attributeValue();
         }
-        return "None";
+        return Cookie.SameSite.NONE.attributeValue();
+    }
+
+    public HttpHeaders deleteTokenCookies() {
+
+        String sameSite = determineSameSitePolicy();
+
+        ResponseCookie accessTokenCookie =
+                ResponseCookie.from(ACCESS_TOKEN_COOKIE_NAME, "")
+                        .path("/")
+                        .maxAge(0)
+                        .secure(true)
+                        .sameSite(sameSite)
+                        .httpOnly(false)
+                        .build();
+
+        ResponseCookie refreshTokenCookie =
+                ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, "")
+                        .path("/")
+                        .maxAge(0)
+                        .secure(true)
+                        .sameSite(sameSite)
+                        .httpOnly(false)
+                        .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+        headers.add(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
+        return headers;
     }
 }
