@@ -27,8 +27,8 @@ public class FeedController {
     }
 
     @Operation(summary = "프로필 피드", description = "피드 탭을 조회합니다.")
-    @GetMapping("/{targetId}")
-    public List<FeedOneByProfileResponse> feedFindAllByTargetId(@PathVariable Long targetId) {
-        return feedService.findAllFeedByTargetId(targetId);
+    @GetMapping("/{memberId}")
+    public List<FeedOneByProfileResponse> feedFindAllByTargetId(@PathVariable Long memberId) {
+        return feedService.findAllFeedByTargetId(memberId);
     }
 }

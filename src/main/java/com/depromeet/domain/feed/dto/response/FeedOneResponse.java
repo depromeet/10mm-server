@@ -7,7 +7,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public record FeedOneResponse(
-        @Schema(description = "작성자 ID", defaultValue = "1") Long targetId,
+        @Schema(description = "작성자 ID", defaultValue = "1") Long memberId,
         @Schema(description = "작성자 닉네임", defaultValue = "default name") String nickname,
         @Schema(description = "작성자 프로필 이미지", defaultValue = "https://image.10mm.today/default.png")
                 String profileImage,
@@ -41,7 +41,7 @@ public record FeedOneResponse(
                 LocalDateTime finishedAt) {
     @QueryProjection
     public FeedOneResponse(
-            Long targetId,
+            Long memberId,
             String nickname,
             String profileImage,
             Long missionId,
@@ -53,7 +53,7 @@ public record FeedOneResponse(
             LocalDateTime startedAt,
             LocalDateTime finishedAt) {
         this(
-                targetId,
+                memberId,
                 nickname,
                 profileImage,
                 missionId,
@@ -68,7 +68,7 @@ public record FeedOneResponse(
     }
 
     public static FeedOneResponse of(
-            Long targetId,
+            Long memberId,
             String nickname,
             String profileImage,
             Long missionId,
@@ -80,7 +80,7 @@ public record FeedOneResponse(
             LocalDateTime startedAt,
             LocalDateTime finishedAt) {
         return new FeedOneResponse(
-                targetId,
+                memberId,
                 nickname,
                 profileImage,
                 missionId,
