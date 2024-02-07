@@ -53,6 +53,9 @@ public enum ErrorCode {
     // Image
     IMAGE_KEY_NOT_FOUND(HttpStatus.NOT_FOUND, "이미지 키를 찾을 수 없습니다."),
     IMAGE_FILE_EXTENSION_NOT_FOUND(HttpStatus.NOT_FOUND, "이미지 파일 형식을 찾을 수 없습니다."),
+
+    // Reaction
+    REACTION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "리액션은 미션기록 당 한번만 가능합니다."),
     ;
 
     private final HttpStatus status;
