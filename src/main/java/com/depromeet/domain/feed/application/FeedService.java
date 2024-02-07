@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 // TODO: Redis 사용해서 캐싱 작업 필요
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class FeedService {
     private final MemberUtil memberUtil;
     private final MissionRecordRepository missionRecordRepository;
@@ -37,6 +38,7 @@ public class FeedService {
         return missionRecordRepository.findFeedAll(sourceIds);
     }
 
+    @Transactional(readOnly = true)
     public List<FeedOneByProfileResponse> findAllFeedByTargetId(Long targetId) {
         final Long sourceId = securityUtil.getCurrentMemberId();
 
