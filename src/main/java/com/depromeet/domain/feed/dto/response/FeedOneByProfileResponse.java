@@ -35,6 +35,7 @@ public record FeedOneByProfileResponse(
                         defaultValue = "2024-01-20 00:34:00",
                         type = "string")
                 LocalDateTime finishedAt) {
+
     public static FeedOneByProfileResponse of(Mission mission, MissionRecord missionRecord) {
         return new FeedOneByProfileResponse(
                 mission.getId(),

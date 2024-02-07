@@ -84,6 +84,20 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     }
 
     @Override
+    public List<MissionRecord> findFeedAllByMemberId(
+            Long memberId, List<MissionVisibility> visibilities) {
+        return jpaQueryFactory
+                .selectFrom(missionRecord)
+                .leftJoin(missionRecord.mission, mission)
+                .fetchJoin()
+                .where(
+                        mission.member.id.eq(memberId),
+                        missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE))
+                .orderBy(missionRecord.startedAt.desc())
+                .fetch();
+    }
+
+    @Override
     public void deleteByMissionRecordId(Long missionRecordId) {
         jpaQueryFactory.delete(missionRecord).where(missionRecord.id.eq(missionRecordId)).execute();
     }
