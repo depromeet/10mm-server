@@ -135,12 +135,8 @@ public class MemberService {
         return response;
     }
 
-    public void withdrawal(UsernameCheckRequest request) {
-        final Member member =
-                memberRepository
-                        .findByUsername(request.username())
-                        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-
+    public void withdrawal() {
+        final Member member = memberUtil.getCurrentMember();
         refreshTokenRepository.deleteById(member.getId());
         member.withdrawal();
     }

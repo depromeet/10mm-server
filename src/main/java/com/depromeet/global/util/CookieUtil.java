@@ -48,4 +48,33 @@ public class CookieUtil {
         }
         return Cookie.SameSite.NONE.attributeValue();
     }
+
+    public HttpHeaders deleteTokenCookies() {
+
+        String sameSite = determineSameSitePolicy();
+
+        ResponseCookie accessTokenCookie =
+                ResponseCookie.from(ACCESS_TOKEN_COOKIE_NAME, "")
+                        .path("/")
+                        .maxAge(0)
+                        .secure(true)
+                        .sameSite(sameSite)
+                        .httpOnly(false)
+                        .build();
+
+        ResponseCookie refreshTokenCookie =
+                ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, "")
+                        .path("/")
+                        .maxAge(0)
+                        .secure(true)
+                        .sameSite(sameSite)
+                        .httpOnly(false)
+                        .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+        headers.add(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
+        return headers;
+    }
 }
