@@ -126,6 +126,7 @@ public class WebSecurityConfig {
         if (springEnvironmentUtil.isDevProfile()) {
             configuration.addAllowedOriginPattern(UrlConstants.DEV_DOMAIN_URL.getValue());
             configuration.addAllowedOriginPattern(UrlConstants.LOCAL_DOMAIN_URL.getValue());
+            configuration.addAllowedOriginPattern(UrlConstants.LOCAL_SECURE_DOMAIN_URL.getValue());
             configuration.addAllowedOriginPattern(UrlConstants.NGROK_DOMAIN_URL.getValue());
         }
 
