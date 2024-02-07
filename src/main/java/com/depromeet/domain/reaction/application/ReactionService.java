@@ -53,4 +53,21 @@ public class ReactionService {
                         });
     }
 
+    public void deleteReaction(Long reactionId) {
+        final Member member = memberUtil.getCurrentMember();
+        Reaction reaction =
+                reactionRepository
+                        .findById(reactionId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.REACTION_NOT_FOUND));
+
+        validateReactionMemberMismatch(member, reaction);
+
+        reactionRepository.delete(reaction);
+    }
+
+    private void validateReactionMemberMismatch(Member member, Reaction reaction) {
+        if (!reaction.getMember().equals(member)) {
+            throw new CustomException(ErrorCode.REACTION_MEMBER_MISMATCH);
+        }
+    }
 }
