@@ -38,7 +38,7 @@ public class ReactionService {
     }
 
     private void validateNotMyMissionRecord(Member member, MissionRecord missionRecord) {
-        if (!missionRecord.getMission().getMember().equals(member)) {
+        if (missionRecord.getMission().getMember().equals(member)) {
             throw new CustomException(ErrorCode.REACTION_SELF_NOT_ALLOWED);
         }
     }
