@@ -76,10 +76,7 @@ public class FeedService {
     }
 
     private List<FeedOneByProfileResponse> extractFeedResponses(List<MissionRecord> records) {
-        return records.stream()
-                // .map(record -> FeedOneByProfileResponse.of(record.getMission(), record))
-                .map(FeedOneByProfileResponse::of)
-                .toList();
+        return records.stream().map(FeedOneByProfileResponse::of).toList();
     }
 
     private List<MissionVisibility> determineVisibilityConditionsByRelationsWithMe(
