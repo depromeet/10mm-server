@@ -1,12 +1,15 @@
 package com.depromeet.domain.auth.application;
 
-import com.depromeet.domain.auth.dto.request.MemberRegisterRequest;
+import com.depromeet.domain.auth.application.nickname.NicknameGenerationStrategy;
+import com.depromeet.domain.auth.domain.OauthProvider;
+import com.depromeet.domain.auth.dto.request.IdTokenRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
+import com.depromeet.domain.auth.dto.response.SocialLoginResponse;
 import com.depromeet.domain.auth.dto.response.TokenPairResponse;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
-import com.depromeet.domain.member.domain.MemberRole;
 import com.depromeet.domain.member.domain.MemberStatus;
+import com.depromeet.domain.member.domain.OauthInfo;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -14,6 +17,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,20 +31,17 @@ public class AuthService {
     private final MemberUtil memberUtil;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenService jwtTokenService;
+    private final IdTokenVerifier idTokenVerifier;
+    private final NicknameGenerationStrategy nicknameGenerationStrategy;
 
-    public void registerMember(MemberRegisterRequest request) {
-        final Member member = memberUtil.getCurrentMember();
-        member.register(request.nickname());
-    }
-
+    @Deprecated
     public TokenPairResponse registerWithUsernameAndPassword(UsernamePasswordRequest request) {
         Optional<Member> member = memberRepository.findByUsername(request.username());
 
         // 첫 회원가입
         if (member.isEmpty()) {
             String encodedPassword = passwordEncoder.encode(request.password());
-            final Member savedMember =
-                    Member.createGuestMember(request.username(), encodedPassword);
+            final Member savedMember = Member.createNormalMember(null, null); // do nothing
             memberRepository.save(savedMember);
             return getLoginResponse(savedMember);
         }
@@ -66,10 +67,9 @@ public class AuthService {
         return getLoginResponse(member);
     }
 
+    @Deprecated
     private void validateNotGuestMember(Member member) {
-        if (member.getRole() == MemberRole.GUEST) {
-            throw new CustomException(ErrorCode.GUEST_MEMBER_REQUIRES_REGISTRATION);
-        }
+        // do nothing
     }
 
     private void validateNormalMember(Member member) {
@@ -89,5 +89,43 @@ public class AuthService {
         String refreshToken = jwtTokenService.createRefreshToken(member.getId());
 
         return TokenPairResponse.from(accessToken, refreshToken);
+    }
+
+    public SocialLoginResponse socialLoginMember(IdTokenRequest request, OauthProvider provider) {
+        OidcUser oidcUser = idTokenVerifier.getOidcUser(request.idToken(), provider);
+        Member member = fetchOrCreate(oidcUser);
+        member.updateLastLoginAt();
+
+        TokenPairResponse loginResponse = getLoginResponse(member);
+
+        return SocialLoginResponse.from(loginResponse);
+    }
+
+    private Member fetchOrCreate(OidcUser oidcUser) {
+        return memberRepository
+                .findByOauthInfoAndStatus(extractOauthInfo(oidcUser), MemberStatus.NORMAL)
+                .orElseGet(() -> saveMember(oidcUser));
+    }
+
+    private Member saveMember(OidcUser oidcUser) {
+
+        OauthInfo oauthInfo = extractOauthInfo(oidcUser);
+        String nickname = generateRandomNickname();
+        Member member = Member.createNormalMember(oauthInfo, nickname);
+        return memberRepository.save(member);
+    }
+
+    private String generateRandomNickname() {
+        while (true) {
+            String nickname = nicknameGenerationStrategy.generate();
+            if (!memberRepository.existsByProfileNickname(nickname)) {
+                return nickname;
+            }
+        }
+    }
+
+    private OauthInfo extractOauthInfo(OidcUser oidcUser) {
+        return OauthInfo.createOauthInfo(
+                oidcUser.getName(), oidcUser.getIssuer().toString(), oidcUser.getEmail());
     }
 }

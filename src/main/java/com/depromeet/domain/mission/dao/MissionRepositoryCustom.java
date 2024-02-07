@@ -9,6 +9,10 @@ public interface MissionRepositoryCustom {
 
     List<Mission> findMissionsWithRecords(Long memberId);
 
+    List<Mission> findInProgressMissionsWithRecords(Long memberId);
+
+    List<Mission> findMissionsWithRecordsByRelations(Long memberId, boolean existsMemberRelations);
+
     void updateFinishedDurationStatus(LocalDateTime today);
 
     Slice<Mission> findAllFinishedMission(Long memberId, int size, Long lastId);

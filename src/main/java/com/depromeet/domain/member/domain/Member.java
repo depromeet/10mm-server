@@ -36,6 +36,8 @@ public class Member extends BaseTimeEntity {
 
     @Embedded private OauthInfo oauthInfo;
 
+    @Embedded private FcmInfo fcmInfo;
+
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
@@ -58,6 +60,7 @@ public class Member extends BaseTimeEntity {
     private Member(
             Profile profile,
             OauthInfo oauthInfo,
+            FcmInfo fcmInfo,
             MemberStatus status,
             MemberRole role,
             MemberVisibility visibility,
@@ -66,6 +69,7 @@ public class Member extends BaseTimeEntity {
             String password) {
         this.profile = profile;
         this.oauthInfo = oauthInfo;
+        this.fcmInfo = fcmInfo;
         this.status = status;
         this.role = role;
         this.visibility = visibility;
@@ -74,25 +78,18 @@ public class Member extends BaseTimeEntity {
         this.password = password;
     }
 
-    public static Member createGuestMember(OauthInfo oauthInfo) {
+    public static Member createNormalMember(OauthInfo oauthInfo, String nickname) {
         return Member.builder()
+                .profile(Profile.createProfile(nickname, null))
                 .oauthInfo(oauthInfo)
+                .fcmInfo(FcmInfo.createFcmInfo())
                 .status(MemberStatus.NORMAL)
-                .role(MemberRole.GUEST)
+                .role(MemberRole.USER)
                 .visibility(MemberVisibility.PUBLIC)
                 .build();
     }
 
-    public static Member createGuestMember(String username, String password) {
-        return Member.builder()
-                .username(username)
-                .password(password)
-                .status(MemberStatus.NORMAL)
-                .role(MemberRole.GUEST)
-                .visibility(MemberVisibility.PUBLIC)
-                .build();
-    }
-
+    @Deprecated
     public static Member createNormalMember(Profile profile) {
         return Member.builder()
                 .profile(profile)
@@ -107,14 +104,6 @@ public class Member extends BaseTimeEntity {
         this.lastLoginAt = LocalDateTime.now();
     }
 
-    public void register(String nickname) {
-        validateRegisterAvailable();
-        // TODO: Profile 클래스를 제거하고 Member 클래스 필드로 변경
-        // TODO: profileImageUrl이 항상 null이 되는 문제 해결
-        this.profile = Profile.createProfile(nickname, null);
-        this.role = MemberRole.USER;
-    }
-
     public void updateProfile(Profile profile) {
         this.profile = profile;
     }
@@ -124,11 +113,18 @@ public class Member extends BaseTimeEntity {
             throw new CustomException(ErrorCode.MEMBER_ALREADY_DELETED);
         }
         this.status = MemberStatus.DELETED;
+        this.fcmInfo = FcmInfo.disableAlarm(FcmInfo.createFcmInfo());
     }
 
-    private void validateRegisterAvailable() {
-        if (role != MemberRole.GUEST) {
-            throw new CustomException(ErrorCode.MEMBER_ALREADY_REGISTERED);
-        }
+    public void toggleAppAlarmState(FcmInfo fcmState) {
+        this.fcmInfo = FcmInfo.toggleAlarm(fcmState);
+    }
+
+    public void updateFcmToken(FcmInfo fcmState, String fcmToken) {
+        this.fcmInfo = FcmInfo.updateToken(fcmState, fcmToken);
+    }
+
+    public void updateNickname(String nickname) {
+        this.profile = Profile.createProfile(nickname, this.profile.getProfileImageUrl());
     }
 }

@@ -3,7 +3,6 @@ package com.depromeet.domain.missionRecord.dto.response;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 public record MissionRecordFindOneResponse(
@@ -12,7 +11,7 @@ public record MissionRecordFindOneResponse(
                 String remark,
         @Schema(
                         description = "미션 기록 인증 사진 Url",
-                        defaultValue = "https://ik.imagekit.io/demo/medium_cafe_B1iTdD0C.jpg")
+                        defaultValue = "https://image.10mm.today/default.png")
                 String imageUrl,
         @Schema(description = "미션 수행한 시간", defaultValue = "21") long duration,
         @Schema(description = "미션 시작한 지 N일차", defaultValue = "3") long sinceDay,
@@ -34,13 +33,13 @@ public record MissionRecordFindOneResponse(
                         defaultValue = "2024-01-03 00:34:00",
                         type = "string")
                 LocalDateTime finishedAt) {
-    public static MissionRecordFindOneResponse from(MissionRecord missionRecord) {
+    public static MissionRecordFindOneResponse of(MissionRecord missionRecord, long sinceDay) {
         return new MissionRecordFindOneResponse(
                 missionRecord.getId(),
                 missionRecord.getRemark(),
                 missionRecord.getImageUrl(),
                 missionRecord.getDuration().toMinutes(),
-                Duration.between(missionRecord.getStartedAt(), LocalDateTime.now()).toDays(),
+                sinceDay,
                 missionRecord.getStartedAt(),
                 missionRecord.getFinishedAt());
     }

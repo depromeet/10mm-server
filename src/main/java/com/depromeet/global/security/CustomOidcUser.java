@@ -16,8 +16,4 @@ public class CustomOidcUser extends DefaultOidcUser {
         this.memberId = memberId;
         this.memberRole = memberRole;
     }
-
-    public boolean isGuest() {
-        return MemberRole.GUEST.equals(memberRole);
-    }
 }

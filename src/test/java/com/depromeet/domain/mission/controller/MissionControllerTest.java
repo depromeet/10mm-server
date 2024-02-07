@@ -26,7 +26,6 @@ import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
-import com.depromeet.global.security.JwtAuthenticationFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -43,7 +42,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 @WebMvcTest(MissionController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@MockBean({JpaMetamodelMappingContext.class, JwtAuthenticationFilter.class})
+@MockBean({JpaMetamodelMappingContext.class})
 class MissionControllerTest {
 
     @Autowired private MockMvc mockMvc;

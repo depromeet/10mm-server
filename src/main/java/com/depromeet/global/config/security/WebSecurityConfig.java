@@ -1,10 +1,14 @@
 package com.depromeet.global.config.security;
 
+import static com.depromeet.global.common.constants.EnvironmentConstants.*;
+import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.security.config.Customizer.*;
 
+import com.depromeet.domain.auth.application.JwtTokenService;
 import com.depromeet.global.common.constants.SwaggerUrlConstants;
 import com.depromeet.global.common.constants.UrlConstants;
 import com.depromeet.global.security.*;
+import com.depromeet.global.util.CookieUtil;
 import com.depromeet.global.util.SpringEnvironmentUtil;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
@@ -33,14 +37,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class WebSecurityConfig {
 
     private final SpringEnvironmentUtil springEnvironmentUtil;
-    //    private final CustomOidcUserService customOidcUserService;
-    //    private final CustomOidcAuthenticationSuccessHandler
-    // customOidcAuthenticationSuccessHandler;
-    //    private final CustomOidcAuthenticationFailureHandler
-    // customOidcAuthenticationFailureHandler;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    //    private final CustomRequestEntityConverterV2 customRequestEntityConverterV2;
+    private final JwtTokenService jwtTokenService;
+    private final CookieUtil cookieUtil;
 
     @Value("${swagger.user}")
     private String swaggerUser;
@@ -100,7 +98,7 @@ public class WebSecurityConfig {
                                 .requestMatchers("/auth/register")
                                 .authenticated() // 소셜 로그인 임시 토큰으로 인증
                                 .requestMatchers("/auth/**")
-                                .permitAll() // 임시 회원가입 / 로그인은 토큰 필요 X
+                                .permitAll() // 임시 회원가입 / 로그인 + OAuth2 로그인
                                 .requestMatchers("/v1/**")
                                 .permitAll() // 임시로 모든 요청 허용
                                 .requestMatchers("/oauth2/**")
@@ -110,28 +108,9 @@ public class WebSecurityConfig {
                                 .authenticated());
         //        .permitAll());
 
-        // TODO: 소셜 로그인은 별도 처리
-
-        //        http.oauth2Login(
-        //                oauth2 ->
-        //                        oauth2.tokenEndpoint(
-        //                                        tokenEndpoint ->
-        //                                                tokenEndpoint.accessTokenResponseClient(
-        //
-        // customAccessTokenResponseClient()))
-        //                                .userInfoEndpoint(
-        //                                        userInfo ->
-        // userInfo.oidcUserService(customOidcUserService))
-        //                                .successHandler(customOidcAuthenticationSuccessHandler)
-        //                                .failureHandler(customOidcAuthenticationFailureHandler)
-        //                                .userInfoEndpoint(
-        //                                        userInfo ->
-        // userInfo.oidcUserService(customOidcUserService))
-        //                                .successHandler(customOidcAuthenticationSuccessHandler)
-        //                                .failureHandler(customOidcAuthenticationFailureHandler));
-
-        //        http.addFilterAfter(jwtAuthenticationFilter, LogoutFilter.class);
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(
+                jwtAuthenticationFilter(jwtTokenService, cookieUtil),
+                UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -140,38 +119,28 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        switch (springEnvironmentUtil.getCurrentProfile()) {
-            case "prod":
-                configuration.addAllowedOriginPattern(UrlConstants.PROD_DOMAIN_URL.getValue());
-                break;
-                // TODO: 프론트 모바일에서 웹뷰 테스트를 위해 임시 주석 처리
-                //            case "dev":
-                //
-                // configuration.addAllowedOriginPattern(UrlConstants.DEV_DOMAIN_URL.getValue());
-                //
-                // configuration.addAllowedOriginPattern(UrlConstants.LOCAL_DOMAIN_URL.getValue());
-                //                break;
-            default:
-                configuration.addAllowedOriginPattern("*");
-                break;
+        if (springEnvironmentUtil.isProdProfile()) {
+            configuration.addAllowedOriginPattern(UrlConstants.PROD_DOMAIN_URL.getValue());
+        }
+
+        if (springEnvironmentUtil.isDevProfile()) {
+            configuration.addAllowedOriginPattern(UrlConstants.DEV_DOMAIN_URL.getValue());
+            configuration.addAllowedOriginPattern(UrlConstants.LOCAL_DOMAIN_URL.getValue());
         }
 
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
-        configuration.addExposedHeader("Set-Cookie");
+        configuration.addExposedHeader(SET_COOKIE);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
-    // TODO: 소셜 로그인 추가 시 빈으로 등록
-
-    //    public DefaultAuthorizationCodeTokenResponseClient customAccessTokenResponseClient() {
-    //        DefaultAuthorizationCodeTokenResponseClient client =
-    //                new DefaultAuthorizationCodeTokenResponseClient();
-    //        client.setRequestEntityConverter(customRequestEntityConverterV2);
-    //        return client;
-    //    }
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(
+            JwtTokenService jwtTokenService, CookieUtil cookieUtil) {
+        return new JwtAuthenticationFilter(jwtTokenService, cookieUtil);
+    }
 }

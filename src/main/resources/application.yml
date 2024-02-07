@@ -11,7 +11,7 @@ spring:
       - security
 
 swagger:
-  version: 0.0.1
+  version: ${SWAGGER_VERSION:default}
   user: ${SWAGGER_USER:default}
   password: ${SWAGGER_PASSWORD:default}
 springdoc:
@@ -30,3 +30,6 @@ springdoc:
 logging:
   level:
     com.depromeet.domain.*.api.*: debug
+
+fcm:
+  certification: ${FCM_CERTIFICATION:}

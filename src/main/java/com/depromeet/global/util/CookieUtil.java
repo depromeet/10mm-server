@@ -1,8 +1,10 @@
 package com.depromeet.global.util;
 
-import com.depromeet.infra.config.jwt.JwtProperties;
-import jakarta.servlet.http.HttpServletResponse;
+import static com.depromeet.global.common.constants.SecurityConstants.ACCESS_TOKEN_COOKIE_NAME;
+import static com.depromeet.global.common.constants.SecurityConstants.REFRESH_TOKEN_COOKIE_NAME;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
@@ -12,34 +14,25 @@ import org.springframework.stereotype.Component;
 public class CookieUtil {
 
     private final SpringEnvironmentUtil springEnvironmentUtil;
-    private final JwtProperties jwtProperties;
-
-    public void addTokenCookies(
-            HttpServletResponse response, String accessToken, String refreshToken) {
-        HttpHeaders headers = generateTokenCookies(accessToken, refreshToken);
-        headers.forEach((key, value) -> response.addHeader(key, value.get(0)));
-    }
 
     public HttpHeaders generateTokenCookies(String accessToken, String refreshToken) {
 
         String sameSite = determineSameSitePolicy();
 
         ResponseCookie accessTokenCookie =
-                ResponseCookie.from("accessToken", accessToken)
+                ResponseCookie.from(ACCESS_TOKEN_COOKIE_NAME, accessToken)
                         .path("/")
-                        .maxAge(jwtProperties.accessTokenExpirationTime())
                         .secure(true)
                         .sameSite(sameSite)
-                        .httpOnly(false)
+                        .httpOnly(true)
                         .build();
 
         ResponseCookie refreshTokenCookie =
-                ResponseCookie.from("refreshToken", refreshToken)
+                ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
                         .path("/")
-                        .maxAge(jwtProperties.refreshTokenExpirationTime())
                         .secure(true)
                         .sameSite(sameSite)
-                        .httpOnly(false)
+                        .httpOnly(true)
                         .build();
 
         HttpHeaders headers = new HttpHeaders();
@@ -51,8 +44,37 @@ public class CookieUtil {
 
     private String determineSameSitePolicy() {
         if (springEnvironmentUtil.isProdProfile()) {
-            return "Strict";
+            return Cookie.SameSite.STRICT.attributeValue();
         }
-        return "None";
+        return Cookie.SameSite.NONE.attributeValue();
+    }
+
+    public HttpHeaders deleteTokenCookies() {
+
+        String sameSite = determineSameSitePolicy();
+
+        ResponseCookie accessTokenCookie =
+                ResponseCookie.from(ACCESS_TOKEN_COOKIE_NAME, "")
+                        .path("/")
+                        .maxAge(0)
+                        .secure(true)
+                        .sameSite(sameSite)
+                        .httpOnly(false)
+                        .build();
+
+        ResponseCookie refreshTokenCookie =
+                ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, "")
+                        .path("/")
+                        .maxAge(0)
+                        .secure(true)
+                        .sameSite(sameSite)
+                        .httpOnly(false)
+                        .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+        headers.add(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
+        return headers;
     }
 }

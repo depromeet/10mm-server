@@ -3,9 +3,11 @@ package com.depromeet.domain.mission.api;
 import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
+import com.depromeet.domain.mission.dto.response.FollowMissionFindAllResponse;
 import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindAllResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
+import com.depromeet.domain.mission.dto.response.MissionSymbolStackResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordSummaryResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,6 +56,12 @@ public class MissionController {
         return missionService.findAllMission();
     }
 
+    @Operation(summary = "친구 미션 목록 조회", description = "친구 미션 목록을 조회합니다.")
+    @GetMapping("/follow/{targetId}")
+    public FollowMissionFindAllResponse followMissionFindAll(@PathVariable Long targetId) {
+        return missionService.findAllFollowMissions(targetId);
+    }
+
     @Operation(summary = "미션 전체 현황", description = "미션 전체 현황을 조회합니다.")
     @GetMapping("/summary")
     public MissionRecordSummaryResponse missionRecordFindSummary() {
@@ -65,6 +73,12 @@ public class MissionController {
     public Slice<MissionFindResponse> missionFindAllFinished(
             @RequestParam int size, @RequestParam(required = false) Long lastId) {
         return missionService.findAllFinishedMission(size, lastId);
+    }
+
+    @Operation(summary = "번개 스택 조회", description = "완료한 미션 대상으로 번개 스택을 조회합니다.")
+    @GetMapping("/symbol/{memberId}")
+    public MissionSymbolStackResponse missionSymbolStackFind(@PathVariable Long memberId) {
+        return missionService.findMissionSymbolStack(memberId);
     }
 
     @Operation(summary = "미션 단건 수정", description = "단건 미션을 수정합니다.")
