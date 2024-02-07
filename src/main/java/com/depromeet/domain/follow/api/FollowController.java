@@ -3,10 +3,7 @@ package com.depromeet.domain.follow.api;
 import com.depromeet.domain.follow.application.FollowService;
 import com.depromeet.domain.follow.dto.request.FollowCreateRequest;
 import com.depromeet.domain.follow.dto.request.FollowDeleteRequest;
-import com.depromeet.domain.follow.dto.response.FollowFindMeInfoResponse;
-import com.depromeet.domain.follow.dto.response.FollowFindTargetInfoResponse;
-import com.depromeet.domain.follow.dto.response.FollowListResponse;
-import com.depromeet.domain.follow.dto.response.MemberFollowedResponse;
+import com.depromeet.domain.follow.dto.response.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -62,5 +59,11 @@ public class FollowController {
     @Operation(summary = "팔로잉, 팔로워 유저 리스트를 반환합니다", description = "팔로잉, 팔로워 유저들을 반환합니다.")
     public FollowListResponse followList(@PathVariable Long targetId) {
         return followService.findFollowList(targetId);
+    }
+
+    @DeleteMapping({"/{targetId}"})
+    @Operation(summary = "팔로워 삭제", description = "내 팔로워 목록 중 targetId로 팔로워를 삭제합니다.")
+    public FollowerDeletedResponse followerDelete(@PathVariable Long targetId) {
+        return followService.deleteFollower(targetId);
     }
 }
