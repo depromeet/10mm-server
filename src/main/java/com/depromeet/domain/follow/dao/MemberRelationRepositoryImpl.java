@@ -22,6 +22,7 @@ public class MemberRelationRepositoryImpl implements MemberRelationRepositoryCus
         return jpaQueryFactory
                 .selectFrom(memberRelation)
                 .leftJoin(memberRelation.target, member)
+                .fetchJoin()
                 .leftJoin(memberRelation.target.missions, mission)
                 .leftJoin(mission.missionRecords, missionRecord)
                 .where(sourceIdEq(memberId))

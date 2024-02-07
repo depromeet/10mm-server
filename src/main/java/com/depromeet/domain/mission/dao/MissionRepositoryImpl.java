@@ -1,5 +1,6 @@
 package com.depromeet.domain.mission.dao;
 
+import static com.depromeet.domain.member.domain.QMember.*;
 import static com.depromeet.domain.mission.domain.QMission.*;
 import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 
