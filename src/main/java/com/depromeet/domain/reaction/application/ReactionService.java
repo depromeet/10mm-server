@@ -30,17 +30,10 @@ public class ReactionService {
                         .findById(request.missionRecordId())
                         .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
 
-        validateMissionRecordMemberMismatch(member, missionRecord);
         validateSingleReaction(member, missionRecord);
 
         Reaction reaction = Reaction.createReaction(request.emojiType(), member, missionRecord);
         return ReactionCreateResponse.from(reactionRepository.save(reaction));
-    }
-
-    private void validateMissionRecordMemberMismatch(Member member, MissionRecord missionRecord) {
-        if (!missionRecord.getMission().getMember().equals(member)) {
-            throw new CustomException(ErrorCode.MISSION_RECORD_USER_MISMATCH);
-        }
     }
 
     private void validateSingleReaction(Member member, MissionRecord missionRecord) {

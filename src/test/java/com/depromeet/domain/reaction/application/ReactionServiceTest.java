@@ -100,26 +100,6 @@ class ReactionServiceTest {
         }
 
         @Test
-        void 자신의_미션기록이_아니면_실패한다() {
-            // given
-            Member anotherMember =
-                    Member.createNormalMember(
-                            OauthInfo.createOauthInfo("another", "another", "another"), "another");
-            memberRepository.save(anotherMember);
-            createMissionAndMissionRecord(anotherMember); // 다른 회원이 미션 기록을 생성
-
-            saveAndRegisterMember(); // 현재 회원
-
-            ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
-
-            // when, then
-            assertThrows(
-                    CustomException.class,
-                    () -> reactionService.createReaction(request),
-                    ErrorCode.MISSION_RECORD_USER_MISMATCH.getMessage());
-        }
-
-        @Test
         void 같은_미션기록에_다른_회원이_리액션을_추가하면_성공한다() {
             // given
             Member member = saveAndRegisterMember();
