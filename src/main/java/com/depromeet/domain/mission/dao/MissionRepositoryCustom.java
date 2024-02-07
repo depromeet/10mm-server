@@ -3,7 +3,6 @@ package com.depromeet.domain.mission.dao;
 import com.depromeet.domain.mission.domain.Mission;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.data.domain.Slice;
 
 public interface MissionRepositoryCustom {
 
@@ -15,5 +14,5 @@ public interface MissionRepositoryCustom {
 
     void updateFinishedDurationStatus(LocalDateTime today);
 
-    Slice<Mission> findAllFinishedMission(Long memberId, int size, Long lastId);
+    List<Mission> findAllFinishedMission(Long memberId);
 }

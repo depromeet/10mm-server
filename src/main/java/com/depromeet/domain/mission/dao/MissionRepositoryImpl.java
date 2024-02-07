@@ -73,21 +73,14 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     }
 
     @Override
-    public Slice<Mission> findAllFinishedMission(Long memberId, int size, Long lastId) {
-        JPAQuery<Mission> query =
-                jpaQueryFactory
-                        .selectFrom(mission)
-                        .leftJoin(mission.missionRecords, missionRecord)
-                        .fetchJoin()
-                        .where(
-                                ltMissionId(lastId),
-                                memberIdEq(memberId),
-                                durationStatusFinishedEq())
-                        .orderBy(mission.finishedAt.desc())
-                        .limit((long) size + 1);
-
-        List<Mission> missions = query.fetch();
-        return checkLastPage(size, missions);
+    public List<Mission> findAllFinishedMission(Long memberId) {
+        return jpaQueryFactory
+                .selectFrom(mission)
+                .leftJoin(mission.missionRecords, missionRecord)
+                .fetchJoin()
+                .where(memberIdEq(memberId), durationStatusFinishedEq())
+                .orderBy(mission.finishedAt.desc())
+                .fetch();
     }
 
     // 미션의 사용자 id 조건 검증 메서드

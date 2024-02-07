@@ -23,7 +23,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -202,11 +201,11 @@ public class MissionService {
         return MissionSymbolStackResponse.of(symbolStack);
     }
 
-    public Slice<MissionFindResponse> findAllFinishedMission(int size, Long lastId) {
+    public List<MissionFindResponse> findAllFinishedMission() {
         Member currentMember = memberUtil.getCurrentMember();
-        Slice<Mission> mappedMissions =
-                missionRepository.findAllFinishedMission(currentMember.getId(), size, lastId);
-        return mappedMissions.map(MissionFindResponse::from);
+        List<Mission> mappedMissions =
+                missionRepository.findAllFinishedMission(currentMember.getId());
+        return mappedMissions.stream().map(MissionFindResponse::from).toList();
     }
 
     public MissionUpdateResponse updateMission(
