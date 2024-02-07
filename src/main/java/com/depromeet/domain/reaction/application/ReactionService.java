@@ -30,13 +30,13 @@ public class ReactionService {
                         .findById(request.missionRecordId())
                         .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
 
-        validateSingleReaction(member, missionRecord);
+        validateMyReactionAlreadyExists(member, missionRecord);
 
         Reaction reaction = Reaction.createReaction(request.emojiType(), member, missionRecord);
         return ReactionCreateResponse.from(reactionRepository.save(reaction));
     }
 
-    private void validateSingleReaction(Member member, MissionRecord missionRecord) {
+    private void validateMyReactionAlreadyExists(Member member, MissionRecord missionRecord) {
         missionRecord.getReactions().stream()
                 .filter(reaction -> reaction.getMember().equals(member))
                 .findAny()
