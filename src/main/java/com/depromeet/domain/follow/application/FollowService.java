@@ -225,6 +225,24 @@ public class FollowService {
                 targetMember.getProfile().getNickname(), followingList, followerList);
     }
 
+    public FollowerDeletedResponse deleteFollower(Long targetId) {
+        final Member currentMember = memberUtil.getCurrentMember();
+        final Member targetMember = getTargetMember(targetId);
+
+        MemberRelation memberRelation =
+                memberRelationRepository
+                        .findBySourceIdAndTargetId(targetMember.getId(), currentMember.getId())
+                        .orElseThrow(() -> new CustomException(ErrorCode.FOLLOW_NOT_EXIST));
+        memberRelationRepository.delete(memberRelation);
+
+        Optional<MemberRelation> optionalMemberRelation =
+                memberRelationRepository.findBySourceIdAndTargetId(
+                        currentMember.getId(), targetMember.getId());
+        return optionalMemberRelation.isPresent()
+                ? FollowerDeletedResponse.from(FollowStatus.FOLLOWING)
+                : FollowerDeletedResponse.from(FollowStatus.NOT_FOLLOWING);
+    }
+
     private static void getFollowStatusIncludeList(
             List<Member> targetMembers,
             List<MemberRelation> currentMemberSources,
