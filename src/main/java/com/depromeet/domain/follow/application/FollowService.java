@@ -73,8 +73,8 @@ public class FollowService {
                         .orElseThrow(() -> new CustomException(ErrorCode.FOLLOW_NOT_EXIST));
 
         Optional<Notification> optionalNotification =
-                notificationRepository.findBySourceMemberIdAndTargetMemberId(
-                        currentMember.getId(), targetMember.getId());
+                notificationRepository.findBySourceMemberIdAndTargetMemberIdAndNotificationType(
+                        currentMember.getId(), targetMember.getId(), NotificationType.FOLLOW);
         if (optionalNotification.isPresent()) {
             Notification notification = optionalNotification.get();
             notificationRepository.delete(notification);
