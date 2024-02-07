@@ -43,14 +43,14 @@ public class FeedService {
     public List<FeedOneByProfileResponse> findAllFeedByTargetId(Long targetId) {
         final Long sourceId = securityUtil.getCurrentMemberId();
 
-        if (!isMyFeedRequired(targetId, sourceId)) {
+        if (isMyFeedRequired(targetId, sourceId)) {
             return findFeedByOtherMember(sourceId, targetId);
         }
         return findFeedByCurrentMember(sourceId);
     }
 
     private boolean isMyFeedRequired(Long targetId, Long sourceId) {
-        return targetId.equals(sourceId);
+        return !targetId.equals(sourceId);
     }
 
     private List<FeedOneByProfileResponse> findFeedByOtherMember(Long sourceId, Long targetId) {
@@ -60,12 +60,10 @@ public class FeedService {
         boolean isMemberRelationExistsWithMe =
                 memberRelationRepository.existsBySourceIdAndTargetId(
                         sourceId, targetMember.getId());
-
+        List<MissionVisibility> visibilities =
+                determineVisibilityConditionsByRelationsWithMe(isMemberRelationExistsWithMe);
         List<MissionRecord> feedAllByMemberId =
-                missionRecordRepository.findFeedAllByMemberId(
-                        targetId,
-                        determineVisibilityConditionsByRelationsWithMe(
-                                isMemberRelationExistsWithMe));
+                missionRecordRepository.findFeedAllByMemberId(targetId, visibilities);
         return extractFeedResponses(feedAllByMemberId);
     }
 
@@ -79,7 +77,8 @@ public class FeedService {
 
     private List<FeedOneByProfileResponse> extractFeedResponses(List<MissionRecord> records) {
         return records.stream()
-                .map(record -> FeedOneByProfileResponse.of(record.getMission(), record))
+                // .map(record -> FeedOneByProfileResponse.of(record.getMission(), record))
+                .map(FeedOneByProfileResponse::of)
                 .toList();
     }
 

@@ -1,6 +1,5 @@
 package com.depromeet.domain.feed.dto.response;
 
-import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,15 +35,15 @@ public record FeedOneByProfileResponse(
                         type = "string")
                 LocalDateTime finishedAt) {
 
-    public static FeedOneByProfileResponse of(Mission mission, MissionRecord missionRecord) {
+    public static FeedOneByProfileResponse of(MissionRecord record) {
         return new FeedOneByProfileResponse(
-                mission.getId(),
-                missionRecord.getId(),
-                mission.getName(),
-                missionRecord.getImageUrl(),
-                missionRecord.getDuration().toMinutes(),
-                Duration.between(missionRecord.getStartedAt(), LocalDateTime.now()).toDays() + 1,
-                missionRecord.getStartedAt(),
-                missionRecord.getFinishedAt());
+                record.getMission().getId(),
+                record.getId(),
+                record.getMission().getName(),
+                record.getImageUrl(),
+                record.getDuration().toMinutes(),
+                Duration.between(record.getStartedAt(), LocalDateTime.now()).toDays() + 1,
+                record.getStartedAt(),
+                record.getFinishedAt());
     }
 }
