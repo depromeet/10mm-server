@@ -36,7 +36,7 @@ public class Member extends BaseTimeEntity {
 
     @Embedded private OauthInfo oauthInfo;
 
-    @Embedded private FcmInfo fcmInfo = FcmInfo.createFcmInfo();
+    @Embedded private FcmInfo fcmInfo;
 
     @Enumerated(EnumType.STRING)
     private MemberStatus status;

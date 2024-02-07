@@ -103,7 +103,7 @@ public class AuthService {
 
     private Member fetchOrCreate(OidcUser oidcUser) {
         return memberRepository
-                .findByOauthInfo(extractOauthInfo(oidcUser))
+                .findByOauthInfoAndStatus(extractOauthInfo(oidcUser), MemberStatus.NORMAL)
                 .orElseGet(() -> saveMember(oidcUser));
     }
 
