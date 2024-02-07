@@ -63,7 +63,7 @@ public class FollowController {
 
     @DeleteMapping({"/{targetId}"})
     @Operation(summary = "팔로워 삭제", description = "내 팔로워 목록 중 targetId로 팔로워를 삭제합니다.")
-    public FollowerDeletedResponse followerDelete(@PathVariable Long targetId) {
-        return followService.deleteFollower(targetId);
+    public ResponseEntity<FollowerDeletedResponse> followerDelete(@PathVariable Long targetId) {
+        return ResponseEntity.ok(followService.deleteFollower(targetId));
     }
 }

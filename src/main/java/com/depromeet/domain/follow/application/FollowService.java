@@ -238,10 +238,9 @@ public class FollowService {
         Optional<MemberRelation> optionalMemberRelation =
                 memberRelationRepository.findBySourceIdAndTargetId(
                         currentMember.getId(), targetMember.getId());
-        if (optionalMemberRelation.isPresent()) {
-            return new FollowerDeletedResponse(FollowStatus.FOLLOWING);
-        }
-        return new FollowerDeletedResponse(FollowStatus.NOT_FOLLOWING);
+        return optionalMemberRelation.isPresent()
+                ? FollowerDeletedResponse.from(FollowStatus.FOLLOWING)
+                : FollowerDeletedResponse.from(FollowStatus.NOT_FOLLOWING);
     }
 
     private static void getFollowStatusIncludeList(
