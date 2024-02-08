@@ -8,10 +8,7 @@ import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.follow.dto.request.FollowCreateRequest;
 import com.depromeet.domain.follow.dto.request.FollowDeleteRequest;
-import com.depromeet.domain.follow.dto.response.FollowFindMeInfoResponse;
-import com.depromeet.domain.follow.dto.response.FollowFindTargetInfoResponse;
-import com.depromeet.domain.follow.dto.response.FollowStatus;
-import com.depromeet.domain.follow.dto.response.MemberFollowedResponse;
+import com.depromeet.domain.follow.dto.response.*;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
@@ -494,6 +491,92 @@ class FollowServiceTest {
             assertEquals(2, response.size());
             assertEquals("targetMember1", response.get(0).nickname());
             assertEquals("targetMember2", response.get(1).nickname());
+        }
+    }
+
+    @Nested
+    class 나의_팔로워를_삭제할_때 {
+        @Test
+        void 로그인된_회원이_존재하지_않는다면_예외를_발생시킨다() {
+            // when, then
+            assertThatThrownBy(() -> followService.deleteFollower(224L))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void 삭제하려는_회원이_존재하지_않는다면_예외를_발생시킨다() {
+            // given
+            Member currentMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("currentMember", "currentMember")));
+
+            // when, then
+            assertThatThrownBy(() -> followService.deleteFollower(224L))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.FOLLOW_TARGET_MEMBER_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void 삭제하려는_유저가_나의_팔로워가_아니라면_예외가_발생한다() {
+            // given
+            Member currentMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("currentMember", "currentMember")));
+            Member targetMember1 =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("targetMember1", "targetMember1")));
+            // when, then
+            assertThatThrownBy(() -> followService.deleteFollower(targetMember1.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.FOLLOW_NOT_EXIST.getMessage());
+        }
+
+        @Test
+        void 내가_팔로우_하고_있다면_FOLLOWER_STATUS가_FOLLOWING로_응답한다() {
+            // given
+            Member currentMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("currentMember", "currentMember")));
+            Member targetMember1 =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("targetMember1", "targetMember1")));
+            memberRelationRepository.save(
+                    MemberRelation.createMemberRelation(targetMember1, currentMember));
+            memberRelationRepository.save(
+                    MemberRelation.createMemberRelation(currentMember, targetMember1));
+
+            // when
+            FollowerDeletedResponse response = followService.deleteFollower(targetMember1.getId());
+
+            // then
+            assertEquals(FollowStatus.FOLLOWING, response.followStatus());
+        }
+
+        @Test
+        void 내가_팔로우_하고_있지_않다면_FOLLOWER_STATUS가_NOT_FOLLOWING로_응답한다() {
+            // given
+            Member currentMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("currentMember", "currentMember")));
+            Member targetMember1 =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("targetMember1", "targetMember1")));
+            memberRelationRepository.save(
+                    MemberRelation.createMemberRelation(targetMember1, currentMember));
+
+            // when
+            FollowerDeletedResponse response = followService.deleteFollower(targetMember1.getId());
+
+            // then
+            assertEquals(FollowStatus.NOT_FOLLOWING, response.followStatus());
         }
     }
 }

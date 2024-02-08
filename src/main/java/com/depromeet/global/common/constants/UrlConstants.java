@@ -13,6 +13,9 @@ public enum UrlConstants {
     PROD_DOMAIN_URL("https://www.10mm.today"),
     DEV_DOMAIN_URL("https://www.dev.10mm.today"),
     LOCAL_DOMAIN_URL("http://localhost:3000"),
+    LOCAL_SECURE_DOMAIN_URL("https://localhost:3000"),
+
+    NGROK_DOMAIN_URL("https://*.ngrok-free.app"),
 
     IMAGE_DOMAIN_URL("https://image.10mm.today"),
     ;
