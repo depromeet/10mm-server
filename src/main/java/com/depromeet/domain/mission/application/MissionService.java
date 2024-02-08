@@ -15,6 +15,7 @@ import com.depromeet.domain.missionRecord.dto.response.MissionRecordSummaryRespo
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
+import com.depromeet.global.util.SecurityUtil;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,6 +36,7 @@ public class MissionService {
     private final MissionRecordTtlRepository missionRecordTtlRepository;
     private final MemberRelationRepository memberRelationRepository;
     private final MemberUtil memberUtil;
+    private final SecurityUtil securityUtil;
 
     public MissionCreateResponse createMission(MissionCreateRequest missionCreateRequest) {
         Mission mission = createMissionEntity(missionCreateRequest);
@@ -201,11 +203,37 @@ public class MissionService {
         return MissionSymbolStackResponse.of(symbolStack);
     }
 
-    public List<MissionFindResponse> findAllFinishedMission() {
-        Member currentMember = memberUtil.getCurrentMember();
-        List<Mission> mappedMissions =
-                missionRepository.findAllFinishedMission(currentMember.getId());
-        return mappedMissions.stream().map(MissionFindResponse::from).toList();
+    @Transactional(readOnly = true)
+    public List<FinishedMissionResponse> findAllFinishedMission() {
+        Long currentMemberId = securityUtil.getCurrentMemberId();
+
+        List<Mission> finishedMissions = missionRepository.findAllFinishedMission(currentMemberId);
+
+        return finishedMissions.stream()
+                .map(
+                        mission -> {
+                            long totalMissionDay =
+                                    Duration.between(
+                                                    // 0일차 방지를 위해 minus 1
+                                                    mission.getStartedAt().minusDays(1),
+                                                    mission.getFinishedAt())
+                                            .toDays();
+                            long completeCount =
+                                    mission.getMissionRecords().stream()
+                                            .filter(
+                                                    missionRecord ->
+                                                            missionRecord
+                                                                    .getUploadStatus()
+                                                                    .equals(
+                                                                            ImageUploadStatus
+                                                                                    .COMPLETE))
+                                            .count();
+
+                            return FinishedMissionResponse.of(
+                                    mission,
+                                    calculateMissionAttainRate(completeCount, totalMissionDay));
+                        })
+                .toList();
     }
 
     public MissionUpdateResponse updateMission(

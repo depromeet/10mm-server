@@ -3,6 +3,7 @@ package com.depromeet.domain.mission.api;
 import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
+import com.depromeet.domain.mission.dto.response.FinishedMissionResponse;
 import com.depromeet.domain.mission.dto.response.FollowMissionFindAllResponse;
 import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindAllResponse;
@@ -68,7 +69,7 @@ public class MissionController {
 
     @Operation(summary = "종료미션 보관함", description = "종료된 미션 리스트를 조회합니다.")
     @GetMapping("/finished")
-    public List<MissionFindResponse> missionFindAllFinished() {
+    public List<FinishedMissionResponse> missionFindAllFinished() {
         return missionService.findAllFinishedMission();
     }
 
