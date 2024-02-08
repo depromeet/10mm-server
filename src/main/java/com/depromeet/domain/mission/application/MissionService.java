@@ -118,8 +118,8 @@ public class MissionService {
                 missions.stream()
                         .mapToLong(
                                 mission ->
-                                        Duration.between(mission.getStartedAt().minusDays(1), today)
-                                                .toDays())
+                                        Duration.between(mission.getStartedAt(), today).toDays()
+                                                + 1)
                         .sum();
         // Duration을 초로 바꾸고 합산
         long sumDuration =
@@ -214,10 +214,10 @@ public class MissionService {
                         mission -> {
                             long totalMissionDay =
                                     Duration.between(
-                                                    // 0일차 방지를 위해 minus 1
-                                                    mission.getStartedAt().minusDays(1),
-                                                    mission.getFinishedAt())
-                                            .toDays();
+                                                            mission.getStartedAt(),
+                                                            mission.getFinishedAt())
+                                                    .toDays()
+                                            + 1;
                             long completeCount =
                                     mission.getMissionRecords().stream()
                                             .filter(
