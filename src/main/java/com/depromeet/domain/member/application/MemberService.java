@@ -81,7 +81,7 @@ public class MemberService {
     public List<MemberSearchResponse> searchMemberNickname(String nickname) {
         final Member currentMember = memberUtil.getCurrentMember();
         final String escapingNickname = escapeSpecialCharacters(nickname);
-        if (nickname == null || nickname.isEmpty()) {
+        if (escapingNickname.isEmpty()) {
             return List.of();
         }
 
