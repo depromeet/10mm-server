@@ -124,8 +124,13 @@ class ReactionServiceTest {
             // given
             Member member = saveAndRegisterMember();
             createMissionAndMissionRecord(member);
+
+            SecurityContextHolder.clearContext(); // 현재 회원 로그아웃
+
+            Member otherMember = saveAndRegisterMember(); // 다른 회원 로그인
+            createMissionAndMissionRecord(otherMember);
             ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
-            reactionService.createReaction(request);
+            reactionService.createReaction(request); // 첫번째 리액션 추가
 
             // when, then
             assertThrows(
@@ -143,6 +148,12 @@ class ReactionServiceTest {
             // given
             Member member = saveAndRegisterMember();
             createMissionAndMissionRecord(member);
+
+            SecurityContextHolder.clearContext(); // 현재 회원 로그아웃
+
+            Member otherMember = saveAndRegisterMember(); // 다른 회원 로그인
+            createMissionAndMissionRecord(otherMember);
+
             ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
             ReactionCreateResponse response = reactionService.createReaction(request);
 
@@ -156,16 +167,22 @@ class ReactionServiceTest {
         @Test
         void 자신의_리액션이_아니면_실패한다() {
             // given
-            Member member = saveAndRegisterMember();
-            createMissionAndMissionRecord(member);
+            Member member1 = saveAndRegisterMember();
+            createMissionAndMissionRecord(member1);
+
+            SecurityContextHolder.clearContext(); // 1번 멤버 로그아웃
+
+            // 2번 멤버 로그인 및 1번 멤버의 미션기록에 리액션 추가
+            Member member2 = saveAndRegisterMember();
+            createMissionAndMissionRecord(member2);
             ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
-            ReactionCreateResponse response =
-                    reactionService.createReaction(request); // 현재 회원이 리액션을 추가
+            ReactionCreateResponse response = reactionService.createReaction(request);
+
             Long reactionId = response.reactionId();
 
-            SecurityContextHolder.clearContext(); // 현재 회원 로그아웃
-
-            saveAndRegisterMember(); // 다른 회원 로그인
+            // 2번 멤버 로그아웃 및 3번 멤버 로그인
+            SecurityContextHolder.clearContext();
+            saveAndRegisterMember();
 
             // when, then
             assertThrows(
