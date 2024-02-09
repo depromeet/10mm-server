@@ -8,10 +8,12 @@ import com.depromeet.domain.reaction.domain.Reaction;
 import com.depromeet.domain.reaction.dto.request.ReactionCreateRequest;
 import com.depromeet.domain.reaction.dto.request.ReactionUpdateRequest;
 import com.depromeet.domain.reaction.dto.response.ReactionCreateResponse;
+import com.depromeet.domain.reaction.dto.response.ReactionFindResponse;
 import com.depromeet.domain.reaction.dto.response.ReactionUpdateResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,11 @@ public class ReactionService {
     private final MemberUtil memberUtil;
     private final MissionRecordRepository missionRecordRepository;
     private final ReactionRepository reactionRepository;
+
+    public ReactionFindResponse findAllReaction(Long missionRecordId) {
+        List<Reaction> reactions = reactionRepository.findAllByMissionRecordId(missionRecordId);
+        return ReactionFindResponse.from(reactions);
+    }
 
     public ReactionCreateResponse createReaction(ReactionCreateRequest request) {
         final Member member = memberUtil.getCurrentMember();
