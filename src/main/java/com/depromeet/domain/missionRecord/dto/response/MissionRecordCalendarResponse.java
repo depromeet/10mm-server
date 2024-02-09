@@ -24,12 +24,14 @@ public record MissionRecordCalendarResponse(
                         defaultValue = "2024-01-15 00:34:00",
                         type = "string")
                 LocalDateTime missionFinishedAt,
-        @Schema(description = "미션 기록들") List<MissionRecordFindResponse> missionRecords) {
+        @Schema(description = "미션 기록들") List<MissionRecordFindResponse> missionRecords,
+        @Schema(description = "재촉하기 여부") UrgingStatus urgingStatus) {
     public static MissionRecordCalendarResponse of(
             LocalDateTime missionStartedAt,
             LocalDateTime missionFinishedAt,
-            List<MissionRecordFindResponse> missionRecords) {
+            List<MissionRecordFindResponse> missionRecords,
+            UrgingStatus urgingStatus) {
         return new MissionRecordCalendarResponse(
-                missionStartedAt, missionFinishedAt, missionRecords);
+                missionStartedAt, missionFinishedAt, missionRecords, urgingStatus);
     }
 }
