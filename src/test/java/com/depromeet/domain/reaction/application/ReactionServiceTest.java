@@ -147,15 +147,15 @@ class ReactionServiceTest {
         @Test
         void 성공한다() {
             // given
-			Member member = saveAndRegisterMember();
-			createMissionAndMissionRecord(member);
+            Member member = saveAndRegisterMember();
+            createMissionAndMissionRecord(member);
 
-			SecurityContextHolder.clearContext(); // 현재 회원 로그아웃
+            SecurityContextHolder.clearContext(); // 현재 회원 로그아웃
 
-			Member otherMember = saveAndRegisterMember(); // 다른 회원 로그인
-			createMissionAndMissionRecord(otherMember);
+            Member otherMember = saveAndRegisterMember(); // 다른 회원 로그인
+            createMissionAndMissionRecord(otherMember);
 
-			ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
+            ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
             ReactionCreateResponse response = reactionService.createReaction(request);
 
             // when
