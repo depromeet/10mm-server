@@ -56,4 +56,8 @@ public class Reaction extends BaseTimeEntity {
                 .missionRecord(missionRecord)
                 .build();
     }
+
+    public void updateEmojiType(EmojiType emojiType) {
+        this.emojiType = emojiType;
+    }
 }

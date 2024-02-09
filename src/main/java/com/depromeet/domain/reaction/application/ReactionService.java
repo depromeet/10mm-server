@@ -6,7 +6,9 @@ import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.reaction.dao.ReactionRepository;
 import com.depromeet.domain.reaction.domain.Reaction;
 import com.depromeet.domain.reaction.dto.request.ReactionCreateRequest;
+import com.depromeet.domain.reaction.dto.request.ReactionUpdateRequest;
 import com.depromeet.domain.reaction.dto.response.ReactionCreateResponse;
+import com.depromeet.domain.reaction.dto.response.ReactionUpdateResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -51,6 +53,19 @@ public class ReactionService {
                         reaction -> {
                             throw new CustomException(ErrorCode.REACTION_ALREADY_EXISTS);
                         });
+    }
+
+    public ReactionUpdateResponse updateReaction(Long reactionId, ReactionUpdateRequest request) {
+        final Member member = memberUtil.getCurrentMember();
+        Reaction reaction =
+                reactionRepository
+                        .findById(reactionId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.REACTION_NOT_FOUND));
+
+        validateReactionMemberMismatch(member, reaction);
+
+        reaction.updateEmojiType(request.emojiType());
+        return ReactionUpdateResponse.from(reaction);
     }
 
     public void deleteReaction(Long reactionId) {
