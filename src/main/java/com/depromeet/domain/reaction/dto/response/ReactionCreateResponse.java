@@ -1,4 +1,4 @@
-package com.depromeet.domain.reaction.dto;
+package com.depromeet.domain.reaction.dto.response;
 
 import com.depromeet.domain.reaction.domain.EmojiType;
 import com.depromeet.domain.reaction.domain.Reaction;

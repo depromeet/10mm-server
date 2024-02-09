@@ -1,4 +1,4 @@
-package com.depromeet.domain.reaction.dto;
+package com.depromeet.domain.reaction.dto.request;
 
 import com.depromeet.domain.reaction.domain.EmojiType;
 import io.swagger.v3.oas.annotations.media.Schema;
