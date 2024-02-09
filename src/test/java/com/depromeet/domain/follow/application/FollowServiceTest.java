@@ -178,6 +178,55 @@ class FollowServiceTest {
         }
 
         @Test
+        void 상대가_나를_팔로우_하고_있다면_FOLLOW_STATUE가_FOLLOWED_BY_ME로_응답한다() {
+            Long targetId = 2L;
+            FollowDeleteRequest request = new FollowDeleteRequest(targetId);
+            Member currentMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname1", "testImageUrl1")));
+            Member targetMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname2", "testImageUrl2")));
+            MemberRelation memberRelation =
+                    MemberRelation.createMemberRelation(currentMember, targetMember);
+            MemberRelation memberRelation2 =
+                    MemberRelation.createMemberRelation(targetMember, currentMember);
+            memberRelationRepository.save(memberRelation);
+            memberRelationRepository.save(memberRelation2);
+
+            // when
+            FollowerDeletedResponse response = followService.deleteFollow(request);
+
+            // then
+            assertEquals(FollowStatus.FOLLOWED_BY_ME, response.followStatus());
+        }
+
+        @Test
+        void 상대가_나를_팔로우_하고_있지_않다면_FOLLOW_STATUE가_NOT_FOLLOWING로_응답한다() {
+            Long targetId = 2L;
+            FollowDeleteRequest request = new FollowDeleteRequest(targetId);
+            Member currentMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname1", "testImageUrl1")));
+            Member targetMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname2", "testImageUrl2")));
+            MemberRelation memberRelation =
+                    MemberRelation.createMemberRelation(currentMember, targetMember);
+            memberRelationRepository.save(memberRelation);
+
+            // when
+            FollowerDeletedResponse response = followService.deleteFollow(request);
+
+            // then
+            assertEquals(FollowStatus.NOT_FOLLOWING, response.followStatus());
+        }
+
+        @Test
         void 정상적이라면_팔로우가_취소된다() {
             Long targetId = 2L;
             FollowDeleteRequest request = new FollowDeleteRequest(targetId);

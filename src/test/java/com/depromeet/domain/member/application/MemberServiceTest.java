@@ -200,7 +200,7 @@ class MemberServiceTest {
         }
 
         @Test
-        void 검색_키워드에_공백에_따른_처리만_허용한다() {
+        void 검색_키워드에_공백만_존재하는_경우_SIZE는_0이다() {
             // given
             memberRepository.save(Member.createNormalMember(Profile.createProfile("바보", "도모 얼굴")));
             memberRepository.save(
@@ -216,7 +216,7 @@ class MemberServiceTest {
                     memberService.searchMemberNickname(searchNickname);
 
             // then
-            assertEquals(3, responses.size());
+            assertEquals(0, responses.size());
         }
 
         @Test

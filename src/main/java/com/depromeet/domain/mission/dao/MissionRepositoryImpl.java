@@ -13,6 +13,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -70,6 +73,18 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                 .execute();
     }
 
+    @Override
+    public List<Mission> findAllFinishedMission(Long memberId) {
+        return jpaQueryFactory
+                .selectFrom(mission)
+                .leftJoin(mission.missionRecords, missionRecord)
+                .fetchJoin()
+                .where(memberIdEq(memberId), durationStatusFinishedEq())
+                .orderBy(mission.finishedAt.desc())
+                .fetch();
+    }
+
+    // 미션의 사용자 id 조건 검증 메서드
     private BooleanExpression memberIdEq(Long memberId) {
         return memberId == null ? null : mission.member.id.eq(memberId);
     }
@@ -82,5 +97,28 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
 
     private BooleanExpression durationStatusInProgress() {
         return mission.durationStatus.in(DurationStatus.IN_PROGRESS);
+    }
+
+    // lastId보다 작은 미션 id 찾는 조건 메서드 (lastId 가 있다면 마지막 요청)
+    private BooleanExpression ltMissionId(Long lastId) {
+        return lastId == null ? null : mission.id.lt(lastId);
+    }
+
+    private BooleanExpression durationStatusFinishedEq() {
+        return mission.durationStatus.eq(DurationStatus.FINISHED);
+    }
+
+    // 무한 스크롤 방식 처리하는 메서드
+    private Slice<Mission> checkLastPage(int size, List<Mission> result) {
+
+        boolean hasNext = false;
+
+        // 조회한 결과 개수가 요청한 페이지 사이즈보다 크면 뒤에 더 있음, next = true
+        if (result.size() > size) {
+            hasNext = true;
+            result.remove(size);
+        }
+        Pageable pageable = Pageable.unpaged();
+        return new SliceImpl<>(result, pageable, hasNext);
     }
 }

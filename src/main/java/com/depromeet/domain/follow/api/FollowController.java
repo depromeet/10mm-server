@@ -29,8 +29,9 @@ public class FollowController {
 
     @DeleteMapping
     @Operation(summary = "팔로우 취소", description = "팔로우를 취소합니다.")
-    public void followDelete(@Valid @RequestBody FollowDeleteRequest request) {
-        followService.deleteFollow(request);
+    public ResponseEntity<FollowerDeletedResponse> followDelete(
+            @Valid @RequestBody FollowDeleteRequest request) {
+        return ResponseEntity.ok(followService.deleteFollow(request));
     }
 
     @GetMapping("/{targetId}")

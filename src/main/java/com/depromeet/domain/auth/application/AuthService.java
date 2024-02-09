@@ -98,7 +98,7 @@ public class AuthService {
 
         TokenPairResponse loginResponse = getLoginResponse(member);
 
-        return SocialLoginResponse.from(loginResponse);
+        return SocialLoginResponse.from(member, loginResponse);
     }
 
     private Member fetchOrCreate(OidcUser oidcUser) {
