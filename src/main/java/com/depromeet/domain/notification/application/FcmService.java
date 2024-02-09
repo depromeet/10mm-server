@@ -1,4 +1,4 @@
-package com.depromeet.global.config.fcm;
+package com.depromeet.domain.notification.application;
 
 import com.google.api.core.ApiFuture;
 import com.google.firebase.messaging.*;

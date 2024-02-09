@@ -16,7 +16,7 @@ import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.notification.dao.NotificationRepository;
 import com.depromeet.domain.notification.domain.Notification;
 import com.depromeet.domain.notification.domain.NotificationType;
-import com.depromeet.global.config.fcm.FcmService;
+import com.depromeet.domain.notification.application.FcmService;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;

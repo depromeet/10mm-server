@@ -16,7 +16,7 @@ import com.depromeet.domain.member.dto.request.UpdateFcmTokenRequest;
 import com.depromeet.domain.member.dto.response.MemberFindOneResponse;
 import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.member.dto.response.MemberSocialInfoResponse;
-import com.depromeet.global.config.fcm.FcmService;
+import com.depromeet.domain.notification.application.FcmService;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
