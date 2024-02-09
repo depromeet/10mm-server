@@ -62,7 +62,7 @@ public class FollowService {
         memberRelationRepository.save(memberRelation);
     }
 
-    public void deleteFollow(FollowDeleteRequest request) {
+    public FollowerDeletedResponse deleteFollow(FollowDeleteRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
         Member targetMember = getTargetMember(request.targetId());
 
@@ -79,6 +79,14 @@ public class FollowService {
             notificationRepository.delete(notification);
         }
         memberRelationRepository.delete(memberRelation);
+
+        Optional<MemberRelation> optionalMemberRelation =
+                memberRelationRepository.findBySourceIdAndTargetId(
+                        targetMember.getId(), currentMember.getId());
+
+        return optionalMemberRelation.isPresent()
+                ? FollowerDeletedResponse.from(FollowStatus.FOLLOWED_BY_ME)
+                : FollowerDeletedResponse.from(FollowStatus.NOT_FOLLOWING);
     }
 
     @Transactional(readOnly = true)
