@@ -19,7 +19,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<Member> findNonCompleteMissions(LocalDateTime today) {
+    public List<Member> findMissionNonCompletedMembers(LocalDateTime today) {
         LocalDateTime start = today.toLocalDate().atStartOfDay();
         LocalDateTime end = today.toLocalDate().atTime(23, 59, 59);
         return jpaQueryFactory

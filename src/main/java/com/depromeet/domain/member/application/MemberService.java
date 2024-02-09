@@ -1,5 +1,7 @@
 package com.depromeet.domain.member.application;
 
+import static com.depromeet.domain.common.constants.PushNotificationConstants.*;
+
 import com.depromeet.domain.auth.dao.RefreshTokenRepository;
 import com.depromeet.domain.auth.dto.request.UsernameCheckRequest;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
@@ -40,10 +42,6 @@ public class MemberService {
     private final MemberRelationRepository memberRelationRepository;
     private final MemberUtil memberUtil;
     private final FcmService fcmService;
-
-    private static final String NON_COMPLETE_MISSION_TITLE = "10MM";
-    private static final String NON_COMPLETE_MISSION_CONTENT =
-            "아직 오늘 미션을 완료하지 않았어요! 10분 동안 빠르게 완료해볼까요?";
 
     @Transactional(readOnly = true)
     public MemberFindOneResponse findMemberInfo() {
@@ -194,14 +192,15 @@ public class MemberService {
     @Transactional(readOnly = true)
     public void pushNotificationMissionRequest() {
         LocalDateTime today = LocalDateTime.now();
-        List<Member> nonCompleteMissions = memberRepository.findNonCompleteMissions(today);
+        List<Member> nonMissionNonCompletedMembers =
+                memberRepository.findMissionNonCompletedMembers(today);
         List<String> tokenList =
-                nonCompleteMissions.stream()
+                nonMissionNonCompletedMembers.stream()
                         .map(member -> member.getFcmInfo().getFcmToken())
                         .toList();
         if (!tokenList.isEmpty()) {
             fcmService.sendGroupMessageAsync(
-                    tokenList, NON_COMPLETE_MISSION_TITLE, NON_COMPLETE_MISSION_CONTENT);
+                    tokenList, PUSH_SERVICE_TITLE, PUSH_NON_COMPLETE_MISSION_SERVICE_CONTENT);
         }
     }
 
