@@ -123,7 +123,9 @@ class MissionControllerTest {
                                 MissionVisibility.ALL,
                                 DurationStatus.IN_PROGRESS,
                                 ArchiveStatus.NONE,
-                                1));
+                                1,
+                                LocalDateTime.of(2024, 01, 01, 1, 5, 0),
+                                LocalDateTime.of(2024, 01, 15, 1, 5, 0)));
 
         // when, then
         ResultActions perform =
