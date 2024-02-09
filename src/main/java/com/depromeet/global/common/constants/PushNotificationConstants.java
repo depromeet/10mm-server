@@ -1,4 +1,4 @@
-package com.depromeet.domain.common.constants;
+package com.depromeet.global.common.constants;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

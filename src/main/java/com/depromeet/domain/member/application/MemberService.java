@@ -1,6 +1,6 @@
 package com.depromeet.domain.member.application;
 
-import static com.depromeet.domain.common.constants.PushNotificationConstants.*;
+import static com.depromeet.global.common.constants.PushNotificationConstants.*;
 
 import com.depromeet.domain.auth.dao.RefreshTokenRepository;
 import com.depromeet.domain.auth.dto.request.UsernameCheckRequest;

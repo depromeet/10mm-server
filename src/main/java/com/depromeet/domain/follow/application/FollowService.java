@@ -1,6 +1,6 @@
 package com.depromeet.domain.follow.application;
 
-import static com.depromeet.domain.common.constants.PushNotificationConstants.*;
+import static com.depromeet.global.common.constants.PushNotificationConstants.*;
 
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
@@ -13,10 +13,10 @@ import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import com.depromeet.domain.notification.application.FcmService;
 import com.depromeet.domain.notification.dao.NotificationRepository;
 import com.depromeet.domain.notification.domain.Notification;
 import com.depromeet.domain.notification.domain.NotificationType;
-import com.depromeet.domain.notification.application.FcmService;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
