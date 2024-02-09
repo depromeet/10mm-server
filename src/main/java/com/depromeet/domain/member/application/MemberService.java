@@ -6,6 +6,7 @@ import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.image.domain.ImageFileExtension;
 import com.depromeet.domain.member.dao.MemberRepository;
+import com.depromeet.domain.member.domain.FcmInfo;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.member.dto.request.NicknameCheckRequest;
@@ -14,12 +15,15 @@ import com.depromeet.domain.member.dto.request.UpdateFcmTokenRequest;
 import com.depromeet.domain.member.dto.response.MemberFindOneResponse;
 import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.member.dto.response.MemberSocialInfoResponse;
+import com.depromeet.global.config.fcm.FcmService;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +41,10 @@ public class MemberService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberRelationRepository memberRelationRepository;
     private final MemberUtil memberUtil;
+    private final FcmService fcmService;
+
+    private static final String NON_COMPLETE_MISSION_TITLE = "10MM";
+    private static final String NON_COMPLETE_MISSION_CONTENT = "아직 수행하지 미션이 있네요! 한번 해볼까요?";
 
     @Transactional(readOnly = true)
     public MemberFindOneResponse findMemberInfo() {
@@ -182,6 +190,23 @@ public class MemberService {
     public void updateFcmToken(UpdateFcmTokenRequest updateFcmTokenRequest) {
         final Member currentMember = memberUtil.getCurrentMember();
         currentMember.updateFcmToken(currentMember.getFcmInfo(), updateFcmTokenRequest.fcmToken());
+    }
+
+    @Transactional(readOnly = true)
+    public void pushNotificationMissionRequest() {
+        LocalDateTime now = LocalDateTime.now();
+        List<Member> nonCompleteMissions = memberRepository.findNonCompleteMissions(now);
+        List<String> tokenList =
+                nonCompleteMissions.stream()
+                        .map(Member::getFcmInfo)
+                        .filter(Objects::nonNull)
+                        .map(FcmInfo::getFcmToken)
+                        .filter(Objects::nonNull)
+                        .toList();
+        if (!tokenList.isEmpty()) {
+            fcmService.sendGroupMessageAsync(
+                    tokenList, NON_COMPLETE_MISSION_TITLE, NON_COMPLETE_MISSION_CONTENT);
+        }
     }
 
     private String escapeSpecialCharacters(String nickname) {
