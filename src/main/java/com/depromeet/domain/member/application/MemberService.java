@@ -6,7 +6,6 @@ import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.image.domain.ImageFileExtension;
 import com.depromeet.domain.member.dao.MemberRepository;
-import com.depromeet.domain.member.domain.FcmInfo;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.member.dto.request.NicknameCheckRequest;
@@ -23,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +43,7 @@ public class MemberService {
 
     private static final String NON_COMPLETE_MISSION_TITLE = "10MM";
     private static final String NON_COMPLETE_MISSION_CONTENT =
-            "아직 미션을 완료하지 않았어요! 10분 동안 빠르게 완료해볼까요?";
+            "아직 오늘 미션을 완료하지 않았어요! 10분 동안 빠르게 완료해볼까요?";
 
     @Transactional(readOnly = true)
     public MemberFindOneResponse findMemberInfo() {
@@ -195,14 +193,11 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public void pushNotificationMissionRequest() {
-        LocalDateTime now = LocalDateTime.now();
-        List<Member> nonCompleteMissions = memberRepository.findNonCompleteMissions(now);
+        LocalDateTime today = LocalDateTime.now();
+        List<Member> nonCompleteMissions = memberRepository.findNonCompleteMissions(today);
         List<String> tokenList =
                 nonCompleteMissions.stream()
-                        .map(Member::getFcmInfo)
-                        .filter(Objects::nonNull)
-                        .map(FcmInfo::getFcmToken)
-                        .filter(Objects::nonNull)
+                        .map(member -> member.getFcmInfo().getFcmToken())
                         .toList();
         if (!tokenList.isEmpty()) {
             fcmService.sendGroupMessageAsync(

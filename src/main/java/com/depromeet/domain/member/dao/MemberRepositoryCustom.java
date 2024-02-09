@@ -5,5 +5,5 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MemberRepositoryCustom {
-    List<Member> findNonCompleteMissions(LocalDateTime now);
+    List<Member> findNonCompleteMissions(LocalDateTime today);
 }

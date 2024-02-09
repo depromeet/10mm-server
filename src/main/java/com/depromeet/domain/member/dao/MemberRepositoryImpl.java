@@ -5,6 +5,7 @@ import static com.depromeet.domain.mission.domain.QMission.*;
 import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,17 +19,22 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<Member> findNonCompleteMissions(LocalDateTime now) {
+    public List<Member> findNonCompleteMissions(LocalDateTime today) {
+        LocalDateTime start = today.toLocalDate().atStartOfDay();
+        LocalDateTime end = today.toLocalDate().atTime(23, 59, 59);
         return jpaQueryFactory
                 .selectFrom(member)
                 .leftJoin(member.missions, mission)
                 .fetchJoin()
                 .leftJoin(mission.missionRecords, missionRecord)
-                .on(missionRecord.id.eq(mission.id))
+                .on(missionRecord.createdAt.between(start, end))
                 .where(
-                        mission.missionRecords.isEmpty(),
-                        mission.startedAt.loe(now),
-                        mission.finishedAt.goe(now))
+                        missionRecord
+                                .isNull()
+                                .or(missionRecord.uploadStatus.ne(ImageUploadStatus.COMPLETE)),
+                        member.fcmInfo.fcmToken.isNotNull(),
+                        mission.startedAt.loe(today),
+                        mission.finishedAt.goe(today))
                 .fetch();
     }
 }
