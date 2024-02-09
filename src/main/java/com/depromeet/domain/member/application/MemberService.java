@@ -44,7 +44,8 @@ public class MemberService {
     private final FcmService fcmService;
 
     private static final String NON_COMPLETE_MISSION_TITLE = "10MM";
-    private static final String NON_COMPLETE_MISSION_CONTENT = "아직 수행하지 미션이 있네요! 한번 해볼까요?";
+    private static final String NON_COMPLETE_MISSION_CONTENT =
+            "아직 미션을 완료하지 않았어요! 10분 동안 빠르게 완료해볼까요?";
 
     @Transactional(readOnly = true)
     public MemberFindOneResponse findMemberInfo() {
