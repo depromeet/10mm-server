@@ -15,7 +15,9 @@ import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.reaction.dao.ReactionRepository;
 import com.depromeet.domain.reaction.domain.EmojiType;
 import com.depromeet.domain.reaction.dto.request.ReactionCreateRequest;
+import com.depromeet.domain.reaction.dto.request.ReactionUpdateRequest;
 import com.depromeet.domain.reaction.dto.response.ReactionCreateResponse;
+import com.depromeet.domain.reaction.dto.response.ReactionUpdateResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.security.PrincipalDetails;
@@ -137,6 +139,59 @@ class ReactionServiceTest {
                     CustomException.class,
                     () -> reactionService.createReaction(request),
                     ErrorCode.REACTION_ALREADY_EXISTS.getMessage());
+        }
+    }
+
+    @Nested
+    class 리액션_이모지_수정시 {
+        @Test
+        void 성공한다() {
+            // given
+			Member member = saveAndRegisterMember();
+			createMissionAndMissionRecord(member);
+
+			SecurityContextHolder.clearContext(); // 현재 회원 로그아웃
+
+			Member otherMember = saveAndRegisterMember(); // 다른 회원 로그인
+			createMissionAndMissionRecord(otherMember);
+
+			ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
+            ReactionCreateResponse response = reactionService.createReaction(request);
+
+            // when
+            ReactionUpdateResponse updateResponse =
+                    reactionService.updateReaction(
+                            response.reactionId(), new ReactionUpdateRequest(EmojiType.FIRE));
+
+            // then
+            assertEquals(EmojiType.FIRE, updateResponse.emojiType());
+        }
+
+        @Test
+        void 자신의_리액션이_아니면_실패한다() {
+            // given
+            Member member1 = saveAndRegisterMember();
+            createMissionAndMissionRecord(member1);
+
+            SecurityContextHolder.clearContext(); // 1번 멤버 로그아웃
+
+            // 2번 멤버 로그인 및 1번 멤버의 미션기록에 리액션 추가
+            Member member2 = saveAndRegisterMember();
+            createMissionAndMissionRecord(member2);
+            ReactionCreateRequest request2 = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
+            reactionService.createReaction(request2);
+
+            // 2번 멤버 로그아웃 및 3번 멤버 로그인
+            SecurityContextHolder.clearContext();
+            saveAndRegisterMember();
+
+            // when, then
+            assertThrows(
+                    CustomException.class,
+                    () ->
+                            reactionService.updateReaction(
+                                    1L, new ReactionUpdateRequest(EmojiType.PURPLE_HEART)),
+                    ErrorCode.REACTION_MEMBER_MISMATCH.getMessage());
         }
     }
 
