@@ -13,4 +13,6 @@ public interface MissionRepositoryCustom {
     List<Mission> findMissionsWithRecordsByRelations(Long memberId, boolean existsMemberRelations);
 
     void updateFinishedDurationStatus(LocalDateTime today);
+
+    List<Mission> findAllFinishedMission(Long memberId);
 }

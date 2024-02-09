@@ -11,7 +11,8 @@ import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
-import com.depromeet.domain.notification.application.NotificationService;
+import com.depromeet.domain.notification.dao.NotificationRepository;
+import com.depromeet.domain.notification.domain.Notification;
 import com.depromeet.domain.notification.domain.NotificationType;
 import com.depromeet.global.config.fcm.FcmService;
 import com.depromeet.global.error.exception.CustomException;
@@ -27,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class FollowService {
-    private final NotificationService notificationService;
+    private final NotificationRepository notificationRepository;
     private final MemberUtil memberUtil;
     private final MemberRepository memberRepository;
     private final MemberRelationRepository memberRelationRepository;
@@ -54,9 +55,10 @@ public class FollowService {
                 targetMember.getFcmInfo().getFcmToken(),
                 PUSH_SERVICE_TITLE,
                 String.format(PUSH_SERVICE_CONTENT, currentMember.getProfile().getNickname()));
-        notificationService.createNotification(
-                NotificationType.FOLLOW, currentMember, targetMember);
-
+        Notification notification =
+                Notification.createNotification(
+                        NotificationType.FOLLOW, currentMember, targetMember);
+        notificationRepository.save(notification);
         memberRelationRepository.save(memberRelation);
     }
 
@@ -69,6 +71,13 @@ public class FollowService {
                         .findBySourceIdAndTargetId(currentMember.getId(), targetMember.getId())
                         .orElseThrow(() -> new CustomException(ErrorCode.FOLLOW_NOT_EXIST));
 
+        Optional<Notification> optionalNotification =
+                notificationRepository.findBySourceMemberIdAndTargetMemberIdAndNotificationType(
+                        currentMember.getId(), targetMember.getId(), NotificationType.FOLLOW);
+        if (optionalNotification.isPresent()) {
+            Notification notification = optionalNotification.get();
+            notificationRepository.delete(notification);
+        }
         memberRelationRepository.delete(memberRelation);
     }
 
@@ -187,6 +196,7 @@ public class FollowService {
         return targetMember;
     }
 
+    @Transactional(readOnly = true)
     public FollowListResponse findFollowList(Long targetId) {
         final Member currentMember = memberUtil.getCurrentMember();
         Member targetMember = getTargetMember(targetId);
@@ -222,6 +232,24 @@ public class FollowService {
 
         return FollowListResponse.of(
                 targetMember.getProfile().getNickname(), followingList, followerList);
+    }
+
+    public FollowerDeletedResponse deleteFollower(Long targetId) {
+        final Member currentMember = memberUtil.getCurrentMember();
+        final Member targetMember = getTargetMember(targetId);
+
+        MemberRelation memberRelation =
+                memberRelationRepository
+                        .findBySourceIdAndTargetId(targetMember.getId(), currentMember.getId())
+                        .orElseThrow(() -> new CustomException(ErrorCode.FOLLOW_NOT_EXIST));
+        memberRelationRepository.delete(memberRelation);
+
+        Optional<MemberRelation> optionalMemberRelation =
+                memberRelationRepository.findBySourceIdAndTargetId(
+                        currentMember.getId(), targetMember.getId());
+        return optionalMemberRelation.isPresent()
+                ? FollowerDeletedResponse.from(FollowStatus.FOLLOWING)
+                : FollowerDeletedResponse.from(FollowStatus.NOT_FOLLOWING);
     }
 
     private static void getFollowStatusIncludeList(
