@@ -2,7 +2,9 @@ package com.depromeet.domain.reaction.api;
 
 import com.depromeet.domain.reaction.application.ReactionService;
 import com.depromeet.domain.reaction.dto.request.ReactionCreateRequest;
+import com.depromeet.domain.reaction.dto.request.ReactionUpdateRequest;
 import com.depromeet.domain.reaction.dto.response.ReactionCreateResponse;
+import com.depromeet.domain.reaction.dto.response.ReactionUpdateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -25,6 +27,14 @@ public class ReactionController {
             @Valid @RequestBody ReactionCreateRequest request) {
         ReactionCreateResponse response = reactionService.createReaction(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Operation(summary = "리액션 수정", description = "리액션에서 선택한 이모지를 수정합니다.")
+    @PutMapping("/{reactionId}")
+    public ResponseEntity<ReactionUpdateResponse> reactionUpdate(
+            @PathVariable Long reactionId, @Valid @RequestBody ReactionUpdateRequest request) {
+        ReactionUpdateResponse response = reactionService.updateReaction(reactionId, request);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "리액션 삭제", description = "미션 기록에서 리액션을 삭제합니다.")
