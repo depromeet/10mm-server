@@ -21,7 +21,7 @@ public record ReactionGroupByEmojiResponse(
             Long reactionId,
             LocalDateTime createdAt,
             LocalDateTime updatedAt,
-            MemberProfileDto memberProfileDto) {
+            MemberProfileDto memberProfile) {
         public static ReactionDetailDto from(Reaction reaction) {
             return new ReactionDetailDto(
                     reaction.getId(),
