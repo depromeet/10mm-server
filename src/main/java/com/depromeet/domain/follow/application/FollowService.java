@@ -1,5 +1,7 @@
 package com.depromeet.domain.follow.application;
 
+import static com.depromeet.domain.common.constants.PushNotificationConstants.*;
+
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.follow.dto.request.FollowCreateRequest;
@@ -33,9 +35,6 @@ public class FollowService {
     private final MemberRepository memberRepository;
     private final MemberRelationRepository memberRelationRepository;
     private final FcmService fcmService;
-
-    private static final String PUSH_SERVICE_TITLE = "10MM";
-    private static final String PUSH_SERVICE_CONTENT = "%s님이 회원님을 팔로우하기 시작했습니다🥳";
 
     public void createFollow(FollowCreateRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
