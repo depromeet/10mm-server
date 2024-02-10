@@ -158,6 +158,35 @@ class ReactionServiceTest {
             assertEquals(EmojiType.PURPLE_HEART, response.get(1).emojiType());
             assertEquals(EmojiType.FIRE, response.get(2).emojiType());
         }
+
+        @Test
+        void 리액션_상세정보_리스트가_리액션_생성시간_내림차순으로_정렬된다() {
+            // given
+            Member member = saveAndRegisterMember(); // 1번 멤버 생성 및 로그인
+            createMissionAndMissionRecord(member);
+
+            // 2번 ~ 8번까지 멤버 생성 및 로그인 후 리액션 추가
+            switchUserAndAddReaction(1L, EmojiType.UNICORN);
+            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART);
+            switchUserAndAddReaction(1L, EmojiType.UNICORN);
+            switchUserAndAddReaction(1L, EmojiType.GLOWING_STAR);
+            switchUserAndAddReaction(1L, EmojiType.UNICORN);
+            switchUserAndAddReaction(1L, EmojiType.SPARKLING_HEART);
+            switchUserAndAddReaction(1L, EmojiType.UNICORN);
+
+            // when
+            List<ReactionGroupByEmojiResponse> response = reactionService.findAllReaction(1L);
+            List<ReactionGroupByEmojiResponse.ReactionDetailDto> reactions =
+                    response.get(0).reactions();
+
+            // then
+            assertEquals(EmojiType.UNICORN, response.get(0).emojiType());
+            assertEquals(4, reactions.size()); // UNICORN 이모지 리액션 개수는 4개
+            // reactions 리스트는 생성순서로 내림차순 정렬되어 있어야 한다.
+            assertTrue(reactions.get(0).createdAt().isAfter(reactions.get(1).createdAt()));
+            assertTrue(reactions.get(1).createdAt().isAfter(reactions.get(2).createdAt()));
+            assertTrue(reactions.get(2).createdAt().isAfter(reactions.get(3).createdAt()));
+        }
     }
 
     @Nested
