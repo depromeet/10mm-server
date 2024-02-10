@@ -32,12 +32,26 @@ public class ReactionService {
     private final ReactionRepository reactionRepository;
 
     public List<ReactionGroupByEmojiResponse> findAllReaction(Long missionRecordId) {
+        final Member member = memberUtil.getCurrentMember();
+        validateMissionRecordMemberMismatch(member, missionRecordId);
+
         Map<EmojiType, List<Reaction>> reactionMap =
                 reactionRepository.findAllGroupByEmoji(missionRecordId);
         return reactionMap.entrySet().stream()
                 .map(ReactionGroupByEmojiResponse::of)
                 .sorted(comparing(ReactionGroupByEmojiResponse::count).reversed())
                 .toList();
+    }
+
+    private void validateMissionRecordMemberMismatch(Member member, Long missionRecordId) {
+        MissionRecord missionRecord =
+                missionRecordRepository
+                        .findById(missionRecordId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.MISSION_RECORD_NOT_FOUND));
+
+        if (!missionRecord.getMission().getMember().getId().equals(member.getId())) {
+            throw new CustomException(ErrorCode.MISSION_RECORD_USER_MISMATCH);
+        }
     }
 
     public ReactionCreateResponse createReaction(ReactionCreateRequest request) {
