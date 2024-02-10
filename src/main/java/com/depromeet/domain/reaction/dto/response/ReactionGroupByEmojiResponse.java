@@ -17,7 +17,7 @@ public record ReactionGroupByEmojiResponse(
                 entry.getValue().stream().map(ReactionDetailDto::of).toList());
     }
 
-    record ReactionDetailDto(
+    public record ReactionDetailDto(
             Long reactionId,
             LocalDateTime createdAt,
             LocalDateTime updatedAt,
