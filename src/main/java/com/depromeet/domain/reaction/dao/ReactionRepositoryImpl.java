@@ -25,6 +25,7 @@ public class ReactionRepositoryImpl implements ReactionRepositoryCustom {
                 .selectFrom(reaction)
                 .innerJoin(reaction.member)
                 .where(reaction.missionRecord.id.eq(missionRecordId))
+                .fetchJoin()
                 .transform(groupBy(reaction.emojiType).as(list(reaction)));
     }
 }
