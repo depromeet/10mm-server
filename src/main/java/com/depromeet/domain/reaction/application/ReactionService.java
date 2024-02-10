@@ -61,13 +61,9 @@ public class ReactionService {
     }
 
     private void validateMyReactionAlreadyExists(Member member, MissionRecord missionRecord) {
-        missionRecord.getReactions().stream()
-                .filter(reaction -> reaction.getMember().equals(member))
-                .findAny()
-                .ifPresent(
-                        reaction -> {
-                            throw new CustomException(ErrorCode.REACTION_ALREADY_EXISTS);
-                        });
+        if (reactionRepository.existsByMemberAndMissionRecord(member, missionRecord)) {
+            throw new CustomException(ErrorCode.REACTION_ALREADY_EXISTS);
+        }
     }
 
     public ReactionUpdateResponse updateReaction(Long reactionId, ReactionUpdateRequest request) {
