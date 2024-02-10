@@ -57,7 +57,7 @@ public class PushService {
     }
 
     private void validateSelfSending(Long currentMemberId, Long targetMemberId) {
-        if (currentMemberId == targetMemberId) {
+        if (currentMemberId.equals(targetMemberId)) {
             throw new CustomException(ErrorCode.SELF_SENDING_NOT_ALLOWED);
         }
     }
