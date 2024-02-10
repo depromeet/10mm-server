@@ -113,7 +113,7 @@ class ReactionServiceTest {
             switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART); // 2번 멤버 생성 및 로그인 후 리액션 추가
 
             // when
-			logoutAndReloginAs(1L); // 1번 멤버로 다시 로그인
+            logoutAndReloginAs(1L); // 1번 멤버로 다시 로그인
             List<ReactionGroupByEmojiResponse> response = reactionService.findAllReaction(1L);
 
             // then
@@ -129,7 +129,7 @@ class ReactionServiceTest {
 
             switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART); // 2번 멤버 생성 및 로그인 후 리액션 추가
 
-			saveAndRegisterMember(); // 3번 멤버 생성 및 로그인
+            saveAndRegisterMember(); // 3번 멤버 생성 및 로그인
 
             // when, then
             assertThrows(
@@ -153,7 +153,7 @@ class ReactionServiceTest {
             switchUserAndAddReaction(1L, EmojiType.UNICORN);
 
             // when
-			logoutAndReloginAs(1L); // 1번 멤버로 다시 로그인
+            logoutAndReloginAs(1L); // 1번 멤버로 다시 로그인
             List<ReactionGroupByEmojiResponse> response = reactionService.findAllReaction(1L);
 
             // then
@@ -175,7 +175,7 @@ class ReactionServiceTest {
             switchUserAndAddReaction(1L, EmojiType.UNICORN);
 
             // when
-			logoutAndReloginAs(1L); // 1번 멤버로 다시 로그인
+            logoutAndReloginAs(1L); // 1번 멤버로 다시 로그인
             List<ReactionGroupByEmojiResponse> response = reactionService.findAllReaction(1L);
 
             // then
@@ -217,7 +217,7 @@ class ReactionServiceTest {
             switchUserAndAddReaction(1L, EmojiType.UNICORN);
 
             // when
-			logoutAndReloginAs(1L); // 1번 멤버로 다시 로그인
+            logoutAndReloginAs(1L); // 1번 멤버로 다시 로그인
             List<ReactionGroupByEmojiResponse> response = reactionService.findAllReaction(1L);
 
             // then
@@ -242,7 +242,7 @@ class ReactionServiceTest {
             switchUserAndAddReaction(1L, EmojiType.UNICORN);
 
             // when
-			logoutAndReloginAs(1L); // 1번 멤버로 다시 로그인
+            logoutAndReloginAs(1L); // 1번 멤버로 다시 로그인
             List<ReactionGroupByEmojiResponse> response = reactionService.findAllReaction(1L);
             List<ReactionGroupByEmojiResponse.ReactionDetailDto> reactions =
                     response.get(0).reactions();
