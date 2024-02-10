@@ -90,9 +90,74 @@ class ReactionServiceTest {
         private void switchUserAndAddReaction(Long missionRecordId, EmojiType emojiType) {
             SecurityContextHolder.clearContext(); // 현재 회원 로그아웃
 
-            Member otherMember = saveAndRegisterMember(); // 다른 회원 생성 및 로그인
+            saveAndRegisterMember(); // 다른 회원 생성 및 로그인
             ReactionCreateRequest request = new ReactionCreateRequest(missionRecordId, emojiType);
             reactionService.createReaction(request);
+        }
+
+        private void logoutAndReloginAs(Long memberId) {
+            SecurityContextHolder.clearContext(); // 현재 회원 로그아웃
+            PrincipalDetails principalDetails = new PrincipalDetails(memberId, "USER");
+            Authentication authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            principalDetails, null, principalDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
+        @Test
+        void 자신의_미션기록이면_성공한다() {
+            // given
+            Member member = saveAndRegisterMember(); // 1번 멤버 생성 및 로그인
+            createMissionAndMissionRecord(member);
+
+            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART); // 2번 멤버 생성 및 로그인 후 리액션 추가
+
+            // when
+			logoutAndReloginAs(1L); // 1번 멤버로 다시 로그인
+            List<ReactionGroupByEmojiResponse> response = reactionService.findAllReaction(1L);
+
+            // then
+            assertNotNull(response);
+            assertEquals(1, response.size());
+        }
+
+        @Test
+        void 자신의_미션기록이_아니라면_실패한다() {
+            // given
+            Member member = saveAndRegisterMember(); // 1번 멤버 생성 및 로그인
+            createMissionAndMissionRecord(member);
+
+            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART); // 2번 멤버 생성 및 로그인 후 리액션 추가
+
+			saveAndRegisterMember(); // 3번 멤버 생성 및 로그인
+
+            // when, then
+            assertThrows(
+                    CustomException.class,
+                    () -> reactionService.findAllReaction(1L),
+                    ErrorCode.MISSION_RECORD_USER_MISMATCH.getMessage());
+        }
+
+        @Test
+        void 리액션_이모지_타입별_리액션_개수를_확인할수있다() {
+            // given
+            Member member = saveAndRegisterMember(); // 1번 멤버 생성 및 로그인
+            createMissionAndMissionRecord(member);
+
+            // 2번 ~ 7번까지 멤버 생성 및 로그인 후 리액션 추가
+            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART);
+            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART);
+            switchUserAndAddReaction(1L, EmojiType.FIRE);
+            switchUserAndAddReaction(1L, EmojiType.UNICORN);
+            switchUserAndAddReaction(1L, EmojiType.UNICORN);
+            switchUserAndAddReaction(1L, EmojiType.UNICORN);
+
+            // when
+			logoutAndReloginAs(1L); // 1번 멤버로 다시 로그인
+            List<ReactionGroupByEmojiResponse> response = reactionService.findAllReaction(1L);
+
+            // then
+            assertEquals(3, response.size());
         }
 
         @Test
@@ -110,6 +175,7 @@ class ReactionServiceTest {
             switchUserAndAddReaction(1L, EmojiType.UNICORN);
 
             // when
+			logoutAndReloginAs(1L); // 1번 멤버로 다시 로그인
             List<ReactionGroupByEmojiResponse> response = reactionService.findAllReaction(1L);
 
             // then
@@ -151,6 +217,7 @@ class ReactionServiceTest {
             switchUserAndAddReaction(1L, EmojiType.UNICORN);
 
             // when
+			logoutAndReloginAs(1L); // 1번 멤버로 다시 로그인
             List<ReactionGroupByEmojiResponse> response = reactionService.findAllReaction(1L);
 
             // then
@@ -175,6 +242,7 @@ class ReactionServiceTest {
             switchUserAndAddReaction(1L, EmojiType.UNICORN);
 
             // when
+			logoutAndReloginAs(1L); // 1번 멤버로 다시 로그인
             List<ReactionGroupByEmojiResponse> response = reactionService.findAllReaction(1L);
             List<ReactionGroupByEmojiResponse.ReactionDetailDto> reactions =
                     response.get(0).reactions();
