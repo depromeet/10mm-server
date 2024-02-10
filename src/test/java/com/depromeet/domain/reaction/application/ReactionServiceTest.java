@@ -17,12 +17,14 @@ import com.depromeet.domain.reaction.domain.EmojiType;
 import com.depromeet.domain.reaction.dto.request.ReactionCreateRequest;
 import com.depromeet.domain.reaction.dto.request.ReactionUpdateRequest;
 import com.depromeet.domain.reaction.dto.response.ReactionCreateResponse;
+import com.depromeet.domain.reaction.dto.response.ReactionGroupByEmojiResponse;
 import com.depromeet.domain.reaction.dto.response.ReactionUpdateResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.security.PrincipalDetails;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -80,6 +82,82 @@ class ReactionServiceTest {
                 MissionRecord.createMissionRecord(
                         Duration.ofMinutes(30), NOW.minusMinutes(25), NOW.minusMinutes(5), mission);
         missionRecordRepository.save(missionRecord);
+    }
+
+    @Nested
+    class 리액션_조회시 {
+
+        private void switchUserAndAddReaction(Long missionRecordId, EmojiType emojiType) {
+            SecurityContextHolder.clearContext(); // 현재 회원 로그아웃
+
+            Member otherMember = saveAndRegisterMember(); // 다른 회원 생성 및 로그인
+            ReactionCreateRequest request = new ReactionCreateRequest(missionRecordId, emojiType);
+            reactionService.createReaction(request);
+        }
+
+        @Test
+        void 이모지_타입별_리액션_개수를_확인할수있다() {
+            // given
+            Member member = saveAndRegisterMember(); // 1번 멤버 생성 및 로그인
+            createMissionAndMissionRecord(member);
+
+            // 2번 ~ 7번까지 멤버 생성 및 로그인 후 리액션 추가
+            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART);
+            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART);
+            switchUserAndAddReaction(1L, EmojiType.FIRE);
+            switchUserAndAddReaction(1L, EmojiType.UNICORN);
+            switchUserAndAddReaction(1L, EmojiType.UNICORN);
+            switchUserAndAddReaction(1L, EmojiType.UNICORN);
+
+            // when
+            List<ReactionGroupByEmojiResponse> response = reactionService.findAllReaction(1L);
+
+            // then
+            assertEquals(
+                    2,
+                    response.stream()
+                            .filter(r -> r.emojiType() == EmojiType.PURPLE_HEART)
+                            .findFirst()
+                            .get()
+                            .count());
+            assertEquals(
+                    1,
+                    response.stream()
+                            .filter(r -> r.emojiType() == EmojiType.FIRE)
+                            .findFirst()
+                            .get()
+                            .count());
+            assertEquals(
+                    3,
+                    response.stream()
+                            .filter(r -> r.emojiType() == EmojiType.UNICORN)
+                            .findFirst()
+                            .get()
+                            .count());
+        }
+
+        @Test
+        void 리액션_개수가_많은_순으로_정렬된다() {
+            // given
+            Member member = saveAndRegisterMember(); // 1번 멤버 생성 및 로그인
+            createMissionAndMissionRecord(member);
+
+            // 2번 ~ 7번까지 멤버 생성 및 로그인 후 리액션 추가
+            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART);
+            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART);
+            switchUserAndAddReaction(1L, EmojiType.FIRE);
+            switchUserAndAddReaction(1L, EmojiType.UNICORN);
+            switchUserAndAddReaction(1L, EmojiType.UNICORN);
+            switchUserAndAddReaction(1L, EmojiType.UNICORN);
+
+            // when
+            List<ReactionGroupByEmojiResponse> response = reactionService.findAllReaction(1L);
+
+            // then
+            assertEquals(EmojiType.UNICORN, response.get(0).emojiType());
+            assertEquals(EmojiType.PURPLE_HEART, response.get(1).emojiType());
+            assertEquals(EmojiType.FIRE, response.get(2).emojiType());
+        }
     }
 
     @Nested
