@@ -4,11 +4,12 @@ import com.depromeet.domain.reaction.application.ReactionService;
 import com.depromeet.domain.reaction.dto.request.ReactionCreateRequest;
 import com.depromeet.domain.reaction.dto.request.ReactionUpdateRequest;
 import com.depromeet.domain.reaction.dto.response.ReactionCreateResponse;
-import com.depromeet.domain.reaction.dto.response.ReactionFindResponse;
+import com.depromeet.domain.reaction.dto.response.ReactionGroupByEmojiResponse;
 import com.depromeet.domain.reaction.dto.response.ReactionUpdateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +25,10 @@ public class ReactionController {
 
     @Operation(summary = "리액션 조회", description = "미션 기록에 추가된 리액션을 조회합니다.")
     @GetMapping
-    public ResponseEntity<ReactionCreateResponse> reactionFindAll(
+    public ResponseEntity<List<ReactionGroupByEmojiResponse>> reactionFindAll(
             @RequestParam Long missionRecordId) {
-        ReactionFindResponse response = reactionService.findAllReaction(missionRecordId);
+        List<ReactionGroupByEmojiResponse> response =
+                reactionService.findAllReaction(missionRecordId);
         return ResponseEntity.ok(response);
     }
 
