@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public record ReactionGroupByEmojiResponse(
-        EmojiType emojiType, Integer count, List<ReactionDetailDto> members) {
+        EmojiType emojiType, Integer count, List<ReactionDetailDto> reactions) {
 
     public static ReactionGroupByEmojiResponse of(Map.Entry<EmojiType, List<Reaction>> entry) {
         return new ReactionGroupByEmojiResponse(
