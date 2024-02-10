@@ -56,9 +56,9 @@ public enum ErrorCode {
 
     // Reaction
     REACTION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 리액션을 찾을 수 없습니다."),
-    REACTION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "리액션은 미션기록 당 한번만 가능합니다."),
+    REACTION_ALREADY_EXISTS(HttpStatus.CONFLICT, "리액션은 미션기록 당 한번만 가능합니다."),
     REACTION_MEMBER_MISMATCH(HttpStatus.CONFLICT, "리액션을 생성한 유저와 로그인된 계정이 일치하지 않습니다."),
-    REACTION_SELF_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "자신의 미션 기록에는 리액션을 추가할 수 없습니다."),
+    REACTION_SELF_NOT_ALLOWED(HttpStatus.CONFLICT, "자신의 미션 기록에는 리액션을 추가할 수 없습니다."),
     ;
 
     private final HttpStatus status;
