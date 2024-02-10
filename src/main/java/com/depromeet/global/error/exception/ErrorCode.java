@@ -56,7 +56,8 @@ public enum ErrorCode {
 
     // Notification
     SELF_SENDING_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "본인에게 메세지를 전송할 수 없습니다."),
-    TODAY_COMPLETED_MISSION_SENDING_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "오늘 미션을 완료한 미션에는 메세지를 전송할 수 없습니다."),
+    TODAY_COMPLETED_MISSION_SENDING_NOT_ALLOWED(
+            HttpStatus.BAD_REQUEST, "오늘 미션을 완료한 미션에는 메세지를 전송할 수 없습니다."),
     ;
 
     private final HttpStatus status;
