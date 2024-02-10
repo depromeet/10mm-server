@@ -76,7 +76,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                 .leftJoin(mission.member, member)
                 .on(mission.member.id.eq(missionRecord.mission.member.id))
                 .where(
-						mission.durationStatus.ne(DurationStatus.FINISHED),
+                        mission.durationStatus.ne(DurationStatus.FINISHED),
                         missionRecord.mission.member.in(members),
                         missionRecord.mission.visibility.in(
                                 MissionVisibility.FOLLOWER, MissionVisibility.ALL),
