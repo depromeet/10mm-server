@@ -1,5 +1,7 @@
 package com.depromeet.domain.follow.application;
 
+import static com.depromeet.domain.common.constants.PushNotificationConstants.*;
+
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.follow.dto.request.FollowCreateRequest;
@@ -34,9 +36,6 @@ public class FollowService {
     private final MemberRelationRepository memberRelationRepository;
     private final FcmService fcmService;
 
-    private static final String PUSH_SERVICE_TITLE = "10MM";
-    private static final String PUSH_SERVICE_CONTENT = "%s님이 회원님을 팔로우하기 시작했습니다🥳";
-
     public void createFollow(FollowCreateRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
         Member targetMember = getTargetMember(request.targetId());
@@ -62,7 +61,7 @@ public class FollowService {
         memberRelationRepository.save(memberRelation);
     }
 
-    public void deleteFollow(FollowDeleteRequest request) {
+    public FollowerDeletedResponse deleteFollow(FollowDeleteRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
         Member targetMember = getTargetMember(request.targetId());
 
@@ -79,6 +78,14 @@ public class FollowService {
             notificationRepository.delete(notification);
         }
         memberRelationRepository.delete(memberRelation);
+
+        Optional<MemberRelation> optionalMemberRelation =
+                memberRelationRepository.findBySourceIdAndTargetId(
+                        targetMember.getId(), currentMember.getId());
+
+        return optionalMemberRelation.isPresent()
+                ? FollowerDeletedResponse.from(FollowStatus.FOLLOWED_BY_ME)
+                : FollowerDeletedResponse.from(FollowStatus.NOT_FOLLOWING);
     }
 
     @Transactional(readOnly = true)

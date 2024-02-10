@@ -1,5 +1,7 @@
 package com.depromeet.domain.member.application;
 
+import static com.depromeet.domain.common.constants.PushNotificationConstants.*;
+
 import com.depromeet.domain.auth.dao.RefreshTokenRepository;
 import com.depromeet.domain.auth.dto.request.UsernameCheckRequest;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
@@ -14,9 +16,11 @@ import com.depromeet.domain.member.dto.request.UpdateFcmTokenRequest;
 import com.depromeet.domain.member.dto.response.MemberFindOneResponse;
 import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.member.dto.response.MemberSocialInfoResponse;
+import com.depromeet.global.config.fcm.FcmService;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -37,6 +41,7 @@ public class MemberService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberRelationRepository memberRelationRepository;
     private final MemberUtil memberUtil;
+    private final FcmService fcmService;
 
     @Transactional(readOnly = true)
     public MemberFindOneResponse findMemberInfo() {
@@ -182,6 +187,21 @@ public class MemberService {
     public void updateFcmToken(UpdateFcmTokenRequest updateFcmTokenRequest) {
         final Member currentMember = memberUtil.getCurrentMember();
         currentMember.updateFcmToken(currentMember.getFcmInfo(), updateFcmTokenRequest.fcmToken());
+    }
+
+    @Transactional(readOnly = true)
+    public void pushNotificationMissionRequest() {
+        LocalDateTime today = LocalDateTime.now();
+        List<Member> nonMissionNonCompletedMembers =
+                memberRepository.findMissionNonCompletedMembers(today);
+        List<String> tokenList =
+                nonMissionNonCompletedMembers.stream()
+                        .map(member -> member.getFcmInfo().getFcmToken())
+                        .toList();
+        if (!tokenList.isEmpty()) {
+            fcmService.sendGroupMessageAsync(
+                    tokenList, PUSH_SERVICE_TITLE, PUSH_NON_COMPLETE_MISSION_SERVICE_CONTENT);
+        }
     }
 
     private String escapeSpecialCharacters(String nickname) {
