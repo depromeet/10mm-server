@@ -38,7 +38,7 @@ public class ReactionService {
         Map<EmojiType, List<Reaction>> reactionMap =
                 reactionRepository.findAllGroupByEmoji(missionRecordId);
         return reactionMap.entrySet().stream()
-                .map(ReactionGroupByEmojiResponse::of)
+                .map(ReactionGroupByEmojiResponse::from)
                 .sorted(comparing(ReactionGroupByEmojiResponse::count).reversed())
                 .toList();
     }

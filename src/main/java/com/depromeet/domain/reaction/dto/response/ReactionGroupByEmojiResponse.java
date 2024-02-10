@@ -10,11 +10,11 @@ import java.util.Map;
 public record ReactionGroupByEmojiResponse(
         EmojiType emojiType, Integer count, List<ReactionDetailDto> reactions) {
 
-    public static ReactionGroupByEmojiResponse of(Map.Entry<EmojiType, List<Reaction>> entry) {
+    public static ReactionGroupByEmojiResponse from(Map.Entry<EmojiType, List<Reaction>> entry) {
         return new ReactionGroupByEmojiResponse(
                 entry.getKey(),
                 entry.getValue().size(),
-                entry.getValue().stream().map(ReactionDetailDto::of).toList());
+                entry.getValue().stream().map(ReactionDetailDto::from).toList());
     }
 
     public record ReactionDetailDto(
@@ -22,7 +22,7 @@ public record ReactionGroupByEmojiResponse(
             LocalDateTime createdAt,
             LocalDateTime updatedAt,
             MemberProfileDto memberProfileDto) {
-        public static ReactionDetailDto of(Reaction reaction) {
+        public static ReactionDetailDto from(Reaction reaction) {
             return new ReactionDetailDto(
                     reaction.getId(),
                     reaction.getCreatedAt(),
