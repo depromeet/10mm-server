@@ -1,19 +1,23 @@
 package com.depromeet.domain.reaction.application;
 
+import static java.util.Comparator.*;
+
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.reaction.dao.ReactionRepository;
+import com.depromeet.domain.reaction.domain.EmojiType;
 import com.depromeet.domain.reaction.domain.Reaction;
 import com.depromeet.domain.reaction.dto.request.ReactionCreateRequest;
 import com.depromeet.domain.reaction.dto.request.ReactionUpdateRequest;
 import com.depromeet.domain.reaction.dto.response.ReactionCreateResponse;
-import com.depromeet.domain.reaction.dto.response.ReactionFindResponse;
+import com.depromeet.domain.reaction.dto.response.ReactionGroupByEmojiResponse;
 import com.depromeet.domain.reaction.dto.response.ReactionUpdateResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +31,13 @@ public class ReactionService {
     private final MissionRecordRepository missionRecordRepository;
     private final ReactionRepository reactionRepository;
 
-    public ReactionFindResponse findAllReaction(Long missionRecordId) {
-        List<Reaction> reactions = reactionRepository.findAllByMissionRecordId(missionRecordId);
-        return ReactionFindResponse.from(reactions);
+    public List<ReactionGroupByEmojiResponse> findAllReaction(Long missionRecordId) {
+        Map<EmojiType, List<Reaction>> reactionMap =
+                reactionRepository.findAllGroupByEmoji(missionRecordId);
+        return reactionMap.entrySet().stream()
+                .map(ReactionGroupByEmojiResponse::of)
+                .sorted(comparing(ReactionGroupByEmojiResponse::count).reversed())
+                .toList();
     }
 
     public ReactionCreateResponse createReaction(ReactionCreateRequest request) {
