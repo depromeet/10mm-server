@@ -122,7 +122,7 @@ class ReactionServiceTest {
         }
 
         @Test
-        void 자신의_미션기록이_아니라면_실패한다() {
+        void 타인의_미션기록이면_성공한다() {
             // given
             Member member = saveAndRegisterMember(); // 1번 멤버 생성 및 로그인
             createMissionAndMissionRecord(member);
@@ -132,10 +132,7 @@ class ReactionServiceTest {
             saveAndRegisterMember(); // 3번 멤버 생성 및 로그인
 
             // when, then
-            assertThrows(
-                    CustomException.class,
-                    () -> reactionService.findAllReaction(1L),
-                    ErrorCode.MISSION_RECORD_USER_MISMATCH.getMessage());
+            assertNotNull(reactionService.findAllReaction(1L));
         }
 
         @Test
