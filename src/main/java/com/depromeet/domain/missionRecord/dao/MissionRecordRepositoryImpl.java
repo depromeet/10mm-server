@@ -38,6 +38,15 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     }
 
     @Override
+    public List<MissionRecord> findAllByMissionId(Long missionId) {
+        return jpaQueryFactory
+                .selectFrom(missionRecord)
+                .where(missionIdEq(missionId), uploadStatusCompleteEq())
+                .orderBy(missionRecord.startedAt.asc())
+                .fetch();
+    }
+
+    @Override
     public boolean isCompletedMissionExistsToday(Long missionId) {
         LocalDate now = LocalDate.now();
         MissionRecord missionRecordFetchOne =
@@ -118,5 +127,9 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
 
     private BooleanExpression dayEq(int day) {
         return missionRecord.startedAt.dayOfMonth().eq(day);
+    }
+
+    private BooleanExpression uploadStatusCompleteEq() {
+        return missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE);
     }
 }
