@@ -6,7 +6,6 @@ import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
 import com.depromeet.domain.member.domain.Member;
-import com.depromeet.domain.mission.domain.DurationStatus;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
@@ -76,12 +75,11 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                 .leftJoin(mission.member, member)
                 .on(mission.member.id.eq(missionRecord.mission.member.id))
                 .where(
-                        mission.durationStatus.ne(DurationStatus.FINISHED),
                         missionRecord.mission.member.in(members),
                         missionRecord.mission.visibility.in(
                                 MissionVisibility.FOLLOWER, MissionVisibility.ALL),
                         missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE))
-                .orderBy(missionRecord.startedAt.desc())
+                .orderBy(missionRecord.finishedAt.desc())
                 .limit(FEED_TAB_LIMIT)
                 .fetch();
     }
