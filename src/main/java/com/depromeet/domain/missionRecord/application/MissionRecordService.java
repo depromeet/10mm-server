@@ -20,7 +20,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -154,96 +153,104 @@ public class MissionRecordService {
         }
     }
 
-	@Transactional(readOnly = true)
-	public MissionStatisticsResponse findMissionStatistics(Long missionId) {
-		Mission mission = findMissionById(missionId);
-		LocalDateTime startedAt = mission.getStartedAt();
-		LocalDateTime finishedAt = mission.getFinishedAt();
-		LocalDateTime today = LocalDateTime.now();
+    @Transactional(readOnly = true)
+    public MissionStatisticsResponse findMissionStatistics(Long missionId) {
+        Mission mission = findMissionById(missionId);
+        LocalDateTime startedAt = mission.getStartedAt();
+        LocalDateTime finishedAt = mission.getFinishedAt();
+        LocalDateTime today = LocalDateTime.now();
 
-		List<MissionRecord> missionRecords = missionRecordRepository.findAllByMissionId(missionId);
+        List<MissionRecord> missionRecords = missionRecordRepository.findAllByMissionId(missionId);
 
-		// 달성률
-		double totalMissionAttainRate = calculateMissionAttainRate(
-			missionRecords.size(),
-			Duration.between(startedAt, finishedAt.isBefore(today) ? finishedAt : today).toDays() + DAYS_ADJUSTMENT);
+        // 달성률
+        double totalMissionAttainRate =
+                calculateMissionAttainRate(
+                        missionRecords.size(),
+                        Duration.between(startedAt, finishedAt.isBefore(today) ? finishedAt : today)
+                                        .toDays()
+                                + DAYS_ADJUSTMENT);
 
-		// 시간표 생성
-		List<FocusMissionTimeOfDay> timeTable = generateRecordTimeTable(missionRecords);
+        // 시간표 생성
+        List<FocusMissionTimeOfDay> timeTable = generateRecordTimeTable(missionRecords);
 
-		// 최대 연속성 계산
-		long maxContinuousSuccessDay = calculateMaxContinuousSuccessDay(startedAt, finishedAt, missionRecords);
+        // 최대 연속성 계산
+        long maxContinuousSuccessDay =
+                calculateMaxContinuousSuccessDay(startedAt, finishedAt, missionRecords);
 
-		// 전체 번개 스택
-		long totalSymbolStack = calculateTotalSymbolStack(timeTable);
+        // 전체 번개 스택
+        long totalSymbolStack = calculateTotalSymbolStack(timeTable);
 
-		// 전체 수행시간
-		long sumDuration = calculateSumDuration(timeTable);
+        // 전체 수행시간
+        long sumDuration = calculateSumDuration(timeTable);
 
-		// 전체 수행 시간 (시간)
-		long totalMissionHour = sumDuration / 60;
+        // 전체 수행 시간 (시간)
+        long totalMissionHour = sumDuration / 60;
 
-		// 전체 수행 시간 (분)
-		long totalMissionMinute = sumDuration % 60;
+        // 전체 수행 시간 (분)
+        long totalMissionMinute = sumDuration % 60;
 
-		return MissionStatisticsResponse.of(
-			totalMissionHour,
-			totalMissionMinute,
-			totalSymbolStack,
-			maxContinuousSuccessDay,
-			missionRecords.size(),
-			totalMissionAttainRate,
-			startedAt,
-			finishedAt,
-			timeTable);
-	}
+        return MissionStatisticsResponse.of(
+                totalMissionHour,
+                totalMissionMinute,
+                totalSymbolStack,
+                maxContinuousSuccessDay,
+                missionRecords.size(),
+                totalMissionAttainRate,
+                startedAt,
+                finishedAt,
+                timeTable);
+    }
 
-	private List<FocusMissionTimeOfDay> generateRecordTimeTable(List<MissionRecord> missionRecords) {
-		return missionRecords.stream()
-			.map(record -> FocusMissionTimeOfDay.of(
-				record.getDuration().toMinutes() / 10,
-				record.getDuration().toMinutes(),
-				record.getStartedAt(),
-				record.getFinishedAt()))
-			.toList();
-	}
+    private List<FocusMissionTimeOfDay> generateRecordTimeTable(
+            List<MissionRecord> missionRecords) {
+        return missionRecords.stream()
+                .map(
+                        record ->
+                                FocusMissionTimeOfDay.of(
+                                        record.getDuration().toMinutes() / 10,
+                                        record.getDuration().toMinutes(),
+                                        record.getStartedAt(),
+                                        record.getFinishedAt()))
+                .toList();
+    }
 
-	private long calculateMaxContinuousSuccessDay(LocalDateTime startedAt, LocalDateTime finishedAt, List<MissionRecord> missionRecords) {
-		long continuousSuccessDay = 1;
-		long maxContinuousSuccessDay = 0;
-		LocalDate previousDate = null;
+    private long calculateMaxContinuousSuccessDay(
+            LocalDateTime startedAt, LocalDateTime finishedAt, List<MissionRecord> missionRecords) {
+        long continuousSuccessDay = 1;
+        long maxContinuousSuccessDay = 0;
+        LocalDate previousDate = null;
 
-		for (MissionRecord missionRecord : missionRecords) {
-			LocalDate currentDate = missionRecord.getStartedAt().toLocalDate();
+        for (MissionRecord missionRecord : missionRecords) {
+            LocalDate currentDate = missionRecord.getStartedAt().toLocalDate();
 
-			// startedAt과 finishedAt 사이에 있는 일자일 때만 고려
-			if (currentDate.isAfter(startedAt.toLocalDate()) && currentDate.isBefore(finishedAt.toLocalDate())) {
-				if (previousDate != null && currentDate.minusDays(1).isEqual(previousDate)) {
-					continuousSuccessDay++;
-				} else {
-					continuousSuccessDay = 1; // 연속성이 깨진 경우 초기화
-				}
+            // startedAt과 finishedAt 사이에 있는 일자일 때만 고려
+            if (currentDate.isAfter(startedAt.toLocalDate())
+                    && currentDate.isBefore(finishedAt.toLocalDate())) {
+                if (previousDate != null && currentDate.minusDays(1).isEqual(previousDate)) {
+                    continuousSuccessDay++;
+                } else {
+                    continuousSuccessDay = 1; // 연속성이 깨진 경우 초기화
+                }
 
-				if (continuousSuccessDay > maxContinuousSuccessDay) {
-					maxContinuousSuccessDay = continuousSuccessDay;
-				}
+                if (continuousSuccessDay > maxContinuousSuccessDay) {
+                    maxContinuousSuccessDay = continuousSuccessDay;
+                }
 
-				previousDate = currentDate;
-			}
-		}
-		return maxContinuousSuccessDay;
-	}
+                previousDate = currentDate;
+            }
+        }
+        return maxContinuousSuccessDay;
+    }
 
-	private long calculateTotalSymbolStack(List<FocusMissionTimeOfDay> timeTable) {
-		return timeTable.stream().mapToLong(FocusMissionTimeOfDay::symbolStack).sum();
-	}
+    private long calculateTotalSymbolStack(List<FocusMissionTimeOfDay> timeTable) {
+        return timeTable.stream().mapToLong(FocusMissionTimeOfDay::symbolStack).sum();
+    }
 
-	private long calculateSumDuration(List<FocusMissionTimeOfDay> timeTable) {
-		return timeTable.stream().mapToLong(FocusMissionTimeOfDay::durationMinute).sum();
-	}
+    private long calculateSumDuration(List<FocusMissionTimeOfDay> timeTable) {
+        return timeTable.stream().mapToLong(FocusMissionTimeOfDay::durationMinute).sum();
+    }
 
-
-	private void validateMissionRecordDuration(Duration duration) {
+    private void validateMissionRecordDuration(Duration duration) {
         if (duration.getSeconds() > 3600L) {
             throw new CustomException(ErrorCode.MISSION_RECORD_DURATION_OVERBALANCE);
         }
@@ -258,5 +265,4 @@ public class MissionRecordService {
     private double calculateMissionAttainRate(long completeSize, long totalSize) {
         return Math.round((double) completeSize / totalSize * 1000) / 10.0;
     }
-
 }

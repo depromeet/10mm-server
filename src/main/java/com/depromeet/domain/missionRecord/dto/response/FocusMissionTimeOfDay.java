@@ -31,7 +31,6 @@ public record FocusMissionTimeOfDay(
             long durationMinute,
             LocalDateTime startedAt,
             LocalDateTime finishedAt) {
-        return new FocusMissionTimeOfDay(
-			symbolStack, durationMinute, startedAt, finishedAt);
+        return new FocusMissionTimeOfDay(symbolStack, durationMinute, startedAt, finishedAt);
     }
 }
