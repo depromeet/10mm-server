@@ -42,7 +42,7 @@ public record FeedOneByProfileResponse(
                 record.getMission().getName(),
                 record.getImageUrl(),
                 record.getDuration().toMinutes(),
-                Duration.between(record.getMission().getStartedAt(), LocalDateTime.now()).toDays()
+                Duration.between(record.getMission().getStartedAt(), record.getStartedAt()).toDays()
                         + 1,
                 record.getStartedAt(),
                 record.getFinishedAt());

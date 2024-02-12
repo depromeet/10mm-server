@@ -77,6 +77,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                                 missionRecord.imageUrl,
                                 missionRecord.duration,
                                 mission.startedAt,
+                                missionRecord.startedAt,
                                 mission.finishedAt))
                 .from(missionRecord)
                 .leftJoin(missionRecord.mission, mission)
