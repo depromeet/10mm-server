@@ -121,4 +121,15 @@ public class Mission extends BaseTimeEntity {
         this.content = content;
         this.visibility = visibility;
     }
+
+    public boolean isCompletedMissionToday() {
+        return this.getMissionRecords().stream()
+                .filter(
+                        record ->
+                                record.getStartedAt()
+                                        .toLocalDate()
+                                        .equals(LocalDateTime.now().toLocalDate()))
+                .findFirst()
+                .isPresent();
+    }
 }
