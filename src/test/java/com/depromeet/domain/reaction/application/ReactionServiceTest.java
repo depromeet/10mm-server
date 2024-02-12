@@ -110,7 +110,7 @@ class ReactionServiceTest {
             Member member = saveAndRegisterMember(); // 1번 멤버 생성 및 로그인
             createMissionAndMissionRecord(member);
 
-            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART); // 2번 멤버 생성 및 로그인 후 리액션 추가
+            switchUserAndAddReaction(1L, EmojiType.BLUE_HEART); // 2번 멤버 생성 및 로그인 후 리액션 추가
 
             // when
             logoutAndReloginAs(1L); // 1번 멤버로 다시 로그인
@@ -127,7 +127,7 @@ class ReactionServiceTest {
             Member member = saveAndRegisterMember(); // 1번 멤버 생성 및 로그인
             createMissionAndMissionRecord(member);
 
-            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART); // 2번 멤버 생성 및 로그인 후 리액션 추가
+            switchUserAndAddReaction(1L, EmojiType.BLUE_HEART); // 2번 멤버 생성 및 로그인 후 리액션 추가
 
             saveAndRegisterMember(); // 3번 멤버 생성 및 로그인
 
@@ -142,8 +142,8 @@ class ReactionServiceTest {
             createMissionAndMissionRecord(member);
 
             // 2번 ~ 7번까지 멤버 생성 및 로그인 후 리액션 추가
-            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART);
-            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART);
+            switchUserAndAddReaction(1L, EmojiType.BLUE_HEART);
+            switchUserAndAddReaction(1L, EmojiType.BLUE_HEART);
             switchUserAndAddReaction(1L, EmojiType.FIRE);
             switchUserAndAddReaction(1L, EmojiType.UNICORN);
             switchUserAndAddReaction(1L, EmojiType.UNICORN);
@@ -164,8 +164,8 @@ class ReactionServiceTest {
             createMissionAndMissionRecord(member);
 
             // 2번 ~ 7번까지 멤버 생성 및 로그인 후 리액션 추가
-            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART);
-            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART);
+            switchUserAndAddReaction(1L, EmojiType.BLUE_HEART);
+            switchUserAndAddReaction(1L, EmojiType.BLUE_HEART);
             switchUserAndAddReaction(1L, EmojiType.FIRE);
             switchUserAndAddReaction(1L, EmojiType.UNICORN);
             switchUserAndAddReaction(1L, EmojiType.UNICORN);
@@ -179,7 +179,7 @@ class ReactionServiceTest {
             assertEquals(
                     2,
                     response.stream()
-                            .filter(r -> r.emojiType() == EmojiType.PURPLE_HEART)
+                            .filter(r -> r.emojiType() == EmojiType.BLUE_HEART)
                             .findFirst()
                             .get()
                             .count());
@@ -206,8 +206,8 @@ class ReactionServiceTest {
             createMissionAndMissionRecord(member);
 
             // 2번 ~ 7번까지 멤버 생성 및 로그인 후 리액션 추가
-            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART);
-            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART);
+            switchUserAndAddReaction(1L, EmojiType.BLUE_HEART);
+            switchUserAndAddReaction(1L, EmojiType.BLUE_HEART);
             switchUserAndAddReaction(1L, EmojiType.FIRE);
             switchUserAndAddReaction(1L, EmojiType.UNICORN);
             switchUserAndAddReaction(1L, EmojiType.UNICORN);
@@ -219,7 +219,7 @@ class ReactionServiceTest {
 
             // then
             assertEquals(EmojiType.UNICORN, response.get(0).emojiType());
-            assertEquals(EmojiType.PURPLE_HEART, response.get(1).emojiType());
+            assertEquals(EmojiType.BLUE_HEART, response.get(1).emojiType());
             assertEquals(EmojiType.FIRE, response.get(2).emojiType());
         }
 
@@ -231,7 +231,7 @@ class ReactionServiceTest {
 
             // 2번 ~ 8번까지 멤버 생성 및 로그인 후 리액션 추가
             switchUserAndAddReaction(1L, EmojiType.UNICORN);
-            switchUserAndAddReaction(1L, EmojiType.PURPLE_HEART);
+            switchUserAndAddReaction(1L, EmojiType.BLUE_HEART);
             switchUserAndAddReaction(1L, EmojiType.UNICORN);
             switchUserAndAddReaction(1L, EmojiType.GLOWING_STAR);
             switchUserAndAddReaction(1L, EmojiType.UNICORN);
@@ -263,7 +263,7 @@ class ReactionServiceTest {
             Member member = saveAndRegisterMember();
             createMissionAndMissionRecord(member);
 
-            ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
+            ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.BLUE_HEART);
 
             // when & then
             assertThrows(
@@ -283,7 +283,7 @@ class ReactionServiceTest {
             Member otherMember = saveAndRegisterMember(); // 다른 회원 로그인
             createMissionAndMissionRecord(otherMember);
 
-            ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
+            ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.BLUE_HEART);
 
             // when
             ReactionCreateResponse response = reactionService.createReaction(request);
@@ -303,7 +303,7 @@ class ReactionServiceTest {
 
             Member otherMember = saveAndRegisterMember(); // 다른 회원 로그인
             createMissionAndMissionRecord(otherMember);
-            ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
+            ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.BLUE_HEART);
             reactionService.createReaction(request); // 첫번째 리액션 추가
 
             // when, then
@@ -327,7 +327,7 @@ class ReactionServiceTest {
             Member otherMember = saveAndRegisterMember(); // 다른 회원 로그인
             createMissionAndMissionRecord(otherMember);
 
-            ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
+            ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.BLUE_HEART);
             ReactionCreateResponse response = reactionService.createReaction(request);
 
             // when
@@ -350,7 +350,7 @@ class ReactionServiceTest {
             // 2번 멤버 로그인 및 1번 멤버의 미션기록에 리액션 추가
             Member member2 = saveAndRegisterMember();
             createMissionAndMissionRecord(member2);
-            ReactionCreateRequest request2 = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
+            ReactionCreateRequest request2 = new ReactionCreateRequest(1L, EmojiType.BLUE_HEART);
             reactionService.createReaction(request2);
 
             // 2번 멤버 로그아웃 및 3번 멤버 로그인
@@ -362,7 +362,7 @@ class ReactionServiceTest {
                     CustomException.class,
                     () ->
                             reactionService.updateReaction(
-                                    1L, new ReactionUpdateRequest(EmojiType.PURPLE_HEART)),
+                                    1L, new ReactionUpdateRequest(EmojiType.BLUE_HEART)),
                     ErrorCode.REACTION_MEMBER_MISMATCH.getMessage());
         }
     }
@@ -381,7 +381,7 @@ class ReactionServiceTest {
             Member otherMember = saveAndRegisterMember(); // 다른 회원 로그인
             createMissionAndMissionRecord(otherMember);
 
-            ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
+            ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.BLUE_HEART);
             ReactionCreateResponse response = reactionService.createReaction(request);
 
             // when
@@ -402,7 +402,7 @@ class ReactionServiceTest {
             // 2번 멤버 로그인 및 1번 멤버의 미션기록에 리액션 추가
             Member member2 = saveAndRegisterMember();
             createMissionAndMissionRecord(member2);
-            ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.PURPLE_HEART);
+            ReactionCreateRequest request = new ReactionCreateRequest(1L, EmojiType.BLUE_HEART);
             ReactionCreateResponse response = reactionService.createReaction(request);
 
             Long reactionId = response.reactionId();
