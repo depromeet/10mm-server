@@ -155,10 +155,10 @@ public class MissionRecordService {
 
     @Transactional(readOnly = true)
     public MissionStatisticsResponse findMissionStatistics(Long missionId) {
-        Mission mission = findMissionById(missionId);
-        LocalDateTime startedAt = mission.getStartedAt();
-        LocalDateTime finishedAt = mission.getFinishedAt();
-        LocalDateTime today = LocalDateTime.now();
+        final Mission mission = findMissionById(missionId);
+        final LocalDateTime startedAt = mission.getStartedAt();
+        final LocalDateTime finishedAt = mission.getFinishedAt();
+        final LocalDateTime today = LocalDateTime.now();
 
         List<MissionRecord> missionRecords =
                 missionRecordRepository.findAllByCompletedMission(missionId);
