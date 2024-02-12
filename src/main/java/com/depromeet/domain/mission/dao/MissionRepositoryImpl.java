@@ -10,6 +10,7 @@ import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -82,6 +83,22 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                 .where(memberIdEq(memberId), durationStatusFinishedEq())
                 .orderBy(mission.finishedAt.desc())
                 .fetch();
+    }
+
+    @Override
+    public List<Mission> findMissionsWithRecordsByDate(LocalDate date, Long memberId) {
+        LocalDateTime startedAt = date.atTime(0, 0, 0);
+        LocalDateTime finishedAt = date.atTime(23, 59, 59);
+        JPAQuery<Mission> query =
+                jpaQueryFactory
+                        .selectFrom(mission)
+                        .leftJoin(mission.missionRecords, missionRecord)
+                        .where(
+                                memberIdEq(memberId),
+                                mission.startedAt.loe(startedAt),
+                                mission.finishedAt.goe(finishedAt))
+                        .fetchJoin();
+        return query.fetch();
     }
 
     // 미션의 사용자 id 조건 검증 메서드

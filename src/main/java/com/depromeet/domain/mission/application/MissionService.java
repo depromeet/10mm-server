@@ -303,4 +303,46 @@ public class MissionService {
                                 missionRecord.getUploadStatus() == ImageUploadStatus.COMPLETE)
                 .toList();
     }
+
+    public MissionSummaryListResponse findSummaryList(LocalDate date) {
+        final Member currentMember = memberUtil.getCurrentMember();
+        List<Mission> missions =
+                missionRepository.findMissionsWithRecordsByDate(date, currentMember.getId());
+        List<MissionSummaryItem> result = new ArrayList<>();
+
+        for (Mission mission : missions) {
+            boolean isCompleted =
+                    mission.getMissionRecords().stream()
+                            .filter(
+                                    missionRecord ->
+                                            missionRecord.getUploadStatus()
+                                                    == ImageUploadStatus.COMPLETE)
+                            .findAny()
+                            .isPresent();
+
+            if (isCompleted) {
+                result.add(MissionSummaryItem.of(mission, MissionStatus.COMPLETED));
+                continue;
+            }
+            result.add(MissionSummaryItem.of(mission, MissionStatus.NONE));
+        }
+
+        result.sort(
+                Comparator.comparing(MissionSummaryItem::missionStatus)
+                        .reversed()
+                        .thenComparing(
+                                Comparator.comparing(MissionSummaryItem::finishedAt).reversed()));
+
+        long missionAllCount = missions.size();
+        long missionCompleteCount =
+                result.stream()
+                        .filter(
+                                missionSummaryItem ->
+                                        missionSummaryItem.missionStatus()
+                                                == MissionStatus.COMPLETED)
+                        .count();
+        long missionNoneCount = missionAllCount - missionCompleteCount;
+        return MissionSummaryListResponse.of(
+                missionAllCount, missionCompleteCount, missionNoneCount, result);
+    }
 }
