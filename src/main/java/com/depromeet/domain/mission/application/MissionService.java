@@ -313,20 +313,13 @@ public class MissionService {
 
         List<MissionSummaryItem> result =
                 missions.stream()
-                        .map(
-                                mission -> {
-                                    boolean isCompleted =
-                                            mission.getMissionRecords().stream()
-                                                    .anyMatch(
-                                                            missionRecord ->
-                                                                    missionRecord.getUploadStatus()
-                                                                            == ImageUploadStatus
-                                                                                    .COMPLETE);
-                                    return isCompleted
-                                            ? MissionSummaryItem.of(
-                                                    mission, MissionStatus.COMPLETED)
-                                            : MissionSummaryItem.of(mission, MissionStatus.NONE);
-                                })
+                        .map(mission -> getMissionSummaryItem(mission))
+                        .sorted(
+                                Comparator.comparing(MissionSummaryItem::missionStatus)
+                                        .reversed()
+                                        .thenComparing(
+                                                Comparator.comparing(MissionSummaryItem::finishedAt)
+                                                        .reversed()))
                         .collect(Collectors.toList());
 
         result.sort(
@@ -346,5 +339,17 @@ public class MissionService {
         long missionNoneCount = missionAllCount - missionCompleteCount;
         return MissionSummaryListResponse.of(
                 missionAllCount, missionCompleteCount, missionNoneCount, result);
+    }
+
+    private static MissionSummaryItem getMissionSummaryItem(Mission mission) {
+        boolean isCompleted =
+                mission.getMissionRecords().stream()
+                        .anyMatch(
+                                missionRecord ->
+                                        missionRecord.getUploadStatus()
+                                                == ImageUploadStatus.COMPLETE);
+        return isCompleted
+                ? MissionSummaryItem.of(mission, MissionStatus.COMPLETED)
+                : MissionSummaryItem.of(mission, MissionStatus.NONE);
     }
 }
