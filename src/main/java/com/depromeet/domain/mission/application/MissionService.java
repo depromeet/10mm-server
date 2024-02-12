@@ -304,6 +304,7 @@ public class MissionService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public MissionSummaryListResponse findSummaryList(LocalDate date) {
         final Member currentMember = memberUtil.getCurrentMember();
         List<Mission> missions =
