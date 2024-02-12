@@ -313,7 +313,7 @@ public class MissionService {
 
         List<MissionSummaryItem> result =
                 missions.stream()
-                        .map(mission -> getMissionSummaryItem(mission))
+                        .map(mission -> getMissionSummaryItem(mission, date))
                         .sorted(
                                 Comparator.comparing(MissionSummaryItem::missionStatus)
                                         .reversed()
@@ -321,12 +321,6 @@ public class MissionService {
                                                 Comparator.comparing(MissionSummaryItem::finishedAt)
                                                         .reversed()))
                         .collect(Collectors.toList());
-
-        result.sort(
-                Comparator.comparing(MissionSummaryItem::missionStatus)
-                        .reversed()
-                        .thenComparing(
-                                Comparator.comparing(MissionSummaryItem::finishedAt).reversed()));
 
         long missionAllCount = missions.size();
         long missionCompleteCount =
@@ -341,13 +335,17 @@ public class MissionService {
                 missionAllCount, missionCompleteCount, missionNoneCount, result);
     }
 
-    private static MissionSummaryItem getMissionSummaryItem(Mission mission) {
+    private static MissionSummaryItem getMissionSummaryItem(Mission mission, LocalDate date) {
         boolean isCompleted =
                 mission.getMissionRecords().stream()
                         .anyMatch(
                                 missionRecord ->
                                         missionRecord.getUploadStatus()
-                                                == ImageUploadStatus.COMPLETE);
+                                                        == ImageUploadStatus.COMPLETE
+                                                && missionRecord
+                                                        .getStartedAt()
+                                                        .toLocalDate()
+                                                        .equals(date));
         return isCompleted
                 ? MissionSummaryItem.of(mission, MissionStatus.COMPLETED)
                 : MissionSummaryItem.of(mission, MissionStatus.NONE);
