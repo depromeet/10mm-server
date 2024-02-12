@@ -88,7 +88,7 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     @Override
     public List<Mission> findMissionsWithRecordsByDate(LocalDate date, Long memberId) {
         LocalDateTime startedAt = date.atTime(0, 0, 0);
-        LocalDateTime finishedAt = date.atTime(23, 59, 59);
+        LocalDateTime finishedAt = startedAt.plusDays(1);
         JPAQuery<Mission> query =
                 jpaQueryFactory
                         .selectFrom(mission)
