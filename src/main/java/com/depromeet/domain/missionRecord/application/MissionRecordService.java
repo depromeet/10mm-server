@@ -251,9 +251,7 @@ public class MissionRecordService {
                 continuousSuccessDay = 1; // 연속성이 깨진 경우 초기화
             }
 
-            if (continuousSuccessDay > maxContinuousSuccessDay) {
-                maxContinuousSuccessDay = continuousSuccessDay;
-            }
+            maxContinuousSuccessDay = Math.max(continuousSuccessDay, maxContinuousSuccessDay);
 
             previousDate = currentDate;
         }
