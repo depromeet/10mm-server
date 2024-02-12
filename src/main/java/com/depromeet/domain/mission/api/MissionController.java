@@ -3,29 +3,17 @@ package com.depromeet.domain.mission.api;
 import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
-import com.depromeet.domain.mission.dto.response.FinishedMissionResponse;
-import com.depromeet.domain.mission.dto.response.FollowMissionFindAllResponse;
-import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
-import com.depromeet.domain.mission.dto.response.MissionFindAllResponse;
-import com.depromeet.domain.mission.dto.response.MissionFindResponse;
-import com.depromeet.domain.mission.dto.response.MissionSymbolStackResponse;
-import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
+import com.depromeet.domain.mission.dto.response.*;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordSummaryResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "2. [미션]", description = "미션 관련 API입니다.")
 @RestController
@@ -65,6 +53,12 @@ public class MissionController {
     @GetMapping("/summary")
     public MissionRecordSummaryResponse missionRecordFindSummary() {
         return missionService.findSummaryMissionRecord();
+    }
+
+    @Operation(summary = "미션 전체 현황 - 리스트", description = "년, 월, 일을 입력받아 해당 날짜의 미션 리스트를 조회합니다.")
+    @GetMapping("/summary-list")
+    public MissionSummaryListResponse missionSummaryList(@RequestParam LocalDate date) {
+        return missionService.findSummaryList(date);
     }
 
     @Operation(summary = "종료미션 보관함", description = "종료된 미션 리스트를 조회합니다.")
