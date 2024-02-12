@@ -2,6 +2,7 @@ package com.depromeet.domain.mission.domain;
 
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -128,7 +129,9 @@ public class Mission extends BaseTimeEntity {
                         record ->
                                 record.getStartedAt()
                                         .toLocalDate()
-                                        .equals(LocalDateTime.now().toLocalDate()))
+                                        .equals(LocalDateTime.now().toLocalDate())
+                                        && record.getUploadStatus() == ImageUploadStatus.COMPLETE
+                )
                 .findFirst()
                 .isPresent();
     }
