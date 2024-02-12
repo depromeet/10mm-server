@@ -208,8 +208,6 @@ class PushServiceTest {
             pushService.sendUrgingPush(request);
 
             // then
-            System.out.println(
-                    "notificationRepository.findAll() = " + notificationRepository.findAll());
             Optional<Notification> optionalNotification = notificationRepository.findById(1L);
             assertTrue(optionalNotification.isPresent());
             assertEquals(1, notificationRepository.findAll().size());
