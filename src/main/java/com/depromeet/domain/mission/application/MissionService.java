@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -312,15 +311,23 @@ public class MissionService {
         List<Mission> missions =
                 missionRepository.findMissionsWithRecordsByDate(date, currentMember.getId());
 
-        List<MissionSummaryItem> result = missions.stream()
-                .map(mission -> {
-                    boolean isCompleted = mission.getMissionRecords().stream()
-                            .anyMatch(missionRecord -> missionRecord.getUploadStatus() == ImageUploadStatus.COMPLETE);
-                    return isCompleted ?
-                            MissionSummaryItem.of(mission, MissionStatus.COMPLETED) :
-                            MissionSummaryItem.of(mission, MissionStatus.NONE);
-                })
-                .collect(Collectors.toList());
+        List<MissionSummaryItem> result =
+                missions.stream()
+                        .map(
+                                mission -> {
+                                    boolean isCompleted =
+                                            mission.getMissionRecords().stream()
+                                                    .anyMatch(
+                                                            missionRecord ->
+                                                                    missionRecord.getUploadStatus()
+                                                                            == ImageUploadStatus
+                                                                                    .COMPLETE);
+                                    return isCompleted
+                                            ? MissionSummaryItem.of(
+                                                    mission, MissionStatus.COMPLETED)
+                                            : MissionSummaryItem.of(mission, MissionStatus.NONE);
+                                })
+                        .collect(Collectors.toList());
 
         result.sort(
                 Comparator.comparing(MissionSummaryItem::missionStatus)

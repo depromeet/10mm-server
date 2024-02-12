@@ -128,10 +128,9 @@ public class Mission extends BaseTimeEntity {
                 .filter(
                         record ->
                                 record.getStartedAt()
-                                        .toLocalDate()
-                                        .equals(LocalDateTime.now().toLocalDate())
-                                        && record.getUploadStatus() == ImageUploadStatus.COMPLETE
-                )
+                                                .toLocalDate()
+                                                .equals(LocalDateTime.now().toLocalDate())
+                                        && record.getUploadStatus() == ImageUploadStatus.COMPLETE)
                 .findFirst()
                 .isPresent();
     }
