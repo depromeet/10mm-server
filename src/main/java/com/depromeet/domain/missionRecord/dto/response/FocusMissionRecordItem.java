@@ -1,5 +1,6 @@
 package com.depromeet.domain.missionRecord.dto.response;
 
+import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -26,11 +27,11 @@ public record FocusMissionRecordItem(
                         type = "string")
                 LocalDateTime finishedAt) {
 
-    public static FocusMissionRecordItem of(
-            long symbolStack,
-            long durationMinute,
-            LocalDateTime startedAt,
-            LocalDateTime finishedAt) {
-        return new FocusMissionRecordItem(symbolStack, durationMinute, startedAt, finishedAt);
+    public static FocusMissionRecordItem from(MissionRecord record) {
+        return new FocusMissionRecordItem(
+                record.getDuration().toMinutes() / 10,
+                record.getDuration().toMinutes(),
+                record.getStartedAt(),
+                record.getFinishedAt());
     }
 }

@@ -177,14 +177,11 @@ public class MissionRecordService {
 
         List<MissionRecord> missionRecords =
                 missionRecordRepository.findAllByCompletedMission(missionId);
+        LocalDateTime endedAt = finishedAt.isBefore(today) ? finishedAt : today;
 
         // 달성률
         double totalMissionAttainRate =
-                calculateMissionAttainRate(
-                        missionRecords.size(),
-                        Duration.between(startedAt, finishedAt.isBefore(today) ? finishedAt : today)
-                                        .toDays()
-                                + DAYS_ADJUSTMENT);
+                calculateMissionAttainRate(missionRecords.size(), startedAt, endedAt);
 
         // 시간표 생성
         List<FocusMissionRecordItem> timeTable = generateRecordTimeTable(missionRecords);
@@ -220,15 +217,7 @@ public class MissionRecordService {
 
     private List<FocusMissionRecordItem> generateRecordTimeTable(
             List<MissionRecord> missionRecords) {
-        return missionRecords.stream()
-                .map(
-                        record ->
-                                FocusMissionRecordItem.of(
-                                        record.getDuration().toMinutes() / 10,
-                                        record.getDuration().toMinutes(),
-                                        record.getStartedAt(),
-                                        record.getFinishedAt()))
-                .toList();
+        return missionRecords.stream().map(FocusMissionRecordItem::from).toList();
     }
 
     private long calculateMaxContinuousSuccessDay(
@@ -270,7 +259,9 @@ public class MissionRecordService {
         }
     }
 
-    private double calculateMissionAttainRate(long completeSize, long totalSize) {
+    private double calculateMissionAttainRate(
+            long completeSize, LocalDateTime startedAt, LocalDateTime endedAt) {
+        long totalSize = Duration.between(startedAt, endedAt).toDays() + DAYS_ADJUSTMENT;
         return Math.round((double) completeSize / totalSize * 1000) / 10.0;
     }
 }
