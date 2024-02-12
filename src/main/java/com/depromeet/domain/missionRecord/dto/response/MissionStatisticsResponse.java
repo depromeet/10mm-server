@@ -30,7 +30,7 @@ public record MissionStatisticsResponse(
                         defaultValue = "2024-01-15 00:34:00",
                         type = "string")
                 LocalDateTime finishedAt,
-        @Schema(description = "미션 수행 타임 테이블") List<FocusMissionTimeOfDay> timeTable) {
+        @Schema(description = "미션 수행 타임 테이블") List<FocusMissionRecordItem> timeTable) {
 
     public static MissionStatisticsResponse of(
             long totalMissionHour,
@@ -41,7 +41,7 @@ public record MissionStatisticsResponse(
             double totalMissionAttainRate,
             LocalDateTime startedAt,
             LocalDateTime finishedAt,
-            List<FocusMissionTimeOfDay> timeTable) {
+            List<FocusMissionRecordItem> timeTable) {
         return new MissionStatisticsResponse(
                 totalMissionHour,
                 totalMissionMinute,

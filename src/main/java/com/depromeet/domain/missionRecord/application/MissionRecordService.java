@@ -187,7 +187,7 @@ public class MissionRecordService {
                                 + DAYS_ADJUSTMENT);
 
         // 시간표 생성
-        List<FocusMissionTimeOfDay> timeTable = generateRecordTimeTable(missionRecords);
+        List<FocusMissionRecordItem> timeTable = generateRecordTimeTable(missionRecords);
 
         // 최대 연속성 계산
         long maxContinuousSuccessDay =
@@ -195,7 +195,7 @@ public class MissionRecordService {
 
         long totalSymbolStack = 0;
         long sumDuration = 0;
-        for (FocusMissionTimeOfDay timeOfDay : timeTable) {
+        for (FocusMissionRecordItem timeOfDay : timeTable) {
             totalSymbolStack += timeOfDay.symbolStack();
             sumDuration += timeOfDay.durationMinute();
         }
@@ -218,12 +218,12 @@ public class MissionRecordService {
                 timeTable);
     }
 
-    private List<FocusMissionTimeOfDay> generateRecordTimeTable(
+    private List<FocusMissionRecordItem> generateRecordTimeTable(
             List<MissionRecord> missionRecords) {
         return missionRecords.stream()
                 .map(
                         record ->
-                                FocusMissionTimeOfDay.of(
+                                FocusMissionRecordItem.of(
                                         record.getDuration().toMinutes() / 10,
                                         record.getDuration().toMinutes(),
                                         record.getStartedAt(),

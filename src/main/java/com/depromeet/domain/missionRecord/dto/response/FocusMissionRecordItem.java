@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 
-public record FocusMissionTimeOfDay(
+public record FocusMissionRecordItem(
         @Schema(description = "번개 수", defaultValue = "3") long symbolStack,
         @Schema(description = "미션 수행 시간 (Minute)", defaultValue = "34") long durationMinute,
         @JsonFormat(
@@ -26,11 +26,11 @@ public record FocusMissionTimeOfDay(
                         type = "string")
                 LocalDateTime finishedAt) {
 
-    public static FocusMissionTimeOfDay of(
+    public static FocusMissionRecordItem of(
             long symbolStack,
             long durationMinute,
             LocalDateTime startedAt,
             LocalDateTime finishedAt) {
-        return new FocusMissionTimeOfDay(symbolStack, durationMinute, startedAt, finishedAt);
+        return new FocusMissionRecordItem(symbolStack, durationMinute, startedAt, finishedAt);
     }
 }
