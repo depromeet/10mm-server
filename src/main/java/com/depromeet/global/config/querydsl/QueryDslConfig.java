@@ -1,5 +1,6 @@
 package com.depromeet.global.config.querydsl;
 
+import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -13,6 +14,6 @@ public class QueryDslConfig {
 
     @Bean
     public JPAQueryFactory jpaQueryFactory() {
-        return new JPAQueryFactory(entityManager);
+        return new JPAQueryFactory(JPQLTemplates.DEFAULT, entityManager);
     }
 }

@@ -91,13 +91,28 @@ public class MissionRecordService {
 
     @Transactional(readOnly = true)
     public MissionRecordCalendarResponse findAllMissionRecord(Long missionId, YearMonth yearMonth) {
+        final Member member = memberUtil.getCurrentMember();
         List<MissionRecord> missionRecords =
                 missionRecordRepository.findAllByMissionIdAndYearMonth(missionId, yearMonth);
         List<MissionRecordFindResponse> missionRecordFindResponses =
                 missionRecords.stream().map(MissionRecordFindResponse::from).toList();
         Mission mission = findMissionById(missionId);
+
+        UrgingStatus urgingStatus = getUrgingStatus(mission, member);
+
         return MissionRecordCalendarResponse.of(
-                mission.getStartedAt(), mission.getFinishedAt(), missionRecordFindResponses);
+                mission.getStartedAt(),
+                mission.getFinishedAt(),
+                missionRecordFindResponses,
+                urgingStatus);
+    }
+
+    private UrgingStatus getUrgingStatus(Mission mission, Member member) {
+        if (member.getId().equals(mission.getMember().getId())
+                || mission.isCompletedMissionToday()) {
+            return UrgingStatus.NONE;
+        }
+        return UrgingStatus.URGING;
     }
 
     public MissionRecordUpdateResponse updateMissionRecord(

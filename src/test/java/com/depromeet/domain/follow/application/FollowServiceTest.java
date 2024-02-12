@@ -69,6 +69,19 @@ class FollowServiceTest {
         }
 
         @Test
+        void 본인을_팔로우_할_경우_예외를_발생시킨다() {
+            FollowCreateRequest request = new FollowCreateRequest(1L);
+            memberRepository.save(
+                    Member.createNormalMember(
+                            Profile.createProfile("testNickname1", "testImageUrl1")));
+
+            // when, then
+            assertThatThrownBy(() -> followService.createFollow(request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.FOLLOW_SELF_NOT_ALLOWED.getMessage());
+        }
+
+        @Test
         void 타겟회원이_존재하지_않는다면_예외를_발생시킨다() {
             // given
             Long targetId = 2L;
