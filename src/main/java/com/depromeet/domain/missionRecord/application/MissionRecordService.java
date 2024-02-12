@@ -108,7 +108,7 @@ public class MissionRecordService {
     }
 
     private UrgingStatus getUrgingStatus(Mission mission, Member member) {
-        if (member.getId() == mission.getMember().getId() || mission.isCompletedMissionToday()) {
+        if (member.getId().equals(mission.getMember().getId()) || mission.isCompletedMissionToday()) {
             return UrgingStatus.NONE;
         }
         return UrgingStatus.URGING;
