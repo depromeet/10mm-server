@@ -178,12 +178,12 @@ public class MissionRecordService {
         long maxContinuousSuccessDay =
                 calculateMaxContinuousSuccessDay(startedAt, finishedAt, missionRecords);
 
-		long totalSymbolStack = 0;
-		long sumDuration = 0;
-		for (FocusMissionTimeOfDay timeOfDay : timeTable) {
-			totalSymbolStack += timeOfDay.symbolStack();
-			sumDuration += timeOfDay.durationMinute();
-		}
+        long totalSymbolStack = 0;
+        long sumDuration = 0;
+        for (FocusMissionTimeOfDay timeOfDay : timeTable) {
+            totalSymbolStack += timeOfDay.symbolStack();
+            sumDuration += timeOfDay.durationMinute();
+        }
 
         // 전체 수행 시간 (시간)
         long totalMissionHour = sumDuration / 60;
