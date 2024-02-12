@@ -85,19 +85,21 @@ class MissionRecordServiceTest {
     @Test
     void 미션별_상세_통계_조회한다() {
         // given
+        long durationMinute = 17;
+        String defaultImage = "https://image.10mm.today/default.png";
         LocalDateTime recordStartedAt = LocalDateTime.of(2024, 1, 25, 22, 58, 53);
-        LocalDateTime recordFinishedAt = recordStartedAt.plusMinutes(17);
+        LocalDateTime recordFinishedAt = recordStartedAt.plusMinutes(durationMinute);
+
         // 연속 성공 3일
         for (int i = 0; i < 3; i++) {
             MissionRecord missionRecord =
                     MissionRecord.createMissionRecord(
-                            Duration.ofMinutes(17),
+                            Duration.ofMinutes(durationMinute),
                             recordStartedAt.plusDays(i),
                             recordFinishedAt.plusDays(i),
                             mission);
             missionRecord.updateUploadStatusPending();
-            missionRecord.updateUploadStatusComplete(
-                    "testRemark " + i, "https://image.10mm.today/default.png");
+            missionRecord.updateUploadStatusComplete("testRemark " + i, defaultImage);
             missionRecordRepository.save(missionRecord);
         }
 
@@ -105,13 +107,12 @@ class MissionRecordServiceTest {
         for (int i = 4; i < 8; i++) {
             MissionRecord missionRecord =
                     MissionRecord.createMissionRecord(
-                            Duration.ofMinutes(17),
+                            Duration.ofMinutes(durationMinute),
                             recordStartedAt.plusDays(i),
                             recordFinishedAt.plusDays(i),
                             mission);
             missionRecord.updateUploadStatusPending();
-            missionRecord.updateUploadStatusComplete(
-                    "testRemark " + i, "https://image.10mm.today/default.png");
+            missionRecord.updateUploadStatusComplete("testRemark " + i, defaultImage);
             missionRecordRepository.save(missionRecord);
         }
 
