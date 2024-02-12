@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -309,24 +311,16 @@ public class MissionService {
         final Member currentMember = memberUtil.getCurrentMember();
         List<Mission> missions =
                 missionRepository.findMissionsWithRecordsByDate(date, currentMember.getId());
-        List<MissionSummaryItem> result = new ArrayList<>();
 
-        for (Mission mission : missions) {
-            boolean isCompleted =
-                    mission.getMissionRecords().stream()
-                            .filter(
-                                    missionRecord ->
-                                            missionRecord.getUploadStatus()
-                                                    == ImageUploadStatus.COMPLETE)
-                            .findAny()
-                            .isPresent();
-
-            if (isCompleted) {
-                result.add(MissionSummaryItem.of(mission, MissionStatus.COMPLETED));
-                continue;
-            }
-            result.add(MissionSummaryItem.of(mission, MissionStatus.NONE));
-        }
+        List<MissionSummaryItem> result = missions.stream()
+                .map(mission -> {
+                    boolean isCompleted = mission.getMissionRecords().stream()
+                            .anyMatch(missionRecord -> missionRecord.getUploadStatus() == ImageUploadStatus.COMPLETE);
+                    return isCompleted ?
+                            MissionSummaryItem.of(mission, MissionStatus.COMPLETED) :
+                            MissionSummaryItem.of(mission, MissionStatus.NONE);
+                })
+                .collect(Collectors.toList());
 
         result.sort(
                 Comparator.comparing(MissionSummaryItem::missionStatus)
