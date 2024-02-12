@@ -11,7 +11,7 @@ public interface MissionRecordRepositoryCustom {
 
     List<MissionRecord> findAllByMissionIdAndYearMonth(Long missionId, YearMonth yearMonth);
 
-    List<MissionRecord> findAllByMissionId(Long missionId);
+    List<MissionRecord> findAllByCompletedMission(Long missionId);
 
     List<FeedOneResponse> findFeedAll(List<Member> members);
 

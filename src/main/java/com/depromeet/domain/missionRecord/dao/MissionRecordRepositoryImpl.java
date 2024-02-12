@@ -38,7 +38,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     }
 
     @Override
-    public List<MissionRecord> findAllByMissionId(Long missionId) {
+    public List<MissionRecord> findAllByCompletedMission(Long missionId) {
         return jpaQueryFactory
                 .selectFrom(missionRecord)
                 .where(missionIdEq(missionId), uploadStatusCompleteEq())

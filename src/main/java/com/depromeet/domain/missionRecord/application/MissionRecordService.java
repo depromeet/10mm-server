@@ -160,7 +160,8 @@ public class MissionRecordService {
         LocalDateTime finishedAt = mission.getFinishedAt();
         LocalDateTime today = LocalDateTime.now();
 
-        List<MissionRecord> missionRecords = missionRecordRepository.findAllByMissionId(missionId);
+        List<MissionRecord> missionRecords =
+                missionRecordRepository.findAllByCompletedMission(missionId);
 
         // 달성률
         double totalMissionAttainRate =
@@ -177,11 +178,12 @@ public class MissionRecordService {
         long maxContinuousSuccessDay =
                 calculateMaxContinuousSuccessDay(startedAt, finishedAt, missionRecords);
 
-        // 전체 번개 스택
-        long totalSymbolStack = calculateTotalSymbolStack(timeTable);
-
-        // 전체 수행시간
-        long sumDuration = calculateSumDuration(timeTable);
+		long totalSymbolStack = 0;
+		long sumDuration = 0;
+		for (FocusMissionTimeOfDay timeOfDay : timeTable) {
+			totalSymbolStack += timeOfDay.symbolStack();
+			sumDuration += timeOfDay.durationMinute();
+		}
 
         // 전체 수행 시간 (시간)
         long totalMissionHour = sumDuration / 60;
@@ -224,30 +226,23 @@ public class MissionRecordService {
             LocalDate currentDate = missionRecord.getStartedAt().toLocalDate();
 
             // startedAt과 finishedAt 사이에 있는 일자일 때만 고려
-            if (currentDate.isAfter(startedAt.toLocalDate())
-                    && currentDate.isBefore(finishedAt.toLocalDate())) {
-                if (previousDate != null && currentDate.minusDays(1).isEqual(previousDate)) {
-                    continuousSuccessDay++;
-                } else {
-                    continuousSuccessDay = 1; // 연속성이 깨진 경우 초기화
-                }
-
-                if (continuousSuccessDay > maxContinuousSuccessDay) {
-                    maxContinuousSuccessDay = continuousSuccessDay;
-                }
-
-                previousDate = currentDate;
+            if (!(currentDate.isAfter(startedAt.toLocalDate())
+                    && currentDate.isBefore(finishedAt.toLocalDate()))) {
+                continue;
             }
+            if (previousDate != null && currentDate.minusDays(1).isEqual(previousDate)) {
+                continuousSuccessDay++;
+            } else {
+                continuousSuccessDay = 1; // 연속성이 깨진 경우 초기화
+            }
+
+            if (continuousSuccessDay > maxContinuousSuccessDay) {
+                maxContinuousSuccessDay = continuousSuccessDay;
+            }
+
+            previousDate = currentDate;
         }
         return maxContinuousSuccessDay;
-    }
-
-    private long calculateTotalSymbolStack(List<FocusMissionTimeOfDay> timeTable) {
-        return timeTable.stream().mapToLong(FocusMissionTimeOfDay::symbolStack).sum();
-    }
-
-    private long calculateSumDuration(List<FocusMissionTimeOfDay> timeTable) {
-        return timeTable.stream().mapToLong(FocusMissionTimeOfDay::durationMinute).sum();
     }
 
     private void validateMissionRecordDuration(Duration duration) {
