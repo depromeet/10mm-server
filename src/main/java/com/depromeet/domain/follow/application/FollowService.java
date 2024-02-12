@@ -38,6 +38,7 @@ public class FollowService {
 
     public void createFollow(FollowCreateRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
+        validateSelfFollow(currentMember.getId(), request.targetId());
         Member targetMember = getTargetMember(request.targetId());
 
         boolean existMemberRelation =
@@ -175,6 +176,12 @@ public class FollowService {
                 .forEach(entry -> result.add(MemberFollowedResponse.of(entry.getKey())));
 
         return result;
+    }
+
+    private void validateSelfFollow(Long expectedId, Long actualId) {
+        if (expectedId.equals(actualId)) {
+            throw new CustomException(ErrorCode.FOLLOW_SELF_NOT_ALLOWED);
+        }
     }
 
     private boolean isToday(LocalDateTime dateTime) {

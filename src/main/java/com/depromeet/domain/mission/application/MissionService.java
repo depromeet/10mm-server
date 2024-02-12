@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -302,5 +303,53 @@ public class MissionService {
                         missionRecord ->
                                 missionRecord.getUploadStatus() == ImageUploadStatus.COMPLETE)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public MissionSummaryListResponse findSummaryList(LocalDate date) {
+        final Member currentMember = memberUtil.getCurrentMember();
+        List<Mission> missions =
+                missionRepository.findMissionsWithRecordsByDate(date, currentMember.getId());
+
+        List<MissionSummaryItem> result =
+                missions.stream()
+                        .map(mission -> getMissionSummaryItem(mission))
+                        .sorted(
+                                Comparator.comparing(MissionSummaryItem::missionStatus)
+                                        .reversed()
+                                        .thenComparing(
+                                                Comparator.comparing(MissionSummaryItem::finishedAt)
+                                                        .reversed()))
+                        .collect(Collectors.toList());
+
+        result.sort(
+                Comparator.comparing(MissionSummaryItem::missionStatus)
+                        .reversed()
+                        .thenComparing(
+                                Comparator.comparing(MissionSummaryItem::finishedAt).reversed()));
+
+        long missionAllCount = missions.size();
+        long missionCompleteCount =
+                result.stream()
+                        .filter(
+                                missionSummaryItem ->
+                                        missionSummaryItem.missionStatus()
+                                                == MissionStatus.COMPLETED)
+                        .count();
+        long missionNoneCount = missionAllCount - missionCompleteCount;
+        return MissionSummaryListResponse.of(
+                missionAllCount, missionCompleteCount, missionNoneCount, result);
+    }
+
+    private static MissionSummaryItem getMissionSummaryItem(Mission mission) {
+        boolean isCompleted =
+                mission.getMissionRecords().stream()
+                        .anyMatch(
+                                missionRecord ->
+                                        missionRecord.getUploadStatus()
+                                                == ImageUploadStatus.COMPLETE);
+        return isCompleted
+                ? MissionSummaryItem.of(mission, MissionStatus.COMPLETED)
+                : MissionSummaryItem.of(mission, MissionStatus.NONE);
     }
 }
