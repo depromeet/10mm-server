@@ -57,7 +57,10 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                 jpaQueryFactory
                         .selectFrom(mission)
                         .leftJoin(mission.missionRecords, missionRecord)
-                        .where(memberIdEq(memberId), visibilityByRelations(existsMemberRelations))
+                        .where(
+                                memberIdEq(memberId),
+                                durationStatusInProgress(),
+                                visibilityByRelations(existsMemberRelations))
                         .orderBy(mission.id.desc())
                         .fetchJoin();
         return query.fetch();

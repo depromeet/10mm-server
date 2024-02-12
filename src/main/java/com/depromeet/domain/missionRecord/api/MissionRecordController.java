@@ -57,4 +57,10 @@ public class MissionRecordController {
         missionRecordService.deleteInProgressMissionRecord();
         return ResponseEntity.ok().build();
     }
+
+    @Operation(summary = "미션별 상세 통계", description = "미션별 통계로 미션에 대한 현황을 파악합니다.")
+    @GetMapping("/statistics/{missionId}")
+    public MissionStatisticsResponse missionStatistics(@PathVariable Long missionId) {
+        return missionRecordService.findMissionStatistics(missionId);
+    }
 }
