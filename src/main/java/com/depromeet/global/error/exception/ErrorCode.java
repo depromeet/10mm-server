@@ -49,6 +49,7 @@ public enum ErrorCode {
     FOLLOW_TARGET_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "타겟 유저을 찾을 수 없습니다."),
     FOLLOW_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 팔로우 중인 회원입니다."),
     FOLLOW_NOT_EXIST(HttpStatus.BAD_REQUEST, "팔로우 중인 회원만 팔로우 취소가 가능합니다."),
+    FOLLOW_SELF_NOT_ALLOWED(HttpStatus.CONFLICT, "본인을 팔로우 할 수 없습니다."),
 
     // Image
     IMAGE_KEY_NOT_FOUND(HttpStatus.NOT_FOUND, "이미지 키를 찾을 수 없습니다."),
