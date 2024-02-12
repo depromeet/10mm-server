@@ -1,10 +1,15 @@
 package com.depromeet.domain.reaction.application;
 
+import static com.depromeet.global.common.constants.PushNotificationConstants.*;
 import static java.util.Comparator.*;
 
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import com.depromeet.domain.notification.application.FcmService;
+import com.depromeet.domain.notification.dao.NotificationRepository;
+import com.depromeet.domain.notification.domain.Notification;
+import com.depromeet.domain.notification.domain.NotificationType;
 import com.depromeet.domain.reaction.dao.ReactionRepository;
 import com.depromeet.domain.reaction.domain.EmojiType;
 import com.depromeet.domain.reaction.domain.Reaction;
@@ -30,6 +35,8 @@ public class ReactionService {
     private final MemberUtil memberUtil;
     private final MissionRecordRepository missionRecordRepository;
     private final ReactionRepository reactionRepository;
+    private final FcmService fcmService;
+    private final NotificationRepository notificationRepository;
 
     public List<ReactionGroupByEmojiResponse> findAllReaction(Long missionRecordId) {
         Map<EmojiType, List<Reaction>> reactionMap =
@@ -52,6 +59,17 @@ public class ReactionService {
         validateMyReactionAlreadyExists(member, missionRecord);
 
         Reaction reaction = Reaction.createReaction(request.emojiType(), member, missionRecord);
+        Member targetMember = missionRecord.getMission().getMember();
+        fcmService.sendMessageSync(
+                targetMember.getFcmInfo().getFcmToken(),
+                PUSH_REACTION_TITLE,
+                String.format(
+                        PUSH_REACTION_CONTENT,
+                        member.getProfile().getNickname(),
+                        missionRecord.getMission().getName()));
+        Notification notification =
+                Notification.createNotification(NotificationType.REACTION, member, targetMember);
+        notificationRepository.save(notification);
         return ReactionCreateResponse.from(reactionRepository.save(reaction));
     }
 
