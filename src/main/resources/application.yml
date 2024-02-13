@@ -33,3 +33,5 @@ logging:
 
 fcm:
   certification: ${FCM_CERTIFICATION:}
+server:
+  port: 8889

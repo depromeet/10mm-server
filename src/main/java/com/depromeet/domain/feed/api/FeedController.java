@@ -3,6 +3,7 @@ package com.depromeet.domain.feed.api;
 import com.depromeet.domain.feed.application.FeedService;
 import com.depromeet.domain.feed.dto.response.FeedOneByProfileResponse;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
+import com.depromeet.domain.mission.domain.MissionVisibility;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,8 +24,9 @@ public class FeedController {
 
     @Operation(summary = "피드 탭", description = "피드 탭을 조회합니다.")
     @GetMapping("/me")
-    public List<FeedOneResponse> feedFindAll() {
-        return feedService.findAllFeed();
+    public List<FeedOneResponse> feedFindAll(
+            @RequestParam(value = "visibility", required = false) MissionVisibility visibility) {
+        return feedService.findAllFeed(visibility);
     }
 
     @Operation(summary = "프로필 피드", description = "피드 탭을 조회합니다.")

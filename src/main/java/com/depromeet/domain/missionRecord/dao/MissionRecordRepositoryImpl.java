@@ -14,6 +14,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -62,7 +63,8 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     }
 
     @Override
-    public List<FeedOneResponse> findFeedAll(List<Member> members) {
+    public List<FeedOneResponse> findFeedByVisibility(
+            List<Member> members, MissionVisibility visibility) {
         return jpaQueryFactory
                 .select(
                         Projections.constructor(
@@ -86,8 +88,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                 .on(mission.member.id.eq(missionRecord.mission.member.id))
                 .where(
                         missionRecord.mission.member.in(members),
-                        missionRecord.mission.visibility.in(
-                                MissionVisibility.FOLLOWER, MissionVisibility.ALL),
+                        missionRecord.mission.visibility.in(visibility),
                         missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE))
                 .orderBy(missionRecord.finishedAt.desc())
                 .limit(FEED_TAB_LIMIT)

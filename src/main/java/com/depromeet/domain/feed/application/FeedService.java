@@ -4,6 +4,7 @@ import com.depromeet.domain.feed.dto.response.FeedOneByProfileResponse;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
+import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
@@ -26,17 +27,24 @@ public class FeedService {
     private final MissionRecordRepository missionRecordRepository;
     private final MemberRelationRepository memberRelationRepository;
     private final SecurityUtil securityUtil;
+    private final MemberRepository memberRepository;
 
     @Transactional(readOnly = true)
-    public List<FeedOneResponse> findAllFeed() {
+    public List<FeedOneResponse> findAllFeed(MissionVisibility visibility) {
+        if (visibility.equals(MissionVisibility.ALL)) {
+            final List<Member> members = memberRepository.findAll();
+            return missionRecordRepository.findFeedByVisibility(members, visibility);
+        }
+
         final Member currentMember = memberUtil.getCurrentMember();
-        List<Member> members =
+
+        List<Member> sourceMembers =
                 memberRelationRepository.findAllBySourceId(currentMember.getId()).stream()
                         .map(MemberRelation::getTarget)
                         .collect(Collectors.toList());
-        members.add(currentMember);
+        sourceMembers.add(currentMember);
 
-        return missionRecordRepository.findFeedAll(members);
+        return missionRecordRepository.findFeedByVisibility(sourceMembers, visibility);
     }
 
     @Transactional(readOnly = true)

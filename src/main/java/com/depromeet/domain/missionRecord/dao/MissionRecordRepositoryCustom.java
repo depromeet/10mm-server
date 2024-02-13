@@ -13,7 +13,7 @@ public interface MissionRecordRepositoryCustom {
 
     List<MissionRecord> findAllByCompletedMission(Long missionId);
 
-    List<FeedOneResponse> findFeedAll(List<Member> members);
+    List<FeedOneResponse> findFeedByVisibility(List<Member> members, MissionVisibility visibility);
 
     List<MissionRecord> findFeedAllByMemberId(Long memberId, List<MissionVisibility> visibilities);
 
