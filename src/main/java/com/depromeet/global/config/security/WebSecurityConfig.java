@@ -1,6 +1,7 @@
 package com.depromeet.global.config.security;
 
-import static com.depromeet.global.common.constants.EnvironmentConstants.*;
+import static com.depromeet.global.common.constants.NewEnvironmentConstants.Constants.DEV_ENV;
+import static com.depromeet.global.common.constants.NewEnvironmentConstants.Constants.LOCAL_ENV;
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.security.config.Customizer.*;
 
@@ -72,7 +73,7 @@ public class WebSecurityConfig {
 
     @Bean
     @Order(1)
-    @ConditionalOnProfile({DEV, LOCAL})
+    @ConditionalOnProfile({DEV_ENV, LOCAL_ENV})
     public SecurityFilterChain swaggerFilterChain(HttpSecurity http) throws Exception {
         defaultFilterChain(http);
 
