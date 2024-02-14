@@ -50,7 +50,8 @@ public record FeedOneResponse(
             String remark,
             String recordImageUrl,
             Duration duration,
-            LocalDateTime startedAt,
+            LocalDateTime missionStartedAt,
+            LocalDateTime recordStartedAt,
             LocalDateTime finishedAt) {
         this(
                 memberId,
@@ -62,8 +63,8 @@ public record FeedOneResponse(
                 remark,
                 recordImageUrl,
                 duration.toMinutes(),
-                Duration.between(startedAt, LocalDateTime.now()).toDays() + 1,
-                startedAt,
+                Duration.between(missionStartedAt, recordStartedAt).toDays() + 1,
+                missionStartedAt,
                 finishedAt);
     }
 

@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum NotificationType {
     FOLLOW("팔로우"),
     MISSION_URGING("재촉하기"),
+    REACTION("리액션"),
     ;
 
     private final String value;
