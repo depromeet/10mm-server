@@ -30,10 +30,10 @@ public class FeedService {
     private final MemberRepository memberRepository;
 
     @Transactional(readOnly = true)
-    public List<FeedOneResponse> findAllFeedByVisibility(MissionVisibility visibility) {
-        if (visibility.equals(MissionVisibility.ALL)) {
+    public List<FeedOneResponse> findAllFeedByVisibility(MissionVisibility visibilities) {
+        if (visibilities == MissionVisibility.ALL) {
             final List<Member> members = memberRepository.findAll();
-            return missionRecordRepository.findFeedByVisibility(members, visibility);
+            return missionRecordRepository.findFeedByVisibility(members, List.of(visibilities));
         }
 
         final Member currentMember = memberUtil.getCurrentMember();
