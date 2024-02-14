@@ -98,7 +98,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                 .where(
                         missionRecord.mission.member.in(members),
                         visibilityCondition,
-                        missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE))
+                        uploadStatusCompleteEq())
                 .orderBy(missionRecord.finishedAt.desc())
                 .limit(FEED_TAB_LIMIT)
                 .fetch();
@@ -114,7 +114,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                 .where(
                         mission.visibility.in(visibilities),
                         mission.member.id.eq(memberId),
-                        missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE))
+                        uploadStatusCompleteEq())
                 .orderBy(missionRecord.startedAt.desc())
                 .fetch();
     }
