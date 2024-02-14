@@ -80,6 +80,19 @@ public class WebSecurityConfig {
 
         http.securityMatcher(SwaggerUrlConstants.getSwaggerUrls()).httpBasic(withDefaults());
 
+        if (springEnvironmentUtil.isDevProfile()) {
+            http.authorizeHttpRequests(
+                    authorize ->
+                            authorize
+                                    .requestMatchers(SwaggerUrlConstants.getSwaggerUrls())
+                                    .authenticated());
+        }
+
+        http.authorizeHttpRequests(
+                authorize ->
+                        authorize
+                                .requestMatchers(SwaggerUrlConstants.getSwaggerUrls())
+                                .permitAll());
 
         return http.build();
     }
@@ -91,12 +104,6 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests(
                 authorize ->
                         authorize
-                                .requestMatchers(
-                                        HttpMethod.GET,
-                                        Arrays.stream(SwaggerUrlConstants.values())
-                                                .map(SwaggerUrlConstants::getValue)
-                                                .toArray(String[]::new))
-                                .permitAll()
                                 .requestMatchers("/10mm-actuator/**")
                                 .permitAll() // 액추에이터
                                 .requestMatchers("/auth/register")
