@@ -46,11 +46,33 @@
   </br></br>
 
 # 🖥️ Tech
-## Architecture
-
-## ERD
+## 🏛️ Architecture
+<p align="center">
+  <img src="https://github.com/depromeet/10mm-server/assets/64088250/d878e879-3758-44a6-8dd1-141430627fc7" width="600"/>
+</p>
+</br></br>
 
 ## 🛠️ Tech Stack
+<div align="left">
+<div>
+<img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=flat-square&logo=Spring Boot&logoColor=white">
+<img src="https://img.shields.io/badge/Gradle-02303A?style=flat-square&logo=Gradle&logoColor=white">
+</div>
+<div>
+<img src="https://img.shields.io/badge/MySQL-4479A1.svg?style=flat-square&logo=MySQL&logoColor=white">
+<img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=Redis&logoColor=white">
+</div>
+
+<div>
+<img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=Docker&logoColor=white">
+<img src="https://img.shields.io/badge/JSON Web Tokens-000000?style=flat-square&logo=JSON Web Tokens&logoColor=white">
+</div>
+
+<div>
+<img src="https://img.shields.io/badge/SonarCloud-F3702A?style=flat-square&logo=SonarCloud&logoColor=white">
+<img src="https://img.shields.io/badge/Slack-4A154B?style=flat-square&logo=slack&logoColor=white">
+</div>
+</br></br>
 
 ## 🧑🏻‍💻 Developers
 | ![](https://avatars.githubusercontent.com/u/64088250?v=4) | ![](https://avatars.githubusercontent.com/u/91878695?v=4) |![](https://avatars.githubusercontent.com/u/68099546?v=4) |
