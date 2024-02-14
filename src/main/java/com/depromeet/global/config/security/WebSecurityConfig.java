@@ -78,13 +78,10 @@ public class WebSecurityConfig {
 
         http.securityMatcher(getSwaggerUrls()).httpBasic(withDefaults());
 
-        if (springEnvironmentUtil.isDevProfile()) {
-            http.authorizeHttpRequests(
-                    authorize -> authorize.requestMatchers(getSwaggerUrls()).authenticated());
-        }
-
         http.authorizeHttpRequests(
-                authorize -> authorize.requestMatchers(getSwaggerUrls()).permitAll());
+                springEnvironmentUtil.isDevProfile()
+                        ? authorize -> authorize.anyRequest().authenticated()
+                        : authorize -> authorize.anyRequest().permitAll());
 
         return http.build();
     }
