@@ -4,6 +4,7 @@ import com.depromeet.domain.feed.dto.response.FeedOneByProfileResponse;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
+import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
@@ -26,16 +27,28 @@ public class FeedService {
     private final MissionRecordRepository missionRecordRepository;
     private final MemberRelationRepository memberRelationRepository;
     private final SecurityUtil securityUtil;
+    private final MemberRepository memberRepository;
+
+    @Transactional(readOnly = true)
+    public List<FeedOneResponse> findAllFeedByVisibility(MissionVisibility visibilities) {
+        if (visibilities == MissionVisibility.ALL) {
+            final List<Member> members = memberRepository.findAll();
+            return missionRecordRepository.findFeedByVisibility(members, List.of(visibilities));
+        }
+
+        final Member currentMember = memberUtil.getCurrentMember();
+        List<Member> sourceMembers = getSourceMembers(currentMember.getId());
+
+        sourceMembers.add(currentMember);
+        return missionRecordRepository.findFeedAll(sourceMembers);
+    }
 
     @Transactional(readOnly = true)
     public List<FeedOneResponse> findAllFeed() {
         final Member currentMember = memberUtil.getCurrentMember();
-        List<Member> members =
-                memberRelationRepository.findAllBySourceId(currentMember.getId()).stream()
-                        .map(MemberRelation::getTarget)
-                        .collect(Collectors.toList());
-        members.add(currentMember);
+        List<Member> members = getSourceMembers(currentMember.getId());
 
+        members.add(currentMember);
         return missionRecordRepository.findFeedAll(members);
     }
 
@@ -47,6 +60,12 @@ public class FeedService {
             return findFeedByOtherMember(sourceId, targetId);
         }
         return findFeedByCurrentMember(sourceId);
+    }
+
+    private List<Member> getSourceMembers(Long currentMemberId) {
+        return memberRelationRepository.findAllBySourceId(currentMemberId).stream()
+                .map(MemberRelation::getTarget)
+                .collect(Collectors.toList());
     }
 
     private boolean isMyFeedRequired(Long targetId, Long sourceId) {
