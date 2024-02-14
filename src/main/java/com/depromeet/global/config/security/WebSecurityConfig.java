@@ -13,8 +13,10 @@ import com.depromeet.global.util.SpringEnvironmentUtil;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -46,6 +48,15 @@ public class WebSecurityConfig {
     @Value("${swagger.password}")
     private String swaggerPassword;
 
+    private static void defaultFilterChain(HttpSecurity http) throws Exception {
+        http.httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .cors(withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    }
+
     @Bean
     public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
         UserDetails user =
@@ -62,27 +73,24 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    @Order(1)
+    @ConditionalOnProperty(name = "spring.profiles.active", havingValue = "dev")
+    public SecurityFilterChain swaggerFilterChain(HttpSecurity http) throws Exception {
+        defaultFilterChain(http);
+
+        http.securityMatcher(
+                        Arrays.stream(SwaggerUrlConstants.values())
+                                .map(SwaggerUrlConstants::getValue)
+                                .toArray(String[]::new))
+                .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+                .httpBasic(withDefaults());
+
+        return http.build();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        http.httpBasic(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .cors(withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(
-                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-        if (springEnvironmentUtil.isProdAndDevProfile()) {
-            http.authorizeHttpRequests(
-                            authorize ->
-                                    authorize
-                                            .requestMatchers(
-                                                    HttpMethod.GET,
-                                                    Arrays.stream(SwaggerUrlConstants.values())
-                                                            .map(SwaggerUrlConstants::getValue)
-                                                            .toArray(String[]::new))
-                                            .authenticated())
-                    .httpBasic(withDefaults());
-        }
+        defaultFilterChain(http);
 
         http.authorizeHttpRequests(
                 authorize ->
