@@ -62,8 +62,18 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     }
 
     @Override
+    public List<FeedOneResponse> findFeedAll(List<Member> members) {
+        return findFeedByVisibility(members, MissionVisibility.FOLLOWER, MissionVisibility.ALL);
+    }
+
+    @Override
     public List<FeedOneResponse> findFeedByVisibility(
-            List<Member> members, List<MissionVisibility> visibilities) {
+            List<Member> members, MissionVisibility... visibilities) {
+        BooleanExpression visibilityCondition = null;
+        if (visibilities != null && visibilities.length > 0) {
+            visibilityCondition = missionRecord.mission.visibility.in(visibilities);
+        }
+
         return jpaQueryFactory
                 .select(
                         Projections.constructor(
@@ -87,7 +97,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                 .on(mission.member.id.eq(missionRecord.mission.member.id))
                 .where(
                         missionRecord.mission.member.in(members),
-                        missionRecord.mission.visibility.in(visibilities),
+                        visibilityCondition,
                         missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE))
                 .orderBy(missionRecord.finishedAt.desc())
                 .limit(FEED_TAB_LIMIT)

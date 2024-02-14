@@ -30,26 +30,26 @@ public class FeedService {
     private final MemberRepository memberRepository;
 
     @Transactional(readOnly = true)
-    public List<FeedOneResponse> findAllFeed(MissionVisibility visibility) {
-		List<MissionVisibility> visibilities = new ArrayList<>();
-		visibilities.add(visibility);
-		if (!visibilities.contains(MissionVisibility.ALL)) {
-			visibilities.add(MissionVisibility.FOLLOWER); // ALL이 아닌 경우에 FOLLOWER를 추가합니다.
-		}
-		if (visibilities.contains(MissionVisibility.ALL)) {
+    public List<FeedOneResponse> findAllFeedByVisibility(MissionVisibility visibility) {
+        if (visibility.equals(MissionVisibility.ALL)) {
             final List<Member> members = memberRepository.findAll();
-            return missionRecordRepository.findFeedByVisibility(members, visibilities);
+            return missionRecordRepository.findFeedByVisibility(members, visibility);
         }
 
         final Member currentMember = memberUtil.getCurrentMember();
+        List<Member> sourceMembers = getSourceMembers(currentMember.getId());
 
-        List<Member> sourceMembers =
-                memberRelationRepository.findAllBySourceId(currentMember.getId()).stream()
-                        .map(MemberRelation::getTarget)
-                        .collect(Collectors.toList());
         sourceMembers.add(currentMember);
+        return missionRecordRepository.findFeedAll(sourceMembers);
+    }
 
-        return missionRecordRepository.findFeedByVisibility(sourceMembers, visibilities);
+    @Transactional(readOnly = true)
+    public List<FeedOneResponse> findAllFeed() {
+        final Member currentMember = memberUtil.getCurrentMember();
+        List<Member> members = getSourceMembers(currentMember.getId());
+
+        members.add(currentMember);
+        return missionRecordRepository.findFeedAll(members);
     }
 
     @Transactional(readOnly = true)
@@ -60,6 +60,12 @@ public class FeedService {
             return findFeedByOtherMember(sourceId, targetId);
         }
         return findFeedByCurrentMember(sourceId);
+    }
+
+    private List<Member> getSourceMembers(Long currentMemberId) {
+        return memberRelationRepository.findAllBySourceId(currentMemberId).stream()
+                .map(MemberRelation::getTarget)
+                .collect(Collectors.toList());
     }
 
     private boolean isMyFeedRequired(Long targetId, Long sourceId) {

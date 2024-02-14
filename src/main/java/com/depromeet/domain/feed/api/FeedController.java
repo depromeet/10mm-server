@@ -23,10 +23,16 @@ public class FeedController {
     private final FeedService feedService;
 
     @Operation(summary = "피드 탭", description = "피드 탭을 조회합니다.")
-    @GetMapping("/me")
+    @GetMapping
     public List<FeedOneResponse> feedFindAll(
             @RequestParam(value = "visibility", required = false) MissionVisibility visibility) {
-        return feedService.findAllFeed(visibility);
+        return feedService.findAllFeedByVisibility(visibility);
+    }
+
+    @Operation(summary = "피드 탭", description = "피드 탭을 조회합니다.")
+    @GetMapping("/me")
+    public List<FeedOneResponse> feedFindAll() {
+        return feedService.findAllFeed();
     }
 
     @Operation(summary = "프로필 피드", description = "피드 탭을 조회합니다.")
