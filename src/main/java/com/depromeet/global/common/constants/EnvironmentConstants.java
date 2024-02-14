@@ -1,6 +1,6 @@
 package com.depromeet.global.common.constants;
 
-import static com.depromeet.global.common.constants.NewEnvironmentConstants.Constants.*;
+import static com.depromeet.global.common.constants.EnvironmentConstants.Constants.*;
 
 import java.util.List;
 import lombok.AccessLevel;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
-public enum NewEnvironmentConstants {
+public enum EnvironmentConstants {
     PROD(PROD_ENV),
     DEV(DEV_ENV),
     LOCAL(LOCAL_ENV);

@@ -1,6 +1,6 @@
 package com.depromeet.global.util;
 
-import static com.depromeet.global.common.constants.NewEnvironmentConstants.Constants.*;
+import static com.depromeet.global.common.constants.EnvironmentConstants.Constants.*;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
