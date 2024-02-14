@@ -1,12 +1,12 @@
 package com.depromeet.global.config.security;
 
 import static com.depromeet.global.common.constants.EnvironmentConstants.*;
+import static com.depromeet.global.common.constants.SwaggerUrlConstants.getSwaggerUrls;
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.security.config.Customizer.*;
 
 import com.depromeet.domain.auth.application.JwtTokenService;
 import com.depromeet.global.annotation.ConditionalOnProfile;
-import com.depromeet.global.common.constants.SwaggerUrlConstants;
 import com.depromeet.global.common.constants.UrlConstants;
 import com.depromeet.global.security.*;
 import com.depromeet.global.util.CookieUtil;
@@ -76,21 +76,15 @@ public class WebSecurityConfig {
     public SecurityFilterChain swaggerFilterChain(HttpSecurity http) throws Exception {
         defaultFilterChain(http);
 
-        http.securityMatcher(SwaggerUrlConstants.getSwaggerUrls()).httpBasic(withDefaults());
+        http.securityMatcher(getSwaggerUrls()).httpBasic(withDefaults());
 
         if (springEnvironmentUtil.isDevProfile()) {
             http.authorizeHttpRequests(
-                    authorize ->
-                            authorize
-                                    .requestMatchers(SwaggerUrlConstants.getSwaggerUrls())
-                                    .authenticated());
+                    authorize -> authorize.requestMatchers(getSwaggerUrls()).authenticated());
         }
 
         http.authorizeHttpRequests(
-                authorize ->
-                        authorize
-                                .requestMatchers(SwaggerUrlConstants.getSwaggerUrls())
-                                .permitAll());
+                authorize -> authorize.requestMatchers(getSwaggerUrls()).permitAll());
 
         return http.build();
     }
