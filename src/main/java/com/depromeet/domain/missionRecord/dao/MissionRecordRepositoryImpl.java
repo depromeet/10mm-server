@@ -63,7 +63,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
 
     @Override
     public List<FeedOneResponse> findFeedByVisibility(
-            List<Member> members, MissionVisibility visibility) {
+            List<Member> members, List<MissionVisibility> visibilities) {
         return jpaQueryFactory
                 .select(
                         Projections.constructor(
@@ -87,7 +87,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                 .on(mission.member.id.eq(missionRecord.mission.member.id))
                 .where(
                         missionRecord.mission.member.in(members),
-                        missionRecord.mission.visibility.in(visibility),
+                        missionRecord.mission.visibility.in(visibilities),
                         missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE))
                 .orderBy(missionRecord.finishedAt.desc())
                 .limit(FEED_TAB_LIMIT)

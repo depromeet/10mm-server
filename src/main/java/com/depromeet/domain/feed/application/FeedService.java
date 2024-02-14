@@ -31,9 +31,14 @@ public class FeedService {
 
     @Transactional(readOnly = true)
     public List<FeedOneResponse> findAllFeed(MissionVisibility visibility) {
-        if (visibility.equals(MissionVisibility.ALL)) {
+		List<MissionVisibility> visibilities = new ArrayList<>();
+		visibilities.add(visibility);
+		if (!visibilities.contains(MissionVisibility.ALL)) {
+			visibilities.add(MissionVisibility.FOLLOWER); // ALL이 아닌 경우에 FOLLOWER를 추가합니다.
+		}
+		if (visibilities.contains(MissionVisibility.ALL)) {
             final List<Member> members = memberRepository.findAll();
-            return missionRecordRepository.findFeedByVisibility(members, visibility);
+            return missionRecordRepository.findFeedByVisibility(members, visibilities);
         }
 
         final Member currentMember = memberUtil.getCurrentMember();
@@ -44,7 +49,7 @@ public class FeedService {
                         .collect(Collectors.toList());
         sourceMembers.add(currentMember);
 
-        return missionRecordRepository.findFeedByVisibility(sourceMembers, visibility);
+        return missionRecordRepository.findFeedByVisibility(sourceMembers, visibilities);
     }
 
     @Transactional(readOnly = true)
