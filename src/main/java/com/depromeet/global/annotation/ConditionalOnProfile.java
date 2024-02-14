@@ -1,7 +1,6 @@
 package com.depromeet.global.annotation;
 
-import static com.depromeet.global.common.constants.NewEnvironmentConstants.Constants.LOCAL_ENV;
-
+import com.depromeet.global.common.constants.EnvironmentConstants;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -12,5 +11,5 @@ import org.springframework.context.annotation.Conditional;
 @Retention(RetentionPolicy.RUNTIME)
 @Conditional({OnProfileCondition.class})
 public @interface ConditionalOnProfile {
-    String[] value() default {LOCAL_ENV};
+    EnvironmentConstants[] value() default {EnvironmentConstants.LOCAL};
 }
