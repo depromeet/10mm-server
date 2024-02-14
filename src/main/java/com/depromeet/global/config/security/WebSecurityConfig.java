@@ -5,19 +5,17 @@ import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.security.config.Customizer.*;
 
 import com.depromeet.domain.auth.application.JwtTokenService;
+import com.depromeet.global.annotation.ConditionalOnProfile;
 import com.depromeet.global.common.constants.SwaggerUrlConstants;
 import com.depromeet.global.common.constants.UrlConstants;
 import com.depromeet.global.security.*;
 import com.depromeet.global.util.CookieUtil;
 import com.depromeet.global.util.SpringEnvironmentUtil;
-import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -74,7 +72,7 @@ public class WebSecurityConfig {
 
     @Bean
     @Order(1)
-    @ConditionalOnProperty(name = "spring.profiles.active", havingValue = "dev")
+    @ConditionalOnProfile({DEV, LOCAL})
     public SecurityFilterChain swaggerFilterChain(HttpSecurity http) throws Exception {
         defaultFilterChain(http);
 
