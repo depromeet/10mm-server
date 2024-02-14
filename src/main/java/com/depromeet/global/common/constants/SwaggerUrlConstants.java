@@ -1,5 +1,6 @@
 package com.depromeet.global.common.constants;
 
+import java.util.Arrays;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,5 +12,11 @@ public enum SwaggerUrlConstants {
     SWAGGER_API_DOCS_URL("/v3/api-docs/**"),
     ;
 
-    private String value;
+    private final String value;
+
+    public static String[] getSwaggerUrls() {
+        return Arrays.stream(SwaggerUrlConstants.values())
+                .map(SwaggerUrlConstants::getValue)
+                .toArray(String[]::new);
+    }
 }

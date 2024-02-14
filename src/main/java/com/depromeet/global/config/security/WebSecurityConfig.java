@@ -78,12 +78,8 @@ public class WebSecurityConfig {
     public SecurityFilterChain swaggerFilterChain(HttpSecurity http) throws Exception {
         defaultFilterChain(http);
 
-        http.securityMatcher(
-                        Arrays.stream(SwaggerUrlConstants.values())
-                                .map(SwaggerUrlConstants::getValue)
-                                .toArray(String[]::new))
-                .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
-                .httpBasic(withDefaults());
+        http.securityMatcher(SwaggerUrlConstants.getSwaggerUrls()).httpBasic(withDefaults());
+
 
         return http.build();
     }
