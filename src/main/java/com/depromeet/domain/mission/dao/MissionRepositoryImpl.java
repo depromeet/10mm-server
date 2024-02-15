@@ -96,8 +96,8 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                         .leftJoin(mission.missionRecords, missionRecord)
                         .where(
                                 memberIdEq(memberId),
-                                mission.startedAt.loe(startedAt),
-                                mission.finishedAt.goe(finishedAt))
+                                mission.startedAt.goe(startedAt),
+                                mission.finishedAt.loe(finishedAt))
                         .fetchJoin();
         return query.fetch();
     }
