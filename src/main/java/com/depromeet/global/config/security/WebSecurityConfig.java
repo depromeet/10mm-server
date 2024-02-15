@@ -46,7 +46,7 @@ public class WebSecurityConfig {
     @Value("${swagger.password}")
     private String swaggerPassword;
 
-    private static void defaultFilterChain(HttpSecurity http) throws Exception {
+    private void defaultFilterChain(HttpSecurity http) throws Exception {
         http.httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .cors(withDefaults())
