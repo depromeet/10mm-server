@@ -35,6 +35,7 @@ public class PushService {
         final Member targetMember = mission.getMember();
 
         validateSelfSending(currentMember.getId(), targetMember.getId());
+        validateFinishedMission(mission);
         validateMissionNotCompletedToday(mission);
 
         fcmService.sendMessageSync(
@@ -48,6 +49,12 @@ public class PushService {
                 Notification.createNotification(
                         NotificationType.MISSION_URGING, currentMember, targetMember);
         notificationRepository.save(notification);
+    }
+
+    private void validateFinishedMission(Mission mission) {
+        if (mission.isFinished()) {
+            throw new CustomException(ErrorCode.FINISHED_MISSION_URGING_NOT_ALLOWED);
+        }
     }
 
     private void validateMissionNotCompletedToday(Mission mission) {

@@ -98,8 +98,6 @@ class PushServiceTest {
         void 본인에게_재촉할_경우_예외를_발생시킨다() {
             // given
             PushUrgingSendRequest request = new PushUrgingSendRequest(1L);
-
-            // when, then
             Member currentMember =
                     memberRepository.save(
                             Member.createNormalMember(
@@ -122,6 +120,38 @@ class PushServiceTest {
             assertThatThrownBy(() -> pushService.sendUrgingPush(request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.SELF_SENDING_NOT_ALLOWED.getMessage());
+        }
+
+        @Test
+        void 종료된_미션을_재촉할_경우_예외를_발생시킨다() {
+            // given
+            PushUrgingSendRequest request = new PushUrgingSendRequest(1L);
+            Member currentMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname1", "testImageUrl1")));
+            Member targetMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname2", "testImageUrl2")));
+            LocalDateTime today = LocalDateTime.now();
+            LocalDateTime missionStartedAt = today.minusWeeks(3);
+            LocalDateTime missionFinishedAt = missionStartedAt.plusWeeks(2);
+            missionRepository.save(
+                    Mission.createMission(
+                            "testMissionName",
+                            "testMissionContent",
+                            1,
+                            MissionCategory.ETC,
+                            MissionVisibility.ALL,
+                            missionStartedAt,
+                            missionFinishedAt,
+                            targetMember));
+
+            // when, then
+            assertThatThrownBy(() -> pushService.sendUrgingPush(request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.FINISHED_MISSION_URGING_NOT_ALLOWED.getMessage());
         }
 
         @Test

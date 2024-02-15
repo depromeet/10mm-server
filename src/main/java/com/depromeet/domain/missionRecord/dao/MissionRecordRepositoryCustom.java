@@ -15,6 +15,9 @@ public interface MissionRecordRepositoryCustom {
 
     List<FeedOneResponse> findFeedAll(List<Member> members);
 
+    List<FeedOneResponse> findFeedByVisibility(
+            List<Member> members, List<MissionVisibility> visibility);
+
     List<MissionRecord> findFeedAllByMemberId(Long memberId, List<MissionVisibility> visibilities);
 
     boolean isCompletedMissionExistsToday(Long missionId);

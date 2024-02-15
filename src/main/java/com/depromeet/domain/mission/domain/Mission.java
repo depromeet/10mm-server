@@ -134,4 +134,13 @@ public class Mission extends BaseTimeEntity {
                 .findFirst()
                 .isPresent();
     }
+
+    public boolean isFinished() {
+        if (this.getDurationStatus() == DurationStatus.FINISHED
+                || this.archiveStatus == ArchiveStatus.ARCHIVED
+                || this.getFinishedAt().isBefore(LocalDateTime.now())) {
+            return true;
+        }
+        return false;
+    }
 }
