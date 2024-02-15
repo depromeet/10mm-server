@@ -108,6 +108,11 @@ public class WebSecurityConfig {
                                 .authenticated());
         //        .permitAll());
 
+        http.exceptionHandling(
+                exception ->
+                        exception.authenticationEntryPoint(
+                                (request, response, authException) -> response.setStatus(401)));
+
         http.addFilterBefore(
                 jwtAuthenticationFilter(jwtTokenService, cookieUtil),
                 UsernamePasswordAuthenticationFilter.class);
