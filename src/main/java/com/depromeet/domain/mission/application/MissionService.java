@@ -80,7 +80,11 @@ public class MissionService {
             // 당일 수행한 미션기록의 인증사진이 존재하면 COMPLETE
             if (optionalRecord.get().getUploadStatus() == ImageUploadStatus.COMPLETE) {
                 results.add(
-                        MissionFindAllResponse.of(mission, MissionStatus.COMPLETED, null, null));
+                        MissionFindAllResponse.of(
+                                mission,
+                                MissionStatus.COMPLETED,
+                                null,
+                                optionalRecord.get().getId()));
                 continue;
             }
 
@@ -308,8 +312,11 @@ public class MissionService {
     @Transactional(readOnly = true)
     public MissionSummaryListResponse findSummaryList(LocalDate date) {
         final Member currentMember = memberUtil.getCurrentMember();
+        LocalDateTime startedAt = date.atTime(0, 0, 0);
+        LocalDateTime finishedAt = startedAt.plusDays(1);
         List<Mission> missions =
-                missionRepository.findMissionsWithRecordsByDate(date, currentMember.getId());
+                missionRepository.findMissionsWithRecordsByDate(
+                        startedAt, finishedAt, currentMember.getId());
 
         List<MissionSummaryItem> result =
                 missions.stream()

@@ -1,7 +1,6 @@
 package com.depromeet.domain.missionRecord.application;
 
 import com.depromeet.domain.member.domain.Member;
-import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
@@ -34,7 +33,6 @@ public class MissionRecordService {
     private static final int DAYS_ADJUSTMENT = 1;
 
     private final MemberUtil memberUtil;
-    private final MissionService missionService;
     private final MissionRepository missionRepository;
     private final MissionRecordRepository missionRecordRepository;
     private final MissionRecordTtlRepository missionRecordTtlRepository;
@@ -224,29 +222,43 @@ public class MissionRecordService {
 
     private long calculateMaxContinuousSuccessDay(
             LocalDateTime startedAt, LocalDateTime finishedAt, List<MissionRecord> missionRecords) {
-        long continuousSuccessDay = 1;
+        if (missionRecords.isEmpty()) return 0;
+
         long maxContinuousSuccessDay = 0;
-        LocalDate previousDate = null;
+        long continuousSuccessDay = 0;
 
-        for (MissionRecord missionRecord : missionRecords) {
-            LocalDate currentDate = missionRecord.getStartedAt().toLocalDate();
+        LocalDate currentDate = startedAt.toLocalDate();
 
-            // startedAt과 finishedAt 사이에 있는 일자일 때만 고려
-            if (!(currentDate.isAfter(startedAt.toLocalDate())
-                    && currentDate.isBefore(finishedAt.toLocalDate()))) {
-                continue;
+        // 시작일부터 종료일까지의 각 날짜에 대해 확인합니다.
+        while (!currentDate.isAfter(finishedAt.toLocalDate())) {
+            boolean isSuccessDay = false;
+
+            // 현재 날짜와 일치하는 미션 기록이 있는지 확인합니다.
+            for (MissionRecord missionRecord : missionRecords) {
+                LocalDate recordDate = missionRecord.getStartedAt().toLocalDate();
+
+                // 현재 날짜와 기록의 시작 날짜가 일치 확인
+                if (currentDate.isEqual(recordDate)) {
+                    isSuccessDay = true;
+                    break;
+                }
             }
-            if (previousDate != null && currentDate.minusDays(1).isEqual(previousDate)) {
+
+            if (isSuccessDay) {
+                // 연속하는 성공일이면 카운트를 증가
                 continuousSuccessDay++;
             } else {
-                continuousSuccessDay = 1; // 연속성이 깨진 경우 초기화
+                // 연속하는 성공일이 끊긴 경우, 최대 연속 성공일을 갱신하고 초기화
+                maxContinuousSuccessDay = Math.max(continuousSuccessDay, maxContinuousSuccessDay);
+                continuousSuccessDay = 0;
             }
 
-            maxContinuousSuccessDay = Math.max(continuousSuccessDay, maxContinuousSuccessDay);
-
-            previousDate = currentDate;
+            // 다음 날짜로 이동
+            currentDate = currentDate.plusDays(1);
         }
-        return maxContinuousSuccessDay;
+
+        // 마지막 연속성을 검사하고 최대값을 반환
+        return Math.max(continuousSuccessDay, maxContinuousSuccessDay);
     }
 
     private void validateMissionRecordDuration(Duration duration) {
