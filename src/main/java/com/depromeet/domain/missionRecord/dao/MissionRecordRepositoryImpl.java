@@ -85,8 +85,8 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                                 missionRecord.imageUrl,
                                 missionRecord.duration,
                                 mission.startedAt,
-                                missionRecord.startedAt,
-                                mission.finishedAt))
+                                mission.finishedAt,
+                                missionRecord.startedAt))
                 .from(missionRecord)
                 .leftJoin(missionRecord.mission, mission)
                 .on(mission.id.eq(missionRecord.mission.id))
@@ -96,7 +96,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                         missionRecord.mission.member.in(members),
                         missionRecord.mission.visibility.in(visibilities),
                         uploadStatusCompleteEq())
-                .orderBy(missionRecord.finishedAt.desc())
+                .orderBy(missionRecord.startedAt.desc())
                 .limit(FEED_TAB_LIMIT)
                 .fetch();
     }
