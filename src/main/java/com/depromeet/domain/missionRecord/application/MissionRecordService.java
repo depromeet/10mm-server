@@ -258,8 +258,7 @@ public class MissionRecordService {
         }
 
         // 마지막 연속성을 검사하고 최대값을 반환
-        maxContinuousSuccessDay = Math.max(continuousSuccessDay, maxContinuousSuccessDay);
-        return maxContinuousSuccessDay;
+        return Math.max(continuousSuccessDay, maxContinuousSuccessDay);
     }
 
     private void validateMissionRecordDuration(Duration duration) {
