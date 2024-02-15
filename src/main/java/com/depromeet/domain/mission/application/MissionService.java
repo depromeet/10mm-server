@@ -80,7 +80,11 @@ public class MissionService {
             // 당일 수행한 미션기록의 인증사진이 존재하면 COMPLETE
             if (optionalRecord.get().getUploadStatus() == ImageUploadStatus.COMPLETE) {
                 results.add(
-                        MissionFindAllResponse.of(mission, MissionStatus.COMPLETED, null, optionalRecord.get().getId()));
+                        MissionFindAllResponse.of(
+                                mission,
+                                MissionStatus.COMPLETED,
+                                null,
+                                optionalRecord.get().getId()));
                 continue;
             }
 
