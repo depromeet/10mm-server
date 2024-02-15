@@ -233,11 +233,11 @@ public class MissionRecordService {
         while (!currentDate.isAfter(finishedAt.toLocalDate())) {
             boolean isSuccessDay = false;
 
-            // 현재 날짜와 일치하는 레코드가 있는지 확인합니다.
+            // 현재 날짜와 일치하는 미션 기록이 있는지 확인합니다.
             for (MissionRecord missionRecord : missionRecords) {
                 LocalDate recordDate = missionRecord.getStartedAt().toLocalDate();
 
-                // 현재 날짜와 레코드의 시작 날짜가 일치하고, 레코드의 상태가 성공인 경우를 확인합니다.
+                // 현재 날짜와 기록의 시작 날짜가 일치 확인
                 if (currentDate.isEqual(recordDate)) {
                     isSuccessDay = true;
                     break;
@@ -245,19 +245,19 @@ public class MissionRecordService {
             }
 
             if (isSuccessDay) {
-                // 연속하는 성공일이면 카운트를 증가시킵니다.
+                // 연속하는 성공일이면 카운트를 증가
                 continuousSuccessDay++;
             } else {
-                // 연속하는 성공일이 끊긴 경우, 최대 연속 성공일을 갱신하고 초기화합니다.
+                // 연속하는 성공일이 끊긴 경우, 최대 연속 성공일을 갱신하고 초기화
                 maxContinuousSuccessDay = Math.max(continuousSuccessDay, maxContinuousSuccessDay);
                 continuousSuccessDay = 0;
             }
 
-            // 다음 날짜로 이동합니다.
+            // 다음 날짜로 이동
             currentDate = currentDate.plusDays(1);
         }
 
-        // 마지막 연속성을 검사하고 최대값을 반환합니다.
+        // 마지막 연속성을 검사하고 최대값을 반환
         maxContinuousSuccessDay = Math.max(continuousSuccessDay, maxContinuousSuccessDay);
         return maxContinuousSuccessDay;
     }

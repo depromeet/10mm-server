@@ -61,8 +61,7 @@ public record FeedOneResponse(
             Duration duration,
             LocalDateTime startedAt,
             LocalDateTime finishedAt,
-            LocalDateTime recordStartedAt,
-            LocalDateTime recordFinishedAt) {
+            LocalDateTime recordStartedAt) {
         this(
                 memberId,
                 nickname,
@@ -91,8 +90,7 @@ public record FeedOneResponse(
             Duration duration,
             LocalDateTime startedAt,
             LocalDateTime finishedAt,
-            LocalDateTime recordStartedAt,
-            LocalDateTime recordFinishedAt) {
+            LocalDateTime recordStartedAt) {
         return new FeedOneResponse(
                 memberId,
                 nickname,
