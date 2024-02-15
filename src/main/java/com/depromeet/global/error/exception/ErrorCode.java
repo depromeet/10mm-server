@@ -59,6 +59,7 @@ public enum ErrorCode {
     SELF_SENDING_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "본인에게 메세지를 전송할 수 없습니다."),
     TODAY_COMPLETED_MISSION_SENDING_NOT_ALLOWED(
             HttpStatus.BAD_REQUEST, "오늘 미션을 완료한 미션에는 메세지를 전송할 수 없습니다."),
+    FINISHED_MISSION_URGING_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "종료된 미션에는 재촉하기를 할 수 없습니다."),
 
     // Reaction
     REACTION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 리액션을 찾을 수 없습니다."),
