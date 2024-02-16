@@ -38,7 +38,16 @@ public record FeedOneResponse(
                         description = "미션 기록 종료 시간",
                         defaultValue = "2024-01-20 00:34:00",
                         type = "string")
-                LocalDateTime finishedAt) {
+                LocalDateTime finishedAt,
+        @JsonFormat(
+                        shape = JsonFormat.Shape.STRING,
+                        pattern = "yyyy-MM-dd HH:mm:ss",
+                        timezone = "Asia/Seoul")
+                @Schema(
+                        description = "미션 기록 시작 시간",
+                        defaultValue = "2024-01-06 00:00:00",
+                        type = "string")
+                LocalDateTime recordStartedAt) {
     @QueryProjection
     public FeedOneResponse(
             Long memberId,
@@ -50,9 +59,9 @@ public record FeedOneResponse(
             String remark,
             String recordImageUrl,
             Duration duration,
-            LocalDateTime missionStartedAt,
-            LocalDateTime recordStartedAt,
-            LocalDateTime finishedAt) {
+            LocalDateTime startedAt,
+            LocalDateTime finishedAt,
+            LocalDateTime recordStartedAt) {
         this(
                 memberId,
                 nickname,
@@ -63,9 +72,10 @@ public record FeedOneResponse(
                 remark,
                 recordImageUrl,
                 duration.toMinutes(),
-                Duration.between(missionStartedAt, recordStartedAt).toDays() + 1,
-                missionStartedAt,
-                finishedAt);
+                Duration.between(startedAt, recordStartedAt).toDays() + 1,
+                startedAt,
+                finishedAt,
+                recordStartedAt);
     }
 
     public static FeedOneResponse of(
@@ -79,7 +89,8 @@ public record FeedOneResponse(
             String recordImageUrl,
             Duration duration,
             LocalDateTime startedAt,
-            LocalDateTime finishedAt) {
+            LocalDateTime finishedAt,
+            LocalDateTime recordStartedAt) {
         return new FeedOneResponse(
                 memberId,
                 nickname,
@@ -92,6 +103,7 @@ public record FeedOneResponse(
                 duration.toMinutes(),
                 Duration.between(startedAt, LocalDateTime.now()).toDays() + 1,
                 startedAt,
-                finishedAt);
+                finishedAt,
+                recordStartedAt);
     }
 }

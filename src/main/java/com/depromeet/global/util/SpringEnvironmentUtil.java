@@ -1,6 +1,6 @@
 package com.depromeet.global.util;
 
-import static com.depromeet.global.common.constants.EnvironmentConstants.*;
+import static com.depromeet.global.common.constants.EnvironmentConstants.Constants.*;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -16,21 +16,21 @@ public class SpringEnvironmentUtil {
 
     public String getCurrentProfile() {
         return getActiveProfiles()
-                .filter(profile -> profile.equals(PROD) || profile.equals(DEV))
+                .filter(profile -> profile.equals(PROD_ENV) || profile.equals(DEV_ENV))
                 .findFirst()
-                .orElse(LOCAL);
+                .orElse(LOCAL_ENV);
     }
 
     public boolean isProdProfile() {
-        return getActiveProfiles().anyMatch(PROD::equals);
+        return getActiveProfiles().anyMatch(PROD_ENV::equals);
     }
 
     public boolean isDevProfile() {
-        return getActiveProfiles().anyMatch(DEV::equals);
+        return getActiveProfiles().anyMatch(DEV_ENV::equals);
     }
 
     public boolean isProdAndDevProfile() {
-        return getActiveProfiles().anyMatch(PROD_AND_DEV::contains);
+        return getActiveProfiles().anyMatch(PROD_AND_DEV_ENV::contains);
     }
 
     private Stream<String> getActiveProfiles() {

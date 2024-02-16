@@ -8,6 +8,7 @@ import com.depromeet.domain.mission.domain.DurationStatus;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
@@ -90,16 +91,18 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
 
     @Override
     public List<Mission> findMissionsWithRecordsByDate(LocalDate date, Long memberId) {
-        LocalDateTime startedAt = date.atTime(0, 0, 0);
-        LocalDateTime finishedAt = startedAt.plusDays(1);
         JPAQuery<Mission> query =
                 jpaQueryFactory
                         .selectFrom(mission)
                         .leftJoin(mission.missionRecords, missionRecord)
                         .where(
                                 memberIdEq(memberId),
-                                mission.startedAt.loe(startedAt),
-                                mission.finishedAt.goe(finishedAt))
+                                Expressions.dateTemplate(
+                                                LocalDate.class, "DATE({0})", mission.startedAt)
+                                        .loe(date),
+                                Expressions.dateTemplate(
+                                                LocalDate.class, "DATE({0})", mission.finishedAt)
+                                        .goe(date))
                         .fetchJoin();
         return query.fetch();
     }

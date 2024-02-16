@@ -1,21 +1,21 @@
 package com.depromeet.global.config.security;
 
 import static com.depromeet.global.common.constants.EnvironmentConstants.*;
+import static com.depromeet.global.common.constants.SwaggerUrlConstants.getSwaggerUrls;
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.security.config.Customizer.*;
 
 import com.depromeet.domain.auth.application.JwtTokenService;
-import com.depromeet.global.common.constants.SwaggerUrlConstants;
+import com.depromeet.global.annotation.ConditionalOnProfile;
 import com.depromeet.global.common.constants.UrlConstants;
 import com.depromeet.global.security.*;
 import com.depromeet.global.util.CookieUtil;
 import com.depromeet.global.util.SpringEnvironmentUtil;
-import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -46,6 +46,15 @@ public class WebSecurityConfig {
     @Value("${swagger.password}")
     private String swaggerPassword;
 
+    private void defaultFilterChain(HttpSecurity http) throws Exception {
+        http.httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .cors(withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    }
+
     @Bean
     public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
         UserDetails user =
@@ -62,37 +71,28 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    @Order(1)
+    @ConditionalOnProfile({DEV, LOCAL})
+    public SecurityFilterChain swaggerFilterChain(HttpSecurity http) throws Exception {
+        defaultFilterChain(http);
+
+        http.securityMatcher(getSwaggerUrls()).httpBasic(withDefaults());
+
+        http.authorizeHttpRequests(
+                springEnvironmentUtil.isDevProfile()
+                        ? authorize -> authorize.anyRequest().authenticated()
+                        : authorize -> authorize.anyRequest().permitAll());
+
+        return http.build();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        http.httpBasic(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .cors(withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(
-                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-        if (springEnvironmentUtil.isProdAndDevProfile()) {
-            http.authorizeHttpRequests(
-                            authorize ->
-                                    authorize
-                                            .requestMatchers(
-                                                    HttpMethod.GET,
-                                                    Arrays.stream(SwaggerUrlConstants.values())
-                                                            .map(SwaggerUrlConstants::getValue)
-                                                            .toArray(String[]::new))
-                                            .authenticated())
-                    .httpBasic(withDefaults());
-        }
+        defaultFilterChain(http);
 
         http.authorizeHttpRequests(
                 authorize ->
                         authorize
-                                .requestMatchers(
-                                        HttpMethod.GET,
-                                        Arrays.stream(SwaggerUrlConstants.values())
-                                                .map(SwaggerUrlConstants::getValue)
-                                                .toArray(String[]::new))
-                                .permitAll()
                                 .requestMatchers("/10mm-actuator/**")
                                 .permitAll() // 액추에이터
                                 .requestMatchers("/auth/register")
@@ -107,6 +107,11 @@ public class WebSecurityConfig {
                                 // TODO: 임시로 모든 url 허용했지만, OIDC에서 권한따라 authentication 할 수 있도록 변경 필요
                                 .authenticated());
         //        .permitAll());
+
+        http.exceptionHandling(
+                exception ->
+                        exception.authenticationEntryPoint(
+                                (request, response, authException) -> response.setStatus(401)));
 
         http.addFilterBefore(
                 jwtAuthenticationFilter(jwtTokenService, cookieUtil),
