@@ -1,6 +1,7 @@
 package com.depromeet.domain.mission.dao;
 
 import com.depromeet.domain.mission.domain.Mission;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,6 +17,5 @@ public interface MissionRepositoryCustom {
 
     List<Mission> findAllFinishedMission(Long memberId);
 
-    List<Mission> findMissionsWithRecordsByDate(
-            LocalDateTime startedAt, LocalDateTime finishedAt, Long memberId);
+    List<Mission> findMissionsWithRecordsByDate(LocalDate date, Long memberId);
 }

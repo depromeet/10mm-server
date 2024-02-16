@@ -312,11 +312,9 @@ public class MissionService {
     @Transactional(readOnly = true)
     public MissionSummaryListResponse findSummaryList(LocalDate date) {
         final Member currentMember = memberUtil.getCurrentMember();
-        LocalDateTime startedAt = date.atTime(0, 0, 0);
-        LocalDateTime finishedAt = startedAt.plusDays(1);
+
         List<Mission> missions =
-                missionRepository.findMissionsWithRecordsByDate(
-                        startedAt, finishedAt, currentMember.getId());
+                missionRepository.findMissionsWithRecordsByDate(date, currentMember.getId());
 
         List<MissionSummaryItem> result =
                 missions.stream()
