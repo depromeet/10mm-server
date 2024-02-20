@@ -4,6 +4,7 @@ import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 public record MissionRecordFindOneResponse(
         @Schema(description = "미션 기록 ID", defaultValue = "1") Long recordId,
@@ -33,13 +34,16 @@ public record MissionRecordFindOneResponse(
                         defaultValue = "2024-01-03 00:34:00",
                         type = "string")
                 LocalDateTime finishedAt) {
-    public static MissionRecordFindOneResponse of(MissionRecord missionRecord, long sinceDay) {
+    public static MissionRecordFindOneResponse from(MissionRecord missionRecord) {
         return new MissionRecordFindOneResponse(
                 missionRecord.getId(),
                 missionRecord.getRemark(),
                 missionRecord.getImageUrl(),
                 missionRecord.getDuration().toMinutes(),
-                sinceDay,
+                ChronoUnit.DAYS.between(
+                                missionRecord.getMission().getStartedAt().toLocalDate(),
+                                missionRecord.getStartedAt().toLocalDate())
+                        + 1,
                 missionRecord.getStartedAt(),
                 missionRecord.getFinishedAt());
     }

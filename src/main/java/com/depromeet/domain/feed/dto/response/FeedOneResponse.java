@@ -5,6 +5,7 @@ import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 public record FeedOneResponse(
         @Schema(description = "작성자 ID", defaultValue = "1") Long memberId,
@@ -72,7 +73,7 @@ public record FeedOneResponse(
                 remark,
                 recordImageUrl,
                 duration.toMinutes(),
-                Duration.between(startedAt, recordStartedAt).toDays() + 1,
+                ChronoUnit.DAYS.between(startedAt, recordStartedAt) + 1,
                 startedAt,
                 finishedAt,
                 recordStartedAt);

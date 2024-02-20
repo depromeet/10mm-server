@@ -3,8 +3,8 @@ package com.depromeet.domain.feed.dto.response;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 public record FeedOneByProfileResponse(
         @Schema(description = "미션 ID", defaultValue = "1") Long missionId,
@@ -42,7 +42,9 @@ public record FeedOneByProfileResponse(
                 record.getMission().getName(),
                 record.getImageUrl(),
                 record.getDuration().toMinutes(),
-                Duration.between(record.getMission().getStartedAt(), record.getStartedAt()).toDays()
+                ChronoUnit.DAYS.between(
+                                record.getMission().getStartedAt().toLocalDate(),
+                                record.getStartedAt().toLocalDate())
                         + 1,
                 record.getStartedAt(),
                 record.getFinishedAt());

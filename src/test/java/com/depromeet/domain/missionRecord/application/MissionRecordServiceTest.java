@@ -1,5 +1,6 @@
 package com.depromeet.domain.missionRecord.application;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import com.depromeet.DatabaseCleaner;
@@ -14,14 +15,13 @@ import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
+import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindOneResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionStatisticsResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.util.SecurityUtil;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -78,7 +78,7 @@ class MissionRecordServiceTest {
         // then
         Long missionId = mission.getId();
 
-        Assertions.assertThrows(
+        assertThrows(
                 CustomException.class, () -> missionRecordService.findOneMissionRecord(missionId));
     }
 
@@ -121,12 +121,59 @@ class MissionRecordServiceTest {
                 missionRecordService.findMissionStatistics(mission.getId());
 
         // then
-        Assertions.assertEquals(missionStatistics.totalMissionHour(), 1);
-        Assertions.assertEquals(missionStatistics.totalMissionMinute(), 59);
-        Assertions.assertEquals(missionStatistics.totalSymbolStack(), 7);
-        Assertions.assertEquals(missionStatistics.continuousSuccessDay(), 4);
-        Assertions.assertEquals(missionStatistics.totalSuccessDay(), 7);
-        Assertions.assertEquals(missionStatistics.totalMissionAttainRate(), 46.7);
-        Assertions.assertEquals(missionStatistics.timeTable().size(), 7);
+        assertEquals(missionStatistics.totalMissionHour(), 1);
+        assertEquals(missionStatistics.totalMissionMinute(), 59);
+        assertEquals(missionStatistics.totalSymbolStack(), 7);
+        assertEquals(missionStatistics.continuousSuccessDay(), 4);
+        assertEquals(missionStatistics.totalSuccessDay(), 7);
+        assertEquals(missionStatistics.totalMissionAttainRate(), 46.7);
+        assertEquals(missionStatistics.timeTable().size(), 7);
+    }
+
+    @Nested
+    class 미션기록_단건_조회할_때 {
+        @Test
+        void 미션이_생성된_당일에_미션기록을_완료한_경우라면_sinceDay가_1이된다() {
+            // given
+            LocalDateTime missionRecordStartedAt = missionStartedAt;
+            LocalDateTime missionRecordFinishedAt =
+                    missionRecordStartedAt.plusMinutes(32).plusSeconds(14);
+            Duration duration = Duration.ofMinutes(32).plusSeconds(14);
+            MissionRecord missionRecord =
+                    MissionRecord.createMissionRecord(
+                            duration, missionRecordStartedAt, missionRecordFinishedAt, mission);
+            missionRecord.updateUploadStatusPending();
+            missionRecord.updateUploadStatusComplete("remark", "imageUrl");
+            MissionRecord savedMissionRecord = missionRecordRepository.save(missionRecord);
+
+            // when
+            MissionRecordFindOneResponse queryMissionRecord =
+                    missionRecordService.findOneMissionRecord(savedMissionRecord.getId());
+
+            // then
+            assertEquals(1, queryMissionRecord.sinceDay());
+        }
+
+        @Test
+        void 미션이_생성되고_일주일후에_미션기록을_완료한_경우라면_sinceDay가_8이된다() {
+            // given
+            LocalDateTime missionRecordStartedAt = missionStartedAt.plusDays(7);
+            LocalDateTime missionRecordFinishedAt =
+                    missionRecordStartedAt.plusMinutes(32).plusSeconds(14);
+            Duration duration = Duration.ofMinutes(32).plusSeconds(14);
+            MissionRecord missionRecord =
+                    MissionRecord.createMissionRecord(
+                            duration, missionRecordStartedAt, missionRecordFinishedAt, mission);
+            missionRecord.updateUploadStatusPending();
+            missionRecord.updateUploadStatusComplete("remark", "imageUrl");
+            MissionRecord savedMissionRecord = missionRecordRepository.save(missionRecord);
+
+            // when
+            MissionRecordFindOneResponse queryMissionRecord =
+                    missionRecordService.findOneMissionRecord(savedMissionRecord.getId());
+
+            // then
+            assertEquals(8, queryMissionRecord.sinceDay());
+        }
     }
 }
