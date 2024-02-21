@@ -96,7 +96,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                         missionRecord.mission.member.in(members),
                         missionRecord.mission.visibility.in(visibilities),
                         uploadStatusCompleteEq())
-                .orderBy(missionRecord.startedAt.desc())
+                .orderBy(missionRecord.finishedAt.desc())
                 .limit(FEED_TAB_LIMIT)
                 .fetch();
     }
