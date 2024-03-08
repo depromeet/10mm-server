@@ -1,6 +1,6 @@
 package com.depromeet.domain.notification.application;
 
-import static com.depromeet.global.common.constants.PushNotificationConstants.PUSH_URGING_TITLE;
+import static com.depromeet.global.common.constants.PushNotificationConstants.*;
 
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.dao.MissionRepository;
@@ -8,6 +8,7 @@ import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.notification.dao.NotificationRepository;
 import com.depromeet.domain.notification.domain.Notification;
 import com.depromeet.domain.notification.domain.NotificationType;
+import com.depromeet.domain.notification.dto.request.PushMissionRemindRequest;
 import com.depromeet.domain.notification.dto.request.PushUrgingSendRequest;
 import com.depromeet.global.common.constants.PushNotificationConstants;
 import com.depromeet.global.error.exception.CustomException;
@@ -50,6 +51,19 @@ public class PushService {
                         NotificationType.MISSION_URGING, currentMember, targetMember);
         notificationRepository.save(notification);
     }
+
+	public void sendMissionRemindPush(PushMissionRemindRequest request) {
+		final Member currentMember = memberUtil.getCurrentMember();
+		final Mission mission =
+			missionRepository
+				.findById(request.missionId())
+				.orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
+
+		fcmService.sendMessageSync(
+			currentMember.getFcmInfo().getFcmToken(),
+			PUSH_MISSION_REMIND_TITLE,
+				PushNotificationConstants.PUSH_MISSION_REMIND_CONTENT);
+	}
 
     private void validateFinishedMission(Mission mission) {
         if (mission.isFinished()) {
