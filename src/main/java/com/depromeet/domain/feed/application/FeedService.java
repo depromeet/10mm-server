@@ -57,7 +57,7 @@ public class FeedService {
         List<Member> sourceMembers = getSourceMembers(currentMember.getId());
 
         sourceMembers.add(currentMember);
-		return missionRecordRepository.findFeedAllByPage(size, lastId, sourceMembers);
+        return missionRecordRepository.findFeedAllByPage(size, lastId, sourceMembers);
     }
 
     @Transactional(readOnly = true)
