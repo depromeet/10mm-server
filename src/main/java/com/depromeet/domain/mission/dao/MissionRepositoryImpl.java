@@ -15,9 +15,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -129,19 +126,5 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
 
     private BooleanExpression durationStatusFinishedEq() {
         return mission.durationStatus.eq(DurationStatus.FINISHED);
-    }
-
-    // 무한 스크롤 방식 처리하는 메서드
-    private Slice<Mission> checkLastPage(int size, List<Mission> result) {
-
-        boolean hasNext = false;
-
-        // 조회한 결과 개수가 요청한 페이지 사이즈보다 크면 뒤에 더 있음, next = true
-        if (result.size() > size) {
-            hasNext = true;
-            result.remove(size);
-        }
-        Pageable pageable = Pageable.unpaged();
-        return new SliceImpl<>(result, pageable, hasNext);
     }
 }

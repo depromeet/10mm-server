@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,10 +30,13 @@ public class FeedController {
         return feedService.findAllFeedByVisibility(visibility);
     }
 
-    @Operation(summary = "피드 탭", description = "피드 탭을 조회합니다.")
+    @Operation(summary = "피드 탭 페이지네이션", description = "피드 탭을 조회합니다.")
     @GetMapping("/me")
-    public List<FeedOneResponse> feedFindAll() {
-        return feedService.findAllFeed();
+    public Slice<FeedOneResponse> feedFindByPage(
+            @RequestParam int size,
+            @RequestParam(required = false) Long lastId,
+            @RequestParam(value = "visibility", required = false) MissionVisibility visibility) {
+        return feedService.findFeedByPage(size, lastId, visibility);
     }
 
     @Operation(summary = "프로필 피드", description = "피드 탭을 조회합니다.")

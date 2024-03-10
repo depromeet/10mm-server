@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,22 @@ public class FeedService {
 
         sourceMembers.add(currentMember);
         return missionRecordRepository.findFeedAll(sourceMembers);
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<FeedOneResponse> findFeedByPage(
+            int size, Long lastId, MissionVisibility visibility) {
+        if (visibility == MissionVisibility.ALL) {
+            final List<Member> members = memberRepository.findAll();
+            return missionRecordRepository.findFeedByVisibilityAndPage(
+                    size, lastId, members, List.of(visibility));
+        }
+
+        final Member currentMember = memberUtil.getCurrentMember();
+        List<Member> sourceMembers = getSourceMembers(currentMember.getId());
+
+        sourceMembers.add(currentMember);
+		return missionRecordRepository.findFeedAllByPage(size, lastId, sourceMembers);
     }
 
     @Transactional(readOnly = true)

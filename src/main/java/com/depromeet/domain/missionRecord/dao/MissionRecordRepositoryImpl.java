@@ -16,6 +16,9 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -102,6 +105,48 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     }
 
     @Override
+    public Slice<FeedOneResponse> findFeedAllByPage(int size, Long lastId, List<Member> members) {
+        return findFeedByVisibilityAndPage(
+                size, lastId, members, List.of(MissionVisibility.FOLLOWER, MissionVisibility.ALL));
+    }
+
+    @Override
+    public Slice<FeedOneResponse> findFeedByVisibilityAndPage(
+            int size, Long lastId, List<Member> members, List<MissionVisibility> visibilities) {
+        List<FeedOneResponse> feedList =
+                jpaQueryFactory
+                        .select(
+                                Projections.constructor(
+                                        FeedOneResponse.class,
+                                        member.id,
+                                        member.profile.nickname,
+                                        member.profile.profileImageUrl,
+                                        mission.id,
+                                        mission.name,
+                                        missionRecord.id,
+                                        missionRecord.remark,
+                                        missionRecord.imageUrl,
+                                        missionRecord.duration,
+                                        mission.startedAt,
+                                        mission.finishedAt,
+                                        missionRecord.startedAt))
+                        .from(missionRecord)
+                        .leftJoin(missionRecord.mission, mission)
+                        .on(mission.id.eq(missionRecord.mission.id))
+                        .leftJoin(mission.member, member)
+                        .on(mission.member.id.eq(missionRecord.mission.member.id))
+                        .where(
+                                ltMissionRecordId(lastId),
+                                missionRecord.mission.member.in(members),
+                                missionRecord.mission.visibility.in(visibilities),
+                                uploadStatusCompleteEq())
+                        .orderBy(missionRecord.finishedAt.desc())
+                        .limit((long) size + 1)
+                        .fetch();
+        return checkLastPage(size, feedList);
+    }
+
+    @Override
     public List<MissionRecord> findFeedAllByMemberId(
             Long memberId, List<MissionVisibility> visibilities) {
         return jpaQueryFactory
@@ -139,5 +184,27 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
 
     private BooleanExpression uploadStatusCompleteEq() {
         return missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE);
+    }
+
+    // no-offset 방식 처리하는 메서드
+    private BooleanExpression ltMissionRecordId(Long lastId) {
+        if (lastId == null) {
+            return null;
+        }
+        return missionRecord.id.lt(lastId);
+    }
+
+    // 무한 스크롤 방식 처리하는 메서드
+    private Slice<FeedOneResponse> checkLastPage(int size, List<FeedOneResponse> result) {
+
+        boolean hasNext = false;
+
+        // 조회한 결과 개수가 요청한 페이지 사이즈보다 크면 뒤에 더 있음, next = true
+        if (result.size() > size) {
+            hasNext = true;
+            result.remove(size);
+        }
+        Pageable pageable = Pageable.unpaged();
+        return new SliceImpl<>(result, pageable, hasNext);
     }
 }

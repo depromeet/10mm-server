@@ -6,6 +6,7 @@ import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import java.time.YearMonth;
 import java.util.List;
+import org.springframework.data.domain.Slice;
 
 public interface MissionRecordRepositoryCustom {
 
@@ -23,4 +24,9 @@ public interface MissionRecordRepositoryCustom {
     boolean isCompletedMissionExistsToday(Long missionId);
 
     void deleteByMissionRecordId(Long missionRecordId);
+
+    Slice<FeedOneResponse> findFeedAllByPage(int size, Long lastId, List<Member> members);
+
+    Slice<FeedOneResponse> findFeedByVisibilityAndPage(
+            int size, Long lastId, List<Member> members, List<MissionVisibility> visibility);
 }
