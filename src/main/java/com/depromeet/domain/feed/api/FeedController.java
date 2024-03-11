@@ -3,6 +3,7 @@ package com.depromeet.domain.feed.api;
 import com.depromeet.domain.feed.application.FeedService;
 import com.depromeet.domain.feed.dto.response.FeedOneByProfileResponse;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
+import com.depromeet.domain.feed.dto.response.FeedSliceResponse;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,9 +31,9 @@ public class FeedController {
         return feedService.findAllFeedByVisibility(visibility);
     }
 
-    @Operation(summary = "피드 탭 페이지네이션", description = "피드 탭을 조회합니다.")
+    @Operation(summary = "피드 탭 (페이지네이션)", description = "피드 탭을 조회합니다.")
     @GetMapping("/me")
-    public Slice<FeedOneResponse> feedFindByPage(
+    public FeedSliceResponse feedFindByPage(
             @RequestParam int size,
             @RequestParam(required = false) Long lastId,
             @RequestParam(value = "visibility", required = false) MissionVisibility visibility) {

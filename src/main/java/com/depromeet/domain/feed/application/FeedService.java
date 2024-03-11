@@ -2,6 +2,7 @@ package com.depromeet.domain.feed.application;
 
 import com.depromeet.domain.feed.dto.response.FeedOneByProfileResponse;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
+import com.depromeet.domain.feed.dto.response.FeedSliceResponse;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.member.dao.MemberRepository;
@@ -45,20 +46,22 @@ public class FeedService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<FeedOneResponse> findFeedByPage(
+    public FeedSliceResponse findFeedByPage(
             int size, Long lastId, MissionVisibility visibility) {
         if (visibility == MissionVisibility.ALL) {
             final List<Member> members = memberRepository.findAll();
-            return missionRecordRepository.findFeedByVisibilityAndPage(
-                    size, lastId, members, List.of(visibility));
+			Slice<FeedOneResponse> feedByVisibilityAndPage = missionRecordRepository.findFeedByVisibilityAndPage(
+				size, lastId, members, List.of(visibility));
+			return FeedSliceResponse.from(feedByVisibilityAndPage);
         }
 
         final Member currentMember = memberUtil.getCurrentMember();
         List<Member> sourceMembers = getSourceMembers(currentMember.getId());
 
         sourceMembers.add(currentMember);
-        return missionRecordRepository.findFeedAllByPage(size, lastId, sourceMembers);
-    }
+		Slice<FeedOneResponse> feedAllByPage = missionRecordRepository.findFeedAllByPage(size, lastId, sourceMembers);
+		return FeedSliceResponse.from(feedAllByPage);
+	}
 
     @Transactional(readOnly = true)
     public List<FeedOneResponse> findAllFeed() {

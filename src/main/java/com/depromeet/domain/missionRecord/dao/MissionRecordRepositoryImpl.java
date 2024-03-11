@@ -16,6 +16,8 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -204,7 +206,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
             hasNext = true;
             result.remove(size);
         }
-        Pageable pageable = Pageable.unpaged();
+        Pageable pageable = PageRequest.ofSize(size);
         return new SliceImpl<>(result, pageable, hasNext);
     }
 }
