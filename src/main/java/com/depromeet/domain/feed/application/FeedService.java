@@ -46,22 +46,23 @@ public class FeedService {
     }
 
     @Transactional(readOnly = true)
-    public FeedSliceResponse findFeedByPage(
-            int size, Long lastId, MissionVisibility visibility) {
+    public FeedSliceResponse findFeedByPage(int size, Long lastId, MissionVisibility visibility) {
         if (visibility == MissionVisibility.ALL) {
             final List<Member> members = memberRepository.findAll();
-			Slice<FeedOneResponse> feedByVisibilityAndPage = missionRecordRepository.findFeedByVisibilityAndPage(
-				size, lastId, members, List.of(visibility));
-			return FeedSliceResponse.from(feedByVisibilityAndPage);
+            Slice<FeedOneResponse> feedByVisibilityAndPage =
+                    missionRecordRepository.findFeedByVisibilityAndPage(
+                            size, lastId, members, List.of(visibility));
+            return FeedSliceResponse.from(feedByVisibilityAndPage);
         }
 
         final Member currentMember = memberUtil.getCurrentMember();
         List<Member> sourceMembers = getSourceMembers(currentMember.getId());
 
         sourceMembers.add(currentMember);
-		Slice<FeedOneResponse> feedAllByPage = missionRecordRepository.findFeedAllByPage(size, lastId, sourceMembers);
-		return FeedSliceResponse.from(feedAllByPage);
-	}
+        Slice<FeedOneResponse> feedAllByPage =
+                missionRecordRepository.findFeedAllByPage(size, lastId, sourceMembers);
+        return FeedSliceResponse.from(feedAllByPage);
+    }
 
     @Transactional(readOnly = true)
     public List<FeedOneResponse> findAllFeed() {
