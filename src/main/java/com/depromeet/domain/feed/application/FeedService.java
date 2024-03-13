@@ -45,26 +45,28 @@ public class FeedService {
         return missionRecordRepository.findFeedAll(sourceMembers);
     }
 
-    @Transactional(readOnly = true)
-    public FeedSliceResponse findFeedByPage(int size, Long lastId, MissionVisibility visibility) {
-        if (visibility == MissionVisibility.ALL) {
-            final List<Member> members = memberRepository.findAll();
-            Slice<FeedOneResponse> feedByVisibilityAndPage =
-                    missionRecordRepository.findFeedByVisibilityAndPage(
-                            size, lastId, members, List.of(visibility));
-            return FeedSliceResponse.from(feedByVisibilityAndPage);
-        }
+	@Transactional(readOnly = true)
+	public FeedSliceResponse findFeedByPageForAllVisibility(int size, Long lastId) {
+		final List<Member> members = memberRepository.findAll();
+		Slice<FeedOneResponse> feedByVisibilityAndPage =
+			missionRecordRepository.findFeedByVisibilityAndPage(
+				size, lastId, members, List.of(MissionVisibility.ALL));
+		return FeedSliceResponse.from(feedByVisibilityAndPage);
+	}
 
-        final Member currentMember = memberUtil.getCurrentMember();
-        List<Member> sourceMembers = getSourceMembers(currentMember.getId());
+	@Transactional(readOnly = true)
+	public FeedSliceResponse findFeedByPageForCurrentVisibility(int size, Long lastId) {
+		final Member currentMember = memberUtil.getCurrentMember();
+		List<Member> sourceMembers = getSourceMembers(currentMember.getId());
 
-        sourceMembers.add(currentMember);
-        Slice<FeedOneResponse> feedAllByPage =
-                missionRecordRepository.findFeedAllByPage(size, lastId, sourceMembers);
-        return FeedSliceResponse.from(feedAllByPage);
-    }
+		sourceMembers.add(currentMember);
+		Slice<FeedOneResponse> feedAllByPage =
+			missionRecordRepository.findFeedAllByPage(size, lastId, sourceMembers);
+		return FeedSliceResponse.from(feedAllByPage);
+	}
 
-    @Transactional(readOnly = true)
+
+	@Transactional(readOnly = true)
     public List<FeedOneResponse> findAllFeed() {
         final Member currentMember = memberUtil.getCurrentMember();
         List<Member> members = getSourceMembers(currentMember.getId());
