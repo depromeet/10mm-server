@@ -30,21 +30,20 @@ public class FeedController {
         return feedService.findAllFeedByVisibility(visibility);
     }
 
-	@Operation(summary = "피드 탭 (페이지네이션)", description = "피드 탭을 조회합니다.")
-	@GetMapping("/me")
-	public FeedSliceResponse feedFindByPage(
-		@RequestParam int size,
-		@RequestParam(required = false) Long lastId,
-		@RequestParam(value = "visibility", required = false) MissionVisibility visibility) {
-		if (visibility == MissionVisibility.ALL) {
-			return feedService.findFeedByPageForAllVisibility(size, lastId);
-		} else {
-			return feedService.findFeedByPageForCurrentVisibility(size, lastId);
-		}
-	}
+    @Operation(summary = "피드 탭 (페이지네이션)", description = "피드 탭을 조회합니다.")
+    @GetMapping("/me")
+    public FeedSliceResponse feedFindByPage(
+            @RequestParam int size,
+            @RequestParam(required = false) Long lastId,
+            @RequestParam(value = "visibility", required = false) MissionVisibility visibility) {
+        if (visibility == MissionVisibility.ALL) {
+            return feedService.findFeedByPageForAllVisibility(size, lastId);
+        } else {
+            return feedService.findFeedByPageForCurrentVisibility(size, lastId);
+        }
+    }
 
-
-	@Operation(summary = "프로필 피드", description = "피드 탭을 조회합니다.")
+    @Operation(summary = "프로필 피드", description = "피드 탭을 조회합니다.")
     @GetMapping("/{memberId}")
     public List<FeedOneByProfileResponse> feedFindAllByTargetId(@PathVariable Long memberId) {
         return feedService.findAllFeedByTargetId(memberId);
