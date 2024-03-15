@@ -37,9 +37,11 @@ public class FeedController {
             @RequestParam(required = false) Long lastId,
             @RequestParam(value = "visibility", required = false) MissionVisibility visibility) {
         if (visibility == MissionVisibility.ALL) {
-            return feedService.findFeedByPageForAllVisibility(size, lastId);
+            // 전체 피드 탭
+            return feedService.findAllFeed(size, lastId);
         } else {
-            return feedService.findFeedByPageForCurrentVisibility(size, lastId);
+            // 팔로워 피드 탭
+            return feedService.findFollowerFeed(size, lastId);
         }
     }
 
