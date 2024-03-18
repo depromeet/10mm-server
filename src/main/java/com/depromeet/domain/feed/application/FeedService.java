@@ -2,6 +2,7 @@ package com.depromeet.domain.feed.application;
 
 import com.depromeet.domain.feed.dto.response.FeedOneByProfileResponse;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
+import com.depromeet.domain.feed.dto.response.FeedSliceResponse;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.member.dao.MemberRepository;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +43,28 @@ public class FeedService {
 
         sourceMembers.add(currentMember);
         return missionRecordRepository.findFeedAll(sourceMembers);
+    }
+
+    // 전체 피드 탭
+    @Transactional(readOnly = true)
+    public FeedSliceResponse findAllFeed(int size, Long lastId) {
+        final List<Member> members = memberRepository.findAll();
+        Slice<FeedOneResponse> feedByVisibilityAndPage =
+                missionRecordRepository.findFeedByVisibilityAndPage(
+                        size, lastId, members, List.of(MissionVisibility.ALL));
+        return FeedSliceResponse.from(feedByVisibilityAndPage);
+    }
+
+    // 팔로워 피드 탭
+    @Transactional(readOnly = true)
+    public FeedSliceResponse findFollowerFeed(int size, Long lastId) {
+        final Member currentMember = memberUtil.getCurrentMember();
+        List<Member> sourceMembers = getSourceMembers(currentMember.getId());
+
+        sourceMembers.add(currentMember);
+        Slice<FeedOneResponse> feedAllByPage =
+                missionRecordRepository.findFeedAllByPage(size, lastId, sourceMembers);
+        return FeedSliceResponse.from(feedAllByPage);
     }
 
     @Transactional(readOnly = true)
