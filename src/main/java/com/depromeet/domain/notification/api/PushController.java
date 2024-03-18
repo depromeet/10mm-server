@@ -9,7 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "7. [알림]", description = "알림 관련 API")
+@Tag(name = "8. [알림]", description = "알림 관련 API")
 @RestController
 @RequestMapping("/notifications")
 @RequiredArgsConstructor

@@ -2,6 +2,8 @@ package com.depromeet.domain.notification.application;
 
 import static com.depromeet.global.common.constants.PushNotificationConstants.*;
 
+import java.time.Instant;
+
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
@@ -15,6 +17,8 @@ import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +30,7 @@ public class PushService {
     private final FcmService fcmService;
     private final MissionRepository missionRepository;
     private final NotificationRepository notificationRepository;
+	private final TaskScheduler taskScheduler;
 
     public void sendUrgingPush(PushUrgingSendRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
@@ -59,10 +64,11 @@ public class PushService {
 				.findById(request.missionId())
 				.orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
 
-		fcmService.sendMessageSync(
+		// 10분 후에 실행되도록 작업을 예약
+		taskScheduler.schedule(() -> fcmService.sendMessageSync(
 			currentMember.getFcmInfo().getFcmToken(),
 			PUSH_MISSION_REMIND_TITLE,
-				PushNotificationConstants.PUSH_MISSION_REMIND_CONTENT);
+			PushNotificationConstants.PUSH_MISSION_REMIND_CONTENT), Instant.now().plusSeconds(600)); // 10분 후에 실행
 	}
 
     private void validateFinishedMission(Mission mission) {

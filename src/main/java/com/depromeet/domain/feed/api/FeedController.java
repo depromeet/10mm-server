@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "6. [피드]", description = "피드 관련 API입니다.")
+@Tag(name = "7. [피드]", description = "피드 관련 API입니다.")
 @RequestMapping("/feed")
 @RequiredArgsConstructor
 public class FeedController {
