@@ -22,9 +22,9 @@ public class PushController {
         pushService.sendUrgingPush(request);
     }
 
-	@Operation(summary = "미션 타이머 리마인드 알림", description = "인증을 놓치는 경우에 대비하여 리마인드 알림을 전송합니다.")
-	@PostMapping("/missions/remind")
-	public void missionRemindSend(@Valid @RequestBody PushMissionRemindRequest request) {
-		pushService.sendMissionRemindPush(request);
-	}
+    @Operation(summary = "미션 타이머 리마인드 알림", description = "인증을 놓치는 경우에 대비하여 리마인드 알림을 전송합니다.")
+    @PostMapping("/missions/remind")
+    public void missionRemindSend(@Valid @RequestBody PushMissionRemindRequest request) {
+        pushService.sendMissionRemindPush(request);
+    }
 }
