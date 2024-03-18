@@ -57,10 +57,10 @@ public class PushService {
 
     public void sendMissionRemindPush(PushMissionRemindRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
-        final Mission mission =
-                missionRepository
-                        .findById(request.missionId())
-                        .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
+        // final Mission mission =
+        //         missionRepository
+        //                 .findById(request.missionId())
+        //                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
 
         // 10분 후에 실행되도록 작업을 예약
         taskScheduler.schedule(
