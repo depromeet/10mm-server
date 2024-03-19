@@ -1,6 +1,7 @@
 package com.depromeet.domain.notification.api;
 
 import com.depromeet.domain.notification.application.PushService;
+import com.depromeet.domain.notification.dto.request.PushMissionRemindRequest;
 import com.depromeet.domain.notification.dto.request.PushUrgingSendRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,7 +24,7 @@ public class PushController {
 
     @Operation(summary = "미션 타이머 리마인드 알림", description = "인증을 놓치는 경우에 대비하여 리마인드 알림을 전송합니다.")
     @PostMapping("/missions/remind")
-    public void missionRemindSend() {
-        pushService.sendMissionRemindPush();
+    public void missionRemindSend(@Valid @RequestBody PushMissionRemindRequest request) {
+        pushService.sendMissionRemindPush(request);
     }
 }

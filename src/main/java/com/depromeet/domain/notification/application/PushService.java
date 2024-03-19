@@ -8,6 +8,7 @@ import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.notification.dao.NotificationRepository;
 import com.depromeet.domain.notification.domain.Notification;
 import com.depromeet.domain.notification.domain.NotificationType;
+import com.depromeet.domain.notification.dto.request.PushMissionRemindRequest;
 import com.depromeet.domain.notification.dto.request.PushUrgingSendRequest;
 import com.depromeet.global.common.constants.PushNotificationConstants;
 import com.depromeet.global.error.exception.CustomException;
@@ -54,7 +55,7 @@ public class PushService {
         notificationRepository.save(notification);
     }
 
-    public void sendMissionRemindPush() {
+    public void sendMissionRemindPush(PushMissionRemindRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
 
         // 10분 후에 실행되도록 작업을 예약
@@ -64,7 +65,7 @@ public class PushService {
                                 currentMember.getFcmInfo().getFcmToken(),
                                 PUSH_MISSION_REMIND_TITLE,
                                 PushNotificationConstants.PUSH_MISSION_REMIND_CONTENT),
-                Instant.now().plusSeconds(600)); // 10분 후에 실행
+                Instant.now().plusSeconds(request.seconds()));
     }
 
     private void validateFinishedMission(Mission mission) {
