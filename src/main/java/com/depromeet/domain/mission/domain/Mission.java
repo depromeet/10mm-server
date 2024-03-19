@@ -63,6 +63,8 @@ public class Mission extends BaseTimeEntity {
 
     private LocalDateTime finishedAt;
 
+	private LocalDateTime remindedAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -81,6 +83,7 @@ public class Mission extends BaseTimeEntity {
             MissionVisibility visibility,
             LocalDateTime startedAt,
             LocalDateTime finishedAt,
+			LocalDateTime remindedAt,
             Member member) {
         this.name = name;
         this.content = content;
@@ -91,6 +94,7 @@ public class Mission extends BaseTimeEntity {
         this.visibility = visibility;
         this.startedAt = startedAt;
         this.finishedAt = finishedAt;
+		this.remindedAt = remindedAt;
         this.member = member;
     }
 
@@ -102,6 +106,7 @@ public class Mission extends BaseTimeEntity {
             MissionVisibility visibility,
             LocalDateTime startedAt,
             LocalDateTime finishedAt,
+			LocalDateTime remindedAt,
             Member member) {
         return Mission.builder()
                 .name(name)
@@ -113,6 +118,7 @@ public class Mission extends BaseTimeEntity {
                 .visibility(visibility)
                 .startedAt(startedAt)
                 .finishedAt(finishedAt)
+				.remindedAt(remindedAt)
                 .member(member)
                 .build();
     }
