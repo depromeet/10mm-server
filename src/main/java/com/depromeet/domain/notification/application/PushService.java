@@ -1,6 +1,6 @@
 package com.depromeet.domain.notification.application;
 
-import static com.depromeet.global.common.constants.PushNotificationConstants.PUSH_URGING_TITLE;
+import static com.depromeet.global.common.constants.PushNotificationConstants.*;
 
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.dao.MissionRepository;
@@ -8,12 +8,15 @@ import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.notification.dao.NotificationRepository;
 import com.depromeet.domain.notification.domain.Notification;
 import com.depromeet.domain.notification.domain.NotificationType;
+import com.depromeet.domain.notification.dto.request.PushMissionRemindRequest;
 import com.depromeet.domain.notification.dto.request.PushUrgingSendRequest;
 import com.depromeet.global.common.constants.PushNotificationConstants;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,7 @@ public class PushService {
     private final FcmService fcmService;
     private final MissionRepository missionRepository;
     private final NotificationRepository notificationRepository;
+    private final TaskScheduler taskScheduler;
 
     public void sendUrgingPush(PushUrgingSendRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
@@ -49,6 +53,19 @@ public class PushService {
                 Notification.createNotification(
                         NotificationType.MISSION_URGING, currentMember, targetMember);
         notificationRepository.save(notification);
+    }
+
+    public void sendMissionRemindPush(PushMissionRemindRequest request) {
+        final Member currentMember = memberUtil.getCurrentMember();
+
+        // 10분 후에 실행되도록 작업을 예약
+        taskScheduler.schedule(
+                () ->
+                        fcmService.sendMessageSync(
+                                currentMember.getFcmInfo().getFcmToken(),
+                                PUSH_MISSION_REMIND_TITLE,
+                                PushNotificationConstants.PUSH_MISSION_REMIND_CONTENT),
+                Instant.now().plusSeconds(request.seconds()));
     }
 
     private void validateFinishedMission(Mission mission) {
