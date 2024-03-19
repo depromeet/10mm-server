@@ -8,7 +8,6 @@ import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.notification.dao.NotificationRepository;
 import com.depromeet.domain.notification.domain.Notification;
 import com.depromeet.domain.notification.domain.NotificationType;
-import com.depromeet.domain.notification.dto.request.PushMissionRemindRequest;
 import com.depromeet.domain.notification.dto.request.PushUrgingSendRequest;
 import com.depromeet.global.common.constants.PushNotificationConstants;
 import com.depromeet.global.error.exception.CustomException;
@@ -55,12 +54,8 @@ public class PushService {
         notificationRepository.save(notification);
     }
 
-    public void sendMissionRemindPush(PushMissionRemindRequest request) {
+    public void sendMissionRemindPush() {
         final Member currentMember = memberUtil.getCurrentMember();
-        // final Mission mission =
-        //         missionRepository
-        //                 .findById(request.missionId())
-        //                 .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
 
         // 10분 후에 실행되도록 작업을 예약
         taskScheduler.schedule(
