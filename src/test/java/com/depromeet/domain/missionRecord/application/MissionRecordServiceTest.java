@@ -17,6 +17,9 @@ import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.dto.request.MissionRecordCreateRequest;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordFindOneResponse;
 import com.depromeet.domain.missionRecord.dto.response.MissionStatisticsResponse;
+import com.depromeet.domain.reaction.dao.ReactionRepository;
+import com.depromeet.domain.reaction.domain.EmojiType;
+import com.depromeet.domain.reaction.domain.Reaction;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.util.SecurityUtil;
 import java.time.Duration;
@@ -31,18 +34,18 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class MissionRecordServiceTest {
 
+    private final LocalDateTime now = LocalDateTime.now();
+    private final LocalDateTime missionStartedAt = LocalDateTime.of(2024, 1, 24, 22, 58, 53);
     @Autowired MissionRecordService missionRecordService;
     @Autowired MissionService missionService;
     @Autowired MemberRepository memberRepository;
     @Autowired MissionRepository missionRepository;
     @Autowired MissionRecordRepository missionRecordRepository;
+    @Autowired ReactionRepository reactionRepository;
     @Autowired DatabaseCleaner databaseCleaner;
     @MockBean SecurityUtil securityUtil;
-
     private Member member;
     private Mission mission;
-    private final LocalDateTime now = LocalDateTime.now();
-    private final LocalDateTime missionStartedAt = LocalDateTime.of(2024, 1, 24, 22, 58, 53);
 
     @BeforeEach
     void setUp() {
@@ -71,6 +74,34 @@ class MissionRecordServiceTest {
         // given
         missionRecordService.createMissionRecord(
                 new MissionRecordCreateRequest(mission.getId(), now, now.plusMinutes(10), 10, 0));
+
+        // when
+        missionRecordService.deleteInProgressMissionRecord();
+
+        // then
+        Long missionId = mission.getId();
+
+        assertThrows(
+                CustomException.class, () -> missionRecordService.findOneMissionRecord(missionId));
+    }
+
+    @Test
+    void 리액션이_존재하는_미션기록을_삭제한다() {
+        // given
+        missionRecordService.createMissionRecord(
+                new MissionRecordCreateRequest(mission.getId(), now, now.plusMinutes(10), 10, 0));
+
+        Member reactedMember =
+                Member.createNormalMember(
+                        OauthInfo.createOauthInfo("test", "test", "test"), "test");
+        memberRepository.save(reactedMember);
+
+        Reaction reaction =
+                Reaction.createReaction(
+                        EmojiType.BLUE_HEART,
+                        reactedMember,
+                        missionRecordRepository.findById(1L).get());
+        reactionRepository.save(reaction);
 
         // when
         missionRecordService.deleteInProgressMissionRecord();
