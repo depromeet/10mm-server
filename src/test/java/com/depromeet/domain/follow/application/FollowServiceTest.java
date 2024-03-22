@@ -493,6 +493,7 @@ class FollowServiceTest {
                                     MissionVisibility.ALL,
                                     missionStartedAt,
                                     missionFinishedAt,
+                                    null,
                                     targetMember2));
 
             LocalDateTime missionRecordStartedAt = today;
