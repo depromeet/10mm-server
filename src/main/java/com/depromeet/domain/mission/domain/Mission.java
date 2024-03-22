@@ -124,10 +124,11 @@ public class Mission extends BaseTimeEntity {
                 .build();
     }
 
-    public void updateMission(String name, String content, MissionVisibility visibility) {
+    public void updateMission(String name, String content, MissionVisibility visibility, LocalTime remindedTime) {
         this.name = name;
         this.content = content;
         this.visibility = visibility;
+		this.remindedTime = remindedTime;
     }
 
     public boolean isCompletedMissionToday() {
