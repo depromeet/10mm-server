@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public record MissionUpdateRequest(
@@ -19,5 +18,5 @@ public record MissionUpdateRequest(
         @NotNull(message = "미션 공개 여부가 null일 수 없습니다.")
                 @Schema(description = "미션 공개여부", defaultValue = "ALL")
                 MissionVisibility visibility,
-		@Schema(description = "미션 리마인드 알림 시간", defaultValue = "00:50:00", type = "string")
-		LocalTime remindedTime) {}
+        @Schema(description = "미션 리마인드 알림 시간", defaultValue = "00:50:00", type = "string")
+                LocalTime remindedTime) {}

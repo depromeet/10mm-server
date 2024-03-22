@@ -256,7 +256,7 @@ public class MissionService {
                 missionUpdateRequest.name(),
                 missionUpdateRequest.content(),
                 missionUpdateRequest.visibility(),
-				missionUpdateRequest.remindedTime());
+                missionUpdateRequest.remindedTime());
         return MissionUpdateResponse.from(mission);
     }
 
