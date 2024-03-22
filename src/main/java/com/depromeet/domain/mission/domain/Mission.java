@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -63,7 +64,7 @@ public class Mission extends BaseTimeEntity {
 
     private LocalDateTime finishedAt;
 
-	private LocalDateTime remindedAt;
+    private LocalTime remindedTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -83,7 +84,7 @@ public class Mission extends BaseTimeEntity {
             MissionVisibility visibility,
             LocalDateTime startedAt,
             LocalDateTime finishedAt,
-			LocalDateTime remindedAt,
+            LocalTime remindedTime,
             Member member) {
         this.name = name;
         this.content = content;
@@ -94,7 +95,7 @@ public class Mission extends BaseTimeEntity {
         this.visibility = visibility;
         this.startedAt = startedAt;
         this.finishedAt = finishedAt;
-		this.remindedAt = remindedAt;
+        this.remindedTime = remindedTime;
         this.member = member;
     }
 
@@ -106,7 +107,7 @@ public class Mission extends BaseTimeEntity {
             MissionVisibility visibility,
             LocalDateTime startedAt,
             LocalDateTime finishedAt,
-			LocalDateTime remindedAt,
+            LocalTime remindedTime,
             Member member) {
         return Mission.builder()
                 .name(name)
@@ -118,7 +119,7 @@ public class Mission extends BaseTimeEntity {
                 .visibility(visibility)
                 .startedAt(startedAt)
                 .finishedAt(finishedAt)
-				.remindedAt(remindedAt)
+                .remindedTime(remindedTime)
                 .member(member)
                 .build();
     }

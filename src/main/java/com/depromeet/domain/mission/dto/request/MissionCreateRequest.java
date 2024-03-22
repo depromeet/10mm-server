@@ -1,13 +1,12 @@
 package com.depromeet.domain.mission.dto.request;
 
-import java.time.LocalDateTime;
-
 import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.time.LocalTime;
 
 public record MissionCreateRequest(
         @NotBlank(message = "이름은 비워둘 수 없습니다.")
@@ -20,9 +19,5 @@ public record MissionCreateRequest(
         @NotNull @Schema(description = "미션 카테고리", defaultValue = "STUDY") MissionCategory category,
         @NotNull @Schema(description = "미션 공개여부", defaultValue = "ALL")
                 MissionVisibility visibility,
-		@Schema(
-			description = "미션 리마인드 알림 시간",
-			defaultValue = "2024-01-01 00:34:00",
-			type = "string")
-		LocalDateTime remindedAt
-		) {}
+        @Schema(description = "미션 리마인드 알림 시간", defaultValue = "00:50:00", type = "string")
+                LocalTime remindedTime) {}

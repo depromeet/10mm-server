@@ -104,6 +104,13 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
         return query.fetch();
     }
 
+    @Override
+    public List<Mission> findAllInProgressMission() {
+        JPAQuery<Mission> query =
+                jpaQueryFactory.selectFrom(mission).where(durationStatusInProgress());
+        return query.fetch();
+    }
+
     // 미션의 사용자 id 조건 검증 메서드
     private BooleanExpression memberIdEq(Long memberId) {
         return memberId == null ? null : mission.member.id.eq(memberId);

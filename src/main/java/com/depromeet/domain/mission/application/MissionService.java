@@ -241,6 +241,11 @@ public class MissionService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<Mission> findInProgressMission() {
+        return missionRepository.findAllInProgressMission();
+    }
+
     public MissionUpdateResponse updateMission(
             MissionUpdateRequest missionUpdateRequest, Long missionId) {
         Mission mission =
@@ -276,7 +281,7 @@ public class MissionService {
                 missionCreateRequest.visibility(),
                 startedAt,
                 startedAt.plusWeeks(2),
-				missionCreateRequest.remindedAt(),
+                missionCreateRequest.remindedTime(),
                 member);
     }
 
