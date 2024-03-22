@@ -8,7 +8,6 @@ import com.depromeet.domain.notification.application.FcmService;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -36,16 +35,22 @@ public class MissionBatchScheduler {
         LocalDateTime now = LocalDateTime.now();
         LocalTime currentTime = LocalTime.of(now.getHour(), now.getMinute());
 
-        List<String> fcmTokenList = findFcmTokensForRemindPush(currentTime);
-        fcmService.sendGroupMessageAsync(
-                fcmTokenList, PUSH_MISSION_START_REMIND_TITLE, PUSH_MISSION_START_REMIND_CONTENT);
+        List<Mission> inProgressMissions = missionService.findInProgressMission();
+        findFcmTokensForRemindPush(currentTime, inProgressMissions);
     }
 
-    private List<String> findFcmTokensForRemindPush(LocalTime currentTime) {
-        List<Mission> inProgressMissions = missionService.findInProgressMission();
-        return inProgressMissions.stream()
+    private void findFcmTokensForRemindPush(
+            LocalTime currentTime, List<Mission> inProgressMissions) {
+        inProgressMissions.stream()
                 .filter(mission -> currentTime.equals(mission.getRemindedTime()))
-                .map(mission -> mission.getMember().getFcmInfo().getFcmToken())
-                .collect(Collectors.toList());
+                .forEach(
+                        mission -> {
+                            String fcmToken = mission.getMember().getFcmInfo().getFcmToken();
+                            fcmService.sendMessageSync(
+                                    fcmToken,
+                                    PUSH_MISSION_START_REMIND_TITLE,
+                                    String.format(
+                                            PUSH_MISSION_START_REMIND_CONTENT, mission.getName()));
+                        });
     }
 }
