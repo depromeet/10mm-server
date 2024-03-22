@@ -1,5 +1,7 @@
 package com.depromeet.scheduler.mission;
 
+import static com.depromeet.global.common.constants.PushNotificationConstants.*;
+
 import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.notification.application.FcmService;
@@ -35,7 +37,8 @@ public class MissionBatchScheduler {
         LocalTime currentTime = LocalTime.of(now.getHour(), now.getMinute());
 
         List<String> fcmTokenList = findFcmTokensForRemindPush(currentTime);
-        fcmService.sendGroupMessageAsync(fcmTokenList, "미션 리마인드", "미션이 다가오고 있어요");
+        fcmService.sendGroupMessageAsync(
+                fcmTokenList, PUSH_MISSION_START_REMIND_TITLE, PUSH_MISSION_START_REMIND_CONTENT);
     }
 
     private List<String> findFcmTokensForRemindPush(LocalTime currentTime) {

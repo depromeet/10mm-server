@@ -15,4 +15,6 @@ public class PushNotificationConstants {
     public static final String PUSH_REACTION_CONTENT = "%s님이 %s 미션을 이모지로 응원했어요!";
     public static final String PUSH_MISSION_REMIND_TITLE = "10분이 지났어요!";
     public static final String PUSH_MISSION_REMIND_CONTENT = "지금부터 미션 인증을 할 수 있어요 🕑";
+    public static final String PUSH_MISSION_START_REMIND_TITLE = "미션 시작 리마인드";
+    public static final String PUSH_MISSION_START_REMIND_CONTENT = "미션을 시작할 시간이에요!";
 }
