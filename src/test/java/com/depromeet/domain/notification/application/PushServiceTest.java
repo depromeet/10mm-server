@@ -23,6 +23,7 @@ import com.depromeet.domain.notification.dto.request.PushUrgingSendRequest;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.security.PrincipalDetails;
+import com.depromeet.global.util.MemberUtil;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -42,6 +43,8 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class PushServiceTest {
     @Autowired private DatabaseCleaner databaseCleaner;
+
+    @Autowired private MemberUtil memberUtil;
 
     @MockBean private FcmService fcmService;
 
@@ -125,7 +128,10 @@ class PushServiceTest {
         void 종료된_미션을_재촉할_경우_예외를_발생시킨다() {
             // given
             PushUrgingSendRequest request = new PushUrgingSendRequest(1L);
-
+            Member currentMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname1", "testImageUrl1")));
             Member targetMember =
                     memberRepository.save(
                             Member.createNormalMember(
@@ -155,7 +161,10 @@ class PushServiceTest {
         void 미션이_당일_완료된_경우_예외를_발생시킨다() {
             // given
             PushUrgingSendRequest request = new PushUrgingSendRequest(1L);
-
+            Member currentMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname1", "testImageUrl1")));
             Member targetMember =
                     memberRepository.save(
                             Member.createNormalMember(
@@ -204,7 +213,10 @@ class PushServiceTest {
             when(fcmService.sendMessageSync(any(), any(), any())).thenReturn(null);
 
             PushUrgingSendRequest request = new PushUrgingSendRequest(1L);
-
+            Member currentMember =
+                    memberRepository.save(
+                            Member.createNormalMember(
+                                    Profile.createProfile("testNickname1", "testImageUrl1")));
             Member targetMember =
                     memberRepository.save(
                             Member.createNormalMember(
