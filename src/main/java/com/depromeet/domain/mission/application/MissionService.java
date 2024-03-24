@@ -243,8 +243,10 @@ public class MissionService {
     }
 
     @Transactional(readOnly = true)
-    public List<Mission> findAllInProgressMission() {
-        return missionRepository.findAllByDurationStatus(DurationStatus.IN_PROGRESS);
+    public List<MissionRemindPushResponse> findAllInProgressMission() {
+        List<Mission> missions =
+                missionRepository.findAllByDurationStatus(DurationStatus.IN_PROGRESS);
+        return missions.stream().map(MissionRemindPushResponse::from).toList();
     }
 
     public MissionUpdateResponse updateMission(
