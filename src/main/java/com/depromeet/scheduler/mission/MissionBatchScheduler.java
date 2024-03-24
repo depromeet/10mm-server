@@ -5,7 +5,6 @@ import static com.depromeet.global.common.constants.PushNotificationConstants.*;
 import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.notification.application.FcmService;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -32,14 +31,13 @@ public class MissionBatchScheduler {
     public void missionRemindPushNotification() {
         log.info("Mission Remind Push Notification batch execute");
 
-        LocalDateTime now = LocalDateTime.now();
-        LocalTime currentTime = LocalTime.of(now.getHour(), now.getMinute());
+        LocalTime now = LocalTime.now();
 
-        List<Mission> inProgressMissions = missionService.findInProgressMission();
-        findFcmTokensForRemindPush(currentTime, inProgressMissions);
+        List<Mission> inProgressMissions = missionService.findAllInProgressMission();
+        sendFcmTokensForRemindPush(now, inProgressMissions);
     }
 
-    private void findFcmTokensForRemindPush(
+    private void sendFcmTokensForRemindPush(
             LocalTime currentTime, List<Mission> inProgressMissions) {
         inProgressMissions.stream()
                 .filter(mission -> currentTime.equals(mission.getRemindAt()))

@@ -18,6 +18,4 @@ public interface MissionRepositoryCustom {
     List<Mission> findAllFinishedMission(Long memberId);
 
     List<Mission> findMissionsWithRecordsByDate(LocalDate date, Long memberId);
-
-    List<Mission> findAllInProgressMission();
 }

@@ -3,6 +3,7 @@ package com.depromeet.domain.mission.application;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.dao.MissionRepository;
+import com.depromeet.domain.mission.domain.DurationStatus;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
@@ -242,8 +243,8 @@ public class MissionService {
     }
 
     @Transactional(readOnly = true)
-    public List<Mission> findInProgressMission() {
-        return missionRepository.findAllInProgressMission();
+    public List<Mission> findAllInProgressMission() {
+        return missionRepository.findAllByDurationStatus(DurationStatus.IN_PROGRESS);
     }
 
     public MissionUpdateResponse updateMission(
