@@ -20,4 +20,4 @@ public record MissionCreateRequest(
         @NotNull @Schema(description = "미션 공개여부", defaultValue = "ALL")
                 MissionVisibility visibility,
         @Schema(description = "미션 리마인드 알림 시간", defaultValue = "00:50:00", type = "string")
-                LocalTime remindedTime) {}
+                LocalTime remindAt) {}

@@ -42,7 +42,7 @@ public class MissionBatchScheduler {
     private void findFcmTokensForRemindPush(
             LocalTime currentTime, List<Mission> inProgressMissions) {
         inProgressMissions.stream()
-                .filter(mission -> currentTime.equals(mission.getRemindedTime()))
+                .filter(mission -> currentTime.equals(mission.getRemindAt()))
                 .forEach(
                         mission -> {
                             String fcmToken = mission.getMember().getFcmInfo().getFcmToken();

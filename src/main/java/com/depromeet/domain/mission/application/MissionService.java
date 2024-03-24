@@ -256,7 +256,7 @@ public class MissionService {
                 missionUpdateRequest.name(),
                 missionUpdateRequest.content(),
                 missionUpdateRequest.visibility(),
-                missionUpdateRequest.remindedTime());
+                missionUpdateRequest.remindAt());
         return MissionUpdateResponse.from(mission);
     }
 
@@ -282,7 +282,7 @@ public class MissionService {
                 missionCreateRequest.visibility(),
                 startedAt,
                 startedAt.plusWeeks(2),
-                missionCreateRequest.remindedTime(),
+                missionCreateRequest.remindAt(),
                 member);
     }
 
