@@ -68,7 +68,8 @@ class MissionControllerTest {
                                 "testMissionName",
                                 "testMissionContent",
                                 MissionCategory.STUDY,
-                                MissionVisibility.ALL));
+                                MissionVisibility.ALL,
+                                LocalTime.of(21, 0)));
         // when, then
         ResultActions perform =
                 mockMvc.perform(
