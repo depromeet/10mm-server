@@ -35,7 +35,8 @@ public class MissionBatchScheduler {
         LocalTime now =
                 LocalTime.parse(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
 
-        List<MissionRemindPushResponse> inProgressMissions = missionService.findAllInProgressMission();
+        List<MissionRemindPushResponse> inProgressMissions =
+                missionService.findAllInProgressMission();
         sendFcmTokensForRemindPush(now, inProgressMissions);
     }
 
