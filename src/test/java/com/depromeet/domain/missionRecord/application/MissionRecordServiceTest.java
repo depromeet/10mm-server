@@ -24,6 +24,7 @@ import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.util.SecurityUtil;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -65,6 +66,7 @@ class MissionRecordServiceTest {
                         MissionVisibility.ALL,
                         missionStartedAt,
                         missionStartedAt.plusWeeks(2),
+                        LocalTime.of(21, 0),
                         member);
         missionRepository.save(mission);
     }

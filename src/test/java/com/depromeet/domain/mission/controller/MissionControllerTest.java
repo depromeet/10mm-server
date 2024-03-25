@@ -28,6 +28,7 @@ import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -57,7 +58,8 @@ class MissionControllerTest {
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.STUDY,
-                        MissionVisibility.ALL);
+                        MissionVisibility.ALL,
+                        LocalTime.of(21, 0));
 
         given(missionService.createMission(any()))
                 .willReturn(
@@ -66,7 +68,8 @@ class MissionControllerTest {
                                 "testMissionName",
                                 "testMissionContent",
                                 MissionCategory.STUDY,
-                                MissionVisibility.ALL));
+                                MissionVisibility.ALL,
+                                LocalTime.of(21, 0)));
         // when, then
         ResultActions perform =
                 mockMvc.perform(
@@ -91,7 +94,11 @@ class MissionControllerTest {
         // given
         MissionCreateRequest createRequest =
                 new MissionCreateRequest(
-                        null, "testMissionContent", MissionCategory.STUDY, MissionVisibility.ALL);
+                        null,
+                        "testMissionContent",
+                        MissionCategory.STUDY,
+                        MissionVisibility.ALL,
+                        LocalTime.of(21, 0));
 
         // when, then
         ResultActions perform =
@@ -160,6 +167,7 @@ class MissionControllerTest {
                         MissionVisibility.ALL,
                         missionStartedAt,
                         missionFinishedAt,
+                        LocalTime.of(21, 0),
                         member);
 
         List<MissionFindAllResponse> missionList =
@@ -189,7 +197,10 @@ class MissionControllerTest {
         // given
         MissionUpdateRequest updateRequest =
                 new MissionUpdateRequest(
-                        "testMissionName", "testMissionContent", MissionVisibility.NONE);
+                        "testMissionName",
+                        "testMissionContent",
+                        MissionVisibility.NONE,
+                        LocalTime.of(21, 0));
         given(missionService.updateMission(any(), any())).willReturn(new MissionUpdateResponse(1L));
 
         // when, then
@@ -211,7 +222,8 @@ class MissionControllerTest {
     void 미션이름을_null로_수정할_수_없다() throws Exception {
         // given
         MissionUpdateRequest updateRequest =
-                new MissionUpdateRequest(null, "testMissionContent", MissionVisibility.NONE);
+                new MissionUpdateRequest(
+                        null, "testMissionContent", MissionVisibility.NONE, LocalTime.of(21, 0));
         given(missionService.updateMission(any(), any())).willReturn(new MissionUpdateResponse(1L));
 
         // when, then
