@@ -1,5 +1,6 @@
 package com.depromeet.domain.missionRecord.domain;
 
+import com.depromeet.domain.comment.domain.Comment;
 import com.depromeet.domain.common.model.BaseTimeEntity;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.reaction.domain.Reaction;
@@ -14,7 +15,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
 
 @Getter
 @Entity
@@ -28,10 +28,10 @@ public class MissionRecord extends BaseTimeEntity {
 
     private Duration duration;
 
-    @Comment("미션 일지")
+    @org.hibernate.annotations.Comment("미션 일지")
     private String remark;
 
-    @Comment("인증 사진")
+    @org.hibernate.annotations.Comment("인증 사진")
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)
@@ -47,6 +47,9 @@ public class MissionRecord extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "missionRecord", cascade = CascadeType.REMOVE)
     private List<Reaction> reactions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "missionRecord", cascade = CascadeType.REMOVE)
+    private List<Comment> comments = new ArrayList<>();
 
     @Builder(access = AccessLevel.PRIVATE)
     private MissionRecord(
