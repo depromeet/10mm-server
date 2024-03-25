@@ -1,4 +1,4 @@
-package com.depromeet.domain.comment.dto;
+package com.depromeet.domain.comment.dto.response;
 
 import com.depromeet.domain.comment.domain.Comment;
 import com.fasterxml.jackson.annotation.JsonFormat;
