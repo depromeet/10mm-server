@@ -32,16 +32,12 @@ public class MissionBatchScheduler {
     public void missionRemindPushNotification() {
         log.info("Mission Remind Push Notification batch execute");
 
-        LocalTime now =
-                LocalTime.parse(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
-
-        List<MissionRemindPushResponse> inProgressMissions =
-                missionService.findAllInProgressMission();
-        sendFcmTokensForRemindPush(now, inProgressMissions);
+        sendFcmTokensForRemindPush(missionService.findAllInProgressMission());
     }
 
-    private void sendFcmTokensForRemindPush(
-            LocalTime currentTime, List<MissionRemindPushResponse> inProgressMissions) {
+    private void sendFcmTokensForRemindPush(List<MissionRemindPushResponse> inProgressMissions) {
+        LocalTime currentTime =
+                LocalTime.parse(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
         inProgressMissions.stream()
                 .filter(mission -> currentTime.equals(mission.remindAt()))
                 .forEach(
