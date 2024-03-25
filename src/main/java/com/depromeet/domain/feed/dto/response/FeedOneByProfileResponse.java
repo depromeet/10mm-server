@@ -35,7 +35,7 @@ public record FeedOneByProfileResponse(
                         type = "string")
                 LocalDateTime finishedAt) {
 
-    public static FeedOneByProfileResponse of(MissionRecord record) {
+    public static FeedOneByProfileResponse from(MissionRecord record) {
         return new FeedOneByProfileResponse(
                 record.getMission().getId(),
                 record.getId(),
