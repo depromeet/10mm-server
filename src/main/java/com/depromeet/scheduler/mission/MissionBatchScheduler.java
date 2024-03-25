@@ -6,7 +6,7 @@ import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.dto.response.MissionRemindPushResponse;
 import com.depromeet.domain.notification.application.FcmService;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,21 +32,18 @@ public class MissionBatchScheduler {
     public void missionRemindPushNotification() {
         log.info("Mission Remind Push Notification batch execute");
 
-        sendFcmTokensForRemindPush(missionService.findAllInProgressMission());
+        List<MissionRemindPushResponse> inProgressMissions =
+                missionService.findAllInProgressMission();
+        inProgressMissions.forEach(this::sendMissionRemindPushNotification);
     }
 
-    private void sendFcmTokensForRemindPush(List<MissionRemindPushResponse> inProgressMissions) {
-        LocalTime currentTime =
-                LocalTime.parse(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
-        inProgressMissions.stream()
-                .filter(mission -> currentTime.equals(mission.remindAt()))
-                .forEach(
-                        mission -> {
-                            fcmService.sendMessageSync(
-                                    mission.fcmToken(),
-                                    PUSH_MISSION_START_REMIND_TITLE,
-                                    String.format(
-                                            PUSH_MISSION_START_REMIND_CONTENT, mission.name()));
-                        });
+    private void sendMissionRemindPushNotification(MissionRemindPushResponse mission) {
+        LocalTime currentTime = LocalTime.now().truncatedTo(ChronoUnit.MINUTES);
+        if (currentTime.equals(mission.remindAt())) {
+            fcmService.sendMessageSync(
+                    mission.fcmToken(),
+                    PUSH_MISSION_START_REMIND_TITLE,
+                    String.format(PUSH_MISSION_START_REMIND_CONTENT, mission.name()));
+        }
     }
 }
