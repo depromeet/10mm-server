@@ -52,6 +52,19 @@ public class CommentService {
         return CommentDto.from(comment);
     }
 
+    public void deleteComment(Long commentId) {
+        final Member member = memberUtil.getCurrentMember();
+
+        Comment comment =
+                commentRepository
+                        .findById(commentId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+
+        validateCommentMemberMismatch(member, comment);
+
+        commentRepository.delete(comment);
+    }
+
     private void validateCommentMemberMismatch(Member member, Comment comment) {
         if (!comment.getMember().equals(member)) {
             throw new CustomException(ErrorCode.COMMENT_MEMBER_MISMATCH);

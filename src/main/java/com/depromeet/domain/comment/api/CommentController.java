@@ -2,6 +2,7 @@ package com.depromeet.domain.comment.api;
 
 import com.depromeet.domain.comment.application.CommentService;
 import com.depromeet.domain.comment.dto.request.CommentCreateRequest;
+import com.depromeet.domain.comment.dto.request.CommentUpdateRequest;
 import com.depromeet.domain.comment.dto.response.CommentDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,5 +33,12 @@ public class CommentController {
             @PathVariable Long commentId, @Valid CommentUpdateRequest request) {
         CommentDto response = commentService.updateComment(commentId, request);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "댓글 삭제", description = "댓글을 삭제합니다.")
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Void> commentDelete(@PathVariable Long commentId) {
+        commentService.deleteComment(commentId);
+        return ResponseEntity.noContent().build();
     }
 }
