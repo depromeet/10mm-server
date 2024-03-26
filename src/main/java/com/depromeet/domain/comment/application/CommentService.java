@@ -3,6 +3,7 @@ package com.depromeet.domain.comment.application;
 import com.depromeet.domain.comment.dao.CommentRepository;
 import com.depromeet.domain.comment.domain.Comment;
 import com.depromeet.domain.comment.dto.request.CommentCreateRequest;
+import com.depromeet.domain.comment.dto.request.CommentUpdateRequest;
 import com.depromeet.domain.comment.dto.response.CommentDto;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
@@ -34,5 +35,25 @@ public class CommentService {
         commentRepository.save(comment);
 
         return CommentDto.from(comment);
+    }
+
+    public CommentDto updateComment(Long commentId, CommentUpdateRequest request) {
+        final Member member = memberUtil.getCurrentMember();
+
+        Comment comment =
+                commentRepository
+                        .findById(commentId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+
+        validateCommentMemberMismatch(member, comment);
+
+        comment.updateContent(request.content());
+        return CommentDto.from(comment);
+    }
+
+    private void validateCommentMemberMismatch(Member member, Comment comment) {
+        if (!comment.getMember().equals(member)) {
+            throw new CustomException(ErrorCode.COMMENT_MEMBER_MISMATCH);
+        }
     }
 }

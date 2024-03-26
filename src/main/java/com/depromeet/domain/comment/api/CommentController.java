@@ -9,9 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "7. [댓글]", description = "댓글 관련 API")
 @RestController
@@ -26,5 +24,13 @@ public class CommentController {
     public ResponseEntity<CommentDto> commentCreate(@Valid CommentCreateRequest request) {
         CommentDto response = commentService.createComment(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Operation(summary = "댓글 수정", description = "댓글을 수정합니다.")
+    @PutMapping("/{commentId}")
+    public ResponseEntity<CommentDto> commentUpdate(
+            @PathVariable Long commentId, @Valid CommentUpdateRequest request) {
+        CommentDto response = commentService.updateComment(commentId, request);
+        return ResponseEntity.ok(response);
     }
 }
