@@ -26,6 +26,7 @@ public class CommentService {
 
     public CommentDto createComment(CommentCreateRequest request) {
         final Member member = memberUtil.getCurrentMember();
+
         MissionRecord missionRecord =
                 missionRecordRepository
                         .findById(request.missionRecordId())
