@@ -13,6 +13,7 @@ import com.depromeet.global.error.exception.ErrorCode;
 import java.lang.reflect.Field;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -33,6 +34,7 @@ class MissionRecordTest {
                         MissionVisibility.ALL,
                         missionStartedAt,
                         missionFinishedAt,
+                        LocalTime.of(21, 0),
                         member);
 
         @Test

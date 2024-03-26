@@ -76,6 +76,7 @@ class ReactionServiceTest {
                         MissionVisibility.ALL,
                         NOW.minusDays(5),
                         NOW.plusDays(5),
+                        null,
                         member);
         missionRepository.save(mission);
         MissionRecord missionRecord =

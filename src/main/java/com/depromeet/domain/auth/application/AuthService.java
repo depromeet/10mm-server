@@ -1,6 +1,7 @@
 package com.depromeet.domain.auth.application;
 
 import com.depromeet.domain.auth.application.nickname.NicknameGenerationStrategy;
+import com.depromeet.domain.auth.domain.LandingStatus;
 import com.depromeet.domain.auth.domain.OauthProvider;
 import com.depromeet.domain.auth.dto.request.IdTokenRequest;
 import com.depromeet.domain.auth.dto.request.UsernamePasswordRequest;
@@ -93,18 +94,20 @@ public class AuthService {
 
     public SocialLoginResponse socialLoginMember(IdTokenRequest request, OauthProvider provider) {
         OidcUser oidcUser = idTokenVerifier.getOidcUser(request.idToken(), provider);
-        Member member = fetchOrCreate(oidcUser);
+        Optional<Member> optionalMember = findByOidcUser(oidcUser);
+        Member member = optionalMember.orElseGet(() -> saveMember(oidcUser));
+
         member.updateLastLoginAt();
 
         TokenPairResponse loginResponse = getLoginResponse(member);
 
-        return SocialLoginResponse.from(member, loginResponse);
+        LandingStatus landingStatus = getLandingStatus(optionalMember.orElse(null));
+        return SocialLoginResponse.of(member, loginResponse, landingStatus);
     }
 
-    private Member fetchOrCreate(OidcUser oidcUser) {
-        return memberRepository
-                .findByOauthInfoAndStatus(extractOauthInfo(oidcUser), MemberStatus.NORMAL)
-                .orElseGet(() -> saveMember(oidcUser));
+    private Optional<Member> findByOidcUser(OidcUser oidcUser) {
+        return memberRepository.findByOauthInfoAndStatus(
+                extractOauthInfo(oidcUser), MemberStatus.NORMAL);
     }
 
     private Member saveMember(OidcUser oidcUser) {
@@ -127,5 +130,9 @@ public class AuthService {
     private OauthInfo extractOauthInfo(OidcUser oidcUser) {
         return OauthInfo.createOauthInfo(
                 oidcUser.getName(), oidcUser.getIssuer().toString(), oidcUser.getEmail());
+    }
+
+    private LandingStatus getLandingStatus(Member member) {
+        return member != null ? LandingStatus.TO_MAIN : LandingStatus.TO_ONBOARDING;
     }
 }

@@ -13,6 +13,7 @@ import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -52,7 +53,8 @@ class MissionRepositoryTest {
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.STUDY,
-                        MissionVisibility.ALL);
+                        MissionVisibility.ALL,
+                        LocalTime.of(21, 0));
 
         // when
         Mission saveMission =
@@ -65,6 +67,7 @@ class MissionRepositoryTest {
                                 missionCreateRequest.visibility(),
                                 startedAt,
                                 startedAt.plusWeeks(2),
+                                LocalTime.of(21, 0),
                                 saveMember));
 
         // then
@@ -85,7 +88,8 @@ class MissionRepositoryTest {
                         "testMissionNameMoreThan",
                         "testMissionContent",
                         MissionCategory.STUDY,
-                        MissionVisibility.ALL);
+                        MissionVisibility.ALL,
+                        LocalTime.of(21, 0));
 
         // when
         Mission mission =
@@ -97,6 +101,7 @@ class MissionRepositoryTest {
                         missionCreateRequest.visibility(),
                         startedAt,
                         startedAt.plusWeeks(2),
+                        LocalTime.of(21, 0),
                         saveMember);
 
         // then
@@ -113,7 +118,8 @@ class MissionRepositoryTest {
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.STUDY,
-                        MissionVisibility.ALL);
+                        MissionVisibility.ALL,
+                        LocalTime.of(21, 0));
         LocalDateTime startedAt = LocalDateTime.now();
         Mission saveMission =
                 missionRepository.save(
@@ -125,6 +131,7 @@ class MissionRepositoryTest {
                                 missionCreateRequest.visibility(),
                                 startedAt,
                                 startedAt.plusWeeks(2),
+                                LocalTime.of(21, 0),
                                 saveMember));
         // when
         Optional<Mission> findMission = missionRepository.findById(saveMission.getId());
@@ -152,7 +159,8 @@ class MissionRepositoryTest {
                                         "testMissionName_" + i,
                                         "testMissionContent_" + i,
                                         MissionCategory.STUDY,
-                                        MissionVisibility.ALL))
+                                        MissionVisibility.ALL,
+                                        LocalTime.of(21, 0)))
                 .forEach(
                         request ->
                                 missionRepository.save(
@@ -164,6 +172,7 @@ class MissionRepositoryTest {
                                                 request.visibility(),
                                                 startedAt,
                                                 startedAt.plusWeeks(2),
+                                                LocalTime.of(21, 0),
                                                 saveMember)));
 
         // when

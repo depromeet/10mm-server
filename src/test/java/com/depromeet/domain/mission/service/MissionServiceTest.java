@@ -22,6 +22,7 @@ import com.depromeet.global.security.PrincipalDetails;
 import com.depromeet.global.util.MemberUtil;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,7 +68,8 @@ class MissionServiceTest {
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.STUDY,
-                        MissionVisibility.ALL);
+                        MissionVisibility.ALL,
+                        LocalTime.of(21, 0));
 
         // when
         MissionCreateResponse mission = missionService.createMission(missionCreateRequest);
@@ -88,7 +90,8 @@ class MissionServiceTest {
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.STUDY,
-                        MissionVisibility.ALL);
+                        MissionVisibility.ALL,
+                        LocalTime.of(21, 0));
         MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
 
         // when
@@ -114,7 +117,8 @@ class MissionServiceTest {
                                         "testMissionName_" + i,
                                         "testMissionContent_" + i,
                                         MissionCategory.STUDY,
-                                        MissionVisibility.ALL))
+                                        MissionVisibility.ALL,
+                                        LocalTime.of(21, 0)))
                 .forEach(
                         request ->
                                 entityManager.persist(
@@ -126,6 +130,7 @@ class MissionServiceTest {
                                                 request.visibility(),
                                                 startedAt,
                                                 startedAt.plusWeeks(2),
+                                                LocalTime.of(21, 0),
                                                 memberUtil.getCurrentMember())));
 
         // when
@@ -150,10 +155,12 @@ class MissionServiceTest {
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.STUDY,
-                        MissionVisibility.ALL);
+                        MissionVisibility.ALL,
+                        LocalTime.of(21, 0));
         MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
-                new MissionUpdateRequest("modifyName", "modifyContent", MissionVisibility.FOLLOWER);
+                new MissionUpdateRequest(
+                        "modifyName", "modifyContent", MissionVisibility.FOLLOWER, null);
 
         // when
         MissionUpdateResponse modifyMission =
@@ -171,10 +178,11 @@ class MissionServiceTest {
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.STUDY,
-                        MissionVisibility.ALL);
+                        MissionVisibility.ALL,
+                        LocalTime.of(21, 0));
         MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
-                new MissionUpdateRequest(null, "modifyContent", MissionVisibility.FOLLOWER);
+                new MissionUpdateRequest(null, "modifyContent", MissionVisibility.FOLLOWER, null);
 
         // when, then
         assertThatThrownBy(
@@ -193,11 +201,15 @@ class MissionServiceTest {
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.STUDY,
-                        MissionVisibility.ALL);
+                        MissionVisibility.ALL,
+                        LocalTime.of(21, 0));
         MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
                 new MissionUpdateRequest(
-                        "modifyMissionName_test", "modifyContent", MissionVisibility.FOLLOWER);
+                        "modifyMissionName_test",
+                        "modifyContent",
+                        MissionVisibility.FOLLOWER,
+                        null);
 
         // when, then
         assertThatThrownBy(
@@ -216,7 +228,8 @@ class MissionServiceTest {
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.STUDY,
-                        MissionVisibility.ALL);
+                        MissionVisibility.ALL,
+                        LocalTime.of(21, 0));
         MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
 
         // when
@@ -235,7 +248,8 @@ class MissionServiceTest {
                         "testMissionName",
                         "testMissionContent",
                         MissionCategory.STUDY,
-                        MissionVisibility.ALL);
+                        MissionVisibility.ALL,
+                        LocalTime.of(21, 0));
         missionService.createMission(missionCreateRequest);
 
         // when
