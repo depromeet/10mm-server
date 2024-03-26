@@ -3,6 +3,7 @@ package com.depromeet.domain.mission.application;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.dao.MissionRepository;
+import com.depromeet.domain.mission.domain.DurationStatus;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
@@ -241,6 +242,13 @@ public class MissionService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<MissionRemindPushResponse> findAllInProgressMission() {
+        List<Mission> missions =
+                missionRepository.findAllByDurationStatus(DurationStatus.IN_PROGRESS);
+        return missions.stream().map(MissionRemindPushResponse::from).toList();
+    }
+
     public MissionUpdateResponse updateMission(
             MissionUpdateRequest missionUpdateRequest, Long missionId) {
         Mission mission =
@@ -250,7 +258,8 @@ public class MissionService {
         mission.updateMission(
                 missionUpdateRequest.name(),
                 missionUpdateRequest.content(),
-                missionUpdateRequest.visibility());
+                missionUpdateRequest.visibility(),
+                missionUpdateRequest.remindAt());
         return MissionUpdateResponse.from(mission);
     }
 
@@ -276,6 +285,7 @@ public class MissionService {
                 missionCreateRequest.visibility(),
                 startedAt,
                 startedAt.plusWeeks(2),
+                missionCreateRequest.remindAt(),
                 member);
     }
 

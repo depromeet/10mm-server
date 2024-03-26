@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,6 +33,7 @@ class MissionTest {
                         MissionVisibility.ALL,
                         startedAt,
                         finishedAt,
+                        LocalTime.of(21, 0),
                         member);
 
         // when
@@ -55,6 +57,7 @@ class MissionTest {
                         MissionVisibility.ALL,
                         startedAt,
                         finishedAt,
+                        LocalTime.of(21, 0),
                         member);
 
         // when
@@ -78,6 +81,7 @@ class MissionTest {
                         MissionVisibility.ALL,
                         startedAt,
                         finishedAt,
+                        LocalTime.of(21, 0),
                         member);
 
         // when
