@@ -14,7 +14,6 @@ import com.depromeet.global.util.MemberUtil;
 import com.depromeet.global.util.SecurityUtil;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
