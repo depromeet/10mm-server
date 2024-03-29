@@ -45,8 +45,15 @@ public class FeedService {
         return missionRecordRepository.findFeedAll(sourceMembers);
     }
 
-    // 전체 피드 탭
     @Transactional(readOnly = true)
+    public FeedSliceResponse findFeed(int size, Long lastId, MissionVisibility visibility) {
+        if (visibility == MissionVisibility.ALL) {
+            return findAllFeed(size, lastId);
+        }
+        return findFollowerFeed(size, lastId);
+    }
+
+    // 전체 피드 탭
     public FeedSliceResponse findAllFeed(int size, Long lastId) {
         final List<Member> members = memberRepository.findAll();
         Slice<FeedOneResponse> feedByVisibilityAndPage =
@@ -56,7 +63,6 @@ public class FeedService {
     }
 
     // 팔로워 피드 탭
-    @Transactional(readOnly = true)
     public FeedSliceResponse findFollowerFeed(int size, Long lastId) {
         final Member currentMember = memberUtil.getCurrentMember();
         List<Member> sourceMembers = getSourceMembers(currentMember.getId());

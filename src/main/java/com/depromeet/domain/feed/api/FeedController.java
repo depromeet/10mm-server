@@ -37,13 +37,7 @@ public class FeedController {
             @RequestParam int size,
             @RequestParam(required = false) Long lastId,
             @RequestParam(value = "visibility", required = false) MissionVisibility visibility) {
-        if (visibility == MissionVisibility.ALL) {
-            // 전체 피드 탭
-            return feedService.findAllFeed(size, lastId);
-        } else {
-            // 팔로워 피드 탭
-            return feedService.findFollowerFeed(size, lastId);
-        }
+        return feedService.findFeed(size, lastId, visibility);
     }
 
     @Operation(summary = "프로필 피드", description = "피드 탭을 조회합니다.")
