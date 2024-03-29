@@ -89,7 +89,7 @@ public class FeedService {
     private List<Member> getSourceMembers(Long currentMemberId) {
         return memberRelationRepository.findAllBySourceId(currentMemberId).stream()
                 .map(MemberRelation::getTarget)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private boolean isMyFeedRequired(Long targetId, Long sourceId) {
