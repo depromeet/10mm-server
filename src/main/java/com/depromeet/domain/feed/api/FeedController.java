@@ -23,6 +23,7 @@ public class FeedController {
 
     private final FeedService feedService;
 
+    @Deprecated
     @Operation(summary = "피드 탭", description = "피드 탭을 조회합니다.")
     @GetMapping
     public List<FeedOneResponse> feedFindAll(

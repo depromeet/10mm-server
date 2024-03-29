@@ -30,6 +30,7 @@ public class FeedService {
     private final SecurityUtil securityUtil;
     private final MemberRepository memberRepository;
 
+    @Deprecated
     @Transactional(readOnly = true)
     public List<FeedOneResponse> findAllFeedByVisibility(MissionVisibility visibilities) {
         if (visibilities == MissionVisibility.ALL) {
