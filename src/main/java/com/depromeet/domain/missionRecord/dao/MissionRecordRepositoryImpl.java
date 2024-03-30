@@ -181,8 +181,6 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                         .fetchJoin()
                         .leftJoin(missionRecord.reactions, reaction)
                         .fetchJoin()
-                        .leftJoin(missionRecord.comments, comment)
-                        .fetchJoin()
                         .distinct()
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize() + 1L)
