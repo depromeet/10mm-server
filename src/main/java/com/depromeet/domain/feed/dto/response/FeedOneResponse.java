@@ -81,11 +81,16 @@ public record FeedOneResponse(
                 remark,
                 recordImageUrl,
                 duration.toMinutes(),
-                ChronoUnit.DAYS.between(startedAt, recordStartedAt) + 1,
+                calculateSinceDay(startedAt, recordStartedAt),
                 startedAt,
                 finishedAt,
                 recordStartedAt,
                 null,
                 null);
     }
+
+    private static long calculateSinceDay(LocalDateTime startedAt, LocalDateTime recordStartedAt) {
+        return ChronoUnit.DAYS.between(startedAt, recordStartedAt) + 1;
+    }
+
 }
