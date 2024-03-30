@@ -89,7 +89,7 @@ public record FeedOneResponse(
                 null);
     }
 
-	// TODO: 다른 DTO에 존재하는 sinceDay 중복 계산 로직 제거
+    // TODO: 다른 DTO에 존재하는 sinceDay 중복 계산 로직 제거
     private static long calculateSinceDay(LocalDateTime startedAt, LocalDateTime recordStartedAt) {
         return ChronoUnit.DAYS.between(startedAt, recordStartedAt) + 1;
     }
