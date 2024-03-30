@@ -34,6 +34,7 @@ public class ReactionService {
     private final ReactionRepository reactionRepository;
     private final FcmService fcmService;
 
+    // TODO: ReactionGroupByEmojiResponse의 groupByEmoji 메서드를 사용하도록 변경
     public List<ReactionGroupByEmojiResponse> findAllReaction(Long missionRecordId) {
         Map<EmojiType, List<Reaction>> reactionMap =
                 reactionRepository.findAllGroupByEmoji(missionRecordId);
