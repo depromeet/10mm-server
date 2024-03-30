@@ -88,33 +88,4 @@ public record FeedOneResponse(
                 null,
                 null);
     }
-
-    public static FeedOneResponse of(
-            Long memberId,
-            String nickname,
-            String profileImage,
-            Long missionId,
-            String name,
-            Long recordId,
-            String remark,
-            String recordImageUrl,
-            Duration duration,
-            LocalDateTime startedAt,
-            LocalDateTime finishedAt,
-            LocalDateTime recordStartedAt) {
-        return new FeedOneResponse(
-                memberId,
-                nickname,
-                profileImage,
-                missionId,
-                name,
-                recordId,
-                remark,
-                recordImageUrl,
-                duration.toMinutes(),
-                Duration.between(startedAt, LocalDateTime.now()).toDays() + 1,
-                startedAt,
-                finishedAt,
-                recordStartedAt);
-    }
 }
