@@ -7,14 +7,17 @@ import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import com.depromeet.domain.reaction.application.ReactionService;
 import com.depromeet.global.util.MemberUtil;
 import com.depromeet.global.util.SecurityUtil;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class FeedService {
+    private final ReactionService reactionService;
     private final MemberUtil memberUtil;
+    private final MissionRepository missionRepository;
     private final MissionRecordRepository missionRecordRepository;
     private final MemberRelationRepository memberRelationRepository;
     private final SecurityUtil securityUtil;
@@ -51,6 +56,18 @@ public class FeedService {
             return findAllFeed(size, lastId);
         }
         return findFollowerFeed(size, lastId);
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<FeedOneResponse> findFeedV2(MissionVisibility visibility, Pageable pageable) {
+        if (visibility == MissionVisibility.ALL) {
+            return findAllFeedV2(pageable);
+        }
+        return findFollowerFeedV2(pageable);
+    }
+
+    public Slice<FeedOneResponse> findAllFeedV2(Pageable pageable) {
+        return missionRecordRepository.findAllFetch(pageable).map(FeedOneResponse::from);
     }
 
     // 전체 피드 탭
