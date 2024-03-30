@@ -33,7 +33,7 @@ public record FeedOneResponse(
                         pattern = "yyyy-MM-dd HH:mm:ss",
                         timezone = "Asia/Seoul")
                 @Schema(
-                        description = "미션 기록 시작 시간",
+                        description = "미션 시작 일시",
                         defaultValue = "2024-01-06 00:00:00",
                         type = "string")
                 LocalDateTime startedAt,
@@ -42,7 +42,7 @@ public record FeedOneResponse(
                         pattern = "yyyy-MM-dd HH:mm:ss",
                         timezone = "Asia/Seoul")
                 @Schema(
-                        description = "미션 기록 종료 시간",
+                        description = "미션 종료 일시",
                         defaultValue = "2024-01-20 00:34:00",
                         type = "string")
                 LocalDateTime finishedAt,
@@ -51,7 +51,7 @@ public record FeedOneResponse(
                         pattern = "yyyy-MM-dd HH:mm:ss",
                         timezone = "Asia/Seoul")
                 @Schema(
-                        description = "미션 기록 시작 시간",
+                        description = "미션 기록 시작 일시",
                         defaultValue = "2024-01-06 00:00:00",
                         type = "string")
                 LocalDateTime recordStartedAt) {
