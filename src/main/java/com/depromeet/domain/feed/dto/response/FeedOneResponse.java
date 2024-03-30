@@ -1,11 +1,18 @@
 package com.depromeet.domain.feed.dto.response;
 
+import com.depromeet.domain.comment.domain.Comment;
+import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.mission.domain.Mission;
+import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import com.depromeet.domain.reaction.domain.Reaction;
+import com.depromeet.domain.reaction.dto.response.ReactionGroupByEmojiResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 public record FeedOneResponse(
         @Schema(description = "작성자 ID", defaultValue = "1") Long memberId,
