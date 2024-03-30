@@ -27,7 +27,7 @@ public record FeedOneResponse(
                         description = "미션 기록 인증 사진 Url",
                         defaultValue = "https://image.10mm.today/default.png")
                 String recordImageUrl,
-        @Schema(description = "미션 수행한 시간", defaultValue = "21") long duration,
+        @Schema(description = "미션 수행 시간 (분 단위)", defaultValue = "21") long duration,
         @Schema(description = "미션 시작한 지 N일차", defaultValue = "3") long sinceDay,
         @JsonFormat(
                         shape = JsonFormat.Shape.STRING,
