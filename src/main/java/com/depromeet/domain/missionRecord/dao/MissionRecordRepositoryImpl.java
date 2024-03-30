@@ -234,4 +234,13 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
         Pageable pageable = PageRequest.ofSize(size);
         return new SliceImpl<>(result, pageable, hasNext);
     }
+
+    private boolean getHasNext(List<?> list, Pageable pageable) {
+        boolean hasNext = false;
+        if (list.size() > pageable.getPageSize()) {
+            list.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+        return hasNext;
+    }
 }
