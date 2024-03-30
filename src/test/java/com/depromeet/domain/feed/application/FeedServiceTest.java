@@ -195,7 +195,7 @@ class FeedServiceTest {
             Slice<FeedOneResponse> response = feedService.findAllFeedV2(pageable);
 
             // then
-            assertThat(response.getSize()).isEqualTo(3);
+            assertThat(response.getContent()).hasSize(3);
         }
     }
 }
