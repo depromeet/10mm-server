@@ -70,6 +70,10 @@ public class FeedService {
         return missionRecordRepository.findAllFetch(pageable).map(FeedOneResponse::from);
     }
 
+    public Slice<FeedOneResponse> findFollowerFeedV2(Pageable pageable) {
+        return null;
+    }
+
     // 전체 피드 탭
     public FeedSliceResponse findAllFeed(int size, Long lastId) {
         final List<Member> members = memberRepository.findAll();
