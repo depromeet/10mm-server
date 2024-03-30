@@ -26,6 +26,7 @@ import com.depromeet.global.security.PrincipalDetails;
 import com.depromeet.global.util.MemberUtil;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -114,6 +115,7 @@ class PushServiceTest {
                             MissionVisibility.ALL,
                             missionStartedAt,
                             missionFinishedAt,
+                            LocalTime.of(21, 0),
                             currentMember));
 
             // when, then
@@ -146,6 +148,7 @@ class PushServiceTest {
                             MissionVisibility.ALL,
                             missionStartedAt,
                             missionFinishedAt,
+                            LocalTime.of(21, 0),
                             targetMember));
 
             // when, then
@@ -180,6 +183,7 @@ class PushServiceTest {
                                     MissionVisibility.ALL,
                                     missionStartedAt,
                                     missionFinishedAt,
+                                    LocalTime.of(21, 0),
                                     targetMember));
 
             LocalDateTime missionRecordStartedAt = today;
@@ -232,6 +236,7 @@ class PushServiceTest {
                             MissionVisibility.ALL,
                             missionStartedAt,
                             missionFinishedAt,
+                            LocalTime.of(21, 0),
                             targetMember));
 
             // when

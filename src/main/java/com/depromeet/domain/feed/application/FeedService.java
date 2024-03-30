@@ -119,7 +119,7 @@ public class FeedService {
     }
 
     private List<FeedOneByProfileResponse> extractFeedResponses(List<MissionRecord> records) {
-        return records.stream().map(FeedOneByProfileResponse::of).toList();
+        return records.stream().map(FeedOneByProfileResponse::from).toList();
     }
 
     private List<MissionVisibility> determineVisibilityConditionsByRelationsWithMe(

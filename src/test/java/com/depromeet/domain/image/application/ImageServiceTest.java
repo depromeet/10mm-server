@@ -25,6 +25,7 @@ import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.security.PrincipalDetails;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -95,7 +96,8 @@ class ImageServiceTest {
                             "testMissionName",
                             "testMissionContent",
                             MissionCategory.STUDY,
-                            MissionVisibility.ALL);
+                            MissionVisibility.ALL,
+                            LocalTime.of(21, 0));
             MissionCreateResponse missionCreateResponse =
                     missionService.createMission(missionCreateRequest);
 
@@ -133,7 +135,8 @@ class ImageServiceTest {
                             "testMissionName",
                             "testMissionContent",
                             MissionCategory.STUDY,
-                            MissionVisibility.ALL);
+                            MissionVisibility.ALL,
+                            LocalTime.of(21, 0));
             MissionCreateResponse missionCreateResponse =
                     missionService.createMission(missionCreateRequest);
 
@@ -210,7 +213,8 @@ class ImageServiceTest {
                             "testMissionName",
                             "testMissionContent",
                             MissionCategory.STUDY,
-                            MissionVisibility.ALL);
+                            MissionVisibility.ALL,
+                            LocalTime.of(21, 0));
             MissionCreateResponse missionCreateResponse =
                     missionService.createMission(missionCreateRequest);
 
