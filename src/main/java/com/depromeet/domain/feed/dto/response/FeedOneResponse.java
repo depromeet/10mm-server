@@ -1,5 +1,8 @@
 package com.depromeet.domain.feed.dto.response;
 
+import static com.depromeet.domain.reaction.dto.response.ReactionGroupByEmojiResponse.*;
+import static java.util.Comparator.*;
+
 import com.depromeet.domain.comment.dto.response.CommentDto;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.domain.Mission;
@@ -94,4 +97,31 @@ public record FeedOneResponse(
         return ChronoUnit.DAYS.between(startedAt, recordStartedAt) + 1;
     }
 
+    public static FeedOneResponse from(MissionRecord missionRecord) {
+        Mission mission = missionRecord.getMission();
+        Member member = mission.getMember();
+
+        List<ReactionGroupByEmojiResponse> reactions =
+                groupByEmojiType(missionRecord.getReactions());
+
+        List<CommentDto> comments =
+                missionRecord.getComments().stream().map(CommentDto::from).toList();
+
+        return new FeedOneResponse(
+                member.getId(),
+                member.getProfile().getNickname(),
+                member.getProfile().getProfileImageUrl(),
+                mission.getId(),
+                mission.getName(),
+                missionRecord.getId(),
+                missionRecord.getRemark(),
+                missionRecord.getImageUrl(),
+                missionRecord.getDuration().toMinutes(),
+                calculateSinceDay(mission.getStartedAt(), missionRecord.getStartedAt()),
+                mission.getStartedAt(),
+                mission.getFinishedAt(),
+                missionRecord.getStartedAt(),
+                reactions,
+                comments);
+    }
 }
