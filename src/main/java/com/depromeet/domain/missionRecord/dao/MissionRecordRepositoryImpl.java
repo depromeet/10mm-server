@@ -1,8 +1,10 @@
 package com.depromeet.domain.missionRecord.dao;
 
+import static com.depromeet.domain.comment.domain.QComment.*;
 import static com.depromeet.domain.member.domain.QMember.*;
 import static com.depromeet.domain.mission.domain.QMission.*;
 import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
+import static com.depromeet.domain.reaction.domain.QReaction.*;
 
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
 import com.depromeet.domain.member.domain.Member;
@@ -165,6 +167,30 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     @Override
     public void deleteByMissionRecordId(Long missionRecordId) {
         jpaQueryFactory.delete(missionRecord).where(missionRecord.id.eq(missionRecordId)).execute();
+    }
+
+    @Override
+    public Slice<MissionRecord> findAllFetch(Pageable pageable) {
+
+        List<MissionRecord> missionRecords =
+                jpaQueryFactory
+                        .selectFrom(missionRecord)
+                        .join(missionRecord.mission, mission)
+                        .fetchJoin()
+                        .join(mission.member, member)
+                        .fetchJoin()
+                        .leftJoin(missionRecord.reactions, reaction)
+                        .fetchJoin()
+                        .leftJoin(missionRecord.comments, comment)
+                        .fetchJoin()
+                        .distinct()
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize() + 1L)
+                        .fetch();
+
+        boolean hasNext = getHasNext(missionRecords, pageable);
+
+        return new SliceImpl<>(missionRecords, pageable, hasNext);
     }
 
     private BooleanExpression missionIdEq(Long missionId) {
