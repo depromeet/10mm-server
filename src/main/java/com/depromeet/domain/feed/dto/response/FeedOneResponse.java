@@ -54,7 +54,9 @@ public record FeedOneResponse(
                         description = "미션 기록 시작 일시",
                         defaultValue = "2024-01-06 00:00:00",
                         type = "string")
-                LocalDateTime recordStartedAt) {
+                LocalDateTime recordStartedAt,
+        @Schema(description = "리액션 타입별 그룹") List<ReactionGroupByEmojiResponse> reactions,
+        @Schema(description = "댓글 목록") List<CommentDto> comments) {
     @QueryProjection
     public FeedOneResponse(
             Long memberId,
@@ -82,7 +84,9 @@ public record FeedOneResponse(
                 ChronoUnit.DAYS.between(startedAt, recordStartedAt) + 1,
                 startedAt,
                 finishedAt,
-                recordStartedAt);
+                recordStartedAt,
+                null,
+                null);
     }
 
     public static FeedOneResponse of(
