@@ -284,7 +284,7 @@ public class MissionService {
                 missionCreateRequest.category(),
                 missionCreateRequest.visibility(),
                 startedAt,
-                startedAt.plusWeeks(2),
+                startedAt.plus(missionCreateRequest.period().getPeriod()),
                 missionCreateRequest.remindAt(),
                 member);
     }
