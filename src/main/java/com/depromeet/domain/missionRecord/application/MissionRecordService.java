@@ -38,6 +38,9 @@ public class MissionRecordService {
     private final MissionRecordTtlRepository missionRecordTtlRepository;
 
     public MissionRecordCreateResponse createMissionRecord(MissionRecordCreateRequest request) {
+        long diffHour = Duration.between(request.startedAt(), request.finishedAt()).toHours();
+        validateMissionRecordDurationOverTime(diffHour);
+
         final Mission mission = findMissionById(request.missionId());
         final Member member = memberUtil.getCurrentMember();
 
@@ -63,6 +66,12 @@ public class MissionRecordService {
                         expirationTime,
                         request.finishedAt().plusMinutes(EXPIRATION_TIME)));
         return MissionRecordCreateResponse.from(createdMissionRecord.getId());
+    }
+
+    private void validateMissionRecordDurationOverTime(long diffHour) {
+        if (diffHour >= 24) {
+            throw new CustomException(ErrorCode.MISSION_RECORD_DURATION_OVERTIME);
+        }
     }
 
     private void validateMissionRecordExistsToday(Long missionId) {
