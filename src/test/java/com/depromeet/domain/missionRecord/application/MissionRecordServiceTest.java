@@ -73,7 +73,7 @@ class MissionRecordServiceTest {
 
     @Test
     void 하루가_지나_미션_인증한_경우_에러를_발생시킨다() {
-		// exception
+        // exception
         assertThrows(
                 CustomException.class,
                 () ->
