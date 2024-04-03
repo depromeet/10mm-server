@@ -72,6 +72,17 @@ class MissionRecordServiceTest {
     }
 
     @Test
+    void 하루가_지나_미션_인증한_경우_에러를_발생시킨다() {
+        // exception
+        assertThrows(
+                CustomException.class,
+                () ->
+                        missionRecordService.createMissionRecord(
+                                new MissionRecordCreateRequest(
+                                        mission.getId(), now, now.plusDays(1), 20, 0)));
+    }
+
+    @Test
     void 진행중인_미션기록을_삭제한다() {
         // given
         missionRecordService.createMissionRecord(
