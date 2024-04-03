@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MissionRecordService {
     private static final int EXPIRATION_TIME = 10;
     private static final int DAYS_ADJUSTMENT = 1;
-	private static final long MAX_DURATION_HOUR = 24;
+    private static final long MAX_DURATION_HOUR = 24;
 
     private final MemberUtil memberUtil;
     private final MissionRepository missionRepository;
