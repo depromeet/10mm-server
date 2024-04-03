@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MissionRecordService {
     private static final int EXPIRATION_TIME = 10;
     private static final int DAYS_ADJUSTMENT = 1;
+	private static final long MAX_DURATION_HOUR = 24;
 
     private final MemberUtil memberUtil;
     private final MissionRepository missionRepository;
@@ -69,7 +70,7 @@ public class MissionRecordService {
     }
 
     private void validateMissionRecordDurationOverTime(long diffHour) {
-        if (diffHour >= 24) {
+        if (diffHour >= MAX_DURATION_HOUR) {
             throw new CustomException(ErrorCode.MISSION_RECORD_DURATION_OVERTIME);
         }
     }
