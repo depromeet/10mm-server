@@ -28,7 +28,7 @@ public class MissionBatchScheduler {
     }
 
     // 매 10분마다 schedule 실행
-    @Scheduled(cron = "0 */2 * * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 */10 * * * *", zone = "Asia/Seoul")
     public void missionRemindPushNotification() {
         log.info("Mission Remind Push Notification batch execute");
 
@@ -37,13 +37,13 @@ public class MissionBatchScheduler {
         inProgressMissions.forEach(this::sendMissionRemindPushNotification);
     }
 
-    private void sendMissionRemindPushNotification(MissionRemindPushResponse response) {
+    private void sendMissionRemindPushNotification(MissionRemindPushResponse remindPushResponse) {
         LocalTime currentTime = LocalTime.now().truncatedTo(ChronoUnit.MINUTES);
-        if (currentTime.equals(response.remindAt())) {
+        if (currentTime.equals(remindPushResponse.remindAt())) {
             fcmService.sendMessageSync(
-                    response.fcmToken(),
+                    remindPushResponse.fcmToken(),
                     PUSH_MISSION_START_REMIND_TITLE,
-                    String.format(PUSH_MISSION_START_REMIND_CONTENT, response.name()));
+                    String.format(PUSH_MISSION_START_REMIND_CONTENT, remindPushResponse.name()));
         }
     }
 }
