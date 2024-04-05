@@ -5,6 +5,7 @@ import static com.depromeet.domain.mission.domain.QMission.*;
 import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.mission.domain.DurationStatus;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
@@ -32,6 +33,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                         missionRecord
                                 .isNull()
                                 .or(missionRecord.uploadStatus.ne(ImageUploadStatus.COMPLETE)),
+                        mission.durationStatus.eq(DurationStatus.IN_PROGRESS),
                         member.fcmInfo.fcmToken.isNotNull(),
                         mission.startedAt.loe(today),
                         mission.finishedAt.goe(today))

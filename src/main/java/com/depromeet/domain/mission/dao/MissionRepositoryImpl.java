@@ -7,6 +7,7 @@ import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 import com.depromeet.domain.mission.domain.DurationStatus;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionVisibility;
+import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -102,6 +103,24 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                                         .goe(date))
                         .fetchJoin();
         return query.fetch();
+    }
+
+    @Override
+    public List<Mission> findMissionsNonCompleteAndInProgress(LocalDateTime today) {
+        return jpaQueryFactory
+                .selectFrom(mission)
+                .leftJoin(mission.member, member)
+                .fetchJoin()
+                .leftJoin(mission.missionRecords, missionRecord)
+                .on(missionRecord.createdAt.loe(today))
+                .where(
+                        missionRecord
+                                .isNull()
+                                .or(missionRecord.uploadStatus.ne(ImageUploadStatus.COMPLETE)),
+                        mission.durationStatus.eq(DurationStatus.IN_PROGRESS),
+                        mission.startedAt.loe(today),
+                        mission.finishedAt.goe(today))
+                .fetch();
     }
 
     // 미션의 사용자 id 조건 검증 메서드
