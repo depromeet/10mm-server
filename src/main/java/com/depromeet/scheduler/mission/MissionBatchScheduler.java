@@ -37,13 +37,13 @@ public class MissionBatchScheduler {
         inProgressMissions.forEach(this::sendMissionRemindPushNotification);
     }
 
-    private void sendMissionRemindPushNotification(MissionRemindPushResponse mission) {
+    private void sendMissionRemindPushNotification(MissionRemindPushResponse remindPushResponse) {
         LocalTime currentTime = LocalTime.now().truncatedTo(ChronoUnit.MINUTES);
-        if (currentTime.equals(mission.remindAt())) {
+        if (currentTime.equals(remindPushResponse.remindAt())) {
             fcmService.sendMessageSync(
-                    mission.fcmToken(),
+                    remindPushResponse.fcmToken(),
                     PUSH_MISSION_START_REMIND_TITLE,
-                    String.format(PUSH_MISSION_START_REMIND_CONTENT, mission.name()));
+                    String.format(PUSH_MISSION_START_REMIND_CONTENT, remindPushResponse.name()));
         }
     }
 }

@@ -12,6 +12,7 @@ import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.domain.MissionCategory;
+import com.depromeet.domain.mission.domain.MissionPeriod;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
@@ -97,6 +98,7 @@ class ImageServiceTest {
                             "testMissionContent",
                             MissionCategory.STUDY,
                             MissionVisibility.ALL,
+                            MissionPeriod.TWO_WEEKS,
                             LocalTime.of(21, 0));
             MissionCreateResponse missionCreateResponse =
                     missionService.createMission(missionCreateRequest);
@@ -136,6 +138,7 @@ class ImageServiceTest {
                             "testMissionContent",
                             MissionCategory.STUDY,
                             MissionVisibility.ALL,
+                            MissionPeriod.TWO_WEEKS,
                             LocalTime.of(21, 0));
             MissionCreateResponse missionCreateResponse =
                     missionService.createMission(missionCreateRequest);
@@ -214,6 +217,7 @@ class ImageServiceTest {
                             "testMissionContent",
                             MissionCategory.STUDY,
                             MissionVisibility.ALL,
+                            MissionPeriod.TWO_WEEKS,
                             LocalTime.of(21, 0));
             MissionCreateResponse missionCreateResponse =
                     missionService.createMission(missionCreateRequest);

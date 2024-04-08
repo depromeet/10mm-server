@@ -11,6 +11,7 @@ import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
+import com.depromeet.domain.mission.domain.MissionPeriod;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
@@ -69,6 +70,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
 
         // when
@@ -91,6 +93,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
         MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
 
@@ -118,6 +121,7 @@ class MissionServiceTest {
                                         "testMissionContent_" + i,
                                         MissionCategory.STUDY,
                                         MissionVisibility.ALL,
+                                        MissionPeriod.TWO_WEEKS,
                                         LocalTime.of(21, 0)))
                 .forEach(
                         request ->
@@ -156,6 +160,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
         MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
@@ -179,6 +184,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
         MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
@@ -202,6 +208,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
         MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
@@ -229,6 +236,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
         MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
 
@@ -249,6 +257,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
         missionService.createMission(missionCreateRequest);
 

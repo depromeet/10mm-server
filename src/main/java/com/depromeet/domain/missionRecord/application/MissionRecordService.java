@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MissionRecordService {
     private static final int EXPIRATION_TIME = 10;
     private static final int DAYS_ADJUSTMENT = 1;
+    private static final long MAX_DURATION_HOUR = 24;
 
     private final MemberUtil memberUtil;
     private final MissionRepository missionRepository;
@@ -38,6 +39,9 @@ public class MissionRecordService {
     private final MissionRecordTtlRepository missionRecordTtlRepository;
 
     public MissionRecordCreateResponse createMissionRecord(MissionRecordCreateRequest request) {
+        long diffHour = Duration.between(request.startedAt(), request.finishedAt()).toHours();
+        validateMissionRecordDurationOverTime(diffHour);
+
         final Mission mission = findMissionById(request.missionId());
         final Member member = memberUtil.getCurrentMember();
 
@@ -63,6 +67,12 @@ public class MissionRecordService {
                         expirationTime,
                         request.finishedAt().plusMinutes(EXPIRATION_TIME)));
         return MissionRecordCreateResponse.from(createdMissionRecord.getId());
+    }
+
+    private void validateMissionRecordDurationOverTime(long diffHour) {
+        if (diffHour >= MAX_DURATION_HOUR) {
+            throw new CustomException(ErrorCode.MISSION_RECORD_DURATION_OVERTIME);
+        }
     }
 
     private void validateMissionRecordExistsToday(Long missionId) {
