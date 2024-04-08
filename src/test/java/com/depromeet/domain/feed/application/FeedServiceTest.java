@@ -7,6 +7,8 @@ import com.depromeet.domain.comment.dao.CommentRepository;
 import com.depromeet.domain.comment.domain.Comment;
 import com.depromeet.domain.feed.domain.FeedVisibility;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
+import com.depromeet.domain.follow.dao.MemberRelationRepository;
+import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.OauthInfo;
@@ -48,6 +50,7 @@ class FeedServiceTest {
     @Autowired private MissionRecordRepository missionRecordRepository;
     @Autowired private ReactionRepository reactionRepository;
     @Autowired private CommentRepository commentRepository;
+    @Autowired private MemberRelationRepository memberRelationRepository;
 
     @BeforeEach
     void setUp() {
@@ -213,6 +216,11 @@ class FeedServiceTest {
                         commentToRecord3ByMember1,
                         commentToRecord3ByMember2,
                         commentToRecord3ByMember3));
+
+        MemberRelation follow1to2 = MemberRelation.createMemberRelation(member1, member2);
+        MemberRelation follow1to3 = MemberRelation.createMemberRelation(member1, member3);
+
+        memberRelationRepository.saveAll(List.of(follow1to2, follow1to3));
     }
 
     @Test
