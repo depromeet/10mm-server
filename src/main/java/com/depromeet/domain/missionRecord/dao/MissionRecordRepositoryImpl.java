@@ -1,7 +1,7 @@
 package com.depromeet.domain.missionRecord.dao;
 
-import static com.depromeet.domain.comment.domain.QComment.*;
 import static com.depromeet.domain.member.domain.QMember.*;
+import static com.depromeet.domain.mission.domain.MissionVisibility.*;
 import static com.depromeet.domain.mission.domain.QMission.*;
 import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 import static com.depromeet.domain.reaction.domain.QReaction.*;
@@ -69,8 +69,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
 
     @Override
     public List<FeedOneResponse> findFeedAll(List<Member> members) {
-        return findFeedByVisibility(
-                members, List.of(MissionVisibility.FOLLOWER, MissionVisibility.ALL));
+        return findFeedByVisibility(members, List.of(FOLLOWER, ALL));
     }
 
     @Override
@@ -109,8 +108,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
 
     @Override
     public Slice<FeedOneResponse> findFeedAllByPage(int size, Long lastId, List<Member> members) {
-        return findFeedByVisibilityAndPage(
-                size, lastId, members, List.of(MissionVisibility.FOLLOWER, MissionVisibility.ALL));
+        return findFeedByVisibilityAndPage(size, lastId, members, List.of(FOLLOWER, ALL));
     }
 
     @Override
