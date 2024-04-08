@@ -66,14 +66,14 @@ public class FeedService {
         if (visibility == FeedVisibility.ALL) {
             return findAllFeedV2(pageable);
         }
-        return findFollowerFeedV2(pageable);
+        return findFollowingFeedV2(pageable);
     }
 
     private Slice<FeedOneResponse> findAllFeedV2(Pageable pageable) {
         return missionRecordRepository.findAllFetch(pageable).map(FeedOneResponse::from);
     }
 
-    private Slice<FeedOneResponse> findFollowerFeedV2(Pageable pageable) {
+    private Slice<FeedOneResponse> findFollowingFeedV2(Pageable pageable) {
         final Member currentMember = memberUtil.getCurrentMember();
         List<Member> followingMembers = followService.getFollowingMembers(currentMember);
 
