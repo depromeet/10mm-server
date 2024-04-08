@@ -237,19 +237,75 @@ class FeedServiceTest {
     }
 
     @Nested
-    class 피드_V2_조회_테스트 {
+    class 팔로잉_피드이면 {
 
         @Test
-        void 전체_피드_조회하기() {
+        void 조회에_성공한다() {
             // given
             setFixture();
+            logoutAndReloginAs(1L);
 
             // when
             Pageable pageable = PageRequest.of(0, 10);
-            Slice<FeedOneResponse> response = feedService.findAllFeedV2(pageable);
+            Slice<FeedOneResponse> response =
+                    feedService.findFeedV2(FeedVisibility.FOLLOWING, pageable);
 
             // then
-            assertThat(response.getContent()).hasSize(3);
+            assertThat(response.getContent()).hasSize(2);
+        }
+
+        @Test
+        void 자신의_미션은_조회하지_않는다() {
+            // given
+            setFixture();
+            logoutAndReloginAs(1L);
+
+            // when
+            Pageable pageable = PageRequest.of(0, 10);
+            Slice<FeedOneResponse> response =
+                    feedService.findFeedV2(FeedVisibility.FOLLOWING, pageable);
+
+            // then
+            assertThat(response.getContent())
+                    .noneMatch(feedOneResponse -> feedOneResponse.memberId() == 1L);
+        }
+
+        @Test
+        void 공개_및_팔로워공개_미션의_미션기록만_조회한다() {
+            // given
+            setFixture();
+            logoutAndReloginAs(1L);
+
+            // when
+            Pageable pageable = PageRequest.of(0, 10);
+            Slice<FeedOneResponse> response =
+                    feedService.findFeedV2(FeedVisibility.FOLLOWING, pageable);
+
+            // then
+            // 2번 미션의 미션기록은 공개이므로 조회
+            assertThat(response.getContent())
+                    .filteredOn(feedOneResponse -> feedOneResponse.missionId() == 2L)
+                    .hasSize(1);
+            // 3번 미션의 미션기록은 팔로워 공개이므로 조회
+            assertThat(response.getContent())
+                    .filteredOn(feedOneResponse -> feedOneResponse.missionId() == 3L)
+                    .hasSize(1);
+        }
+
+        @Test
+        void 비공개_미션의_미션기록은_조회하지_않는다() {
+            // given
+            setFixture();
+            logoutAndReloginAs(1L);
+
+            // when
+            Pageable pageable = PageRequest.of(0, 10);
+            Slice<FeedOneResponse> response =
+                    feedService.findFeedV2(FeedVisibility.FOLLOWING, pageable);
+
+            // then
+            assertThat(response.getContent())
+                    .noneMatch(feedOneResponse -> feedOneResponse.missionId() == 4L);
         }
     }
 }
