@@ -214,6 +214,18 @@ class FeedServiceTest {
                         commentToRecord3ByMember2,
                         commentToRecord3ByMember3));
     }
+
+    @Test
+    void 전체_피드이면_모든_미션기록을_조회한다() {
+        // given
+        setFixture();
+
+        // when
+        Pageable pageable = PageRequest.of(0, 10);
+        Slice<FeedOneResponse> response = feedService.findFeedV2(FeedVisibility.ALL, pageable);
+
+        // then
+        assertThat(response.getContent()).hasSize(4);
     }
 
     @Nested
