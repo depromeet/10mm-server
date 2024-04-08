@@ -74,9 +74,7 @@ class FeedServiceTest {
                 Member.createNormalMember(
                         OauthInfo.createOauthInfo("test3", "test3", "test3"), "test3");
 
-        memberRepository.save(member1);
-        memberRepository.save(member2);
-        memberRepository.save(member3);
+        memberRepository.saveAll(List.of(member1, member2, member3));
 
         Mission mission1 =
                 Mission.createMission(
@@ -108,15 +106,25 @@ class FeedServiceTest {
                         "content3",
                         3,
                         MissionCategory.STUDY,
-                        MissionVisibility.ALL,
+                        MissionVisibility.FOLLOWER,
                         LocalDateTime.of(2024, 3, 3, 0, 0),
                         LocalDateTime.of(2024, 3, 16, 0, 0),
                         LocalTime.of(12, 0, 0),
                         member3);
 
-        missionRepository.save(mission1);
-        missionRepository.save(mission2);
-        missionRepository.save(mission3);
+        Mission mission4 =
+                Mission.createMission(
+                        "mission4",
+                        "content4",
+                        4,
+                        MissionCategory.ETC,
+                        MissionVisibility.NONE,
+                        LocalDateTime.of(2024, 3, 4, 0, 0),
+                        LocalDateTime.of(2024, 3, 17, 0, 0),
+                        LocalTime.of(12, 0, 0),
+                        member3);
+
+        missionRepository.saveAll(List.of(mission1, mission2, mission3, mission4));
 
         MissionRecord missionRecord1 =
                 MissionRecord.createMissionRecord(
@@ -139,9 +147,15 @@ class FeedServiceTest {
                         LocalDateTime.of(2024, 3, 3, 12, 35),
                         mission3);
 
-        missionRecordRepository.save(missionRecord1);
-        missionRecordRepository.save(missionRecord2);
-        missionRecordRepository.save(missionRecord3);
+        MissionRecord missionRecord4 =
+                MissionRecord.createMissionRecord(
+                        Duration.ofMinutes(45),
+                        LocalDateTime.of(2024, 3, 4, 12, 0),
+                        LocalDateTime.of(2024, 3, 4, 12, 45),
+                        mission4);
+
+        missionRecordRepository.saveAll(
+                List.of(missionRecord1, missionRecord2, missionRecord3, missionRecord4));
 
         Reaction reactionToRecord1ByMember2 =
                 Reaction.createReaction(EmojiType.BLUE_HEART, member2, missionRecord1);
@@ -158,12 +172,14 @@ class FeedServiceTest {
         Reaction reactionToRecord3ByMember3 =
                 Reaction.createReaction(EmojiType.PARTYING_FACE, member3, missionRecord3);
 
-        reactionRepository.save(reactionToRecord1ByMember2);
-        reactionRepository.save(reactionToRecord1ByMember3);
-        reactionRepository.save(reactionToRecord2ByMember1);
-        reactionRepository.save(reactionToRecord2ByMember3);
-        reactionRepository.save(reactionToRecord3ByMember1);
-        reactionRepository.save(reactionToRecord3ByMember3);
+        reactionRepository.saveAll(
+                List.of(
+                        reactionToRecord1ByMember2,
+                        reactionToRecord1ByMember3,
+                        reactionToRecord2ByMember1,
+                        reactionToRecord2ByMember3,
+                        reactionToRecord3ByMember1,
+                        reactionToRecord3ByMember3));
 
         Comment commentToRecord1ByMember1 =
                 Comment.createComment("commentToRecord1ByMember1", member1, missionRecord1);
@@ -186,15 +202,18 @@ class FeedServiceTest {
         Comment commentToRecord3ByMember3 =
                 Comment.createComment("commentToRecord3ByMember3", member3, missionRecord3);
 
-        commentRepository.save(commentToRecord1ByMember1);
-        commentRepository.save(commentToRecord1ByMember2);
-        commentRepository.save(commentToRecord1ByMember3);
-        commentRepository.save(commentToRecord2ByMember1);
-        commentRepository.save(commentToRecord2ByMember2);
-        commentRepository.save(commentToRecord2ByMember3);
-        commentRepository.save(commentToRecord3ByMember1);
-        commentRepository.save(commentToRecord3ByMember2);
-        commentRepository.save(commentToRecord3ByMember3);
+        commentRepository.saveAll(
+                List.of(
+                        commentToRecord1ByMember1,
+                        commentToRecord1ByMember2,
+                        commentToRecord1ByMember3,
+                        commentToRecord2ByMember1,
+                        commentToRecord2ByMember2,
+                        commentToRecord2ByMember3,
+                        commentToRecord3ByMember1,
+                        commentToRecord3ByMember2,
+                        commentToRecord3ByMember3));
+    }
     }
 
     @Nested
