@@ -21,4 +21,6 @@ public interface MemberRelationRepository
     List<MemberRelation> findAllBySourceIdAndTargetIn(Long sourceId, List<Member> targetIds);
 
     List<MemberRelation> findAllByTargetId(Long targetId);
+
+    List<MemberRelation> findBySource(Member source);
 }

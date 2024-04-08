@@ -32,4 +32,6 @@ public interface MissionRecordRepositoryCustom {
             int size, Long lastId, List<Member> members, List<MissionVisibility> visibility);
 
     Slice<MissionRecord> findAllFetch(Pageable pageable);
+
+    Slice<MissionRecord> findAllFetchByFollowings(Pageable pageable, List<Member> followingMembers);
 }

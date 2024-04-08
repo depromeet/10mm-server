@@ -191,6 +191,27 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
         return new SliceImpl<>(missionRecords, pageable, hasNext);
     }
 
+    @Override
+    public Slice<MissionRecord> findAllFetchByFollowings(
+            Pageable pageable, List<Member> followingMembers) {
+
+        List<MissionRecord> missionRecords =
+                jpaQueryFactory
+                        .selectFrom(missionRecord)
+                        .join(missionRecord.mission, mission)
+                        .fetchJoin()
+                        .join(mission.member, member)
+                        .fetchJoin()
+                        .where(missionRecord.mission.member.in(followingMembers))
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize() + 1L)
+                        .fetch();
+
+        boolean hasNext = getHasNext(missionRecords, pageable);
+
+        return new SliceImpl<>(missionRecords, pageable, hasNext);
+    }
+
     private BooleanExpression missionIdEq(Long missionId) {
         return missionRecord.mission.id.eq(missionId);
     }

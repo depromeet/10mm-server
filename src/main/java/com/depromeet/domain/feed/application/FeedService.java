@@ -3,6 +3,7 @@ package com.depromeet.domain.feed.application;
 import com.depromeet.domain.feed.dto.response.FeedOneByProfileResponse;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
 import com.depromeet.domain.feed.dto.response.FeedSliceResponse;
+import com.depromeet.domain.follow.application.FollowService;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.member.dao.MemberRepository;
@@ -34,6 +35,7 @@ public class FeedService {
     private final MemberRelationRepository memberRelationRepository;
     private final SecurityUtil securityUtil;
     private final MemberRepository memberRepository;
+    private final FollowService followService;
 
     @Deprecated
     @Transactional(readOnly = true)
@@ -70,8 +72,13 @@ public class FeedService {
         return missionRecordRepository.findAllFetch(pageable).map(FeedOneResponse::from);
     }
 
-    public Slice<FeedOneResponse> findFollowerFeedV2(Pageable pageable) {
-        return null;
+    private Slice<FeedOneResponse> findFollowerFeedV2(Pageable pageable) {
+        final Member currentMember = memberUtil.getCurrentMember();
+        List<Member> followingMembers = followService.getFollowingMembers(currentMember);
+
+        return missionRecordRepository
+                .findAllFetchByFollowings(pageable, followingMembers)
+                .map(FeedOneResponse::from);
     }
 
     // 전체 피드 탭
