@@ -201,6 +201,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                         .join(mission.member, member)
                         .fetchJoin()
                         .where(missionRecord.mission.member.in(followingMembers))
+                        .where(mission.visibility.in(List.of(ALL, FOLLOWER)))
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize() + 1L)
                         .fetch();
