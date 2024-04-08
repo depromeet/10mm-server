@@ -1,5 +1,6 @@
 package com.depromeet.domain.feed.application;
 
+import com.depromeet.domain.feed.domain.FeedVisibility;
 import com.depromeet.domain.feed.dto.response.FeedOneByProfileResponse;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
 import com.depromeet.domain.feed.dto.response.FeedSliceResponse;
