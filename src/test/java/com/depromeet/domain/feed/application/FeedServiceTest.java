@@ -54,6 +54,15 @@ class FeedServiceTest {
         databaseCleaner.execute();
     }
 
+    private void logoutAndReloginAs(Long memberId) {
+        SecurityContextHolder.clearContext(); // 현재 회원 로그아웃
+        PrincipalDetails principalDetails = new PrincipalDetails(memberId, "USER");
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(
+                        principalDetails, null, principalDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
     private void setFixture() {
         Member member1 =
                 Member.createNormalMember(
