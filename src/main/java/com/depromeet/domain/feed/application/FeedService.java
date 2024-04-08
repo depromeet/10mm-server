@@ -59,8 +59,8 @@ public class FeedService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<FeedOneResponse> findFeedV2(MissionVisibility visibility, Pageable pageable) {
-        if (visibility == MissionVisibility.ALL) {
+    public Slice<FeedOneResponse> findFeedV2(FeedVisibility visibility, Pageable pageable) {
+        if (visibility == FeedVisibility.ALL) {
             return findAllFeedV2(pageable);
         }
         return findFollowerFeedV2(pageable);

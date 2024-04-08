@@ -1,6 +1,7 @@
 package com.depromeet.domain.feed.api;
 
 import com.depromeet.domain.feed.application.FeedService;
+import com.depromeet.domain.feed.domain.FeedVisibility;
 import com.depromeet.domain.feed.dto.response.FeedOneByProfileResponse;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
 import com.depromeet.domain.feed.dto.response.FeedSliceResponse;
@@ -45,7 +46,7 @@ public class FeedController {
     @Operation(summary = "피드 탭 V2 (페이지네이션)", description = "피드 탭을 조회합니다.")
     @GetMapping("/me/v2")
     public Slice<FeedOneResponse> feedFindByPageV2(
-            @RequestParam(required = false) MissionVisibility visibility, Pageable pageable) {
+            @RequestParam(required = false) FeedVisibility visibility, Pageable pageable) {
         return feedService.findFeedV2(visibility, pageable);
     }
 
