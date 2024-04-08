@@ -68,7 +68,7 @@ public class FeedService {
         return findFollowerFeedV2(pageable);
     }
 
-    public Slice<FeedOneResponse> findAllFeedV2(Pageable pageable) {
+    private Slice<FeedOneResponse> findAllFeedV2(Pageable pageable) {
         return missionRecordRepository.findAllFetch(pageable).map(FeedOneResponse::from);
     }
 
