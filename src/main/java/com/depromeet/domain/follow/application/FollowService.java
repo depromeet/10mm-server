@@ -273,7 +273,7 @@ public class FollowService {
      * @return 팔로우 중인 멤버 목록
      */
     public List<Member> getFollowingMembers(Member source) {
-        return memberRelationRepository.findBySource(source).stream()
+        return memberRelationRepository.findAllBySource(source).stream()
                 .map(MemberRelation::getTarget)
                 .toList();
     }
