@@ -1,21 +1,25 @@
 package com.depromeet.domain.feed.application;
 
+import com.depromeet.domain.feed.domain.FeedVisibility;
 import com.depromeet.domain.feed.dto.response.FeedOneByProfileResponse;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
 import com.depromeet.domain.feed.dto.response.FeedSliceResponse;
+import com.depromeet.domain.follow.application.FollowService;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import com.depromeet.domain.reaction.application.ReactionService;
 import com.depromeet.global.util.MemberUtil;
 import com.depromeet.global.util.SecurityUtil;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +29,16 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class FeedService {
+    private final ReactionService reactionService;
     private final MemberUtil memberUtil;
+    private final MissionRepository missionRepository;
     private final MissionRecordRepository missionRecordRepository;
     private final MemberRelationRepository memberRelationRepository;
     private final SecurityUtil securityUtil;
     private final MemberRepository memberRepository;
+    private final FollowService followService;
 
+    @Deprecated
     @Transactional(readOnly = true)
     public List<FeedOneResponse> findAllFeedByVisibility(MissionVisibility visibilities) {
         if (visibilities == MissionVisibility.ALL) {
@@ -45,8 +53,36 @@ public class FeedService {
         return missionRecordRepository.findFeedAll(sourceMembers);
     }
 
-    // 전체 피드 탭
     @Transactional(readOnly = true)
+    public FeedSliceResponse findFeed(int size, Long lastId, MissionVisibility visibility) {
+        if (visibility == MissionVisibility.ALL) {
+            return findAllFeed(size, lastId);
+        }
+        return findFollowerFeed(size, lastId);
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<FeedOneResponse> findFeedV2(FeedVisibility visibility, Pageable pageable) {
+        if (visibility == FeedVisibility.ALL) {
+            return findAllFeedV2(pageable);
+        }
+        return findFollowingFeedV2(pageable);
+    }
+
+    private Slice<FeedOneResponse> findAllFeedV2(Pageable pageable) {
+        return missionRecordRepository.findAllFetch(pageable).map(FeedOneResponse::from);
+    }
+
+    private Slice<FeedOneResponse> findFollowingFeedV2(Pageable pageable) {
+        final Member currentMember = memberUtil.getCurrentMember();
+        List<Member> followingMembers = followService.getFollowingMembers(currentMember);
+
+        return missionRecordRepository
+                .findAllFetchByFollowings(pageable, followingMembers)
+                .map(FeedOneResponse::from);
+    }
+
+    // 전체 피드 탭
     public FeedSliceResponse findAllFeed(int size, Long lastId) {
         final List<Member> members = memberRepository.findAll();
         Slice<FeedOneResponse> feedByVisibilityAndPage =
@@ -56,7 +92,6 @@ public class FeedService {
     }
 
     // 팔로워 피드 탭
-    @Transactional(readOnly = true)
     public FeedSliceResponse findFollowerFeed(int size, Long lastId) {
         final Member currentMember = memberUtil.getCurrentMember();
         List<Member> sourceMembers = getSourceMembers(currentMember.getId());
@@ -89,7 +124,7 @@ public class FeedService {
     private List<Member> getSourceMembers(Long currentMemberId) {
         return memberRelationRepository.findAllBySourceId(currentMemberId).stream()
                 .map(MemberRelation::getTarget)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private boolean isMyFeedRequired(Long targetId, Long sourceId) {

@@ -1,8 +1,10 @@
 package com.depromeet.domain.missionRecord.dao;
 
 import static com.depromeet.domain.member.domain.QMember.*;
+import static com.depromeet.domain.mission.domain.MissionVisibility.*;
 import static com.depromeet.domain.mission.domain.QMission.*;
 import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
+import static com.depromeet.domain.reaction.domain.QReaction.*;
 
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
 import com.depromeet.domain.member.domain.Member;
@@ -67,8 +69,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
 
     @Override
     public List<FeedOneResponse> findFeedAll(List<Member> members) {
-        return findFeedByVisibility(
-                members, List.of(MissionVisibility.FOLLOWER, MissionVisibility.ALL));
+        return findFeedByVisibility(members, List.of(FOLLOWER, ALL));
     }
 
     @Override
@@ -107,8 +108,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
 
     @Override
     public Slice<FeedOneResponse> findFeedAllByPage(int size, Long lastId, List<Member> members) {
-        return findFeedByVisibilityAndPage(
-                size, lastId, members, List.of(MissionVisibility.FOLLOWER, MissionVisibility.ALL));
+        return findFeedByVisibilityAndPage(size, lastId, members, List.of(FOLLOWER, ALL));
     }
 
     @Override
@@ -167,6 +167,50 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
         jpaQueryFactory.delete(missionRecord).where(missionRecord.id.eq(missionRecordId)).execute();
     }
 
+    @Override
+    public Slice<MissionRecord> findAllFetch(Pageable pageable) {
+
+        List<MissionRecord> missionRecords =
+                jpaQueryFactory
+                        .selectFrom(missionRecord)
+                        .join(missionRecord.mission, mission)
+                        .fetchJoin()
+                        .join(mission.member, member)
+                        .fetchJoin()
+                        .leftJoin(missionRecord.reactions, reaction)
+                        .fetchJoin()
+                        .distinct()
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize() + 1L)
+                        .fetch();
+
+        boolean hasNext = getHasNext(missionRecords, pageable);
+
+        return new SliceImpl<>(missionRecords, pageable, hasNext);
+    }
+
+    @Override
+    public Slice<MissionRecord> findAllFetchByFollowings(
+            Pageable pageable, List<Member> followingMembers) {
+
+        List<MissionRecord> missionRecords =
+                jpaQueryFactory
+                        .selectFrom(missionRecord)
+                        .join(missionRecord.mission, mission)
+                        .fetchJoin()
+                        .join(mission.member, member)
+                        .fetchJoin()
+                        .where(missionRecord.mission.member.in(followingMembers))
+                        .where(mission.visibility.in(List.of(ALL, FOLLOWER)))
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize() + 1L)
+                        .fetch();
+
+        boolean hasNext = getHasNext(missionRecords, pageable);
+
+        return new SliceImpl<>(missionRecords, pageable, hasNext);
+    }
+
     private BooleanExpression missionIdEq(Long missionId) {
         return missionRecord.mission.id.eq(missionId);
     }
@@ -207,5 +251,14 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
         }
         Pageable pageable = PageRequest.ofSize(size);
         return new SliceImpl<>(result, pageable, hasNext);
+    }
+
+    private boolean getHasNext(List<?> list, Pageable pageable) {
+        boolean hasNext = false;
+        if (list.size() > pageable.getPageSize()) {
+            list.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+        return hasNext;
     }
 }
