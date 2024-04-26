@@ -21,7 +21,6 @@ import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
 import com.depromeet.global.security.PrincipalDetails;
 import com.depromeet.global.util.MemberUtil;
-import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -44,7 +43,6 @@ class MissionServiceTest {
     @Autowired private MissionRepository missionRepository;
     @Autowired private MemberRepository memberRepository;
     @Autowired private DatabaseCleaner databaseCleaner;
-    @Autowired private EntityManager entityManager;
     @Autowired private MemberUtil memberUtil;
 
     @BeforeEach
