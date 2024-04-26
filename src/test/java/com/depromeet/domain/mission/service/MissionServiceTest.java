@@ -21,7 +21,6 @@ import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
 import com.depromeet.global.security.PrincipalDetails;
 import com.depromeet.global.util.MemberUtil;
-import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -35,7 +34,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -45,7 +43,6 @@ class MissionServiceTest {
     @Autowired private MissionRepository missionRepository;
     @Autowired private MemberRepository memberRepository;
     @Autowired private DatabaseCleaner databaseCleaner;
-    @Autowired private EntityManager entityManager;
     @Autowired private MemberUtil memberUtil;
 
     @BeforeEach
@@ -108,7 +105,6 @@ class MissionServiceTest {
     }
 
     @Test
-    @Transactional
     void 미션_리스트를_조회한다() {
         // given
         LocalDateTime startedAt = LocalDateTime.now();
@@ -125,7 +121,7 @@ class MissionServiceTest {
                                         LocalTime.of(21, 0)))
                 .forEach(
                         request ->
-                                entityManager.persist(
+                                missionRepository.save(
                                         Mission.createMission(
                                                 request.name(),
                                                 request.content(),
