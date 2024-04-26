@@ -35,7 +35,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -108,7 +107,6 @@ class MissionServiceTest {
     }
 
     @Test
-    @Transactional
     void 미션_리스트를_조회한다() {
         // given
         LocalDateTime startedAt = LocalDateTime.now();
@@ -125,7 +123,7 @@ class MissionServiceTest {
                                         LocalTime.of(21, 0)))
                 .forEach(
                         request ->
-                                entityManager.persist(
+                                missionRepository.save(
                                         Mission.createMission(
                                                 request.name(),
                                                 request.content(),
