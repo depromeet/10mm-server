@@ -2,7 +2,7 @@ package com.depromeet.domain.image.application;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 
-import com.depromeet.DatabaseCleaner;
+import com.depromeet.NoTransactionExtension;
 import com.depromeet.domain.image.domain.ImageFileExtension;
 import com.depromeet.domain.image.dto.request.MissionRecordImageCreateRequest;
 import com.depromeet.domain.image.dto.request.MissionRecordImageUploadCompleteRequest;
@@ -30,6 +30,7 @@ import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,8 +40,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@ExtendWith(NoTransactionExtension.class)
 class ImageServiceTest {
-    @Autowired private DatabaseCleaner databaseCleaner;
     @Autowired private MemberRepository memberRepository;
     @Autowired private ImageService imageService;
     @Autowired private MissionRecordService missionRecordService;
@@ -49,7 +50,6 @@ class ImageServiceTest {
 
     @BeforeEach
     void setUp() {
-        databaseCleaner.execute();
         PrincipalDetails principal = new PrincipalDetails(1L, "USER");
         Authentication authentication =
                 new UsernamePasswordAuthenticationToken(

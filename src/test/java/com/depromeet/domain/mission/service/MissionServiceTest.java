@@ -3,7 +3,7 @@ package com.depromeet.domain.mission.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.depromeet.DatabaseCleaner;
+import com.depromeet.NoTransactionExtension;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.OauthInfo;
@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -37,17 +38,16 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@ExtendWith(NoTransactionExtension.class)
 class MissionServiceTest {
 
     @Autowired private MissionService missionService;
     @Autowired private MissionRepository missionRepository;
     @Autowired private MemberRepository memberRepository;
-    @Autowired private DatabaseCleaner databaseCleaner;
     @Autowired private MemberUtil memberUtil;
 
     @BeforeEach
     void setUp() {
-        databaseCleaner.execute();
         PrincipalDetails principal = new PrincipalDetails(1L, "USER");
         Authentication authentication =
                 new UsernamePasswordAuthenticationToken(
