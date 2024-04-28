@@ -6,25 +6,28 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.depromeet.TestQuerydslConfig;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
-import com.depromeet.domain.member.domain.Profile;
+import com.depromeet.domain.member.domain.OauthInfo;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionPeriod;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
+import com.depromeet.global.security.PrincipalDetails;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
@@ -35,20 +38,27 @@ class MissionRepositoryTest {
 
     @Autowired private MissionRepository missionRepository;
     @Autowired private MemberRepository memberRepository;
-    private Member saveMember;
 
-    @BeforeEach
-    void setUp() {
-        missionRepository.deleteAll();
-        Member member =
-                Member.createNormalMember(Profile.createProfile("testNickname", "testImageUrl"));
-        saveMember = memberRepository.save(member);
+    private Member saveAndRegisterMember() {
+        SecurityContextHolder.clearContext();
+        OauthInfo oauthInfo =
+                OauthInfo.createOauthInfo("testOauthId", "testOauthProvider", "testOauthEmail");
+        Member member = Member.createNormalMember(oauthInfo, "testNickname");
+        memberRepository.save(member);
+        PrincipalDetails principalDetails = new PrincipalDetails(member.getId(), "USER");
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(
+                        principalDetails, null, principalDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return member;
     }
 
     @Test
     void 미션을_생성한다() {
         // given
         LocalDateTime startedAt = LocalDateTime.now();
+        Member member = saveAndRegisterMember();
+
         MissionCreateRequest missionCreateRequest =
                 new MissionCreateRequest(
                         "testMissionName",
@@ -70,7 +80,7 @@ class MissionRepositoryTest {
                                 startedAt,
                                 startedAt.plusWeeks(2),
                                 LocalTime.of(21, 0),
-                                saveMember));
+                                member));
 
         // then
         assertThat(saveMission.getId()).isNotNull();
@@ -85,6 +95,8 @@ class MissionRepositoryTest {
     void 미션이름_20자_초과하면_미션생셩_실패한다() {
         // given
         LocalDateTime startedAt = LocalDateTime.now();
+        Member member = saveAndRegisterMember();
+
         MissionCreateRequest missionCreateRequest =
                 new MissionCreateRequest(
                         "testMissionNameMoreThan",
@@ -105,7 +117,7 @@ class MissionRepositoryTest {
                         startedAt,
                         startedAt.plusWeeks(2),
                         LocalTime.of(21, 0),
-                        saveMember);
+                        member);
 
         // then
         assertThatThrownBy(() -> missionRepository.save(mission))
@@ -125,6 +137,8 @@ class MissionRepositoryTest {
                         MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
         LocalDateTime startedAt = LocalDateTime.now();
+        Member member = saveAndRegisterMember();
+
         Mission saveMission =
                 missionRepository.save(
                         Mission.createMission(
@@ -136,7 +150,7 @@ class MissionRepositoryTest {
                                 startedAt,
                                 startedAt.plusWeeks(2),
                                 LocalTime.of(21, 0),
-                                saveMember));
+                                member));
         // when
         Optional<Mission> findMission = missionRepository.findById(saveMission.getId());
 
@@ -155,6 +169,7 @@ class MissionRepositoryTest {
     void 미션_리스트_조회한다() {
         // given
         LocalDateTime startedAt = LocalDateTime.now();
+        Member member = saveAndRegisterMember();
 
         IntStream.range(1, 5)
                 .mapToObj(
@@ -178,11 +193,11 @@ class MissionRepositoryTest {
                                                 startedAt,
                                                 startedAt.plusWeeks(2),
                                                 LocalTime.of(21, 0),
-                                                saveMember)));
+                                                member)));
 
         // when
         List<Mission> missionList =
-                missionRepository.findInProgressMissionsWithRecords(saveMember.getId());
+                missionRepository.findInProgressMissionsWithRecords(member.getId());
 
         // then
         assertThat(missionList.size()).isEqualTo(4);

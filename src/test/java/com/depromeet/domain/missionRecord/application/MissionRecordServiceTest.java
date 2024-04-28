@@ -3,7 +3,6 @@ package com.depromeet.domain.missionRecord.application;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-import com.depromeet.NoTransactionExtension;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.OauthInfo;
@@ -26,7 +25,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -34,7 +32,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@ExtendWith(NoTransactionExtension.class)
 class MissionRecordServiceTest {
 
     private final LocalDateTime now = LocalDateTime.now();

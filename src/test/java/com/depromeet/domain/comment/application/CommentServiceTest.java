@@ -3,7 +3,6 @@ package com.depromeet.domain.comment.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-import com.depromeet.NoTransactionExtension;
 import com.depromeet.domain.comment.dao.CommentRepository;
 import com.depromeet.domain.comment.dto.request.CommentCreateRequest;
 import com.depromeet.domain.comment.dto.request.CommentUpdateRequest;
@@ -24,7 +23,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,7 +32,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@ExtendWith(NoTransactionExtension.class)
 class CommentServiceTest {
 
     private static final LocalDateTime NOW = LocalDateTime.of(2024, 3, 26, 5, 0, 0);
