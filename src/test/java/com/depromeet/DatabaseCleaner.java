@@ -6,7 +6,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
 
-public abstract class DatabaseCleaner {
+public class DatabaseCleaner {
+
+    private DatabaseCleaner() {
+        throw new IllegalStateException("Utility class");
+    }
 
     public static void clear(ApplicationContext applicationContext) {
         var entityManager = applicationContext.getBean(EntityManager.class);
