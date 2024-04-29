@@ -19,18 +19,18 @@ public class NoTransactionExtension implements BeforeEachCallback {
     public void beforeEach(ExtensionContext extensionContext) {
         var applicationContext = SpringExtension.getApplicationContext(extensionContext);
 
-		if (!validateDataJpaTestAnnotationExists(extensionContext)) {
-			validateTransactionalAnnotationExists(extensionContext);
-		}
+        if (!validateDataJpaTestAnnotationExists(extensionContext)) {
+            validateTransactionalAnnotationExists(extensionContext);
+        }
         cleanDatabase(applicationContext);
     }
 
-	private static boolean validateDataJpaTestAnnotationExists(ExtensionContext extensionContext) {
-		return TestContextAnnotationUtils.hasAnnotation(
-			extensionContext.getRequiredTestClass(), DataJpaTest.class);
-	}
+    private static boolean validateDataJpaTestAnnotationExists(ExtensionContext extensionContext) {
+        return TestContextAnnotationUtils.hasAnnotation(
+                extensionContext.getRequiredTestClass(), DataJpaTest.class);
+    }
 
-	// Transactional 어노테이션이 존재하는지 검증하는 메서드
+    // Transactional 어노테이션이 존재하는지 검증하는 메서드
     private static void validateTransactionalAnnotationExists(ExtensionContext extensionContext) {
         if (TestContextAnnotationUtils.hasAnnotation(
                         extensionContext.getRequiredTestClass(), Transactional.class)
