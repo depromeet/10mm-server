@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.test.context.TestContextAnnotationUtils;
@@ -18,10 +19,18 @@ public class NoTransactionExtension implements BeforeEachCallback {
     public void beforeEach(ExtensionContext extensionContext) {
         var applicationContext = SpringExtension.getApplicationContext(extensionContext);
 
-        // validateTransactionalAnnotationExists(extensionContext);
+		if (!validateDataJpaTestAnnotationExists(extensionContext)) {
+			validateTransactionalAnnotationExists(extensionContext);
+		}
         cleanDatabase(applicationContext);
     }
 
+	private static boolean validateDataJpaTestAnnotationExists(ExtensionContext extensionContext) {
+		return TestContextAnnotationUtils.hasAnnotation(
+			extensionContext.getRequiredTestClass(), DataJpaTest.class);
+	}
+
+	// Transactional 어노테이션이 존재하는지 검증하는 메서드
     private static void validateTransactionalAnnotationExists(ExtensionContext extensionContext) {
         if (TestContextAnnotationUtils.hasAnnotation(
                         extensionContext.getRequiredTestClass(), Transactional.class)
