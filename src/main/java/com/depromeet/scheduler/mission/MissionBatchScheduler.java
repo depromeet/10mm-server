@@ -33,7 +33,7 @@ public class MissionBatchScheduler {
         missionService.updateFinishedDurationStatus();
     }
 
-    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 21 * * *", zone = "Asia/Seoul")
     public void updateRankingSymbolStack() {
         log.info("Ranking Symbol Stack Update batch execute");
         List<MissionSymbolStackResponse> allMissionSymbolStack =
@@ -51,7 +51,7 @@ public class MissionBatchScheduler {
     }
 
     // 매 10분마다 schedule 실행
-    @Scheduled(cron = "0 0 21 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 */10 * * * *", zone = "Asia/Seoul")
     public void missionRemindPushNotification() {
         log.info("Mission Remind Push Notification batch execute");
 
