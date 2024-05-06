@@ -33,7 +33,7 @@ public class MissionBatchScheduler {
         missionService.updateFinishedDurationStatus();
     }
 
-    @Scheduled(cron = "0 */1 * * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 21 * * *", zone = "Asia/Seoul")
     public void updateRankingSymbolStack() {
         log.info("Ranking Symbol Stack Update batch execute");
         List<RankingDto> allMissionSymbolStack = missionService.findAllMissionSymbolStack();
