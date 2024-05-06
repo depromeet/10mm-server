@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
@@ -29,18 +28,4 @@ public class Ranking extends BaseTimeEntity {
     @OneToOne
     @JoinColumn(name = "member_id")
     private Member member;
-
-    @Builder(access = AccessLevel.PRIVATE)
-    private Ranking(Long symbolStack, Member member) {
-        this.symbolStack = symbolStack;
-        this.member = member;
-    }
-
-    public static Ranking createRanking(Long symbolStack, Member member) {
-        return Ranking.builder().symbolStack(symbolStack).member(member).build();
-    }
-
-    public void updateSymbolStack(Long symbolStack) {
-        this.symbolStack = symbolStack;
-    }
 }

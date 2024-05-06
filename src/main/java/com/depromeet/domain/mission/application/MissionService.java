@@ -213,19 +213,15 @@ public class MissionService {
         List<Mission> missions = missionRepository.findAllMissionWithRecords();
         List<MissionRecord> completedMissionRecords = findCompletedMissionRecords(missions);
 
-        // 번개 stack 누적할 변수 선언
-        List<MissionSymbolStackResponse> list =
-                completedMissionRecords.stream()
-                        .collect(Collectors.groupingBy(MissionRecord::getMemberId))
-                        .entrySet()
-                        .stream()
-                        .map(
-                                entry ->
-                                        MissionSymbolStackResponse.of(
-                                                entry.getKey(),
-                                                symbolStackCalculate(entry.getValue())))
-                        .collect(Collectors.toList());
-        return list;
+        return completedMissionRecords.stream()
+                .collect(Collectors.groupingBy(MissionRecord::getMemberId))
+                .entrySet()
+                .stream()
+                .map(
+                        entry ->
+                                MissionSymbolStackResponse.of(
+                                        entry.getKey(), symbolStackCalculate(entry.getValue())))
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
