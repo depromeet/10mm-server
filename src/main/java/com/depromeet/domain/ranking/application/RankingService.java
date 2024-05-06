@@ -1,7 +1,8 @@
 package com.depromeet.domain.ranking.application;
 
-import com.depromeet.domain.mission.dto.response.MissionSymbolStackResponse;
 import com.depromeet.domain.ranking.dao.RankingRepository;
+import com.depromeet.domain.ranking.domain.Ranking;
+import com.depromeet.domain.ranking.dto.RankingDto;
 import com.depromeet.domain.ranking.dto.response.RankingResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,11 @@ public class RankingService {
                 .toList();
     }
 
-    public void updateSymbolStack(List<MissionSymbolStackResponse> allMissionSymbolStack) {
-        for (MissionSymbolStackResponse missionSymbolStackResponse : allMissionSymbolStack) {
+    public void updateSymbolStack(List<RankingDto> rankingDtos) {
+        for (RankingDto rankingDto : rankingDtos) {
+            Ranking ranking = Ranking.createRanking(rankingDto.symbolStack(), rankingDto.member());
             rankingRepository.updateSymbolStackAndMemberId(
-                    missionSymbolStackResponse.memberId(),
-                    missionSymbolStackResponse.symbolStack());
+                    ranking.getMember().getId(), ranking.getSymbolStack());
         }
     }
 }

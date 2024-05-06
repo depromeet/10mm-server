@@ -6,9 +6,9 @@ import com.depromeet.domain.member.application.MemberService;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.dto.response.MissionRemindPushResponse;
-import com.depromeet.domain.mission.dto.response.MissionSymbolStackResponse;
 import com.depromeet.domain.notification.application.FcmService;
 import com.depromeet.domain.ranking.application.RankingService;
+import com.depromeet.domain.ranking.dto.RankingDto;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -33,11 +33,10 @@ public class MissionBatchScheduler {
         missionService.updateFinishedDurationStatus();
     }
 
-    @Scheduled(cron = "0 0 21 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 */1 * * * *", zone = "Asia/Seoul")
     public void updateRankingSymbolStack() {
         log.info("Ranking Symbol Stack Update batch execute");
-        List<MissionSymbolStackResponse> allMissionSymbolStack =
-                missionService.findAllMissionSymbolStack();
+        List<RankingDto> allMissionSymbolStack = missionService.findAllMissionSymbolStack();
         rankingService.updateSymbolStack(allMissionSymbolStack);
 
         log.info("send All Member Ranking Notification");
