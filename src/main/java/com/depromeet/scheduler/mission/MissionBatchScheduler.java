@@ -4,7 +4,9 @@ import static com.depromeet.global.common.constants.PushNotificationConstants.*;
 
 import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.dto.response.MissionRemindPushResponse;
+import com.depromeet.domain.mission.dto.response.MissionSymbolStackResponse;
 import com.depromeet.domain.notification.application.FcmService;
+import com.depromeet.domain.ranking.application.RankingService;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class MissionBatchScheduler {
     private final MissionService missionService;
+    private final RankingService rankingService;
     private final FcmService fcmService;
 
     // 자정에 schedule 실행
@@ -25,6 +28,14 @@ public class MissionBatchScheduler {
     public void updateFinishedDurationStatus() {
         log.info("DurationStatus Update batch execute");
         missionService.updateFinishedDurationStatus();
+    }
+
+    @Scheduled(cron = "0 */1 * * * *", zone = "Asia/Seoul")
+    public void updateRankingSymbolStack() {
+        log.info("Ranking Symbol Stack Update batch execute");
+        List<MissionSymbolStackResponse> allMissionSymbolStack =
+                missionService.findAllMissionSymbolStack();
+        rankingService.updateSymbolStack(allMissionSymbolStack);
     }
 
     // 매 10분마다 schedule 실행

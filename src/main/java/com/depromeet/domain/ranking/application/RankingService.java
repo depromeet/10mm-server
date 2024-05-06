@@ -1,5 +1,6 @@
 package com.depromeet.domain.ranking.application;
 
+import com.depromeet.domain.mission.dto.response.MissionSymbolStackResponse;
 import com.depromeet.domain.ranking.dao.RankingRepository;
 import com.depromeet.domain.ranking.dto.response.RankingResponse;
 import java.util.List;
@@ -14,9 +15,19 @@ public class RankingService {
 
     private final RankingRepository rankingRepository;
 
+    @Transactional(readOnly = true)
     public List<RankingResponse> findAllRanking() {
         return rankingRepository.findTop50ByOrderBySymbolStackDesc().stream()
                 .map(RankingResponse::from)
                 .toList();
+    }
+
+    public void updateSymbolStack(List<MissionSymbolStackResponse> allMissionSymbolStack) {
+        allMissionSymbolStack.forEach(
+                missionSymbolStackResponse -> {
+                    rankingRepository.updateSymbolStackAndMemberId(
+                            missionSymbolStackResponse.memberId(),
+                            missionSymbolStackResponse.symbolStack());
+                });
     }
 }

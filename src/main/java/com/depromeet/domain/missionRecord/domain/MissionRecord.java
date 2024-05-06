@@ -99,4 +99,8 @@ public class MissionRecord extends BaseTimeEntity {
     public void updateMissionRecord(String remark) {
         this.remark = remark;
     }
+
+    public Long getMemberId() {
+        return mission.getMember().getId();
+    }
 }

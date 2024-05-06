@@ -17,6 +17,8 @@ public interface MissionRepositoryCustom {
 
     List<Mission> findAllFinishedMission(Long memberId);
 
+    List<Mission> findAllMissionWithRecords();
+
     List<Mission> findMissionsWithRecordsByDate(LocalDate date, Long memberId);
 
     List<Mission> findMissionsNonCompleteAndInProgress(LocalDateTime today);
