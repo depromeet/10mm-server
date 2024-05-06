@@ -23,11 +23,10 @@ public class RankingService {
     }
 
     public void updateSymbolStack(List<MissionSymbolStackResponse> allMissionSymbolStack) {
-        allMissionSymbolStack.forEach(
-                missionSymbolStackResponse -> {
-                    rankingRepository.updateSymbolStackAndMemberId(
-                            missionSymbolStackResponse.memberId(),
-                            missionSymbolStackResponse.symbolStack());
-                });
+        for (MissionSymbolStackResponse missionSymbolStackResponse : allMissionSymbolStack) {
+            rankingRepository.updateSymbolStackAndMemberId(
+                    missionSymbolStackResponse.memberId(),
+                    missionSymbolStackResponse.symbolStack());
+        }
     }
 }
