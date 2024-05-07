@@ -22,7 +22,7 @@ public class RankingService {
     public List<RankingResponse> findAllRanking() {
         List<Ranking> rankings = rankingRepository.findTop50ByOrderBySymbolStackDesc();
         return IntStream.range(0, rankings.size())
-                .mapToObj(i -> RankingResponse.of(rankings.get(i), i + 1))
+                .mapToObj(i -> RankingResponse.of(rankings.get(i), (long) i + 1))
                 .collect(Collectors.toList());
     }
 
