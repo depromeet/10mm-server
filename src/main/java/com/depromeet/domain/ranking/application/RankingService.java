@@ -5,6 +5,8 @@ import com.depromeet.domain.ranking.domain.Ranking;
 import com.depromeet.domain.ranking.dto.RankingDto;
 import com.depromeet.domain.ranking.dto.response.RankingResponse;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +20,10 @@ public class RankingService {
 
     @Transactional(readOnly = true)
     public List<RankingResponse> findAllRanking() {
-        return rankingRepository.findTop50ByOrderBySymbolStackDesc().stream()
-                .map(RankingResponse::from)
-                .toList();
+        List<Ranking> rankings = rankingRepository.findTop50ByOrderBySymbolStackDesc();
+        return IntStream.range(0, rankings.size())
+                .mapToObj(i -> RankingResponse.of(rankings.get(i), i + 1))
+                .collect(Collectors.toList());
     }
 
     public void updateSymbolStack(List<RankingDto> rankingDtos) {
