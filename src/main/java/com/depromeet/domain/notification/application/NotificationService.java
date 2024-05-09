@@ -8,6 +8,7 @@ import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.notification.dao.NotificationRepository;
 import com.depromeet.domain.notification.domain.Notification;
 import com.depromeet.domain.notification.domain.NotificationType;
+import com.depromeet.domain.notification.dto.NotificationFindAllResponse;
 import com.depromeet.domain.notification.dto.request.PushMissionRemindRequest;
 import com.depromeet.domain.notification.dto.request.PushUrgingSendRequest;
 import com.depromeet.global.common.constants.PushNotificationConstants;
@@ -15,6 +16,8 @@ import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
 import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
@@ -23,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class PushService {
+public class NotificationService {
     private final MemberUtil memberUtil;
     private final FcmService fcmService;
     private final MissionRepository missionRepository;
@@ -66,6 +69,17 @@ public class PushService {
                                 PUSH_MISSION_REMIND_TITLE,
                                 PushNotificationConstants.PUSH_MISSION_REMIND_CONTENT),
                 Instant.now().plusSeconds(request.seconds()));
+    }
+
+    public List<NotificationFindAllResponse> findAllNotification() {
+        final Member member = memberUtil.getCurrentMember();
+        return notificationRepository.findAllByTargetMemberId(member.getId()).stream()
+                .map(
+                        notification ->
+                                NotificationFindAllResponse.of(
+                                        notification.getNotificationType(),
+                                        notification.getCreatedAt()))
+                .collect(Collectors.toList());
     }
 
     private void validateFinishedMission(Mission mission) {
