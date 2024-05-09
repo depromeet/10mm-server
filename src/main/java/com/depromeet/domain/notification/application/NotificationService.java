@@ -73,7 +73,9 @@ public class NotificationService {
 
     public List<NotificationFindAllResponse> findAllNotification() {
         final Member member = memberUtil.getCurrentMember();
-        return notificationRepository.findAllByTargetMemberId(member.getId()).stream()
+        return notificationRepository
+                .findAllByTargetMemberIdOrderByCreatedAtDesc(member.getId())
+                .stream()
                 .map(
                         notification ->
                                 NotificationFindAllResponse.of(
