@@ -12,7 +12,6 @@ import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.missionRecord.domain.MissionRecordTtl;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordSummaryResponse;
-import com.depromeet.domain.ranking.dto.RankingDto;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
@@ -207,19 +206,6 @@ public class MissionService {
         // 번개 stack 누적할 변수 선언
         long symbolStack = symbolStackCalculate(completedMissionRecords);
         return MissionSymbolStackResponse.of(symbolStack);
-    }
-
-    @Transactional(readOnly = true)
-    public List<RankingDto> findAllMissionSymbolStack() {
-        List<Mission> missions = missionRepository.findAllMissionWithRecords();
-        List<MissionRecord> completedMissionRecords = findCompletedMissionRecords(missions);
-
-        return completedMissionRecords.stream()
-                .collect(Collectors.groupingBy(MissionRecord::getMember))
-                .entrySet()
-                .stream()
-                .map(entry -> RankingDto.of(entry.getKey(), symbolStackCalculate(entry.getValue())))
-                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

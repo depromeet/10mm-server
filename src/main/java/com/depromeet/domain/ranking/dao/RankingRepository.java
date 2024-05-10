@@ -20,5 +20,5 @@ public interface RankingRepository extends JpaRepository<Ranking, Long>, Ranking
                             + "ON DUPLICATE KEY UPDATE member_id = :memberId, symbol_stack = :symbolStack, updated_at = NOW()",
             nativeQuery = true)
     void updateSymbolStackAndMemberId(
-            @Param("memberId") Long memberId, @Param("symbolStack") long symbolStack);
+            @Param("symbolStack") long symbolStack, @Param("memberId") Long memberId);
 }

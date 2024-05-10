@@ -36,7 +36,7 @@ public class MissionBatchScheduler {
     @Scheduled(cron = "0 0 21 * * *", zone = "Asia/Seoul")
     public void updateRankingSymbolStack() {
         log.info("Ranking Symbol Stack Update batch execute");
-        List<RankingDto> allMissionSymbolStack = missionService.findAllMissionSymbolStack();
+        List<RankingDto> allMissionSymbolStack = rankingService.findAllMissionSymbolStack();
         rankingService.updateSymbolStack(allMissionSymbolStack);
 
         log.info("send All Member Ranking Notification");
