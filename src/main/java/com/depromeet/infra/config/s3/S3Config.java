@@ -18,8 +18,7 @@ public class S3Config {
     @Bean
     public AmazonS3 amazonS3() {
         AWSCredentials credentials =
-                new BasicAWSCredentials(
-                        s3Properties.accessKey(), s3Properties.secretKey());
+                new BasicAWSCredentials(s3Properties.accessKey(), s3Properties.secretKey());
         AwsClientBuilder.EndpointConfiguration endpointConfiguration =
                 new AwsClientBuilder.EndpointConfiguration(
                         s3Properties.endpoint(), s3Properties.region());

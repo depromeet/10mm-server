@@ -5,6 +5,6 @@ spring:
 storage:
   accessKey: ${AWS_ACCESS_KEY:}
   secretKey: ${AWS_SECRET_KEY:}
-  bucket: ${AWS_S3_BUCKET:}
+  bucket: ${S3_BUCKET:}
   region: ${AWS_REGION:}
-  endpoint: ${AWS_S3_ENDPOINT:https://s3.ap-northeast-2.amazonaws.com}
+  endpoint: ${S3_ENDPOINT:https://s3.ap-northeast-2.amazonaws.com}
