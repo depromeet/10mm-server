@@ -120,4 +120,5 @@ jobs:
             echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
             docker pull ${{ env.IMAGE_FULL_URL }}
             docker compose up -d
+            docker exec -d nginx nginx -s reload
             docker image prune -a -f
