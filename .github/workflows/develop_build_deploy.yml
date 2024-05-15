@@ -59,13 +59,24 @@ jobs:
           username: ${{ env.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
-      # Docker 이미지 빌드 및 푸시
+      # Docker 메타데이터 추출
+      - name: Extract Docker metadata
+        id: metadata
+        uses: docker/metadata-action@v5.5.0
+        env:
+          DOCKERHUB_IMAGE_FULL_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE_NAME }}
+        with:
+          images: ${{ env.DOCKERHUB_IMAGE_FULL_NAME }}
+          tags: |
+            type=sha,prefix=
+
+      # Docker 이미지 빌드 및 도커허브로 푸시
       - name: Docker Build and Push
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ steps.image-tag.outputs.value }}
+          tags: ${{ steps.metadata.outputs.tags }}
 
       # 서버로 docker-compose 파일 전송
       - name: copy source via ssh key
