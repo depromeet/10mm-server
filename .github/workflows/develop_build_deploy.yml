@@ -109,7 +109,7 @@ jobs:
 
       # EC2로 배포
       - name: Deploy to EC2 Server
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.0.3
         env:
           IMAGE_FULL_URL: ${{ steps.metadata.outputs.tags }}
         with:
