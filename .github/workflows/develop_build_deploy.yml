@@ -3,6 +3,8 @@ name: develop Build And Deploy
 on:
   push:
     branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
 
 env:
   DOCKERHUB_USERNAME: tenminutes
