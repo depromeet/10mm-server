@@ -10,7 +10,7 @@ env:
   DOCKERHUB_IMAGE_NAME: 10mm-server
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
     environment: PROD
     strategy:
@@ -60,7 +60,7 @@ jobs:
         id: metadata
         uses: docker/metadata-action@v5.5.0
         env:
-          DOCKERHUB_IMAGE_FULL_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE_NAME }}
+          DOCKERHUB_IMAGE_FULL_NAME: ${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE_NAME }}
         with:
           images: ${{ env.DOCKERHUB_IMAGE_FULL_NAME }}
           tags: |
@@ -117,7 +117,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           envs: IMAGE_FULL_URL # docker-compose.yml 에서 사용할 환경 변수
           script: |
-            echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
             docker pull ${{ env.IMAGE_FULL_URL }}
             docker compose up -d
             docker image prune -a -f
