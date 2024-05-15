@@ -73,6 +73,14 @@ jobs:
           flavor: |
             latest=false
 
+      # 멀티 아키텍처 지원을 위한 QEMU 설정
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # 도커 확장 빌드를 위한 Buildx 설정
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       # Docker 이미지 빌드 및 도커허브로 푸시
       - name: Docker Build and Push
         uses: docker/build-push-action@v5
@@ -105,21 +113,19 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
       # EC2로 배포
-      - name: Deploy to NCP Server
+      - name: Deploy to EC2 Server
         uses: appleboy/ssh-action@master
         env:
-          NCP_CONTAINER_REGISTRY: ${{ secrets.NCP_CONTAINER_REGISTRY }}
-          NCP_IMAGE_TAG: ${{ steps.image-tag.outputs.value }}
+          IMAGE_FULL_URL: ${{ steps.metadata.outputs.tags }}
         with:
-          host: ${{ secrets.NCP_HOST }}
-          username: ${{ secrets.NCP_USERNAME }}
-          key: ${{ secrets.NCP_PRIVATE_KEY }}
-          port: ${{ secrets.NCP_PORT }}
-          envs: NCP_CONTAINER_REGISTRY,NCP_IMAGE_TAG  # docker-compose.yml 에서 사용할 환경 변수
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          envs: IMAGE_FULL_URL # docker-compose.yml 에서 사용할 환경 변수
           script: |
-            echo "${{ secrets.NCP_SECRET_KEY }}" | docker login -u "${{ secrets.NCP_ACCESS_KEY }}" --password-stdin "${{ secrets.NCP_CONTAINER_REGISTRY }}"
-            docker pull ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ env.NCP_IMAGE_TAG }}
-            SWAGGER_VERSION=${{ env.NCP_IMAGE_TAG }}
-            sed -i "s/SWAGGER_VERSION=.*/SWAGGER_VERSION=$SWAGGER_VERSION/" .env
+            echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            docker pull ${{ env.IMAGE_FULL_URL }}
+#            SWAGGER_VERSION=${{ env.NCP_IMAGE_TAG }}
+#            sed -i "s/SWAGGER_VERSION=.*/SWAGGER_VERSION=$SWAGGER_VERSION/" .env
             docker compose -f /home/tenminute/docker-compose.yaml up -d
             docker image prune -a -f
