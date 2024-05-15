@@ -83,12 +83,11 @@ jobs:
         uses: burnett01/rsync-deployments@4.1
         with:
           switches: -avzr --delete
-          remote_host: ${{ secrets.NCP_HOST }}
-          remote_user: ${{ secrets.NCP_USERNAME }}
-          remote_port: ${{ secrets.NCP_PORT }}
-          remote_key: ${{ secrets.NCP_PRIVATE_KEY }}
+          remote_host: ${{ secrets.EC2_HOST }}
+          remote_user: ${{ secrets.EC2_USERNAME }}
+          remote_key: ${{ secrets.EC2_PRIVATE_KEY }}
           path: docker-compose.yaml
-          remote_path: /home/tenminute/
+          remote_path: /
 
       # 슬랙으로 빌드 스캔 결과 전송
       - name: Send to slack
@@ -114,7 +113,5 @@ jobs:
           script: |
             echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
             docker pull ${{ env.IMAGE_FULL_URL }}
-#            SWAGGER_VERSION=${{ env.NCP_IMAGE_TAG }}
-#            sed -i "s/SWAGGER_VERSION=.*/SWAGGER_VERSION=$SWAGGER_VERSION/" .env
-            docker compose -f /home/tenminute/docker-compose.yaml up -d
+            docker compose up -d
             docker image prune -a -f
