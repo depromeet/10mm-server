@@ -7,26 +7,27 @@ on:
         description: 'version'
         required: true
 
+env:
+  DOCKERHUB_USERNAME: tenminutes
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: PROD
     steps:
-      - name: Deploy to NCP Server
+      # EC2로 배포
+      - name: Deploy to EC2 Server
         uses: appleboy/ssh-action@master
         env:
-          NCP_CONTAINER_REGISTRY: ${{ secrets.NCP_CONTAINER_REGISTRY }}
-          NCP_IMAGE_TAG: ${{ github.event.inputs.version }}
+          IMAGE_FULL_URL: ${{ steps.metadata.outputs.tags }}
         with:
-          host: ${{ secrets.NCP_HOST }}
-          username: tenminute
-          key: ${{ secrets.NCP_PRIVATE_KEY }}
-          port: ${{ secrets.NCP_PORT }}
-          envs: NCP_CONTAINER_REGISTRY,NCP_IMAGE_TAG  # docker-compose.yml 에서 사용할 환경 변수
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          envs: IMAGE_FULL_URL # docker-compose.yml 에서 사용할 환경 변수
           script: |
-            echo "${{ secrets.NCP_SECRET_KEY }}" | docker login -u "${{ secrets.NCP_ACCESS_KEY }}" --password-stdin "${{ secrets.NCP_CONTAINER_REGISTRY }}"
-            docker pull ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ github.event.inputs.version }}
-            SWAGGER_VERSION=${{ env.NCP_IMAGE_TAG }}
-            sed -i "s/SWAGGER_VERSION=.*/SWAGGER_VERSION=$SWAGGER_VERSION/" .env
-            docker compose -f /home/tenminute/docker-compose.yaml up -d
+            echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
+            docker pull ${{ env.IMAGE_FULL_URL }}
+            docker compose up -d
+            docker exec -d nginx nginx -s reload
             docker image prune -a -f
