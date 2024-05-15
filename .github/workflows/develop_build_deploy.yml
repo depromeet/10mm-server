@@ -52,13 +52,12 @@ jobs:
             --scan
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' }}
 
-      # NCP Container Registry 로그인
-      - name: Login to NCP Container Registry
+      # Dockerhub 로그인
+      - name: Login to Dockerhub
         uses: docker/login-action@v3
         with:
-          registry: ${{ secrets.NCP_CONTAINER_REGISTRY }}
-          username: ${{ secrets.NCP_ACCESS_KEY }}
-          password: ${{ secrets.NCP_SECRET_KEY }}
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
       # Docker 이미지 빌드 및 푸시
       - name: Docker Build and Push
