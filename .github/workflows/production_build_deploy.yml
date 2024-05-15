@@ -6,7 +6,7 @@ on:
       - v*.*.*
 
 env:
-  DOCKERHUB_USERNAME: teminutes
+  DOCKERHUB_USERNAME: tenminutes
   DOCKERHUB_IMAGE_NAME: 10mm-server
 
 jobs:
