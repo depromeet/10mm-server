@@ -4,17 +4,19 @@ on:
   push:
     branches: [ "develop" ]
 
+env:
+  DOCKERHUB_USERNAME: teminutes
+  DOCKERHUB_IMAGE_NAME: 10mm-server
+
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
     environment: DEV
     strategy:
       matrix:
         java-version: [ 17 ]
         distribution: [ 'temurin' ]
-    outputs:
-      # IMAGE_TAG 환경 변수를 다른 Job에서 사용하기 위해 설정
-      image-tag: ${{ steps.image-tag.outputs.value }}
+
     steps:
       # 기본 체크아웃
       - name: Checkout
@@ -89,16 +91,12 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-  deploy:
-    runs-on: ubuntu-latest
-    environment: DEV
-    needs: build
-    steps:
+      # EC2로 배포
       - name: Deploy to NCP Server
         uses: appleboy/ssh-action@master
         env:
           NCP_CONTAINER_REGISTRY: ${{ secrets.NCP_CONTAINER_REGISTRY }}
-          NCP_IMAGE_TAG: ${{ needs.build.outputs.image-tag }}
+          NCP_IMAGE_TAG: ${{ steps.image-tag.outputs.value }}
         with:
           host: ${{ secrets.NCP_HOST }}
           username: ${{ secrets.NCP_USERNAME }}
