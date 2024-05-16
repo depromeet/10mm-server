@@ -102,7 +102,7 @@ jobs:
           remote_host: ${{ secrets.EC2_HOST }}
           remote_user: ${{ secrets.EC2_USERNAME }}
           remote_key: ${{ secrets.EC2_PRIVATE_KEY }}
-          path: ./nginx/
+          path: ./nginx
           remote_path: /
 
       # 슬랙으로 빌드 스캔 결과 전송
@@ -125,10 +125,9 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
-          envs: IMAGE_FULL_URL # docker-compose.yml 에서 사용할 환경 변수
+          envs: IMAGE_FULL_URL, DOCKERHUB_IMAGE_NAME # docker-compose.yml 에서 사용할 환경 변수
           script: |
             echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
-            docker pull ${{ env.IMAGE_FULL_URL }}
             docker compose up -d
             docker exec -d nginx nginx -s reload
             docker image prune -a -f

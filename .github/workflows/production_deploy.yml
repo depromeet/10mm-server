@@ -9,6 +9,7 @@ on:
 
 env:
   DOCKERHUB_USERNAME: tenminutes
+  DOCKERHUB_IMAGE_NAME: 10mm-server
 
 jobs:
   deploy:
@@ -20,14 +21,14 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           IMAGE_FULL_URL: ${{ steps.metadata.outputs.tags }}
+          DOCKERHUB_IMAGE_NAME: ${{ env.DOCKERHUB_IMAGE_NAME }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
-          envs: IMAGE_FULL_URL # docker-compose.yml 에서 사용할 환경 변수
+          envs: IMAGE_FULL_URL, DOCKERHUB_IMAGE_NAME # docker-compose.yml 에서 사용할 환경 변수
           script: |
             echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
-            docker pull ${{ env.IMAGE_FULL_URL }}
             docker compose up -d
             docker exec -d nginx nginx -s reload
             docker image prune -a -f
