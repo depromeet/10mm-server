@@ -77,7 +77,7 @@ jobs:
 
       # 서버로 docker-compose 파일 전송
       - name: Copy docker-compose file to EC2
-        uses: burnett01/rsync-deployments@4.1
+        uses: burnett01/rsync-deployments@7.0.1
         with:
           switches: -avzr --delete
           remote_host: ${{ secrets.EC2_HOST }}
@@ -87,7 +87,7 @@ jobs:
           remote_path: /home/ec2-user/
 
       - name: Copy default.conf to EC2
-        uses: burnett01/rsync-deployments@4.1
+        uses: burnett01/rsync-deployments@7.0.1
         with:
           switches: -avzr --delete
           remote_host: ${{ secrets.EC2_HOST }}
