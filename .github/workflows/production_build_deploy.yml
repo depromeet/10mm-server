@@ -93,14 +93,7 @@ jobs:
           remote_user: ${{ secrets.EC2_USERNAME }}
           remote_key: ${{ secrets.EC2_PRIVATE_KEY }}
           path: docker-compose.yaml
-<<<<<<< Updated upstream
-          remote_path: /
-=======
-<<<<<<< Updated upstream
-          remote_path: /home/tenminute/
-=======
           remote_path: /home/ec2-user/
->>>>>>> Stashed changes
 
       - name: Copy default.conf to EC2
         uses: burnett01/rsync-deployments@7.0.1
@@ -110,12 +103,7 @@ jobs:
           remote_user: ${{ secrets.EC2_USERNAME }}
           remote_key: ${{ secrets.EC2_PRIVATE_KEY }}
           path: ./nginx
-<<<<<<< Updated upstream
-          remote_path: /
-=======
           remote_path: /home/ec2-user/
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
       # 슬랙으로 빌드 스캔 결과 전송
       - name: Send to slack
