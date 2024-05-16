@@ -266,6 +266,18 @@ public class FollowService {
                 : FollowerDeletedResponse.from(FollowStatus.NOT_FOLLOWING);
     }
 
+    /**
+     * 특정 멤버가 팔로우 중인 멤버 목록을 조회합니다.
+     *
+     * @param source 특정 멤버
+     * @return 팔로우 중인 멤버 목록
+     */
+    public List<Member> getFollowingMembers(Member source) {
+        return memberRelationRepository.findAllBySource(source).stream()
+                .map(MemberRelation::getTarget)
+                .toList();
+    }
+
     private static void getFollowStatusIncludeList(
             List<Member> targetMembers,
             List<MemberRelation> currentMemberSources,

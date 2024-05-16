@@ -1,6 +1,7 @@
 package com.depromeet.domain.feed.api;
 
 import com.depromeet.domain.feed.application.FeedService;
+import com.depromeet.domain.feed.domain.FeedVisibility;
 import com.depromeet.domain.feed.dto.response.FeedOneByProfileResponse;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
 import com.depromeet.domain.feed.dto.response.FeedSliceResponse;
@@ -9,6 +10,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +26,7 @@ public class FeedController {
 
     private final FeedService feedService;
 
+    @Deprecated
     @Operation(summary = "피드 탭", description = "피드 탭을 조회합니다.")
     @GetMapping
     public List<FeedOneResponse> feedFindAll(
@@ -36,13 +40,14 @@ public class FeedController {
             @RequestParam int size,
             @RequestParam(required = false) Long lastId,
             @RequestParam(value = "visibility", required = false) MissionVisibility visibility) {
-        if (visibility == MissionVisibility.ALL) {
-            // 전체 피드 탭
-            return feedService.findAllFeed(size, lastId);
-        } else {
-            // 팔로워 피드 탭
-            return feedService.findFollowerFeed(size, lastId);
-        }
+        return feedService.findFeed(size, lastId, visibility);
+    }
+
+    @Operation(summary = "피드 탭 V2 (페이지네이션)", description = "피드 탭을 조회합니다.")
+    @GetMapping("/me/v2")
+    public Slice<FeedOneResponse> feedFindByPageV2(
+            @RequestParam(required = false) FeedVisibility visibility, Pageable pageable) {
+        return feedService.findFeedV2(visibility, pageable);
     }
 
     @Operation(summary = "프로필 피드", description = "피드 탭을 조회합니다.")

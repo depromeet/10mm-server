@@ -10,6 +10,7 @@ import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
+import com.depromeet.domain.mission.domain.MissionPeriod;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import java.time.LocalDateTime;
@@ -54,6 +55,7 @@ class MissionRepositoryTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
 
         // when
@@ -89,6 +91,7 @@ class MissionRepositoryTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
 
         // when
@@ -119,6 +122,7 @@ class MissionRepositoryTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
         LocalDateTime startedAt = LocalDateTime.now();
         Mission saveMission =
@@ -160,6 +164,7 @@ class MissionRepositoryTest {
                                         "testMissionContent_" + i,
                                         MissionCategory.STUDY,
                                         MissionVisibility.ALL,
+                                        MissionPeriod.TWO_WEEKS,
                                         LocalTime.of(21, 0)))
                 .forEach(
                         request ->

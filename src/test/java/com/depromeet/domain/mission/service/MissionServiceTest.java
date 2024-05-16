@@ -11,6 +11,7 @@ import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
+import com.depromeet.domain.mission.domain.MissionPeriod;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
@@ -20,7 +21,6 @@ import com.depromeet.domain.mission.dto.response.MissionFindResponse;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
 import com.depromeet.global.security.PrincipalDetails;
 import com.depromeet.global.util.MemberUtil;
-import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -34,7 +34,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -44,7 +43,6 @@ class MissionServiceTest {
     @Autowired private MissionRepository missionRepository;
     @Autowired private MemberRepository memberRepository;
     @Autowired private DatabaseCleaner databaseCleaner;
-    @Autowired private EntityManager entityManager;
     @Autowired private MemberUtil memberUtil;
 
     @BeforeEach
@@ -69,6 +67,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
 
         // when
@@ -91,6 +90,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
         MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
 
@@ -105,7 +105,6 @@ class MissionServiceTest {
     }
 
     @Test
-    @Transactional
     void 미션_리스트를_조회한다() {
         // given
         LocalDateTime startedAt = LocalDateTime.now();
@@ -118,10 +117,11 @@ class MissionServiceTest {
                                         "testMissionContent_" + i,
                                         MissionCategory.STUDY,
                                         MissionVisibility.ALL,
+                                        MissionPeriod.TWO_WEEKS,
                                         LocalTime.of(21, 0)))
                 .forEach(
                         request ->
-                                entityManager.persist(
+                                missionRepository.save(
                                         Mission.createMission(
                                                 request.name(),
                                                 request.content(),
@@ -156,6 +156,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
         MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
@@ -179,6 +180,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
         MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
@@ -202,6 +204,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
         MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
         MissionUpdateRequest missionUpdateRequest =
@@ -229,6 +232,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
         MissionCreateResponse saveMission = missionService.createMission(missionCreateRequest);
 
@@ -249,6 +253,7 @@ class MissionServiceTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
         missionService.createMission(missionCreateRequest);
 

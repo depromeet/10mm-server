@@ -59,7 +59,7 @@ public class CookieUtil {
                         .maxAge(0)
                         .secure(true)
                         .sameSite(sameSite)
-                        .httpOnly(false)
+                        .httpOnly(true)
                         .build();
 
         ResponseCookie refreshTokenCookie =
@@ -68,7 +68,7 @@ public class CookieUtil {
                         .maxAge(0)
                         .secure(true)
                         .sameSite(sameSite)
-                        .httpOnly(false)
+                        .httpOnly(true)
                         .build();
 
         HttpHeaders headers = new HttpHeaders();

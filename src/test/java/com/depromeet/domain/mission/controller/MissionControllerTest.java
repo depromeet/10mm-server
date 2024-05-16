@@ -13,11 +13,7 @@ import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.mission.api.MissionController;
 import com.depromeet.domain.mission.application.MissionService;
-import com.depromeet.domain.mission.domain.ArchiveStatus;
-import com.depromeet.domain.mission.domain.DurationStatus;
-import com.depromeet.domain.mission.domain.Mission;
-import com.depromeet.domain.mission.domain.MissionCategory;
-import com.depromeet.domain.mission.domain.MissionVisibility;
+import com.depromeet.domain.mission.domain.*;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
 import com.depromeet.domain.mission.dto.response.*;
@@ -59,6 +55,7 @@ class MissionControllerTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
 
         given(missionService.createMission(any()))
@@ -98,6 +95,7 @@ class MissionControllerTest {
                         "testMissionContent",
                         MissionCategory.STUDY,
                         MissionVisibility.ALL,
+                        MissionPeriod.TWO_WEEKS,
                         LocalTime.of(21, 0));
 
         // when, then

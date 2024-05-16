@@ -25,7 +25,7 @@ import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
 import com.depromeet.global.util.SpringEnvironmentUtil;
-import com.depromeet.infra.config.storage.StorageProperties;
+import com.depromeet.infra.config.s3.S3Properties;
 import java.util.Date;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ImageService {
     private final MemberUtil memberUtil;
     private final SpringEnvironmentUtil springEnvironmentUtil;
-    private final StorageProperties storageProperties;
+    private final S3Properties s3Properties;
     private final AmazonS3 amazonS3;
     private final MissionRecordRepository missionRecordRepository;
     private final MissionRecordTtlRepository missionRecordTtlRepository;
@@ -62,7 +62,7 @@ public class ImageService {
                         request.imageFileExtension());
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
                 createGeneratePreSignedUrlRequest(
-                        storageProperties.bucket(),
+                        s3Properties.bucket(),
                         fileName,
                         request.imageFileExtension().getUploadExtension());
 
@@ -113,7 +113,7 @@ public class ImageService {
                         request.imageFileExtension());
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
                 createGeneratePreSignedUrlRequest(
-                        storageProperties.bucket(),
+                        s3Properties.bucket(),
                         fileName,
                         request.imageFileExtension().getUploadExtension());
 
@@ -205,9 +205,9 @@ public class ImageService {
             Long targetId,
             String imageKey,
             ImageFileExtension imageFileExtension) {
-        return storageProperties.endpoint()
+        return s3Properties.endpoint()
                 + "/"
-                + storageProperties.bucket()
+                + s3Properties.bucket()
                 + "/"
                 + springEnvironmentUtil.getCurrentProfile()
                 + "/"
