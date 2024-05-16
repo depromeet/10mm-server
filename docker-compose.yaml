@@ -3,7 +3,7 @@ version: "3.8"
 services:
   backend:
     image: ${IMAGE_FULL_URL}
-    container_name: server-spring
+    container_name: ${DOCKERHUB_IMAGE_NAME}
     restart: always
     environment:
       - TZ=Asia/Seoul
