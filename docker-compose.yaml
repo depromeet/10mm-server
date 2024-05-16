@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   backend:
-    image: ${NCP_CONTAINER_REGISTRY}/server-spring:${NCP_IMAGE_TAG}
+    image: ${IMAGE_FULL_URL}
     container_name: server-spring
     restart: always
     environment:
