@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface RankingRepository extends JpaRepository<Ranking, Long>, RankingRepositoryCustom {
+public interface RankingRepository extends JpaRepository<Ranking, Long> {
 
     // 최대 50개의 랭킹을 조회한다.
     List<Ranking> findTop50ByOrderBySymbolStackDesc();
