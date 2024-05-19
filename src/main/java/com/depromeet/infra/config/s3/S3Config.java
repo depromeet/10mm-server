@@ -1,4 +1,4 @@
-package com.depromeet.infra.config.storage;
+package com.depromeet.infra.config.s3;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -12,17 +12,16 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
-public class StorageConfig {
-    private final StorageProperties storageProperties;
+public class S3Config {
+    private final S3Properties s3Properties;
 
     @Bean
     public AmazonS3 amazonS3() {
         AWSCredentials credentials =
-                new BasicAWSCredentials(
-                        storageProperties.accessKey(), storageProperties.secretKey());
+                new BasicAWSCredentials(s3Properties.accessKey(), s3Properties.secretKey());
         AwsClientBuilder.EndpointConfiguration endpointConfiguration =
                 new AwsClientBuilder.EndpointConfiguration(
-                        storageProperties.endpoint(), storageProperties.region());
+                        s3Properties.endpoint(), s3Properties.region());
 
         return AmazonS3ClientBuilder.standard()
                 .withEndpointConfiguration(endpointConfiguration)

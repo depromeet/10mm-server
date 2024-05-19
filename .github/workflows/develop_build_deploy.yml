@@ -4,17 +4,19 @@ on:
   push:
     branches: [ "develop" ]
 
+env:
+  DOCKERHUB_USERNAME: tenminutes
+  DOCKERHUB_IMAGE_NAME: 10mm-server
+
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
     environment: DEV
     strategy:
       matrix:
         java-version: [ 17 ]
         distribution: [ 'temurin' ]
-    outputs:
-      # IMAGE_TAG 환경 변수를 다른 Job에서 사용하기 위해 설정
-      image-tag: ${{ steps.image-tag.outputs.value }}
+
     steps:
       # 기본 체크아웃
       - name: Checkout
@@ -26,11 +28,6 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: ${{ matrix.distribution }}
-
-      # 이미지 태그 설정
-      - name: Set up image-tag by GITHUB_SHA
-        id: image-tag
-        run: echo "value=$(echo ${GITHUB_SHA::7})" >> $GITHUB_OUTPUT
 
       # test 돌릴때 레디스 필요
       - name: Start containers
@@ -50,33 +47,52 @@ jobs:
             --scan
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' }}
 
-      # NCP Container Registry 로그인
-      - name: Login to NCP Container Registry
+      # Dockerhub 로그인
+      - name: Login to Dockerhub
         uses: docker/login-action@v3
         with:
-          registry: ${{ secrets.NCP_CONTAINER_REGISTRY }}
-          username: ${{ secrets.NCP_ACCESS_KEY }}
-          password: ${{ secrets.NCP_SECRET_KEY }}
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
-      # Docker 이미지 빌드 및 푸시
+      # Docker 메타데이터 추출
+      - name: Extract Docker metadata
+        id: metadata
+        uses: docker/metadata-action@v5.5.0
+        env:
+          DOCKERHUB_IMAGE_FULL_NAME: ${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE_NAME }}
+        with:
+          images: ${{ env.DOCKERHUB_IMAGE_FULL_NAME }}
+          tags: |
+            type=sha,prefix=
+
+      # Docker 이미지 빌드 및 도커허브로 푸시
       - name: Docker Build and Push
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ steps.image-tag.outputs.value }}
+          tags: ${{ steps.metadata.outputs.tags }}
 
       # 서버로 docker-compose 파일 전송
-      - name: copy source via ssh key
-        uses: burnett01/rsync-deployments@4.1
+      - name: Copy docker-compose file to EC2
+        uses: burnett01/rsync-deployments@7.0.1
         with:
           switches: -avzr --delete
-          remote_host: ${{ secrets.NCP_HOST }}
-          remote_user: ${{ secrets.NCP_USERNAME }}
-          remote_port: ${{ secrets.NCP_PORT }}
-          remote_key: ${{ secrets.NCP_PRIVATE_KEY }}
+          remote_host: ${{ secrets.EC2_HOST }}
+          remote_user: ${{ secrets.EC2_USERNAME }}
+          remote_key: ${{ secrets.EC2_PRIVATE_KEY }}
           path: docker-compose.yaml
-          remote_path: /home/tenminute/
+          remote_path: /home/ec2-user/
+
+      - name: Copy default.conf to EC2
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avzr --delete
+          remote_host: ${{ secrets.EC2_HOST }}
+          remote_user: ${{ secrets.EC2_USERNAME }}
+          remote_key: ${{ secrets.EC2_PRIVATE_KEY }}
+          path: ./nginx
+          remote_path: /home/ec2-user/
 
       # 슬랙으로 빌드 스캔 결과 전송
       - name: Send to slack
@@ -89,26 +105,20 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-  deploy:
-    runs-on: ubuntu-latest
-    environment: DEV
-    needs: build
-    steps:
-      - name: Deploy to NCP Server
-        uses: appleboy/ssh-action@master
+      # EC2로 배포
+      - name: Deploy to EC2 Server
+        uses: appleboy/ssh-action@v1.0.3
         env:
-          NCP_CONTAINER_REGISTRY: ${{ secrets.NCP_CONTAINER_REGISTRY }}
-          NCP_IMAGE_TAG: ${{ needs.build.outputs.image-tag }}
+          IMAGE_FULL_URL: ${{ steps.metadata.outputs.tags }}
+          DOCKERHUB_IMAGE_NAME: ${{ env.DOCKERHUB_IMAGE_NAME }}
         with:
-          host: ${{ secrets.NCP_HOST }}
-          username: ${{ secrets.NCP_USERNAME }}
-          key: ${{ secrets.NCP_PRIVATE_KEY }}
-          port: ${{ secrets.NCP_PORT }}
-          envs: NCP_CONTAINER_REGISTRY,NCP_IMAGE_TAG  # docker-compose.yml 에서 사용할 환경 변수
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          envs: IMAGE_FULL_URL, DOCKERHUB_IMAGE_NAME # docker-compose.yml 에서 사용할 환경 변수
+          debug: true
           script: |
-            echo "${{ secrets.NCP_SECRET_KEY }}" | docker login -u "${{ secrets.NCP_ACCESS_KEY }}" --password-stdin "${{ secrets.NCP_CONTAINER_REGISTRY }}"
-            docker pull ${{ secrets.NCP_CONTAINER_REGISTRY }}/server-spring:${{ env.NCP_IMAGE_TAG }}
-            SWAGGER_VERSION=${{ env.NCP_IMAGE_TAG }}
-            sed -i "s/SWAGGER_VERSION=.*/SWAGGER_VERSION=$SWAGGER_VERSION/" .env
-            docker compose -f /home/tenminute/docker-compose.yaml up -d
+            echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
+            docker compose up -d
+            docker exec -d nginx nginx -s reload
             docker image prune -a -f
