@@ -230,7 +230,7 @@ class FeedServiceTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 10);
-        Slice<FeedOneResponse> response = feedService.findFeedV2(FeedVisibility.ALL, pageable);
+        Slice<FeedOneResponse> response = feedService.findFeedV2(FeedVisibility.ALL, 10, 5L);
 
         // then
         assertThat(response.getContent()).hasSize(4);
@@ -248,7 +248,7 @@ class FeedServiceTest {
             // when
             Pageable pageable = PageRequest.of(0, 10);
             Slice<FeedOneResponse> response =
-                    feedService.findFeedV2(FeedVisibility.FOLLOWING, pageable);
+                    feedService.findFeedV2(FeedVisibility.FOLLOWING, 10, 5L);
 
             // then
             assertThat(response.getContent()).hasSize(2);
@@ -263,7 +263,7 @@ class FeedServiceTest {
             // when
             Pageable pageable = PageRequest.of(0, 10);
             Slice<FeedOneResponse> response =
-                    feedService.findFeedV2(FeedVisibility.FOLLOWING, pageable);
+                    feedService.findFeedV2(FeedVisibility.FOLLOWING, 10, 5L);
 
             // then
             assertThat(response.getContent())
@@ -279,7 +279,7 @@ class FeedServiceTest {
             // when
             Pageable pageable = PageRequest.of(0, 10);
             Slice<FeedOneResponse> response =
-                    feedService.findFeedV2(FeedVisibility.FOLLOWING, pageable);
+                    feedService.findFeedV2(FeedVisibility.FOLLOWING, 10, 5L);
 
             // then
             // 2번 미션의 미션기록은 공개이므로 조회
@@ -301,7 +301,7 @@ class FeedServiceTest {
             // when
             Pageable pageable = PageRequest.of(0, 10);
             Slice<FeedOneResponse> response =
-                    feedService.findFeedV2(FeedVisibility.FOLLOWING, pageable);
+                    feedService.findFeedV2(FeedVisibility.FOLLOWING, 10, 0L);
 
             // then
             assertThat(response.getContent())

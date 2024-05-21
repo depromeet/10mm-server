@@ -19,7 +19,6 @@ import com.depromeet.global.util.SecurityUtil;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,23 +61,23 @@ public class FeedService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<FeedOneResponse> findFeedV2(FeedVisibility visibility, Pageable pageable) {
+    public Slice<FeedOneResponse> findFeedV2(FeedVisibility visibility, int size, Long lastId) {
         if (visibility == FeedVisibility.ALL) {
-            return findAllFeedV2(pageable);
+            return findAllFeedV2(size, lastId);
         }
-        return findFollowingFeedV2(pageable);
+        return findFollowingFeedV2(size, lastId);
     }
 
-    private Slice<FeedOneResponse> findAllFeedV2(Pageable pageable) {
-        return missionRecordRepository.findAllFetch(pageable).map(FeedOneResponse::from);
+    private Slice<FeedOneResponse> findAllFeedV2(int size, Long lastId) {
+        return missionRecordRepository.findAllFetch(size, lastId).map(FeedOneResponse::from);
     }
 
-    private Slice<FeedOneResponse> findFollowingFeedV2(Pageable pageable) {
+    private Slice<FeedOneResponse> findFollowingFeedV2(int size, Long lastId) {
         final Member currentMember = memberUtil.getCurrentMember();
         List<Member> followingMembers = followService.getFollowingMembers(currentMember);
 
         return missionRecordRepository
-                .findAllFetchByFollowings(pageable, followingMembers)
+                .findAllFetchByFollowings(size, lastId, followingMembers)
                 .map(FeedOneResponse::from);
     }
 
@@ -95,8 +94,8 @@ public class FeedService {
     public FeedSliceResponse findFollowerFeed(int size, Long lastId) {
         final Member currentMember = memberUtil.getCurrentMember();
         List<Member> sourceMembers = getSourceMembers(currentMember.getId());
+        System.out.println(sourceMembers.size());
 
-        sourceMembers.add(currentMember);
         Slice<FeedOneResponse> feedAllByPage =
                 missionRecordRepository.findFeedAllByPage(size, lastId, sourceMembers);
         return FeedSliceResponse.from(feedAllByPage);
