@@ -94,7 +94,6 @@ public class FeedService {
     public FeedSliceResponse findFollowerFeed(int size, Long lastId) {
         final Member currentMember = memberUtil.getCurrentMember();
         List<Member> sourceMembers = getSourceMembers(currentMember.getId());
-        System.out.println(sourceMembers.size());
 
         Slice<FeedOneResponse> feedAllByPage =
                 missionRecordRepository.findFeedAllByPage(size, lastId, sourceMembers);

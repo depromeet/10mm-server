@@ -39,7 +39,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                         missionIdEq(missionId),
                         yearEq(yearMonth.getYear()),
                         monthEq(yearMonth.getMonthValue()))
-                .orderBy(missionRecord.startedAt.asc())
+                .orderBy(missionRecord.finishedAt.desc())
                 .fetch();
     }
 
@@ -181,6 +181,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                         .fetchJoin()
                         .distinct()
                         .where(ltMissionRecordId(lastId))
+                        .orderBy(missionRecord.finishedAt.desc())
                         .limit((long) size + 1)
                         .fetch();
 
@@ -204,6 +205,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                                 ltMissionRecordId(lastId),
                                 missionRecord.mission.member.in(followingMembers))
                         .where(mission.visibility.in(List.of(ALL, FOLLOWER)))
+                        .orderBy(missionRecord.finishedAt.desc())
                         .limit((long) size + 1)
                         .fetch();
 
