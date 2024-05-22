@@ -6,7 +6,6 @@ import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import java.time.YearMonth;
 import java.util.List;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 public interface MissionRecordRepositoryCustom {
@@ -31,7 +30,8 @@ public interface MissionRecordRepositoryCustom {
     Slice<FeedOneResponse> findFeedByVisibilityAndPage(
             int size, Long lastId, List<Member> members, List<MissionVisibility> visibility);
 
-    Slice<MissionRecord> findAllFetch(Pageable pageable);
+    Slice<MissionRecord> findAllFetch(int size, Long lastId);
 
-    Slice<MissionRecord> findAllFetchByFollowings(Pageable pageable, List<Member> followingMembers);
+    Slice<MissionRecord> findAllFetchByFollowings(
+            int size, Long lastId, List<Member> followingMembers);
 }

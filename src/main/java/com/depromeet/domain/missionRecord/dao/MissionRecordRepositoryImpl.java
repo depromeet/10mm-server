@@ -39,7 +39,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                         missionIdEq(missionId),
                         yearEq(yearMonth.getYear()),
                         monthEq(yearMonth.getMonthValue()))
-                .orderBy(missionRecord.startedAt.asc())
+                .orderBy(missionRecord.finishedAt.desc())
                 .fetch();
     }
 
@@ -168,7 +168,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     }
 
     @Override
-    public Slice<MissionRecord> findAllFetch(Pageable pageable) {
+    public Slice<MissionRecord> findAllFetch(int size, Long lastId) {
 
         List<MissionRecord> missionRecords =
                 jpaQueryFactory
@@ -180,18 +180,19 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                         .leftJoin(missionRecord.reactions, reaction)
                         .fetchJoin()
                         .distinct()
-                        .offset(pageable.getOffset())
-                        .limit(pageable.getPageSize() + 1L)
+                        .where(ltMissionRecordId(lastId))
+                        .orderBy(missionRecord.finishedAt.desc())
+                        .limit((long) size + 1)
                         .fetch();
 
-        boolean hasNext = getHasNext(missionRecords, pageable);
+        boolean hasNext = getHasNext(missionRecords, size);
 
-        return new SliceImpl<>(missionRecords, pageable, hasNext);
+        return new SliceImpl<>(missionRecords, Pageable.ofSize(size), hasNext);
     }
 
     @Override
     public Slice<MissionRecord> findAllFetchByFollowings(
-            Pageable pageable, List<Member> followingMembers) {
+            int size, Long lastId, List<Member> followingMembers) {
 
         List<MissionRecord> missionRecords =
                 jpaQueryFactory
@@ -200,15 +201,17 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                         .fetchJoin()
                         .join(mission.member, member)
                         .fetchJoin()
-                        .where(missionRecord.mission.member.in(followingMembers))
+                        .where(
+                                ltMissionRecordId(lastId),
+                                missionRecord.mission.member.in(followingMembers))
                         .where(mission.visibility.in(List.of(ALL, FOLLOWER)))
-                        .offset(pageable.getOffset())
-                        .limit(pageable.getPageSize() + 1L)
+                        .orderBy(missionRecord.finishedAt.desc())
+                        .limit((long) size + 1)
                         .fetch();
 
-        boolean hasNext = getHasNext(missionRecords, pageable);
+        boolean hasNext = getHasNext(missionRecords, size);
 
-        return new SliceImpl<>(missionRecords, pageable, hasNext);
+        return new SliceImpl<>(missionRecords, Pageable.ofSize(size), hasNext);
     }
 
     private BooleanExpression missionIdEq(Long missionId) {
@@ -253,10 +256,10 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
         return new SliceImpl<>(result, pageable, hasNext);
     }
 
-    private boolean getHasNext(List<?> list, Pageable pageable) {
+    private boolean getHasNext(List<?> list, int size) {
         boolean hasNext = false;
-        if (list.size() > pageable.getPageSize()) {
-            list.remove(pageable.getPageSize());
+        if (list.size() > size) {
+            list.remove(size);
             hasNext = true;
         }
         return hasNext;
