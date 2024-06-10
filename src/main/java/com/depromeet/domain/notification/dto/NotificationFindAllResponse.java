@@ -13,7 +13,12 @@ public record NotificationFindAllResponse(
         @Schema(description = "알림 날짜") LocalDateTime createdAt) {
 
     public static NotificationFindAllResponse of(
-            Long notificationId, NotificationType notificationType, Long resourceId, String message, LocalDateTime createdAt) {
-        return new NotificationFindAllResponse(notificationId, notificationType, resourceId, message, createdAt);
+            Long notificationId,
+            NotificationType notificationType,
+            Long resourceId,
+            String message,
+            LocalDateTime createdAt) {
+        return new NotificationFindAllResponse(
+                notificationId, notificationType, resourceId, message, createdAt);
     }
 }
