@@ -57,7 +57,7 @@ public class FollowService {
                 String.format(PUSH_SERVICE_CONTENT, currentMember.getProfile().getNickname()));
         Notification notification =
                 Notification.createNotification(
-                        NotificationType.FOLLOW, currentMember, targetMember);
+                        NotificationType.FOLLOW, currentMember, targetMember, currentMember.getId());
         notificationRepository.save(notification);
         memberRelationRepository.save(memberRelation);
     }
