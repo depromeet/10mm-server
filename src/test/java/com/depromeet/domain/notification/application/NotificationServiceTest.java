@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.depromeet.DatabaseCleaner;
+import com.depromeet.NoTransactionExtension;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.FcmInfo;
 import com.depromeet.domain.member.domain.Member;
@@ -30,6 +32,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -40,7 +43,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class PushServiceTest {
+@ExtendWith(NoTransactionExtension.class)
+class NotificationServiceTest {
 
     @Autowired private MemberUtil memberUtil;
 
@@ -54,7 +58,7 @@ class PushServiceTest {
 
     @Autowired private MissionRecordRepository missionRecordRepository;
 
-    @Autowired private PushService pushService;
+    @Autowired private NotificationService notificationService;
 
     @BeforeEach
     void setUp() {
@@ -73,7 +77,7 @@ class PushServiceTest {
             PushUrgingSendRequest request = new PushUrgingSendRequest(1L);
 
             // when, then
-            assertThatThrownBy(() -> pushService.sendUrgingPush(request))
+            assertThatThrownBy(() -> notificationService.sendUrgingPush(request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
         }
@@ -87,7 +91,7 @@ class PushServiceTest {
                             Profile.createProfile("testNickname1", "testImageUrl1")));
 
             // when, then
-            assertThatThrownBy(() -> pushService.sendUrgingPush(request))
+            assertThatThrownBy(() -> notificationService.sendUrgingPush(request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.MISSION_NOT_FOUND.getMessage());
         }
@@ -116,7 +120,7 @@ class PushServiceTest {
                             currentMember));
 
             // when, then
-            assertThatThrownBy(() -> pushService.sendUrgingPush(request))
+            assertThatThrownBy(() -> notificationService.sendUrgingPush(request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.SELF_SENDING_NOT_ALLOWED.getMessage());
         }
@@ -149,7 +153,7 @@ class PushServiceTest {
                             targetMember));
 
             // when, then
-            assertThatThrownBy(() -> pushService.sendUrgingPush(request))
+            assertThatThrownBy(() -> notificationService.sendUrgingPush(request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.FINISHED_MISSION_URGING_NOT_ALLOWED.getMessage());
         }
@@ -199,7 +203,7 @@ class PushServiceTest {
             missionRecordRepository.save(missionRecord);
 
             // when, then
-            assertThatThrownBy(() -> pushService.sendUrgingPush(request))
+            assertThatThrownBy(() -> notificationService.sendUrgingPush(request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.TODAY_COMPLETED_MISSION_SENDING_NOT_ALLOWED.getMessage());
         }
@@ -237,7 +241,7 @@ class PushServiceTest {
                             targetMember));
 
             // when
-            pushService.sendUrgingPush(request);
+            notificationService.sendUrgingPush(request);
 
             // then
             Optional<Notification> optionalNotification = notificationRepository.findById(1L);

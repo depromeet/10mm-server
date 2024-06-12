@@ -2,6 +2,7 @@ package com.depromeet.domain.feed.application;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.depromeet.NoTransactionExtension;
 import com.depromeet.domain.comment.dao.CommentRepository;
 import com.depromeet.domain.comment.domain.Comment;
 import com.depromeet.domain.feed.domain.FeedVisibility;
@@ -27,6 +28,7 @@ import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
@@ -39,6 +41,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@ExtendWith(NoTransactionExtension.class)
 class FeedServiceTest {
 
     @Autowired private FeedService feedService;
@@ -222,7 +225,7 @@ class FeedServiceTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 10);
-        Slice<FeedOneResponse> response = feedService.findFeedV2(FeedVisibility.ALL, pageable);
+        Slice<FeedOneResponse> response = feedService.findFeedV2(FeedVisibility.ALL, 10, 5L);
 
         // then
         assertThat(response.getContent()).hasSize(4);
@@ -240,7 +243,7 @@ class FeedServiceTest {
             // when
             Pageable pageable = PageRequest.of(0, 10);
             Slice<FeedOneResponse> response =
-                    feedService.findFeedV2(FeedVisibility.FOLLOWING, pageable);
+                    feedService.findFeedV2(FeedVisibility.FOLLOWING, 10, 5L);
 
             // then
             assertThat(response.getContent()).hasSize(2);
@@ -255,7 +258,7 @@ class FeedServiceTest {
             // when
             Pageable pageable = PageRequest.of(0, 10);
             Slice<FeedOneResponse> response =
-                    feedService.findFeedV2(FeedVisibility.FOLLOWING, pageable);
+                    feedService.findFeedV2(FeedVisibility.FOLLOWING, 10, 5L);
 
             // then
             assertThat(response.getContent())
@@ -271,7 +274,7 @@ class FeedServiceTest {
             // when
             Pageable pageable = PageRequest.of(0, 10);
             Slice<FeedOneResponse> response =
-                    feedService.findFeedV2(FeedVisibility.FOLLOWING, pageable);
+                    feedService.findFeedV2(FeedVisibility.FOLLOWING, 10, 5L);
 
             // then
             // 2번 미션의 미션기록은 공개이므로 조회
@@ -293,7 +296,7 @@ class FeedServiceTest {
             // when
             Pageable pageable = PageRequest.of(0, 10);
             Slice<FeedOneResponse> response =
-                    feedService.findFeedV2(FeedVisibility.FOLLOWING, pageable);
+                    feedService.findFeedV2(FeedVisibility.FOLLOWING, 10, 0L);
 
             // then
             assertThat(response.getContent())

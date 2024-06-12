@@ -19,6 +19,7 @@ import com.depromeet.global.util.SecurityUtil;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -283,7 +284,10 @@ public class MissionService {
                 missionCreateRequest.category(),
                 missionCreateRequest.visibility(),
                 startedAt,
-                startedAt.plus(missionCreateRequest.period().getPeriod()),
+                startedAt.plus(
+                        missionCreateRequest.period() == null
+                                ? Period.ofWeeks(2)
+                                : missionCreateRequest.period().getPeriod()),
                 missionCreateRequest.remindAt(),
                 member);
     }

@@ -20,6 +20,6 @@ public record MissionCreateRequest(
         @NotNull @Schema(description = "미션 카테고리", defaultValue = "STUDY") MissionCategory category,
         @NotNull @Schema(description = "미션 공개여부", defaultValue = "ALL")
                 MissionVisibility visibility,
-        @NotNull @Schema(description = "미션 기한", defaultValue = "TWO_WEEKS") MissionPeriod period,
+        @Schema(description = "미션 기한", defaultValue = "TWO_WEEKS") MissionPeriod period,
         @Schema(description = "미션 리마인드 알림 시간", defaultValue = "00:50:00", type = "string")
                 LocalTime remindAt) {}

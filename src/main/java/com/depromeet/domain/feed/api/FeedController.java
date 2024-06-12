@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,8 +45,10 @@ public class FeedController {
     @Operation(summary = "피드 탭 V2 (페이지네이션)", description = "피드 탭을 조회합니다.")
     @GetMapping("/me/v2")
     public Slice<FeedOneResponse> feedFindByPageV2(
-            @RequestParam(required = false) FeedVisibility visibility, Pageable pageable) {
-        return feedService.findFeedV2(visibility, pageable);
+            @RequestParam int size,
+            @RequestParam(required = false) Long lastId,
+            @RequestParam(required = false) FeedVisibility visibility) {
+        return feedService.findFeedV2(visibility, size, lastId);
     }
 
     @Operation(summary = "프로필 피드", description = "피드 탭을 조회합니다.")

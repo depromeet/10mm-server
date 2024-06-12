@@ -2,11 +2,13 @@ package com.depromeet.global.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.depromeet.NoTransactionExtension;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.OauthInfo;
 import com.depromeet.global.security.PrincipalDetails;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@ExtendWith(NoTransactionExtension.class)
 class MemberUtilTest {
 
     @Autowired private MemberUtil memberUtil;
