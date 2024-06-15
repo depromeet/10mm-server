@@ -2,6 +2,7 @@ package com.depromeet.domain.missionRecord.domain;
 
 import com.depromeet.domain.comment.domain.Comment;
 import com.depromeet.domain.common.model.BaseTimeEntity;
+import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.reaction.domain.Reaction;
 import com.depromeet.global.error.exception.CustomException;
@@ -98,5 +99,9 @@ public class MissionRecord extends BaseTimeEntity {
 
     public void updateMissionRecord(String remark) {
         this.remark = remark;
+    }
+
+    public Member getMember() {
+        return mission.getMember();
     }
 }
