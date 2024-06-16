@@ -9,6 +9,7 @@ import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.image.domain.ImageFileExtension;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
+import com.depromeet.domain.member.domain.MemberStatus;
 import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.member.dto.request.NicknameCheckRequest;
 import com.depromeet.domain.member.dto.request.NicknameUpdateRequest;
@@ -207,5 +208,10 @@ public class MemberService {
     private String escapeSpecialCharacters(String nickname) {
         // 여기서 특수문자를 '_'로 대체할 수 있도록 정규표현식을 활용하여 구현
         return nickname == null ? "" : nickname.replaceAll("[^0-9a-zA-Z가-힣 ]", "_");
+    }
+
+    @Transactional(readOnly = true)
+    public List<Member> findAllNormalMember() {
+        return memberRepository.findAllByStatusIs(MemberStatus.NORMAL);
     }
 }
