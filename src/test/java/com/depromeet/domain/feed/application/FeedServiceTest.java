@@ -2,7 +2,6 @@ package com.depromeet.domain.feed.application;
 
 import static org.assertj.core.api.Assertions.*;
 
-import com.depromeet.NoTransactionExtension;
 import com.depromeet.domain.comment.dao.CommentRepository;
 import com.depromeet.domain.comment.domain.Comment;
 import com.depromeet.domain.feed.domain.FeedVisibility;
@@ -28,7 +27,6 @@ import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
@@ -41,7 +39,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@ExtendWith(NoTransactionExtension.class)
 class FeedServiceTest {
 
     @Autowired private FeedService feedService;

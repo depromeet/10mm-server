@@ -2,7 +2,6 @@ package com.depromeet.domain.ranking.application;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.depromeet.DatabaseCleaner;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.OauthInfo;
@@ -18,7 +17,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,16 +26,10 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class RankingServiceTest {
 
-    @Autowired private DatabaseCleaner databaseCleaner;
     @Autowired private RankingService rankingService;
     @Autowired private MemberRepository memberRepository;
     @Autowired private MissionRepository missionRepository;
     @Autowired private MissionRecordRepository missionRecordRepository;
-
-    @BeforeEach
-    void setUp() {
-        databaseCleaner.execute();
-    }
 
     private void setFixture() {
         Member member1 =
