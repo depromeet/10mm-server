@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.depromeet.DatabaseCleaner;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.FcmInfo;
 import com.depromeet.domain.member.domain.Member;
@@ -42,7 +41,6 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("test")
 class NotificationServiceTest {
-    @Autowired private DatabaseCleaner databaseCleaner;
 
     @Autowired private MemberUtil memberUtil;
 
@@ -60,7 +58,6 @@ class NotificationServiceTest {
 
     @BeforeEach
     void setUp() {
-        databaseCleaner.execute();
         PrincipalDetails principal = new PrincipalDetails(1L, "USER");
         Authentication authentication =
                 new UsernamePasswordAuthenticationToken(

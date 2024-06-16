@@ -3,7 +3,6 @@ package com.depromeet.domain.follow.application;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.depromeet.DatabaseCleaner;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.follow.dto.request.FollowCreateRequest;
@@ -37,7 +36,6 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("test")
 class FollowServiceTest {
-    @Autowired private DatabaseCleaner databaseCleaner;
     @Autowired private MemberRepository memberRepository;
     @Autowired private MemberRelationRepository memberRelationRepository;
     @Autowired private MissionRepository missionRepository;
@@ -46,7 +44,6 @@ class FollowServiceTest {
 
     @BeforeEach
     void setUp() {
-        databaseCleaner.execute();
         PrincipalDetails principal = new PrincipalDetails(1L, "USER");
         Authentication authentication =
                 new UsernamePasswordAuthenticationToken(

@@ -3,7 +3,6 @@ package com.depromeet.domain.missionRecord.application;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-import com.depromeet.DatabaseCleaner;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.OauthInfo;
@@ -43,14 +42,12 @@ class MissionRecordServiceTest {
     @Autowired MissionRepository missionRepository;
     @Autowired MissionRecordRepository missionRecordRepository;
     @Autowired ReactionRepository reactionRepository;
-    @Autowired DatabaseCleaner databaseCleaner;
     @MockBean SecurityUtil securityUtil;
     private Member member;
     private Mission mission;
 
     @BeforeEach
     void setUp() {
-        databaseCleaner.execute();
         when(securityUtil.getCurrentMemberId()).thenReturn(1L);
 
         member =
