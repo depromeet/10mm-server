@@ -54,7 +54,10 @@ public class NotificationService {
                         mission.getName()));
         Notification notification =
                 Notification.createNotification(
-                        NotificationType.MISSION_URGING, currentMember, targetMember);
+                        NotificationType.MISSION_URGING,
+                        currentMember,
+                        targetMember,
+                        mission.getId());
         notificationRepository.save(notification);
     }
 
@@ -79,7 +82,13 @@ public class NotificationService {
                 .map(
                         notification ->
                                 NotificationFindAllResponse.of(
+                                        notification.getId(),
                                         notification.getNotificationType(),
+                                        notification.getResourceId(),
+                                        getNotificationMessage(
+                                                notification.getNotificationType(),
+                                                notification.getSourceMember(),
+                                                notification.getTargetMember()),
                                         notification.getCreatedAt()))
                 .collect(Collectors.toList());
     }
@@ -99,6 +108,21 @@ public class NotificationService {
     private void validateSelfSending(Long currentMemberId, Long targetMemberId) {
         if (currentMemberId.equals(targetMemberId)) {
             throw new CustomException(ErrorCode.SELF_SENDING_NOT_ALLOWED);
+        }
+    }
+
+    private String getNotificationMessage(
+            NotificationType notificationType, Member sourceMember, Member targetMember) {
+        switch (notificationType) {
+            case FOLLOW:
+                return String.format(PUSH_SERVICE_CONTENT, sourceMember.getProfile().getNickname());
+            case MISSION_URGING:
+                return String.format(
+                        PUSH_URGING_CONTENT,
+                        sourceMember.getProfile().getNickname(),
+                        targetMember.getProfile().getNickname());
+            default:
+                throw new CustomException(ErrorCode.NOTIFICATION_TYPE_NOT_FOUND);
         }
     }
 }
