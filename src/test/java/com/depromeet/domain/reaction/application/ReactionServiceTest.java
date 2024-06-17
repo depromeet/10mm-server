@@ -2,7 +2,6 @@ package com.depromeet.domain.reaction.application;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.depromeet.DatabaseCleaner;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.OauthInfo;
@@ -25,7 +24,6 @@ import com.depromeet.global.security.PrincipalDetails;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,15 +41,9 @@ class ReactionServiceTest {
 
     @Autowired private ReactionService reactionService;
     @Autowired private ReactionRepository reactionRepository;
-    @Autowired private DatabaseCleaner databaseCleaner;
     @Autowired private MemberRepository memberRepository;
     @Autowired private MissionRepository missionRepository;
     @Autowired private MissionRecordRepository missionRecordRepository;
-
-    @BeforeEach
-    void setUp() {
-        databaseCleaner.execute();
-    }
 
     private Member saveAndRegisterMember() {
         OauthInfo oauthInfo =

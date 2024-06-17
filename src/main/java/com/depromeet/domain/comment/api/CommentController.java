@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "8. [댓글]", description = "댓글 관련 API")
+@Tag(name = "9. [댓글]", description = "댓글 관련 API")
 @RestController
 @RequestMapping("/comments")
 @RequiredArgsConstructor

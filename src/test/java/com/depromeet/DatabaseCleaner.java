@@ -1,52 +1,41 @@
 package com.depromeet;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.hibernate.Session;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Component;
+import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.support.TransactionTemplate;
 
-@Component
-public class DatabaseCleaner implements InitializingBean {
+public class DatabaseCleaner {
 
-    @PersistenceContext private EntityManager entityManager;
-    private List<String> tableNames;
-
-    @Override
-    public void afterPropertiesSet() {
-        entityManager.unwrap(Session.class).doWork(this::extractTableNames);
+    private DatabaseCleaner() {
+        throw new IllegalStateException("Utility class");
     }
 
-    private void extractTableNames(Connection conn) {
-        tableNames =
-                entityManager.getMetamodel().getEntities().stream()
-                        .map(e -> e.getName().replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase())
-                        .collect(Collectors.toList());
+    public static void clear(ApplicationContext applicationContext) {
+        var entityManager = applicationContext.getBean(EntityManager.class);
+        var jdbcTemplate = applicationContext.getBean(JdbcTemplate.class);
+        var transactionTemplate = applicationContext.getBean(TransactionTemplate.class);
+
+        transactionTemplate.execute(
+                status -> {
+                    entityManager.clear();
+                    deleteAll(jdbcTemplate, entityManager);
+                    return null;
+                });
     }
 
-    public void execute() {
-        entityManager.unwrap(Session.class).doWork(this::cleanUpDatabase);
-    }
-
-    private void cleanUpDatabase(Connection conn) throws SQLException {
-        Statement statement = conn.createStatement();
-        statement.executeUpdate("SET REFERENTIAL_INTEGRITY FALSE");
-
-        for (String tableName : tableNames) {
-            statement.executeUpdate("TRUNCATE TABLE " + tableName);
-            statement.executeUpdate(
-                    "ALTER TABLE "
-                            + tableName
-                            + " ALTER COLUMN "
-                            + tableName
-                            + "_id RESTART WITH 1");
+    private static void deleteAll(JdbcTemplate jdbcTemplate, EntityManager entityManager) {
+        entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
+        for (String tableName : findDatabaseTableNames(jdbcTemplate)) {
+            entityManager
+                    .createNativeQuery("TRUNCATE TABLE %s".formatted(tableName))
+                    .executeUpdate();
         }
+        entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
+    }
 
-        statement.executeUpdate("SET REFERENTIAL_INTEGRITY TRUE");
+    private static List<String> findDatabaseTableNames(JdbcTemplate jdbcTemplate) {
+        return jdbcTemplate.query("SHOW TABLES", (rs, rowNum) -> rs.getString(1)).stream().toList();
     }
 }

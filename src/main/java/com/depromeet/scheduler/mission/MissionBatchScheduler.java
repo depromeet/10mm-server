@@ -2,9 +2,13 @@ package com.depromeet.scheduler.mission;
 
 import static com.depromeet.global.common.constants.PushNotificationConstants.*;
 
+import com.depromeet.domain.member.application.MemberService;
+import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.application.MissionService;
 import com.depromeet.domain.mission.dto.response.MissionRemindPushResponse;
 import com.depromeet.domain.notification.application.FcmService;
+import com.depromeet.domain.ranking.application.RankingService;
+import com.depromeet.domain.ranking.dto.RankingDto;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -18,6 +22,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class MissionBatchScheduler {
     private final MissionService missionService;
+    private final MemberService memberService;
+    private final RankingService rankingService;
     private final FcmService fcmService;
 
     // 자정에 schedule 실행
@@ -25,6 +31,22 @@ public class MissionBatchScheduler {
     public void updateFinishedDurationStatus() {
         log.info("DurationStatus Update batch execute");
         missionService.updateFinishedDurationStatus();
+    }
+
+    @Scheduled(cron = "0 0 21 * * *", zone = "Asia/Seoul")
+    public void updateRankingSymbolStack() {
+        log.info("Ranking Symbol Stack Update batch execute");
+        List<RankingDto> allMissionSymbolStack = rankingService.findAllMissionSymbolStack();
+        rankingService.updateSymbolStack(allMissionSymbolStack);
+
+        log.info("send All Member Ranking Notification");
+        List<Member> allNormalMember = memberService.findAllNormalMember();
+
+        List<String> tokenList =
+                allNormalMember.stream().map(member -> member.getFcmInfo().getFcmToken()).toList();
+        if (!tokenList.isEmpty()) {
+            fcmService.sendGroupMessageAsync(tokenList, PUSH_SERVICE_TITLE, PUSH_RANKING_CONTENT);
+        }
     }
 
     // 매 10분마다 schedule 실행
