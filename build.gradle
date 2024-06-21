@@ -191,7 +191,7 @@ spotless {
 
 // pre-commit spotless check script
 tasks.register('updateGitHooks', Copy) {
-    from './scripts/pre-commit'
-    into './.git/hooks'
+    from 'scripts/pre-commit'
+    into '.git/hooks'
 }
 compileJava.dependsOn updateGitHooks

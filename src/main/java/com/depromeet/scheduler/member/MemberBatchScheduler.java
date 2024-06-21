@@ -12,6 +12,19 @@ import org.springframework.stereotype.Component;
 public class MemberBatchScheduler {
     private final MemberService memberService;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     @Scheduled(cron = "0 0 22 * * *")
     public void pushNotificationByMissionRequest() {
         log.info("PushNotification MissionRequest execute");
