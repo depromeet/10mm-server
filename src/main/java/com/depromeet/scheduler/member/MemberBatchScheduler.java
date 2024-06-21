@@ -10,14 +10,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Slf4j
 public class MemberBatchScheduler {
+
+
+
     private final MemberService memberService;
-
-
-
-
-
-
-
 
 
 

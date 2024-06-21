@@ -14,5 +14,6 @@ else
         git add $file
       fi
     done
+    echo "Spotless Apply succeed"
 exit 1
 fi
