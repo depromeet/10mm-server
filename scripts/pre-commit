@@ -1,19 +1,13 @@
-#!/bin/bash
-echo "Running spotless check"
-./gradlew spotlessCheck
-if [ \$? -eq 0 ]
-then
-    echo "Spotless check succeed"
-else
-    echo "Spotless check failed" >&2
-    ./gradlew spotlessApply
+#!/bin/sh
 
-    # Add files to stage spotless applied
-    for file in $targetFiles; do
-      if test -f "$file"; then
-        git add $file
-      fi
-    done
-    echo "Spotless Apply succeed"
-exit 1
-fi
+targetFiles=$(git diff --staged --name-only)
+
+echo "Apply Spotless.."
+./gradlew spotlessApply
+
+# Add files to stage spotless applied
+for file in $targetFiles; do
+  if test -f "$file"; then
+    git add $file
+  fi
+done
