@@ -77,4 +77,4 @@
 ## 🧑🏻‍💻 Developers
 | ![](https://avatars.githubusercontent.com/u/64088250?v=4) | ![](https://avatars.githubusercontent.com/u/91878695?v=4) |![](https://avatars.githubusercontent.com/u/68099546?v=4) |
 | :--: | :--: | :--: |
-| [김동호](https://github.com/kdomo) | [안재현](https://github.com/uwoobeat) | [차윤범](https://github.com/uiurihappy) |
+| [김동호](https://github.com/kdomo) | [안재현](https://github.com/uwoobeat) | [차윤범](https://github.com/char-yb) |
