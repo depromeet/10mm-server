@@ -42,7 +42,7 @@
 ## 📝 직접 사용해보기
 - [iOS](https://apps.apple.com/kr/app/10%EB%B6%84%EB%A7%8C-10mm-10%EB%B6%84%EC%9C%BC%EB%A1%9C-%EC%8B%9C%EC%9E%91%ED%95%98%EB%8A%94-%EC%8A%B5%EA%B4%80-%ED%98%95%EC%84%B1/id6475635740)
 - [AOS](https://play.google.com/store/apps/details?id=com.tenminuteapp)
-- [WEB](https://10mm.today/)
+- [WEB](https://10mm.site/)
   </br></br>
 
 # 🖥️ Tech
