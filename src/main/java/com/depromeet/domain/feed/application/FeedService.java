@@ -62,9 +62,11 @@ public class FeedService {
 
     @Transactional(readOnly = true)
     public Slice<FeedOneResponse> findFeedV2(FeedVisibility visibility, int size, Long lastId) {
+		// 전체
         if (visibility == FeedVisibility.ALL) {
             return findAllFeedV2(size, lastId);
         }
+		// 팔로잉
         return findFollowingFeedV2(size, lastId);
     }
 

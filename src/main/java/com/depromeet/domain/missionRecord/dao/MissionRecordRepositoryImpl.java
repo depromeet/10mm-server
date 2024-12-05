@@ -168,8 +168,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     }
 
     @Override
-    public Slice<MissionRecord> findAllFetch(int size, Long lastId) {
-
+    public Slice<MissionRecord> findAllFetch(final int size, final Long lastId) {
         List<MissionRecord> missionRecords =
                 jpaQueryFactory
                         .selectFrom(missionRecord)
@@ -180,7 +179,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                         .leftJoin(missionRecord.reactions, reaction)
                         .fetchJoin()
                         .distinct()
-                        .where(ltMissionRecordId(lastId))
+                        .where(ltMissionRecordId(lastId).and(checkMissionVisibilityNone()))
                         .orderBy(missionRecord.finishedAt.desc())
                         .limit((long) size + 1)
                         .fetch();
@@ -264,4 +263,8 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
         }
         return hasNext;
     }
+
+	private BooleanExpression checkMissionVisibilityNone() {
+		return mission.visibility.ne(MissionVisibility.NONE);
+	}
 }
