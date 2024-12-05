@@ -264,7 +264,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
         return hasNext;
     }
 
-	private BooleanExpression checkMissionVisibilityNone() {
-		return mission.visibility.ne(MissionVisibility.NONE);
-	}
+    private BooleanExpression checkMissionVisibilityNone() {
+        return mission.visibility.ne(MissionVisibility.NONE);
+    }
 }
