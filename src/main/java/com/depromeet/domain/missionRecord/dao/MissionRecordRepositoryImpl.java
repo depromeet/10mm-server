@@ -167,31 +167,31 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
         jpaQueryFactory.delete(missionRecord).where(missionRecord.id.eq(missionRecordId)).execute();
     }
 
-	@Override
-	public Slice<MissionRecord> findAllFetch(final int size, final Long lastId) {
-		List<MissionRecord> missionRecords =
-			jpaQueryFactory
-				.selectFrom(missionRecord)
-				.join(missionRecord.mission, mission)
-				.fetchJoin()
-				.join(mission.member, member)
-				.fetchJoin()
-				.leftJoin(missionRecord.reactions, reaction)
-				.fetchJoin()
-				.distinct()
-				.where(
-					ltMissionRecordId(lastId) != null
-						? ltMissionRecordId(lastId).and(checkMissionVisibilityNone())
-						: checkMissionVisibilityNone()
-				)
-				.orderBy(missionRecord.finishedAt.desc())
-				.limit((long) size + 1)
-				.fetch();
+    @Override
+    public Slice<MissionRecord> findAllFetch(final int size, final Long lastId) {
+        List<MissionRecord> missionRecords =
+                jpaQueryFactory
+                        .selectFrom(missionRecord)
+                        .join(missionRecord.mission, mission)
+                        .fetchJoin()
+                        .join(mission.member, member)
+                        .fetchJoin()
+                        .leftJoin(missionRecord.reactions, reaction)
+                        .fetchJoin()
+                        .distinct()
+                        .where(
+                                ltMissionRecordId(lastId) != null
+                                        ? ltMissionRecordId(lastId)
+                                                .and(checkMissionVisibilityNone())
+                                        : checkMissionVisibilityNone())
+                        .orderBy(missionRecord.finishedAt.desc())
+                        .limit((long) size + 1)
+                        .fetch();
 
-		boolean hasNext = getHasNext(missionRecords, size);
+        boolean hasNext = getHasNext(missionRecords, size);
 
-		return new SliceImpl<>(missionRecords, Pageable.ofSize(size), hasNext);
-	}
+        return new SliceImpl<>(missionRecords, Pageable.ofSize(size), hasNext);
+    }
 
     @Override
     public Slice<MissionRecord> findAllFetchByFollowings(
