@@ -37,6 +37,16 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     }
 
     @Override
+    public List<Mission> findAllMissionWithRecords() {
+        JPAQuery<Mission> query =
+                jpaQueryFactory
+                        .selectFrom(mission)
+                        .leftJoin(mission.missionRecords, missionRecord)
+                        .fetchJoin();
+        return query.fetch();
+    }
+
+    @Override
     public List<Mission> findInProgressMissionsWithRecords(Long memberId) {
         JPAQuery<Mission> query =
                 jpaQueryFactory

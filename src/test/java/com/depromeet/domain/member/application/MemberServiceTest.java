@@ -3,7 +3,6 @@ package com.depromeet.domain.member.application;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.depromeet.DatabaseCleaner;
 import com.depromeet.domain.auth.domain.OauthProvider;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
@@ -38,16 +37,10 @@ import org.springframework.test.context.ActiveProfiles;
 class MemberServiceTest {
 
     @Autowired EntityManager em;
-    @Autowired DatabaseCleaner databaseCleaner;
     @Autowired MemberUtil memberUtil;
     @Autowired MemberService memberService;
     @Autowired MemberRepository memberRepository;
     @Autowired MemberRelationRepository memberRelationRepository;
-
-    @BeforeEach
-    void setUp() {
-        databaseCleaner.execute();
-    }
 
     private void saveAndRegisterMember(OauthInfo oauthInfo) {
         Member member = Member.createNormalMember(oauthInfo, "testNickname");
@@ -123,7 +116,6 @@ class MemberServiceTest {
 
         @BeforeEach
         void setUp() {
-            databaseCleaner.execute();
             PrincipalDetails principal = new PrincipalDetails(1L, "USER");
             Authentication authentication =
                     new UsernamePasswordAuthenticationToken(

@@ -37,20 +37,30 @@ public class Notification extends BaseTimeEntity {
     @JoinColumn(name = "target_id")
     private Member targetMember;
 
+    private Long resourceId;
+
     @Builder(access = AccessLevel.PRIVATE)
     private Notification(
-            NotificationType notificationType, Member sourceMember, Member targetMember) {
+            NotificationType notificationType,
+            Member sourceMember,
+            Member targetMember,
+            Long resourceId) {
         this.notificationType = notificationType;
         this.sourceMember = sourceMember;
         this.targetMember = targetMember;
+        this.resourceId = resourceId;
     }
 
     public static Notification createNotification(
-            NotificationType notificationType, Member currentMember, Member targetMember) {
+            NotificationType notificationType,
+            Member currentMember,
+            Member targetMember,
+            Long resourceId) {
         return Notification.builder()
                 .notificationType(notificationType)
                 .sourceMember(currentMember)
                 .targetMember(targetMember)
+                .resourceId(resourceId)
                 .build();
     }
 }

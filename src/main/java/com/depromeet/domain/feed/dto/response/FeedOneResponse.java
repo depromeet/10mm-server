@@ -19,7 +19,7 @@ import java.util.List;
 public record FeedOneResponse(
         @Schema(description = "작성자 ID", defaultValue = "1") Long memberId,
         @Schema(description = "작성자 닉네임", defaultValue = "default name") String nickname,
-        @Schema(description = "작성자 프로필 이미지", defaultValue = "https://image.10mm.today/default.png")
+        @Schema(description = "작성자 프로필 이미지", defaultValue = "https://image.10mm.site/default.png")
                 String profileImage,
         @Schema(description = "미션 ID", defaultValue = "1") Long missionId,
         @Schema(description = "미션 이름", defaultValue = "default name") String name,
@@ -27,7 +27,7 @@ public record FeedOneResponse(
         @Schema(description = "미션 일지 내용", defaultValue = "default remark") String remark,
         @Schema(
                         description = "미션 기록 인증 사진 Url",
-                        defaultValue = "https://image.10mm.today/default.png")
+                        defaultValue = "https://image.10mm.site/default.png")
                 String recordImageUrl,
         @Schema(description = "미션 수행 시간 (분 단위)", defaultValue = "21") long duration,
         @Schema(description = "미션 시작한 지 N일차", defaultValue = "3") long sinceDay,

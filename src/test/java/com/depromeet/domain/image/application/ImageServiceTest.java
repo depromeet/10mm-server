@@ -2,7 +2,6 @@ package com.depromeet.domain.image.application;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 
-import com.depromeet.DatabaseCleaner;
 import com.depromeet.domain.image.domain.ImageFileExtension;
 import com.depromeet.domain.image.dto.request.MissionRecordImageCreateRequest;
 import com.depromeet.domain.image.dto.request.MissionRecordImageUploadCompleteRequest;
@@ -40,7 +39,6 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("test")
 class ImageServiceTest {
-    @Autowired private DatabaseCleaner databaseCleaner;
     @Autowired private MemberRepository memberRepository;
     @Autowired private ImageService imageService;
     @Autowired private MissionRecordService missionRecordService;
@@ -49,7 +47,6 @@ class ImageServiceTest {
 
     @BeforeEach
     void setUp() {
-        databaseCleaner.execute();
         PrincipalDetails principal = new PrincipalDetails(1L, "USER");
         Authentication authentication =
                 new UsernamePasswordAuthenticationToken(

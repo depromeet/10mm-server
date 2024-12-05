@@ -11,7 +11,7 @@ public record MissionRecordFindResponse(
                 String remark,
         @Schema(
                         description = "미션 기록 인증 사진 Url",
-                        defaultValue = "https://image.10mm.today/default.png")
+                        defaultValue = "https://image.10mm.site/default.png")
                 String imageUrl,
         @Schema(description = "미션 시작 일자", defaultValue = "3") int missionDay,
         @JsonFormat(

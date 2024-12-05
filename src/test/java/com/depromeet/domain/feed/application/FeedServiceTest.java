@@ -2,7 +2,6 @@ package com.depromeet.domain.feed.application;
 
 import static org.assertj.core.api.Assertions.*;
 
-import com.depromeet.DatabaseCleaner;
 import com.depromeet.domain.comment.dao.CommentRepository;
 import com.depromeet.domain.comment.domain.Comment;
 import com.depromeet.domain.feed.domain.FeedVisibility;
@@ -26,7 +25,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,18 +42,12 @@ import org.springframework.test.context.ActiveProfiles;
 class FeedServiceTest {
 
     @Autowired private FeedService feedService;
-    @Autowired private DatabaseCleaner databaseCleaner;
     @Autowired private MemberRepository memberRepository;
     @Autowired private MissionRepository missionRepository;
     @Autowired private MissionRecordRepository missionRecordRepository;
     @Autowired private ReactionRepository reactionRepository;
     @Autowired private CommentRepository commentRepository;
     @Autowired private MemberRelationRepository memberRelationRepository;
-
-    @BeforeEach
-    void setUp() {
-        databaseCleaner.execute();
-    }
 
     private void logoutAndReloginAs(Long memberId) {
         SecurityContextHolder.clearContext(); // 현재 회원 로그아웃

@@ -3,7 +3,6 @@ package com.depromeet.domain.missionRecord.application;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-import com.depromeet.DatabaseCleaner;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.OauthInfo;
@@ -43,14 +42,12 @@ class MissionRecordServiceTest {
     @Autowired MissionRepository missionRepository;
     @Autowired MissionRecordRepository missionRecordRepository;
     @Autowired ReactionRepository reactionRepository;
-    @Autowired DatabaseCleaner databaseCleaner;
     @MockBean SecurityUtil securityUtil;
     private Member member;
     private Mission mission;
 
     @BeforeEach
     void setUp() {
-        databaseCleaner.execute();
         when(securityUtil.getCurrentMemberId()).thenReturn(1L);
 
         member =
@@ -130,7 +127,7 @@ class MissionRecordServiceTest {
     void 미션별_상세_통계_조회한다() {
         // given
         long durationMinute = 17;
-        String defaultImage = "https://image.10mm.today/default.png";
+        String defaultImage = "https://image.10mm.site/default.png";
         LocalDateTime recordStartedAt = LocalDateTime.of(2024, 1, 25, 22, 58, 53);
         LocalDateTime recordFinishedAt = recordStartedAt.plusMinutes(durationMinute);
 

@@ -12,7 +12,7 @@ public record MissionRecordFindOneResponse(
                 String remark,
         @Schema(
                         description = "미션 기록 인증 사진 Url",
-                        defaultValue = "https://image.10mm.today/default.png")
+                        defaultValue = "https://image.10mm.site/default.png")
                 String imageUrl,
         @Schema(description = "미션 수행한 시간", defaultValue = "21") long duration,
         @Schema(description = "미션 시작한 지 N일차", defaultValue = "3") long sinceDay,

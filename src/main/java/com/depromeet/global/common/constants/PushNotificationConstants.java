@@ -17,4 +17,5 @@ public class PushNotificationConstants {
     public static final String PUSH_MISSION_REMIND_CONTENT = "지금부터 미션 인증을 할 수 있어요 🕑";
     public static final String PUSH_MISSION_START_REMIND_TITLE = "미션을 시작할 시간이에요!";
     public static final String PUSH_MISSION_START_REMIND_CONTENT = "10분만 투자해서 %s 미션을 완료해봐요 🥳";
+    public static final String PUSH_RANKING_CONTENT = "오늘의 랭킹이 업데이트 되었어요! 🎉";
 }
