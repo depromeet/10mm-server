@@ -20,7 +20,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Start containers  # test 돌릴때 레디스 필요
-        run: docker-compose -f ./docker-compose-test.yaml up -d
+        run: docker compose -f ./docker-compose-test.yaml up -d
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew

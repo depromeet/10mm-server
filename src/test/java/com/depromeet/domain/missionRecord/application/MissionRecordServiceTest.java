@@ -127,7 +127,7 @@ class MissionRecordServiceTest {
     void 미션별_상세_통계_조회한다() {
         // given
         long durationMinute = 17;
-        String defaultImage = "https://image.10mm.today/default.png";
+        String defaultImage = "https://image.10mm.site/default.png";
         LocalDateTime recordStartedAt = LocalDateTime.of(2024, 1, 25, 22, 58, 53);
         LocalDateTime recordFinishedAt = recordStartedAt.plusMinutes(durationMinute);
 
