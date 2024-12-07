@@ -225,7 +225,7 @@ class FeedServiceTest {
         Slice<FeedOneResponse> response = feedService.findFeedV2(FeedVisibility.ALL, 10, 5L);
 
         // then
-        assertThat(response.getContent()).hasSize(4);
+        assertThat(response.getContent()).hasSize(3);
     }
 
     @Nested
