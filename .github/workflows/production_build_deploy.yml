@@ -15,7 +15,7 @@ jobs:
     environment: PROD
     strategy:
       matrix:
-        java-version: [ 17 ]
+        java-version: [ 21 ]
         distribution: [ 'temurin' ]
 
     steps:
@@ -23,8 +23,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # JDK를 17 버전으로 세팅
-      - name: Set up JDK 17
+      # JDK를 21 버전으로 세팅
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java-version }}
