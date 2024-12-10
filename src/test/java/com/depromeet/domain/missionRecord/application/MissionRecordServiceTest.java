@@ -42,8 +42,7 @@ class MissionRecordServiceTest {
     @Autowired MissionRepository missionRepository;
     @Autowired MissionRecordRepository missionRecordRepository;
     @Autowired ReactionRepository reactionRepository;
-    @MockitoBean
-	SecurityUtil securityUtil;
+    @MockitoBean SecurityUtil securityUtil;
     private Member member;
     private Mission mission;
 

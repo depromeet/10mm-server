@@ -44,8 +44,7 @@ class NotificationServiceTest {
 
     @Autowired private MemberUtil memberUtil;
 
-	@MockitoBean
-	private FcmService fcmService;
+    @MockitoBean private FcmService fcmService;
 
     @Autowired private MissionRepository missionRepository;
 

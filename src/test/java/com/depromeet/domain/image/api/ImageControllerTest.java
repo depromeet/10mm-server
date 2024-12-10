@@ -28,8 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 class ImageControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
-    @MockitoBean
-	private ImageService imageService;
+    @MockitoBean private ImageService imageService;
 
     @Nested
     class 미션_기록_이미지_PresignedUrl을_생성할_때 {

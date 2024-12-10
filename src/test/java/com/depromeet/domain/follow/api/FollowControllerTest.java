@@ -25,8 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 class FollowControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
-    @MockitoBean
-	private FollowService followService;
+    @MockitoBean private FollowService followService;
 
     @Nested
     class 팔로우를_추가할_때 {

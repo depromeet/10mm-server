@@ -42,8 +42,7 @@ class MissionControllerTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
-    @MockitoBean
-	private MissionService missionService;
+    @MockitoBean private MissionService missionService;
 
     @Test
     void 공부미션을_생성한다() throws Exception {
