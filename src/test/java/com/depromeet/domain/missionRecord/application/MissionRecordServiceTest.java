@@ -27,8 +27,8 @@ import java.time.LocalTime;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -42,7 +42,8 @@ class MissionRecordServiceTest {
     @Autowired MissionRepository missionRepository;
     @Autowired MissionRecordRepository missionRecordRepository;
     @Autowired ReactionRepository reactionRepository;
-    @MockBean SecurityUtil securityUtil;
+    @MockitoBean
+	SecurityUtil securityUtil;
     private Member member;
     private Mission mission;
 
