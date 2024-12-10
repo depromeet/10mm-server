@@ -9,6 +9,9 @@ spring:
       - redis
       - storage
       - security
+  threads:
+    virtual:
+      enabled: true
 
 swagger:
   version: ${SWAGGER_VERSION:default}
