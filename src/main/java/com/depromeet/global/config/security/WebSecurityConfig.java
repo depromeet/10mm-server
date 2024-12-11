@@ -72,14 +72,14 @@ public class WebSecurityConfig {
 
     @Bean
     @Order(1)
-    @ConditionalOnProfile({DEV, LOCAL})
+    @ConditionalOnProfile({PROD, DEV, LOCAL})
     public SecurityFilterChain swaggerFilterChain(HttpSecurity http) throws Exception {
         defaultFilterChain(http);
 
         http.securityMatcher(getSwaggerUrls()).httpBasic(withDefaults());
 
         http.authorizeHttpRequests(
-                springEnvironmentUtil.isDevProfile()
+                (springEnvironmentUtil.isDevProfile() || springEnvironmentUtil.isProdProfile())
                         ? authorize -> authorize.anyRequest().authenticated()
                         : authorize -> authorize.anyRequest().permitAll());
 
