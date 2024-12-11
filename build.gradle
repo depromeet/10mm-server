@@ -79,12 +79,6 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.boot:spring-boot-dependencies:3.4.0"
-    }
-}
-
 tasks.named('bootBuildImage') {
     builder = 'paketobuildpacks/builder-jammy-base:latest'
 }
