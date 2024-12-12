@@ -49,14 +49,11 @@ public class SwaggerConfig {
     }
 
     private String getServerUrl() {
-        switch (springEnvironmentUtil.getCurrentProfile()) {
-            case "prod":
-                return UrlConstants.PROD_SERVER_URL.getValue();
-            case "dev":
-                return UrlConstants.DEV_SERVER_URL.getValue();
-            default:
-                return UrlConstants.LOCAL_SERVER_URL.getValue();
-        }
+        return switch (springEnvironmentUtil.getCurrentProfile()) {
+            case "prod" -> UrlConstants.PROD_SERVER_URL.getValue();
+            case "dev" -> UrlConstants.DEV_SERVER_URL.getValue();
+            default -> UrlConstants.LOCAL_SERVER_URL.getValue();
+        };
     }
 
     private Components authSetting() {
