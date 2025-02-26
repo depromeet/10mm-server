@@ -140,7 +140,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                                 ltMissionRecordId(lastId),
                                 missionRecord.mission.member.in(members),
                                 missionRecord.mission.visibility.in(visibilities),
-								checkMissionVisibilityNone(),
+                                checkMissionVisibilityNone(),
                                 uploadStatusCompleteEq())
                         .orderBy(missionRecord.finishedAt.desc())
                         .limit((long) size + 1)
@@ -159,7 +159,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                         mission.visibility.in(visibilities),
                         mission.member.id.eq(memberId),
                         uploadStatusCompleteEq(),
-						checkMissionVisibilityNone())
+                        checkMissionVisibilityNone())
                 .orderBy(missionRecord.startedAt.desc())
                 .fetch();
     }
