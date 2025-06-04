@@ -15,9 +15,9 @@ public interface RankingRepository extends JpaRepository<Ranking, Long> {
     @Modifying
     @Query(
             value =
-                    "INSERT INTO Ranking (member_id, symbol_stack, created_at) "
+                    "INSERT INTO ranking (member_id, symbol_stack, created_at) "
                             + "VALUES (:memberId, :symbolStack, NOW()) "
-                            + "ON DUPLICATE KEY UPDATE member_id = :memberId, symbol_stack = :symbolStack, updated_at = NOW()",
+                            + "ON CONFLICT (member_id) DO UPDATE SET member_id = :memberId, symbol_stack = :symbolStack, updated_at = NOW()",
             nativeQuery = true)
     void updateSymbolStackAndMemberId(
             @Param("symbolStack") long symbolStack, @Param("memberId") Long memberId);
