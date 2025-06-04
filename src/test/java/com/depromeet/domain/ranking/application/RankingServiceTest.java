@@ -1,6 +1,7 @@
 package com.depromeet.domain.ranking.application;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
@@ -11,16 +12,21 @@ import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import com.depromeet.domain.ranking.dao.RankingRepository;
 import com.depromeet.domain.ranking.dto.RankingDto;
 import com.depromeet.domain.ranking.dto.response.RankingResponse;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -30,6 +36,36 @@ class RankingServiceTest {
     @Autowired private MemberRepository memberRepository;
     @Autowired private MissionRepository missionRepository;
     @Autowired private MissionRecordRepository missionRecordRepository;
+    @MockitoSpyBean private RankingRepository rankingRepository;
+    @PersistenceContext private EntityManager em;
+
+    @BeforeEach
+    void setUp() {
+        // H2 PostgreSQL 모드에서는 ON CONFLICT DO UPDATE 구문이 지원되지 않으므로,
+        // RankingRepository 모킹 후 MERGE INTO를 사용하여 스터빙
+        doAnswer(
+                        invocation -> {
+                            long symbolStack = invocation.getArgument(0);
+                            Long memberId = invocation.getArgument(1);
+
+                            String sql =
+                                    "MERGE INTO ranking "
+                                            + "USING (VALUES (?, ?, NOW())) AS source (member_id, symbol_stack, created_at) "
+                                            + "ON ranking.member_id = source.member_id "
+                                            + "WHEN MATCHED THEN UPDATE SET symbol_stack = source.symbol_stack, updated_at = NOW() "
+                                            + "WHEN NOT MATCHED THEN INSERT (member_id, symbol_stack, created_at) "
+                                            + "VALUES (source.member_id, source.symbol_stack, source.created_at)";
+
+                            em.createNativeQuery(sql)
+                                    .setParameter(1, memberId)
+                                    .setParameter(2, symbolStack)
+                                    .executeUpdate();
+
+                            return null;
+                        })
+                .when(rankingRepository)
+                .updateSymbolStackAndMemberId(anyLong(), anyLong());
+    }
 
     private void setFixture() {
         Member member1 =
