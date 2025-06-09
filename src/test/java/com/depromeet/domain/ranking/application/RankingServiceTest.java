@@ -41,7 +41,7 @@ class RankingServiceTest {
 
     @BeforeEach
     void setUp() {
-        // H2 PostgreSQL 모드에서는 ON CONFLICT DO UPDATE 구문이 지원되지 않으므로,
+        // H2 Oracle 모드에서는 FROM DUAL 등 문법이 지원되지 않으므로,
         // RankingRepository 모킹 후 MERGE INTO를 사용하여 스터빙
         doAnswer(
                         invocation -> {

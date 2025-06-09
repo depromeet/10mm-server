@@ -57,7 +57,7 @@ public class DatabaseCleaner {
 
         List<String> columns =
                 jdbcTemplate.query(
-                        query, (rs, rowNum) -> rs.getString("column_name"), "public", tableName);
+                        query, (rs, rowNum) -> rs.getString("column_name"), "PUBLIC", tableName);
 
         return columns.getFirst();
     }
@@ -69,6 +69,6 @@ public class DatabaseCleaner {
 			WHERE table_schema = ? AND table_type = 'BASE TABLE'
 			ORDER BY table_name
 			""";
-        return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("table_name"), "public");
+        return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("table_name"), "PUBLIC");
     }
 }
