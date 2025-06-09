@@ -3,11 +3,11 @@ spring:
     activate:
       on-profile: "datasource"
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    url: jdbc:oracle:thin:@${DB_CONNECTION_STRING}
     hikari:
       maxLifetime: 580000
       maximum-pool-size: 20
-    driver-class-name: org.postgresql.Driver
+    driver-class-name: oracle.jdbc.OracleDriver
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   jpa:
