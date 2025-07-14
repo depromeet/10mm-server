@@ -3,13 +3,13 @@ spring:
     activate:
       on-profile: "datasource"
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${DB_NAME}?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&tinyInt1isBit=false
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:oracle:thin:@${DB_CONNECTION_STRING}
     hikari:
       maxLifetime: 580000
       maximum-pool-size: 20
-    password: ${MYSQL_PASSWORD}
-    username: ${MYSQL_USERNAME}
+    driver-class-name: oracle.jdbc.OracleDriver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     properties:
       hibernate:

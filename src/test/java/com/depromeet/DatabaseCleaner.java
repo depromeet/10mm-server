@@ -28,14 +28,47 @@ public class DatabaseCleaner {
     private static void deleteAll(JdbcTemplate jdbcTemplate, EntityManager entityManager) {
         entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
         for (String tableName : findDatabaseTableNames(jdbcTemplate)) {
-            entityManager
-                    .createNativeQuery("TRUNCATE TABLE %s".formatted(tableName))
-                    .executeUpdate();
+            deleteDataFromTable(entityManager, tableName);
+            resetAutoIncrementColumn(jdbcTemplate, entityManager, tableName);
         }
         entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
     }
 
+    private static void deleteDataFromTable(EntityManager entityManager, String tableName) {
+        String deleteQuery = "DELETE FROM %s".formatted(tableName);
+        entityManager.createNativeQuery(deleteQuery).executeUpdate();
+    }
+
+    private static void resetAutoIncrementColumn(
+            JdbcTemplate jdbcTemplate, EntityManager entityManager, String tableName) {
+        String autoIncrementColumn = findAutoIncrementColumn(jdbcTemplate, tableName);
+        String resetQuery =
+                "ALTER TABLE %s ALTER COLUMN %s RESTART WITH 1"
+                        .formatted(tableName, autoIncrementColumn);
+        entityManager.createNativeQuery(resetQuery).executeUpdate();
+    }
+
+    private static String findAutoIncrementColumn(JdbcTemplate jdbcTemplate, String tableName) {
+        String query =
+                """
+			SELECT column_name FROM information_schema.columns
+			WHERE table_schema = ? AND table_name = ? AND is_identity = 'YES'
+			""";
+
+        List<String> columns =
+                jdbcTemplate.query(
+                        query, (rs, rowNum) -> rs.getString("column_name"), "PUBLIC", tableName);
+
+        return columns.getFirst();
+    }
+
     private static List<String> findDatabaseTableNames(JdbcTemplate jdbcTemplate) {
-        return jdbcTemplate.query("SHOW TABLES", (rs, rowNum) -> rs.getString(1)).stream().toList();
+        String query =
+                """
+			SELECT table_name FROM information_schema.tables
+			WHERE table_schema = ? AND table_type = 'BASE TABLE'
+			ORDER BY table_name
+			""";
+        return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("table_name"), "PUBLIC");
     }
 }

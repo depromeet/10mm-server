@@ -3,8 +3,8 @@ spring:
     activate:
       on-profile: "storage"
 storage:
-  accessKey: ${AWS_ACCESS_KEY:}
-  secretKey: ${AWS_SECRET_KEY:}
-  bucket: ${S3_BUCKET:}
-  region: ${AWS_REGION:}
-  endpoint: ${S3_ENDPOINT:https://s3.ap-northeast-2.amazonaws.com}
+  accessKey: ${STORAGE_ACCESS_KEY:}
+  secretKey: ${STORAGE_SECRET_KEY:}
+  bucket: ${STORAGE_BUCKET:}
+  region: ${STORAGE_REGION:ap-northeast-2}
+  endpoint: ${STORAGE_ENDPOINT:https://s3.ap-northeast-2.amazonaws.com}
