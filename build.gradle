@@ -4,7 +4,6 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.6'
     id 'com.diffplug.spotless' version '6.21.0'
     id 'jacoco'
-    id 'org.sonarqube' version '4.4.1.3373'
 }
 
 group = 'com.depromeet'
@@ -113,21 +112,6 @@ def jacocoExcludePatterns = [
         "**/error/**",
         "**/config/**"
 ]
-
-sonar {
-    properties {
-        property "sonar.projectKey", "depromeet_10mm-server"
-        property "sonar.organization", "depromeet-1"
-        property "sonar.host.url", "https://sonarcloud.io"
-        property 'sonar.sources', 'src'
-        property 'sonar.language', 'java'
-        property 'sonar.sourceEncoding', 'UTF-8'
-        property 'sonar.exclusions', jacocoExcludePatterns.join(',')
-        property 'sonar.test.inclusions', '**/*Test.java'
-        property 'sonar.java.coveragePlugin', 'jacoco'
-        property 'sonar.coverage.jacoco.xmlReportPaths', jacocoDir.get().file("jacoco/index.xml").asFile
-    }
-}
 
 jacoco {
     toolVersion = "0.8.12"
