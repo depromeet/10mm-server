@@ -1,9 +1,5 @@
 package com.depromeet.domain.image.application;
 
-import com.amazonaws.HttpMethod;
-import com.amazonaws.services.s3.Headers;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.depromeet.domain.image.dao.ImageRepository;
 import com.depromeet.domain.image.domain.Image;
 import com.depromeet.domain.image.domain.ImageFileExtension;
@@ -25,8 +21,6 @@ import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.ImageUtil;
 import com.depromeet.global.util.MemberUtil;
 import com.depromeet.global.util.SpringEnvironmentUtil;
-import com.depromeet.infra.config.s3.S3Properties;
-import java.util.Date;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,7 +33,6 @@ public class ImageService {
     private final MemberUtil memberUtil;
     private final SpringEnvironmentUtil springEnvironmentUtil;
     private final ImageUtil imageUtil;
-    private final S3Properties s3Properties;
     private final MissionRecordRepository missionRecordRepository;
     private final MissionRecordTtlRepository missionRecordTtlRepository;
     private final ImageRepository imageRepository;
@@ -191,26 +184,6 @@ public class ImageService {
                 + imageFileExtension.getUploadExtension();
     }
 
-    private String createUploadImageUrl(
-            ImageType imageType,
-            Long targetId,
-            String imageKey,
-            ImageFileExtension imageFileExtension) {
-        return s3Properties.endpoint()
-                + "/"
-                + s3Properties.bucket()
-                + "/"
-                + springEnvironmentUtil.getCurrentProfile()
-                + "/"
-                + imageType.getValue()
-                + "/"
-                + targetId
-                + "/"
-                + imageKey
-                + "."
-                + imageFileExtension.getUploadExtension();
-    }
-
     private String createReadImageUrl(
             ImageType imageType,
             Long targetId,
@@ -227,28 +200,6 @@ public class ImageService {
                 + imageKey
                 + "."
                 + imageFileExtension.getUploadExtension();
-    }
-
-    private GeneratePresignedUrlRequest createGeneratePreSignedUrlRequest(
-            String bucket, String fileName, String fileExtension) {
-        GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                new GeneratePresignedUrlRequest(bucket, fileName, HttpMethod.PUT)
-                        .withKey(fileName)
-                        .withContentType("image/" + fileExtension)
-                        .withExpiration(getPreSignedUrlExpiration());
-
-        generatePresignedUrlRequest.addRequestParameter(
-                Headers.S3_CANNED_ACL, CannedAccessControlList.PublicRead.toString());
-
-        return generatePresignedUrlRequest;
-    }
-
-    private Date getPreSignedUrlExpiration() {
-        Date expiration = new Date();
-        var expTimeMillis = expiration.getTime();
-        expTimeMillis += 1000 * 60 * 30;
-        expiration.setTime(expTimeMillis);
-        return expiration;
     }
 
     private void validateMissionRecordUserMismatch(Mission mission, Member member) {
