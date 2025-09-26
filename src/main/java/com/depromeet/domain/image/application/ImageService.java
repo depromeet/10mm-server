@@ -54,7 +54,7 @@ public class ImageService {
                         imageKey,
                         request.imageFileExtension());
 
-        String presignedUrl = imageUtil.createPreSignedUrl(fileName, request.imageFileExtension());
+        String presignedUrl = imageUtil.createUploadUrl(fileName, request.imageFileExtension());
 
         missionRecord.updateUploadStatusPending();
         missionRecordTtlRepository.deleteById(request.missionRecordId());
@@ -100,7 +100,7 @@ public class ImageService {
                         imageKey,
                         request.imageFileExtension());
 
-        String presignedUrl = imageUtil.createPreSignedUrl(fileName, request.imageFileExtension());
+        String presignedUrl = imageUtil.createUploadUrl(fileName, request.imageFileExtension());
 
         imageRepository.save(
                 Image.createImage(
