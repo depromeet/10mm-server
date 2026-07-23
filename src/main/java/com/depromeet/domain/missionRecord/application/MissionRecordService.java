@@ -21,6 +21,9 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,11 +41,14 @@ public class MissionRecordService {
     private final MissionRecordRepository missionRecordRepository;
     private final MissionRecordTtlRepository missionRecordTtlRepository;
 
+    private static final ExecutorService VIRTUAL_THREAD_EXECUTOR =
+            Executors.newVirtualThreadPerTaskExecutor();
+
     public MissionRecordCreateResponse createMissionRecord(MissionRecordCreateRequest request) {
         long diffHour = Duration.between(request.startedAt(), request.finishedAt()).toHours();
         validateMissionRecordDurationOverTime(diffHour);
 
-        final Mission mission = findMissionById(request.missionId());
+        final Mission mission = findMissionByIdAsync(request.missionId());
         final Member member = memberUtil.getCurrentMember();
 
         Duration duration =
@@ -79,6 +85,12 @@ public class MissionRecordService {
         if (missionRecordRepository.isCompletedMissionExistsToday(missionId)) {
             throw new CustomException(ErrorCode.MISSION_RECORD_ALREADY_EXISTS_TODAY);
         }
+    }
+
+    private Mission findMissionByIdAsync(Long missionId) {
+        return CompletableFuture.supplyAsync(
+                        () -> findMissionById(missionId), VIRTUAL_THREAD_EXECUTOR)
+                .join();
     }
 
     private Mission findMissionById(Long missionId) {
