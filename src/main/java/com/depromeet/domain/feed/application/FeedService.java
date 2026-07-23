@@ -4,7 +4,6 @@ import com.depromeet.domain.feed.domain.FeedVisibility;
 import com.depromeet.domain.feed.dto.response.FeedOneByProfileResponse;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
 import com.depromeet.domain.feed.dto.response.FeedSliceResponse;
-import com.depromeet.domain.follow.application.FollowService;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.member.dao.MemberRepository;
@@ -35,7 +34,6 @@ public class FeedService {
     private final MemberRelationRepository memberRelationRepository;
     private final SecurityUtil securityUtil;
     private final MemberRepository memberRepository;
-    private final FollowService followService;
 
     @Deprecated
     @Transactional(readOnly = true)
@@ -75,11 +73,10 @@ public class FeedService {
     }
 
     private Slice<FeedOneResponse> findFollowingFeedV2(int size, Long lastId) {
-        final Member currentMember = memberUtil.getCurrentMember();
-        List<Member> followingMembers = followService.getFollowingMembers(currentMember);
+        final Long currentMemberId = securityUtil.getCurrentMemberId();
 
         return missionRecordRepository
-                .findAllFetchByFollowings(size, lastId, followingMembers)
+                .findAllFetchByFollowings(size, lastId, currentMemberId)
                 .map(FeedOneResponse::from);
     }
 

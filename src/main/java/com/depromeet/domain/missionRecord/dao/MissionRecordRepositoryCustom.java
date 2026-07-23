@@ -32,6 +32,5 @@ public interface MissionRecordRepositoryCustom {
 
     Slice<MissionRecord> findAllFetch(int size, Long lastId);
 
-    Slice<MissionRecord> findAllFetchByFollowings(
-            int size, Long lastId, List<Member> followingMembers);
+    Slice<MissionRecord> findAllFetchByFollowings(int size, Long lastId, Long currentMemberId);
 }

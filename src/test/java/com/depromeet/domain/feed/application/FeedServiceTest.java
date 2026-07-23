@@ -228,6 +228,33 @@ class FeedServiceTest {
         assertThat(response.getContent()).hasSize(3);
     }
 
+    @Test
+    void 완료시간과_ID_순서가_달라도_중복없이_페이지네이션한다() {
+        // given
+        setFixture();
+        Mission mission = missionRepository.findById(1L).orElseThrow();
+        MissionRecord laterCreatedOlderRecord =
+                MissionRecord.createMissionRecord(
+                        Duration.ofMinutes(20),
+                        LocalDateTime.of(2024, 3, 2, 12, 40),
+                        LocalDateTime.of(2024, 3, 2, 13, 0),
+                        mission);
+        missionRecordRepository.save(laterCreatedOlderRecord);
+
+        // when
+        Slice<FeedOneResponse> firstPage = feedService.findFeedV2(FeedVisibility.ALL, 2, null);
+        Long lastId = firstPage.getContent().getLast().recordId();
+        Slice<FeedOneResponse> secondPage = feedService.findFeedV2(FeedVisibility.ALL, 2, lastId);
+
+        // then
+        assertThat(firstPage.getContent())
+                .extracting(FeedOneResponse::recordId)
+                .containsExactly(3L, 5L);
+        assertThat(secondPage.getContent())
+                .extracting(FeedOneResponse::recordId)
+                .containsExactly(2L, 1L);
+    }
+
     @Nested
     class 팔로잉_피드이면 {
 
