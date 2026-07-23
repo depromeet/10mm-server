@@ -1,20 +1,24 @@
 package com.depromeet.domain.missionRecord.dao;
 
+import static com.depromeet.domain.follow.domain.QMemberRelation.memberRelation;
 import static com.depromeet.domain.member.domain.QMember.*;
 import static com.depromeet.domain.mission.domain.MissionVisibility.*;
 import static com.depromeet.domain.mission.domain.QMission.*;
 import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
-import static com.depromeet.domain.reaction.domain.QReaction.*;
 
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import com.depromeet.domain.missionRecord.domain.QMissionRecord;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -137,12 +141,12 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                         .leftJoin(mission.member, member)
                         .on(mission.member.id.eq(missionRecord.mission.member.id))
                         .where(
-                                ltMissionRecordId(lastId),
+                                feedCursorCondition(lastId),
                                 missionRecord.mission.member.in(members),
                                 missionRecord.mission.visibility.in(visibilities),
                                 checkMissionVisibilityNone(),
                                 uploadStatusCompleteEq())
-                        .orderBy(missionRecord.finishedAt.desc())
+                        .orderBy(missionRecord.finishedAt.desc(), missionRecord.id.desc())
                         .limit((long) size + 1)
                         .fetch();
         return checkLastPage(size, feedList);
@@ -178,15 +182,8 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                         .fetchJoin()
                         .join(mission.member, member)
                         .fetchJoin()
-                        .leftJoin(missionRecord.reactions, reaction)
-                        .fetchJoin()
-                        .distinct()
-                        .where(
-                                ltMissionRecordId(lastId) != null
-                                        ? ltMissionRecordId(lastId)
-                                                .and(checkMissionVisibilityNone())
-                                        : checkMissionVisibilityNone())
-                        .orderBy(missionRecord.finishedAt.desc())
+                        .where(feedCursorCondition(lastId), checkMissionVisibilityNone())
+                        .orderBy(missionRecord.finishedAt.desc(), missionRecord.id.desc())
                         .limit((long) size + 1)
                         .fetch();
 
@@ -197,7 +194,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
 
     @Override
     public Slice<MissionRecord> findAllFetchByFollowings(
-            int size, Long lastId, List<Member> followingMembers) {
+            int size, Long lastId, Long currentMemberId) {
 
         List<MissionRecord> missionRecords =
                 jpaQueryFactory
@@ -206,11 +203,9 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                         .fetchJoin()
                         .join(mission.member, member)
                         .fetchJoin()
-                        .where(
-                                ltMissionRecordId(lastId),
-                                missionRecord.mission.member.in(followingMembers))
+                        .where(feedCursorCondition(lastId), followingMemberExists(currentMemberId))
                         .where(mission.visibility.in(List.of(ALL, FOLLOWER)))
-                        .orderBy(missionRecord.finishedAt.desc())
+                        .orderBy(missionRecord.finishedAt.desc(), missionRecord.id.desc())
                         .limit((long) size + 1)
                         .fetch();
 
@@ -239,12 +234,33 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
         return missionRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE);
     }
 
-    // no-offset 방식 처리하는 메서드
-    private BooleanExpression ltMissionRecordId(Long lastId) {
+    private BooleanExpression feedCursorCondition(Long lastId) {
         if (lastId == null) {
             return null;
         }
-        return missionRecord.id.lt(lastId);
+
+        QMissionRecord cursorMissionRecord = new QMissionRecord("cursorMissionRecord");
+        JPQLQuery<LocalDateTime> cursorFinishedAt =
+                JPAExpressions.select(cursorMissionRecord.finishedAt)
+                        .from(cursorMissionRecord)
+                        .where(cursorMissionRecord.id.eq(lastId));
+        BooleanExpression cursorExists =
+                JPAExpressions.selectOne()
+                        .from(cursorMissionRecord)
+                        .where(cursorMissionRecord.id.eq(lastId))
+                        .exists();
+
+        BooleanExpression afterCursor =
+                missionRecord
+                        .finishedAt
+                        .lt(cursorFinishedAt)
+                        .or(
+                                missionRecord
+                                        .finishedAt
+                                        .eq(cursorFinishedAt)
+                                        .and(missionRecord.id.lt(lastId)));
+
+        return afterCursor.or(cursorExists.not().and(missionRecord.id.lt(lastId)));
     }
 
     // 무한 스크롤 방식 처리하는 메서드
@@ -272,5 +288,14 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
 
     private BooleanExpression checkMissionVisibilityNone() {
         return mission.visibility.ne(MissionVisibility.NONE);
+    }
+
+    private BooleanExpression followingMemberExists(Long currentMemberId) {
+        return JPAExpressions.selectOne()
+                .from(memberRelation)
+                .where(
+                        memberRelation.source.id.eq(currentMemberId),
+                        memberRelation.target.id.eq(member.id))
+                .exists();
     }
 }
