@@ -26,7 +26,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
             join fetch notification.targetMember
             where notification.targetMember.id = :targetMemberId
               and (
-                    :cursorCreatedAt is null
+                    cast(:cursorCreatedAt as LocalDateTime) is null
                     or notification.createdAt < :cursorCreatedAt
                     or (
                         notification.createdAt = :cursorCreatedAt

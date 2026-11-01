@@ -137,7 +137,7 @@ public class MemberService {
         Integer cursorPriority = null;
         String cursorNickname = null;
         Long cursorMemberId = null;
-        if (cursor != null) {
+        if (cursor != null && !cursor.isBlank()) {
             List<String> values = cursorCodec.decode(cursor, 3);
             cursorPriority = cursorCodec.integerValue(values, 0);
             cursorNickname = values.get(1);

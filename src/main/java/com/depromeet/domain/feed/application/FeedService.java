@@ -160,7 +160,9 @@ public class FeedService {
         memberUtil.getMemberByMemberId(targetId);
         Long viewerId = securityUtil.getCurrentMemberId();
         Long lastId =
-                cursor == null ? null : cursorCodec.longValue(cursorCodec.decode(cursor, 1), 0);
+                cursor == null || cursor.isBlank()
+                        ? null
+                        : cursorCodec.longValue(cursorCodec.decode(cursor, 1), 0);
         List<FeedOneByProfileResponse> rows =
                 missionRecordRepository.findProfileFeedPage(targetId, viewerId, lastId, size + 1);
         boolean hasNext = rows.size() > size;

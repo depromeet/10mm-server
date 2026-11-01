@@ -675,11 +675,14 @@ class FollowServiceTest {
         long queryCount = sessionFactory.getStatistics().getPrepareStatementCount();
         CursorSliceResponse<MemberSearchResponse> secondPage =
                 followService.findMyFollowingPage(2, firstPage.nextCursor());
+        CursorSliceResponse<MemberSearchResponse> emptyCursorPage =
+                followService.findMyFollowingPage(2, "");
 
         // then
         assertTrue(firstPage.hasNext());
         assertFalse(secondPage.hasNext());
         assertEquals(2L, queryCount);
+        assertEquals(firstPage, emptyCursorPage);
         assertEquals(
                 3,
                 Stream.concat(firstPage.content().stream(), secondPage.content().stream())

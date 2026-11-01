@@ -97,7 +97,7 @@ public class NotificationService {
         Long memberId = securityUtil.getCurrentMemberId();
         LocalDateTime cursorCreatedAt = null;
         Long cursorNotificationId = null;
-        if (cursor != null) {
+        if (cursor != null && !cursor.isBlank()) {
             List<String> values = cursorCodec.decode(cursor, 2);
             cursorCreatedAt = cursorCodec.dateTimeValue(values, 0);
             cursorNotificationId = cursorCodec.longValue(values, 1);

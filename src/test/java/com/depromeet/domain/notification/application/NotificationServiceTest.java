@@ -276,10 +276,13 @@ class NotificationServiceTest {
                 notificationService.findNotificationPage(2, null);
         CursorSliceResponse<NotificationFindAllResponse> secondPage =
                 notificationService.findNotificationPage(2, firstPage.nextCursor());
+        CursorSliceResponse<NotificationFindAllResponse> emptyCursorPage =
+                notificationService.findNotificationPage(2, "");
 
         // then
         assertTrue(firstPage.hasNext());
         assertFalse(secondPage.hasNext());
+        assertEquals(firstPage, emptyCursorPage);
         assertEquals(
                 3,
                 Stream.concat(firstPage.content().stream(), secondPage.content().stream())

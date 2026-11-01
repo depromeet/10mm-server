@@ -323,11 +323,14 @@ class MemberServiceTest {
                     memberService.searchMemberNicknameV2("도모", 2, null);
             CursorSliceResponse<MemberSearchResponse> secondPage =
                     memberService.searchMemberNicknameV2("도모", 2, firstPage.nextCursor());
+            CursorSliceResponse<MemberSearchResponse> emptyCursorPage =
+                    memberService.searchMemberNicknameV2("도모", 2, "");
 
             // then
             assertTrue(firstPage.hasNext());
             assertFalse(secondPage.hasNext());
             assertEquals("도모", firstPage.content().getFirst().nickname());
+            assertEquals(firstPage, emptyCursorPage);
             assertEquals(
                     3,
                     java.util.stream.Stream.concat(

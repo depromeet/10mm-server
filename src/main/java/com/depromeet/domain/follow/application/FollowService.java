@@ -240,7 +240,7 @@ public class FollowService {
             Long targetId, int size, String cursor, boolean followerDirection) {
         LocalDateTime cursorCreatedAt = null;
         Long cursorRelationId = null;
-        if (cursor != null) {
+        if (cursor != null && !cursor.isBlank()) {
             List<String> values = cursorCodec.decode(cursor, 2);
             cursorCreatedAt = cursorCodec.dateTimeValue(values, 0);
             cursorRelationId = cursorCodec.longValue(values, 1);
