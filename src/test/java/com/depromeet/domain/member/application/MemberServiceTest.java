@@ -14,6 +14,7 @@ import com.depromeet.domain.member.domain.Profile;
 import com.depromeet.domain.member.dto.request.NicknameUpdateRequest;
 import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.member.dto.response.MemberSocialInfoResponse;
+import com.depromeet.global.common.response.CursorSliceResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.security.PrincipalDetails;
@@ -304,6 +305,36 @@ class MemberServiceTest {
 
             // 재현이만 도모를 팔로우하고있다.
             assertEquals(FollowStatus.FOLLOWED_BY_ME, responses.get(2).followStatus());
+        }
+
+        @Test
+        void 회원검색_V2는_복합_커서로_중복없이_페이지네이션한다() {
+            // given
+            memberRepository.save(
+                    Member.createNormalMember(Profile.createProfile("current", "current")));
+            memberRepository.saveAll(
+                    List.of(
+                            Member.createNormalMember(Profile.createProfile("도모", "image1")),
+                            Member.createNormalMember(Profile.createProfile("가도모", "image2")),
+                            Member.createNormalMember(Profile.createProfile("나도모", "image3"))));
+
+            // when
+            CursorSliceResponse<MemberSearchResponse> firstPage =
+                    memberService.searchMemberNicknameV2("도모", 2, null);
+            CursorSliceResponse<MemberSearchResponse> secondPage =
+                    memberService.searchMemberNicknameV2("도모", 2, firstPage.nextCursor());
+
+            // then
+            assertTrue(firstPage.hasNext());
+            assertFalse(secondPage.hasNext());
+            assertEquals("도모", firstPage.content().getFirst().nickname());
+            assertEquals(
+                    3,
+                    java.util.stream.Stream.concat(
+                                    firstPage.content().stream(), secondPage.content().stream())
+                            .map(MemberSearchResponse::memberId)
+                            .distinct()
+                            .count());
         }
     }
 

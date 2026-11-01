@@ -6,11 +6,15 @@ import com.depromeet.domain.feed.dto.response.FeedOneByProfileResponse;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
 import com.depromeet.domain.feed.dto.response.FeedSliceResponse;
 import com.depromeet.domain.mission.domain.MissionVisibility;
+import com.depromeet.global.common.response.CursorSliceResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Validated
 @Tag(name = "7. [피드]", description = "피드 관련 API입니다.")
 @RequestMapping("/feed")
 @RequiredArgsConstructor
@@ -45,7 +50,7 @@ public class FeedController {
     @Operation(summary = "피드 탭 V2 (페이지네이션)", description = "피드 탭을 조회합니다.")
     @GetMapping("/me/v2")
     public Slice<FeedOneResponse> feedFindByPageV2(
-            @RequestParam int size,
+            @RequestParam @Min(1) @Max(50) int size,
             @RequestParam(required = false) Long lastId,
             @RequestParam(required = false) FeedVisibility visibility) {
         return feedService.findFeedV2(visibility, size, lastId);
@@ -55,5 +60,14 @@ public class FeedController {
     @GetMapping("/{memberId}")
     public List<FeedOneByProfileResponse> feedFindAllByTargetId(@PathVariable Long memberId) {
         return feedService.findAllFeedByTargetId(memberId);
+    }
+
+    @Operation(summary = "프로필 피드 V2", description = "cursor 기반으로 프로필 피드를 조회합니다.")
+    @GetMapping("/{memberId}/v2")
+    public CursorSliceResponse<FeedOneByProfileResponse> feedFindAllByTargetIdV2(
+            @PathVariable Long memberId,
+            @RequestParam(defaultValue = "20") @Min(1) @Max(50) int size,
+            @RequestParam(required = false) String cursor) {
+        return feedService.findProfileFeedV2(memberId, size, cursor);
     }
 }

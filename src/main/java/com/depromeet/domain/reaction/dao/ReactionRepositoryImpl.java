@@ -29,4 +29,15 @@ public class ReactionRepositoryImpl implements ReactionRepositoryCustom {
                 .fetchJoin()
                 .transform(groupBy(reaction.emojiType).as(list(reaction)));
     }
+
+    @Override
+    public List<Reaction> findAllWithMemberByMissionRecordIdIn(List<Long> missionRecordIds) {
+        return jpaQueryFactory
+                .selectFrom(reaction)
+                .innerJoin(reaction.member)
+                .fetchJoin()
+                .where(reaction.missionRecord.id.in(missionRecordIds))
+                .orderBy(reaction.createdAt.desc())
+                .fetch();
+    }
 }

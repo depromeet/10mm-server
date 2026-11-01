@@ -6,6 +6,7 @@ import com.depromeet.domain.auth.dao.RefreshTokenRepository;
 import com.depromeet.domain.auth.dto.request.UsernameCheckRequest;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
+import com.depromeet.domain.follow.dto.response.MemberRelationPair;
 import com.depromeet.domain.image.domain.ImageFileExtension;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
@@ -18,14 +19,17 @@ import com.depromeet.domain.member.dto.response.MemberFindOneResponse;
 import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.member.dto.response.MemberSocialInfoResponse;
 import com.depromeet.domain.notification.application.FcmService;
+import com.depromeet.global.common.response.CursorSliceResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
+import com.depromeet.global.util.CursorCodec;
 import com.depromeet.global.util.MemberUtil;
+import com.depromeet.global.util.SecurityUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +47,8 @@ public class MemberService {
     private final MemberRelationRepository memberRelationRepository;
     private final MemberUtil memberUtil;
     private final FcmService fcmService;
+    private final CursorCodec cursorCodec;
+    private final SecurityUtil securityUtil;
 
     @Transactional(readOnly = true)
     public MemberFindOneResponse findMemberInfo() {
@@ -98,50 +104,81 @@ public class MemberService {
                 memberRelationRepository.findAllBySourceIdAndTargetIn(
                         currentMember.getId(), members);
         List<MemberRelation> memberRelationByTargetId =
-                memberRelationRepository.findAllByTargetId(currentMember.getId());
+                memberRelationRepository.findAllByTargetIdAndSourceIn(
+                        currentMember.getId(), members);
+        Set<Long> followingIds =
+                memberRelationBySourceId.stream()
+                        .map(relation -> relation.getTarget().getId())
+                        .collect(Collectors.toSet());
+        Set<Long> followerIds =
+                memberRelationByTargetId.stream()
+                        .map(relation -> relation.getSource().getId())
+                        .collect(Collectors.toSet());
 
-        List<MemberSearchResponse> response = new ArrayList<>();
-        for (Member member : members) {
-            boolean existRelation = false;
-            for (MemberRelation memberRelation : memberRelationBySourceId) {
-                if (member.getId().equals(memberRelation.getTarget().getId())) {
-                    existRelation = true;
-                    break;
-                }
-            }
+        return members.stream()
+                .map(member -> MemberSearchResponse.of(member, followingIds, followerIds))
+                .sorted(
+                        Comparator.comparing(
+                                        (MemberSearchResponse response) ->
+                                                response.nickname().equals(nickname) ? 0 : 1)
+                                .thenComparing(MemberSearchResponse::nickname))
+                .toList();
+    }
 
-            if (existRelation) { // 닉네임 검색한 애들 중 내가 팔로우한 애라면
-                response.add(MemberSearchResponse.toFollowingResponse(member));
-                continue;
-            }
-
-            // 내가 팔로우를 하지 않았을 때
-            Optional<MemberRelation> optionalMemberRelation =
-                    memberRelationByTargetId.stream()
-                            .filter(
-                                    memberRelation ->
-                                            member.getId()
-                                                    .equals(memberRelation.getSource().getId()))
-                            .findFirst();
-            if (optionalMemberRelation.isPresent()) { // 상대방만 나를 팔로우 하고 있을  때
-                response.add(MemberSearchResponse.toFollowedByMeResponse(member));
-                continue;
-            }
-
-            // 아니라면 서로 팔로우가 아닌 상태
-            response.add(MemberSearchResponse.toNotFollowingResponse(member));
+    @Transactional(readOnly = true)
+    public CursorSliceResponse<MemberSearchResponse> searchMemberNicknameV2(
+            String nickname, int size, String cursor) {
+        final Long currentMemberId = securityUtil.getCurrentMemberId();
+        final String escapingNickname = escapeSpecialCharacters(nickname);
+        if (escapingNickname.isBlank()) {
+            return CursorSliceResponse.of(List.of(), null, false);
         }
-        response =
-                response.stream()
-                        .sorted(Comparator.comparing(MemberSearchResponse::nickname))
-                        .sorted(
-                                Comparator.comparing(
-                                        MemberSearchResponse ->
-                                                MemberSearchResponse.nickname().equals(nickname)
-                                                        ? 0
-                                                        : 1))
-                        .collect(Collectors.toList());
-        return response;
+
+        Integer cursorPriority = null;
+        String cursorNickname = null;
+        Long cursorMemberId = null;
+        if (cursor != null) {
+            List<String> values = cursorCodec.decode(cursor, 3);
+            cursorPriority = cursorCodec.integerValue(values, 0);
+            cursorNickname = values.get(1);
+            cursorMemberId = cursorCodec.longValue(values, 2);
+        }
+
+        List<Member> members =
+                memberRepository.nicknameSearchPage(
+                        escapingNickname,
+                        currentMemberId,
+                        cursorPriority,
+                        cursorNickname,
+                        cursorMemberId,
+                        size + 1);
+        boolean hasNext = members.size() > size;
+        if (hasNext) {
+            members = new ArrayList<>(members.subList(0, size));
+        }
+
+        List<Long> memberIds = members.stream().map(Member::getId).toList();
+        List<MemberRelationPair> relations =
+                memberRelationRepository.findRelationsBetween(currentMemberId, memberIds);
+        Set<Long> followingIds = MemberRelationPair.followingIds(relations, currentMemberId);
+        Set<Long> followerIds = MemberRelationPair.followerIds(relations, currentMemberId);
+        List<MemberSearchResponse> content =
+                members.stream()
+                        .map(member -> MemberSearchResponse.of(member, followingIds, followerIds))
+                        .toList();
+
+        String nextCursor = null;
+        if (hasNext && !members.isEmpty()) {
+            Member lastMember = members.getLast();
+            int exactMatchPriority =
+                    lastMember.getProfile().getNickname().equals(escapingNickname) ? 0 : 1;
+            nextCursor =
+                    cursorCodec.encode(
+                            exactMatchPriority,
+                            lastMember.getProfile().getNickname(),
+                            lastMember.getId());
+        }
+        return CursorSliceResponse.of(content, nextCursor, hasNext);
     }
 
     public void withdrawal() {

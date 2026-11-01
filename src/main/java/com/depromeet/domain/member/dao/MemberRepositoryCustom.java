@@ -6,4 +6,12 @@ import java.util.List;
 
 public interface MemberRepositoryCustom {
     List<Member> findMissionNonCompletedMembers(LocalDateTime today);
+
+    List<Member> nicknameSearchPage(
+            String nickname,
+            Long currentMemberId,
+            Integer cursorPriority,
+            String cursorNickname,
+            Long cursorMemberId,
+            int limit);
 }

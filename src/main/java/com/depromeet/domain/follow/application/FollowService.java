@@ -10,19 +10,21 @@ import com.depromeet.domain.follow.dto.response.*;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.dto.response.MemberSearchResponse;
-import com.depromeet.domain.mission.domain.Mission;
-import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
-import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.notification.application.FcmService;
 import com.depromeet.domain.notification.dao.NotificationRepository;
 import com.depromeet.domain.notification.domain.Notification;
 import com.depromeet.domain.notification.domain.NotificationType;
+import com.depromeet.global.common.response.CursorSliceResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
+import com.depromeet.global.util.CursorCodec;
 import com.depromeet.global.util.MemberUtil;
+import com.depromeet.global.util.SecurityUtil;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,10 @@ public class FollowService {
     private final MemberRepository memberRepository;
     private final MemberRelationRepository memberRelationRepository;
     private final FcmService fcmService;
+    private final FollowSummaryQueryService followSummaryQueryService;
+    private final ApplicationEventPublisher eventPublisher;
+    private final CursorCodec cursorCodec;
+    private final SecurityUtil securityUtil;
 
     public void createFollow(FollowCreateRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
@@ -63,6 +69,7 @@ public class FollowService {
                         currentMember.getId());
         notificationRepository.save(notification);
         memberRelationRepository.save(memberRelation);
+        publishRelationChanged(currentMember.getId(), targetMember.getId());
     }
 
     public FollowerDeletedResponse deleteFollow(FollowDeleteRequest request) {
@@ -86,6 +93,7 @@ public class FollowService {
         Optional<MemberRelation> optionalMemberRelation =
                 memberRelationRepository.findBySourceIdAndTargetId(
                         targetMember.getId(), currentMember.getId());
+        publishRelationChanged(currentMember.getId(), targetMember.getId());
 
         return optionalMemberRelation.isPresent()
                 ? FollowerDeletedResponse.from(FollowStatus.FOLLOWED_BY_ME)
@@ -97,99 +105,38 @@ public class FollowService {
         final Member currentMember = memberUtil.getCurrentMember();
         final Member targetMember = getTargetMember(targetId);
 
-        Long followingCount = memberRelationRepository.countBySourceId(targetMember.getId());
-        Long followerCount = memberRelationRepository.countByTargetId(targetMember.getId());
-
-        boolean isFollowing =
-                memberRelationRepository.existsBySourceIdAndTargetId(
+        FollowStatusProjection followStatusProjection =
+                memberRelationRepository.findFollowStatus(
                         currentMember.getId(), targetMember.getId());
-        boolean isFollowedByMe =
-                memberRelationRepository.existsBySourceIdAndTargetId(
-                        targetMember.getId(), currentMember.getId());
-        FollowStatus followStatus = determineFollowStatus(isFollowing, isFollowedByMe);
+        FollowSummary followSummary = followSummaryQueryService.find(targetMember.getId());
+        FollowStatus followStatus =
+                determineFollowStatus(
+                        followStatusProjection.getFollowing(),
+                        followStatusProjection.getFollowedByMe());
 
-        return FollowFindTargetInfoResponse.of(followingCount, followerCount, followStatus);
+        return FollowFindTargetInfoResponse.of(
+                followSummary.followingCount(), followSummary.followerCount(), followStatus);
     }
 
     @Transactional(readOnly = true)
     public FollowFindMeInfoResponse findMeFollowInfo() {
         final Member currentMember = memberUtil.getCurrentMember();
 
-        Long followingCount = memberRelationRepository.countBySourceId(currentMember.getId());
-        Long followerCount = memberRelationRepository.countByTargetId(currentMember.getId());
-
-        return FollowFindMeInfoResponse.of(followingCount, followerCount);
+        FollowSummary followSummary = followSummaryQueryService.find(currentMember.getId());
+        return FollowFindMeInfoResponse.of(
+                followSummary.followingCount(), followSummary.followerCount());
     }
 
-    @Transactional(readOnly = true) // TODO: 로직 개선 필요
+    @Transactional(readOnly = true)
     public List<MemberFollowedResponse> findAllFollowedMember() {
         final Member currentMember = memberUtil.getCurrentMember();
-        List<MemberRelation> followedMemberList =
-                memberRelationRepository.findAllBySourceId(currentMember.getId());
-
-        // 결과를 반환하는 List
-        List<MemberFollowedResponse> result = new ArrayList<>();
-
-        // 당일 미션 기록이 존재하여 미션기록의 순서로 정렬이 될 회원들이 담길 Map
-        Map<Member, LocalDateTime> sortedByMemberMissionRecordMap = new HashMap<>();
-
-        // 당일 미션 기록이 존재하지 않아서 팔로우 시간 순서로 정렬이 될 회원들이 담길 Map
-        Map<Member, LocalDateTime> sortedByMemberRelationMap = new HashMap<>();
-
-        for (MemberRelation memberRelation : followedMemberList) {
-            Member targetMember = memberRelation.getTarget();
-            List<Mission> targetMemberMissions = targetMember.getMissions();
-            boolean isTargetMemberHasMissionTodayComplete = false;
-            for (Mission mission : targetMemberMissions) {
-                List<MissionRecord> targetMemberMissionRecords = mission.getMissionRecords();
-
-                // 완료한 미션기록이고 오늘인 미션기록 찾기
-                Optional<MissionRecord> optionalMissionRecord =
-                        targetMemberMissionRecords.stream()
-                                .filter(
-                                        record ->
-                                                record.getUploadStatus()
-                                                                == ImageUploadStatus.COMPLETE
-                                                        && isToday(record.getStartedAt()))
-                                .max(Comparator.comparing(MissionRecord::getStartedAt));
-
-                // 있다면 미션 기록들 중에서 시간비교를 해야하기 때문에 sortedByMemberMissionRecordMap에 저장
-                if (optionalMissionRecord.isPresent()) {
-                    isTargetMemberHasMissionTodayComplete = true;
-                    sortedByMemberMissionRecordMap.put(
-                            targetMember, optionalMissionRecord.get().getStartedAt());
-                    break;
-                }
-            }
-
-            // 없다면 팔로우 시간 순서로 비교 해야하기 때문에 sortedByMemberRelationMap에 저장
-            if (!isTargetMemberHasMissionTodayComplete) {
-                sortedByMemberRelationMap.put(targetMember, memberRelation.getCreatedAt());
-            }
-        }
-
-        // (정렬조건 1번째) 당일 미션 기록이 존재하는 회원들 먼저 result에 저장
-        sortedByMemberMissionRecordMap.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
-                .forEach(entry -> result.add(MemberFollowedResponse.of(entry.getKey())));
-
-        // (정렬조건 2번째) 미션 기록이 존재하지 않는 회원들은 팔로우 시간으로 result에 저장
-        sortedByMemberRelationMap.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
-                .forEach(entry -> result.add(MemberFollowedResponse.of(entry.getKey())));
-
-        return result;
+        return memberRelationRepository.findAllFollowedMemberResponses(currentMember.getId());
     }
 
     private void validateSelfFollow(Long expectedId, Long actualId) {
         if (expectedId.equals(actualId)) {
             throw new CustomException(ErrorCode.FOLLOW_SELF_NOT_ALLOWED);
         }
-    }
-
-    private boolean isToday(LocalDateTime dateTime) {
-        LocalDateTime today = LocalDateTime.now();
-        return dateTime.toLocalDate().isEqual(today.toLocalDate());
     }
 
     private FollowStatus determineFollowStatus(boolean isFollowing, boolean isFollowedByMe) {
@@ -218,37 +165,39 @@ public class FollowService {
         final Member currentMember = memberUtil.getCurrentMember();
         Member targetMember = getTargetMember(targetId);
 
-        List<MemberSearchResponse> followingList = new ArrayList<>();
-        List<MemberSearchResponse> followerList = new ArrayList<>();
-
-        List<MemberRelation> targetMemberSources =
-                memberRelationRepository.findAllBySourceId(targetMember.getId());
-        List<MemberRelation> targetMemberTargets =
-                memberRelationRepository.findAllByTargetId(targetMember.getId());
-
-        List<MemberRelation> currentMemberSources =
-                memberRelationRepository.findAllBySourceId(currentMember.getId());
-        List<MemberRelation> currentMemberTargets =
-                memberRelationRepository.findAllByTargetId(currentMember.getId());
-
         // target 유저의 팔로잉
         List<Member> followingMembers =
-                targetMemberSources.stream().map(MemberRelation::getTarget).toList();
+                memberRelationRepository.findAllBySourceId(targetMember.getId()).stream()
+                        .map(MemberRelation::getTarget)
+                        .toList();
 
         // target 유저의 팔로워
         List<Member> followerMembers =
-                targetMemberTargets.stream().map(MemberRelation::getSource).toList();
+                memberRelationRepository.findAllByTargetId(targetMember.getId()).stream()
+                        .map(MemberRelation::getSource)
+                        .toList();
 
-        // 팔로잉 리스트 구하기
-        getFollowStatusIncludeList(
-                followingMembers, currentMemberSources, followingList, currentMemberTargets);
-
-        // 팔로워 리스트 구하기
-        getFollowStatusIncludeList(
-                followerMembers, currentMemberSources, followerList, currentMemberTargets);
+        List<Long> memberIds =
+                Stream.concat(followingMembers.stream(), followerMembers.stream())
+                        .map(Member::getId)
+                        .distinct()
+                        .toList();
+        List<MemberRelationPair> relations =
+                memberRelationRepository.findRelationsBetween(currentMember.getId(), memberIds);
+        Set<Long> followingIds = MemberRelationPair.followingIds(relations, currentMember.getId());
+        Set<Long> followerIds = MemberRelationPair.followerIds(relations, currentMember.getId());
 
         return FollowListResponse.of(
-                targetMember.getProfile().getNickname(), followingList, followerList);
+                targetMember.getProfile().getNickname(),
+                toSearchResponses(followingMembers, followingIds, followerIds),
+                toSearchResponses(followerMembers, followingIds, followerIds));
+    }
+
+    private static List<MemberSearchResponse> toSearchResponses(
+            List<Member> members, Set<Long> followingIds, Set<Long> followerIds) {
+        return members.stream()
+                .map(member -> MemberSearchResponse.of(member, followingIds, followerIds))
+                .toList();
     }
 
     public FollowerDeletedResponse deleteFollower(Long targetId) {
@@ -264,45 +213,74 @@ public class FollowService {
         Optional<MemberRelation> optionalMemberRelation =
                 memberRelationRepository.findBySourceIdAndTargetId(
                         currentMember.getId(), targetMember.getId());
+        publishRelationChanged(targetMember.getId(), currentMember.getId());
         return optionalMemberRelation.isPresent()
                 ? FollowerDeletedResponse.from(FollowStatus.FOLLOWING)
                 : FollowerDeletedResponse.from(FollowStatus.NOT_FOLLOWING);
     }
 
-    private static void getFollowStatusIncludeList(
-            List<Member> targetMembers,
-            List<MemberRelation> currentMemberSources,
-            List<MemberSearchResponse> resultList,
-            List<MemberRelation> currentMemberTargets) {
-        for (Member member : targetMembers) {
-            boolean existRelation = false;
-            for (MemberRelation memberRelation : currentMemberSources) {
-                if (member.getId().equals(memberRelation.getTarget().getId())) {
-                    existRelation = true;
-                    break;
-                }
-            }
+    @Transactional(readOnly = true)
+    public CursorSliceResponse<MemberSearchResponse> findFollowingPage(
+            Long targetId, int size, String cursor) {
+        return findFollowMemberPage(targetId, size, cursor, false);
+    }
 
-            if (existRelation) { // 조회 된 애들 중 내가 팔로우한 애라면
-                resultList.add(MemberSearchResponse.toFollowingResponse(member));
-                continue;
-            }
+    @Transactional(readOnly = true)
+    public CursorSliceResponse<MemberSearchResponse> findFollowerPage(
+            Long targetId, int size, String cursor) {
+        return findFollowMemberPage(targetId, size, cursor, true);
+    }
 
-            // 내가 팔로우를 하지 않았을 때
-            Optional<MemberRelation> optionalMemberRelation =
-                    currentMemberTargets.stream()
-                            .filter(
-                                    memberRelation ->
-                                            member.getId()
-                                                    .equals(memberRelation.getSource().getId()))
-                            .findFirst();
-            if (optionalMemberRelation.isPresent()) { // 상대방만 나를 팔로우 하고 있을  때
-                resultList.add(MemberSearchResponse.toFollowedByMeResponse(member));
-                continue;
-            }
+    @Transactional(readOnly = true)
+    public CursorSliceResponse<MemberSearchResponse> findMyFollowingPage(int size, String cursor) {
+        return findFollowMemberPage(securityUtil.getCurrentMemberId(), size, cursor, false);
+    }
 
-            // 아니라면 서로 팔로우가 아닌 상태
-            resultList.add(MemberSearchResponse.toNotFollowingResponse(member));
+    private CursorSliceResponse<MemberSearchResponse> findFollowMemberPage(
+            Long targetId, int size, String cursor, boolean followerDirection) {
+        LocalDateTime cursorCreatedAt = null;
+        Long cursorRelationId = null;
+        if (cursor != null) {
+            List<String> values = cursorCodec.decode(cursor, 2);
+            cursorCreatedAt = cursorCodec.dateTimeValue(values, 0);
+            cursorRelationId = cursorCodec.longValue(values, 1);
         }
+
+        List<FollowMemberPageRow> rows =
+                followerDirection
+                        ? memberRelationRepository.findFollowerPage(
+                                targetId, cursorCreatedAt, cursorRelationId, size + 1)
+                        : memberRelationRepository.findFollowingPage(
+                                targetId, cursorCreatedAt, cursorRelationId, size + 1);
+        boolean hasNext = rows.size() > size;
+        if (hasNext) {
+            rows = new ArrayList<>(rows.subList(0, size));
+        }
+        if (rows.isEmpty()) {
+            getTargetMember(targetId);
+        }
+
+        Long viewerId = securityUtil.getCurrentMemberId();
+        List<Long> memberIds = rows.stream().map(row -> row.member().getId()).toList();
+        List<MemberRelationPair> relations =
+                memberRelationRepository.findRelationsBetween(viewerId, memberIds);
+        Set<Long> followingIds = MemberRelationPair.followingIds(relations, viewerId);
+        Set<Long> followerIds = MemberRelationPair.followerIds(relations, viewerId);
+
+        List<MemberSearchResponse> content =
+                toSearchResponses(
+                        rows.stream().map(FollowMemberPageRow::member).toList(),
+                        followingIds,
+                        followerIds);
+        String nextCursor =
+                hasNext && !rows.isEmpty()
+                        ? cursorCodec.encode(
+                                rows.getLast().createdAt(), rows.getLast().relationId())
+                        : null;
+        return CursorSliceResponse.of(content, nextCursor, hasNext);
+    }
+
+    private void publishRelationChanged(Long sourceMemberId, Long targetMemberId) {
+        eventPublisher.publishEvent(new FollowRelationChangedEvent(sourceMemberId, targetMemberId));
     }
 }

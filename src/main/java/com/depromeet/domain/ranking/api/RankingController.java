@@ -18,7 +18,11 @@ public class RankingController {
 
     private final RankingService rankingService;
 
-    @Operation(summary = "랭킹 조회", description = "랭킹을 조회합니다.")
+    @Deprecated
+    @Operation(
+            summary = "랭킹 조회",
+            description = "랭킹을 조회합니다. 이 API는 더 이상 갱신되지 않으며 다음 릴리스에서 제거될 예정입니다.",
+            deprecated = true)
     @GetMapping
     public List<RankingResponse> rankingFindAll() {
         return rankingService.findAllRanking();

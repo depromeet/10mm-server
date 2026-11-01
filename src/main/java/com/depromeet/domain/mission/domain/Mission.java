@@ -16,10 +16,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -142,6 +144,13 @@ public class Mission extends BaseTimeEntity {
                                         && record.getUploadStatus() == ImageUploadStatus.COMPLETE)
                 .findFirst()
                 .isPresent();
+    }
+
+    /** 해당 일자에 수행한 미션 기록 (미션당 하루 한 건) */
+    public Optional<MissionRecord> findRecordByDate(LocalDate date) {
+        return this.missionRecords.stream()
+                .filter(record -> record.getStartedAt().toLocalDate().equals(date))
+                .findFirst();
     }
 
     public boolean isFinished() {

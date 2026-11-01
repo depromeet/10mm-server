@@ -21,16 +21,16 @@ import com.depromeet.domain.reaction.dao.ReactionRepository;
 import com.depromeet.domain.reaction.domain.EmojiType;
 import com.depromeet.domain.reaction.domain.Reaction;
 import com.depromeet.global.security.PrincipalDetails;
+import jakarta.persistence.EntityManagerFactory;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -48,6 +48,7 @@ class FeedServiceTest {
     @Autowired private ReactionRepository reactionRepository;
     @Autowired private CommentRepository commentRepository;
     @Autowired private MemberRelationRepository memberRelationRepository;
+    @Autowired private EntityManagerFactory entityManagerFactory;
 
     private void logoutAndReloginAs(Long memberId) {
         SecurityContextHolder.clearContext(); // 현재 회원 로그아웃
@@ -149,8 +150,12 @@ class FeedServiceTest {
                         LocalDateTime.of(2024, 3, 4, 12, 45),
                         mission4);
 
-        missionRecordRepository.saveAll(
-                List.of(missionRecord1, missionRecord2, missionRecord3, missionRecord4));
+        List<MissionRecord> missionRecords =
+                List.of(missionRecord1, missionRecord2, missionRecord3, missionRecord4);
+        missionRecords.forEach(MissionRecord::updateUploadStatusPending);
+        missionRecords.forEach(
+                missionRecord -> missionRecord.updateUploadStatusComplete("remark", "imageUrl"));
+        missionRecordRepository.saveAll(missionRecords);
 
         Reaction reactionToRecord1ByMember2 =
                 Reaction.createReaction(EmojiType.BLUE_HEART, member2, missionRecord1);
@@ -221,11 +226,10 @@ class FeedServiceTest {
         setFixture();
 
         // when
-        Pageable pageable = PageRequest.of(0, 10);
         Slice<FeedOneResponse> response = feedService.findFeedV2(FeedVisibility.ALL, 10, 5L);
 
         // then
-        assertThat(response.getContent()).hasSize(3);
+        assertThat(response.getContent()).hasSize(2);
     }
 
     @Test
@@ -236,9 +240,11 @@ class FeedServiceTest {
         MissionRecord laterCreatedOlderRecord =
                 MissionRecord.createMissionRecord(
                         Duration.ofMinutes(20),
-                        LocalDateTime.of(2024, 3, 2, 12, 40),
-                        LocalDateTime.of(2024, 3, 2, 13, 0),
+                        LocalDateTime.of(2024, 3, 1, 10, 40),
+                        LocalDateTime.of(2024, 3, 1, 11, 0),
                         mission);
+        laterCreatedOlderRecord.updateUploadStatusPending();
+        laterCreatedOlderRecord.updateUploadStatusComplete("remark", "imageUrl");
         missionRecordRepository.save(laterCreatedOlderRecord);
 
         // when
@@ -249,10 +255,26 @@ class FeedServiceTest {
         // then
         assertThat(firstPage.getContent())
                 .extracting(FeedOneResponse::recordId)
-                .containsExactly(3L, 5L);
+                .containsExactly(5L, 2L);
         assertThat(secondPage.getContent())
                 .extracting(FeedOneResponse::recordId)
-                .containsExactly(2L, 1L);
+                .containsExactly(1L);
+    }
+
+    @Test
+    void 피드_한_페이지는_본문_댓글_리액션_세_쿼리로_조회한다() {
+        // given
+        setFixture();
+        SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
+        sessionFactory.getStatistics().clear();
+
+        // when
+        Slice<FeedOneResponse> response = feedService.findFeedV2(FeedVisibility.ALL, 20, null);
+
+        // then
+        assertThat(response.getContent()).hasSize(2);
+        assertThat(sessionFactory.getStatistics().getPrepareStatementCount())
+                .isLessThanOrEqualTo(3);
     }
 
     @Nested
@@ -265,7 +287,6 @@ class FeedServiceTest {
             logoutAndReloginAs(1L);
 
             // when
-            Pageable pageable = PageRequest.of(0, 10);
             Slice<FeedOneResponse> response =
                     feedService.findFeedV2(FeedVisibility.FOLLOWING, 10, 5L);
 
@@ -280,7 +301,6 @@ class FeedServiceTest {
             logoutAndReloginAs(1L);
 
             // when
-            Pageable pageable = PageRequest.of(0, 10);
             Slice<FeedOneResponse> response =
                     feedService.findFeedV2(FeedVisibility.FOLLOWING, 10, 5L);
 
@@ -296,7 +316,6 @@ class FeedServiceTest {
             logoutAndReloginAs(1L);
 
             // when
-            Pageable pageable = PageRequest.of(0, 10);
             Slice<FeedOneResponse> response =
                     feedService.findFeedV2(FeedVisibility.FOLLOWING, 10, 5L);
 
@@ -318,7 +337,6 @@ class FeedServiceTest {
             logoutAndReloginAs(1L);
 
             // when
-            Pageable pageable = PageRequest.of(0, 10);
             Slice<FeedOneResponse> response =
                     feedService.findFeedV2(FeedVisibility.FOLLOWING, 10, 0L);
 

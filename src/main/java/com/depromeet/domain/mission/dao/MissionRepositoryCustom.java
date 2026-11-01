@@ -3,6 +3,7 @@ package com.depromeet.domain.mission.dao;
 import com.depromeet.domain.mission.domain.Mission;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 public interface MissionRepositoryCustom {
@@ -10,6 +11,8 @@ public interface MissionRepositoryCustom {
     List<Mission> findMissionsWithRecords(Long memberId);
 
     List<Mission> findInProgressMissionsWithRecords(Long memberId);
+
+    List<Mission> findInProgressMissions(Long memberId);
 
     List<Mission> findMissionsWithRecordsByRelations(Long memberId, boolean existsMemberRelations);
 
@@ -21,5 +24,5 @@ public interface MissionRepositoryCustom {
 
     List<Mission> findMissionsWithRecordsByDate(LocalDate date, Long memberId);
 
-    List<Mission> findMissionsNonCompleteAndInProgress(LocalDateTime today);
+    List<Mission> findMissionsNonCompleteAndInProgress(LocalDateTime today, LocalTime remindAt);
 }

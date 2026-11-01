@@ -6,16 +6,16 @@ import static com.depromeet.domain.mission.domain.MissionVisibility.*;
 import static com.depromeet.domain.mission.domain.QMission.*;
 import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 
+import com.depromeet.domain.feed.dto.response.FeedOneByProfileResponse;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
-import com.depromeet.domain.missionRecord.domain.QMissionRecord;
+import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,6 +53,18 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                 .selectFrom(missionRecord)
                 .where(missionIdEq(missionId), uploadStatusCompleteEq())
                 .orderBy(missionRecord.startedAt.asc())
+                .fetch();
+    }
+
+    @Override
+    public List<MissionRecord> findAllByMissionIdsAndStartedAtRange(
+            List<Long> missionIds, LocalDateTime from, LocalDateTime to) {
+        return jpaQueryFactory
+                .selectFrom(missionRecord)
+                .where(
+                        missionRecord.mission.id.in(missionIds),
+                        missionRecord.startedAt.goe(from),
+                        missionRecord.startedAt.lt(to))
                 .fetch();
     }
 
@@ -146,19 +158,19 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
                                 missionRecord.mission.visibility.in(visibilities),
                                 checkMissionVisibilityNone(),
                                 uploadStatusCompleteEq())
-                        .orderBy(missionRecord.finishedAt.desc(), missionRecord.id.desc())
+                        .orderBy(missionRecord.id.desc())
                         .limit((long) size + 1)
                         .fetch();
         return checkLastPage(size, feedList);
     }
 
     @Override
-    public List<MissionRecord> findFeedAllByMemberId(
+    public List<FeedOneByProfileResponse> findFeedAllByMemberId(
             Long memberId, List<MissionVisibility> visibilities) {
         return jpaQueryFactory
-                .selectFrom(missionRecord)
+                .select(profileFeedProjection())
+                .from(missionRecord)
                 .leftJoin(missionRecord.mission, mission)
-                .fetchJoin()
                 .where(
                         mission.visibility.in(visibilities),
                         mission.member.id.eq(memberId),
@@ -174,44 +186,106 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     }
 
     @Override
-    public Slice<MissionRecord> findAllFetch(final int size, final Long lastId) {
-        List<MissionRecord> missionRecords =
+    public Slice<FeedOneResponse> findAllFetch(final int size, final Long lastId) {
+        List<FeedOneResponse> feedResponses =
                 jpaQueryFactory
-                        .selectFrom(missionRecord)
+                        .select(feedProjection())
+                        .from(missionRecord)
                         .join(missionRecord.mission, mission)
-                        .fetchJoin()
                         .join(mission.member, member)
-                        .fetchJoin()
-                        .where(feedCursorCondition(lastId), checkMissionVisibilityNone())
-                        .orderBy(missionRecord.finishedAt.desc(), missionRecord.id.desc())
+                        .where(
+                                feedCursorCondition(lastId),
+                                mission.visibility.eq(ALL),
+                                uploadStatusCompleteEq())
+                        .orderBy(missionRecord.id.desc())
                         .limit((long) size + 1)
                         .fetch();
 
-        boolean hasNext = getHasNext(missionRecords, size);
+        boolean hasNext = getHasNext(feedResponses, size);
 
-        return new SliceImpl<>(missionRecords, Pageable.ofSize(size), hasNext);
+        return new SliceImpl<>(feedResponses, Pageable.ofSize(size), hasNext);
     }
 
     @Override
-    public Slice<MissionRecord> findAllFetchByFollowings(
+    public Slice<FeedOneResponse> findAllFetchByFollowings(
             int size, Long lastId, Long currentMemberId) {
 
-        List<MissionRecord> missionRecords =
+        List<FeedOneResponse> feedResponses =
                 jpaQueryFactory
-                        .selectFrom(missionRecord)
+                        .select(feedProjection())
+                        .from(missionRecord)
                         .join(missionRecord.mission, mission)
-                        .fetchJoin()
                         .join(mission.member, member)
-                        .fetchJoin()
-                        .where(feedCursorCondition(lastId), followingMemberExists(currentMemberId))
-                        .where(mission.visibility.in(List.of(ALL, FOLLOWER)))
-                        .orderBy(missionRecord.finishedAt.desc(), missionRecord.id.desc())
+                        .where(
+                                feedCursorCondition(lastId),
+                                followingMemberExists(currentMemberId),
+                                mission.visibility.in(List.of(ALL, FOLLOWER)),
+                                uploadStatusCompleteEq())
+                        .orderBy(missionRecord.id.desc())
                         .limit((long) size + 1)
                         .fetch();
 
-        boolean hasNext = getHasNext(missionRecords, size);
+        boolean hasNext = getHasNext(feedResponses, size);
 
-        return new SliceImpl<>(missionRecords, Pageable.ofSize(size), hasNext);
+        return new SliceImpl<>(feedResponses, Pageable.ofSize(size), hasNext);
+    }
+
+    private ConstructorExpression<FeedOneByProfileResponse> profileFeedProjection() {
+        return Projections.constructor(
+                FeedOneByProfileResponse.class,
+                mission.id,
+                missionRecord.id,
+                mission.name,
+                missionRecord.imageUrl,
+                missionRecord.duration,
+                mission.startedAt,
+                missionRecord.startedAt,
+                missionRecord.finishedAt);
+    }
+
+    private ConstructorExpression<FeedOneResponse> feedProjection() {
+        return Projections.constructor(
+                FeedOneResponse.class,
+                member.id,
+                member.profile.nickname,
+                member.profile.profileImageUrl,
+                mission.id,
+                mission.name,
+                missionRecord.id,
+                missionRecord.remark,
+                missionRecord.imageUrl,
+                missionRecord.duration,
+                mission.startedAt,
+                mission.finishedAt,
+                missionRecord.startedAt);
+    }
+
+    @Override
+    public List<FeedOneByProfileResponse> findProfileFeedPage(
+            Long targetMemberId, Long viewerMemberId, Long lastId, int limit) {
+        BooleanExpression visibilityCondition =
+                targetMemberId.equals(viewerMemberId)
+                        ? null
+                        : mission.visibility
+                                .eq(ALL)
+                                .or(
+                                        mission.visibility
+                                                .eq(FOLLOWER)
+                                                .and(followingMemberExists(viewerMemberId)));
+
+        return jpaQueryFactory
+                .select(profileFeedProjection())
+                .from(missionRecord)
+                .join(missionRecord.mission, mission)
+                .join(mission.member, member)
+                .where(
+                        mission.member.id.eq(targetMemberId),
+                        lastId == null ? null : missionRecord.id.lt(lastId),
+                        visibilityCondition,
+                        uploadStatusCompleteEq())
+                .orderBy(missionRecord.id.desc())
+                .limit(limit)
+                .fetch();
     }
 
     private BooleanExpression missionIdEq(Long missionId) {
@@ -235,32 +309,7 @@ public class MissionRecordRepositoryImpl implements MissionRecordRepositoryCusto
     }
 
     private BooleanExpression feedCursorCondition(Long lastId) {
-        if (lastId == null) {
-            return null;
-        }
-
-        QMissionRecord cursorMissionRecord = new QMissionRecord("cursorMissionRecord");
-        JPQLQuery<LocalDateTime> cursorFinishedAt =
-                JPAExpressions.select(cursorMissionRecord.finishedAt)
-                        .from(cursorMissionRecord)
-                        .where(cursorMissionRecord.id.eq(lastId));
-        BooleanExpression cursorExists =
-                JPAExpressions.selectOne()
-                        .from(cursorMissionRecord)
-                        .where(cursorMissionRecord.id.eq(lastId))
-                        .exists();
-
-        BooleanExpression afterCursor =
-                missionRecord
-                        .finishedAt
-                        .lt(cursorFinishedAt)
-                        .or(
-                                missionRecord
-                                        .finishedAt
-                                        .eq(cursorFinishedAt)
-                                        .and(missionRecord.id.lt(lastId)));
-
-        return afterCursor.or(cursorExists.not().and(missionRecord.id.lt(lastId)));
+        return lastId == null ? null : missionRecord.id.lt(lastId);
     }
 
     // 무한 스크롤 방식 처리하는 메서드

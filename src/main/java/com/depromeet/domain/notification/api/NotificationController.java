@@ -4,15 +4,20 @@ import com.depromeet.domain.notification.application.NotificationService;
 import com.depromeet.domain.notification.dto.NotificationFindAllResponse;
 import com.depromeet.domain.notification.dto.request.PushMissionRemindRequest;
 import com.depromeet.domain.notification.dto.request.PushUrgingSendRequest;
+import com.depromeet.global.common.response.CursorSliceResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "8. [알림]", description = "알림 관련 API")
 @RestController
+@Validated
 @RequestMapping("/notifications")
 @RequiredArgsConstructor
 public class NotificationController {
@@ -22,6 +27,14 @@ public class NotificationController {
     @GetMapping
     public List<NotificationFindAllResponse> notificationFindAll() {
         return notificationService.findAllNotification();
+    }
+
+    @Operation(summary = "알림센터 조회 V2", description = "cursor 기반으로 알림 목록을 조회합니다.")
+    @GetMapping("/v2")
+    public CursorSliceResponse<NotificationFindAllResponse> notificationFindAllV2(
+            @RequestParam(defaultValue = "20") @Min(1) @Max(50) int size,
+            @RequestParam(required = false) String cursor) {
+        return notificationService.findNotificationPage(size, cursor);
     }
 
     @Operation(summary = "재촉하기", description = "당일 미션을 완료하지 않은 친구에게 재촉하기 Push Message를 발송합니다.")

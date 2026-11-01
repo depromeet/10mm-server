@@ -1,8 +1,8 @@
 package com.depromeet.domain.missionRecord.application;
 
-import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.global.common.constants.RedisExpireEventConstants;
-import lombok.RequiredArgsConstructor;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
@@ -10,9 +10,19 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class RedisExpireEventRedisMessageListener implements MessageListener {
-    private final MissionRecordRepository missionRecordRepository;
+    private final MissionRecordExpirationService missionRecordExpirationService;
+    private final Counter recoveryCounter;
+
+    public RedisExpireEventRedisMessageListener(
+            MissionRecordExpirationService missionRecordExpirationService,
+            MeterRegistry meterRegistry) {
+        this.missionRecordExpirationService = missionRecordExpirationService;
+        this.recoveryCounter =
+                Counter.builder("mission_record.expiration.recovered")
+                        .tag("source", "redis_keyspace")
+                        .register(meterRegistry);
+    }
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
@@ -29,6 +39,8 @@ public class RedisExpireEventRedisMessageListener implements MessageListener {
             return;
         }
         Long missionRecordId = Long.parseLong(message.toString().split(":")[1]);
-        missionRecordRepository.deleteById(missionRecordId);
+        if (missionRecordExpirationService.deleteExpiredRecord(missionRecordId) > 0) {
+            recoveryCounter.increment();
+        }
     }
 }

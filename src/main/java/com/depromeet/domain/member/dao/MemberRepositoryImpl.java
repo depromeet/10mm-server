@@ -7,6 +7,9 @@ import static com.depromeet.domain.missionRecord.domain.QMissionRecord.*;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.mission.domain.DurationStatus;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,5 +41,49 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                         mission.startedAt.loe(today),
                         mission.finishedAt.goe(today))
                 .fetch();
+    }
+
+    @Override
+    public List<Member> nicknameSearchPage(
+            String nickname,
+            Long currentMemberId,
+            Integer cursorPriority,
+            String cursorNickname,
+            Long cursorMemberId,
+            int limit) {
+        NumberExpression<Integer> exactMatchPriority =
+                new CaseBuilder().when(member.profile.nickname.eq(nickname)).then(0).otherwise(1);
+
+        return jpaQueryFactory
+                .selectFrom(member)
+                .where(
+                        member.profile.nickname.contains(nickname),
+                        member.id.ne(currentMemberId),
+                        memberSearchCursorCondition(
+                                exactMatchPriority, cursorPriority, cursorNickname, cursorMemberId))
+                .orderBy(exactMatchPriority.asc(), member.profile.nickname.asc(), member.id.asc())
+                .limit(limit)
+                .fetch();
+    }
+
+    private BooleanExpression memberSearchCursorCondition(
+            NumberExpression<Integer> exactMatchPriority,
+            Integer cursorPriority,
+            String cursorNickname,
+            Long cursorMemberId) {
+        if (cursorPriority == null || cursorNickname == null || cursorMemberId == null) {
+            return null;
+        }
+        return exactMatchPriority
+                .gt(cursorPriority)
+                .or(
+                        exactMatchPriority
+                                .eq(cursorPriority)
+                                .and(member.profile.nickname.gt(cursorNickname)))
+                .or(
+                        exactMatchPriority
+                                .eq(cursorPriority)
+                                .and(member.profile.nickname.eq(cursorNickname))
+                                .and(member.id.gt(cursorMemberId)));
     }
 }

@@ -17,13 +17,20 @@ import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
 import com.depromeet.domain.mission.dto.response.MissionCreateResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindAllResponse;
 import com.depromeet.domain.mission.dto.response.MissionFindResponse;
+import com.depromeet.domain.mission.dto.response.MissionStatus;
 import com.depromeet.domain.mission.dto.response.MissionUpdateResponse;
+import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
+import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.global.security.PrincipalDetails;
 import com.depromeet.global.util.MemberUtil;
+import jakarta.persistence.EntityManagerFactory;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.IntStream;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +49,8 @@ class MissionServiceTest {
     @Autowired private MissionRepository missionRepository;
     @Autowired private MemberRepository memberRepository;
     @Autowired private MemberUtil memberUtil;
+    @Autowired private MissionRecordRepository missionRecordRepository;
+    @Autowired private EntityManagerFactory entityManagerFactory;
 
     @BeforeEach
     void setUp() {
@@ -142,6 +151,54 @@ class MissionServiceTest {
                         tuple(2L, "testMissionName_2", "testMissionContent_2"),
                         tuple(3L, "testMissionName_3", "testMissionContent_3"),
                         tuple(4L, "testMissionName_4", "testMissionContent_4"));
+    }
+
+    @Test
+    void 미션_리스트는_당일_기록만으로_상태를_판단하고_전체_기록을_로드하지_않는다() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        Mission todayCompleted = saveMission("todayCompleted", now.minusDays(3));
+        Mission pastOnly = saveMission("pastOnly", now.minusDays(3));
+        MissionRecord todayRecord = saveCompletedRecord(todayCompleted, now);
+        saveCompletedRecord(todayCompleted, now.minusDays(1));
+        saveCompletedRecord(pastOnly, now.minusDays(1));
+        Statistics statistics = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
+        statistics.clear();
+
+        // when
+        List<MissionFindAllResponse> missionList = missionService.findAllMission();
+
+        // then
+        assertThat(missionList)
+                .extracting("name", "missionStatus", "missionRecordId")
+                .containsExactlyInAnyOrder(
+                        tuple("todayCompleted", MissionStatus.COMPLETED, todayRecord.getId()),
+                        tuple("pastOnly", MissionStatus.NONE, null));
+        assertEquals(0L, statistics.getCollectionLoadCount());
+        assertEquals(4L, statistics.getEntityLoadCount()); // member 1 + mission 2 + 당일 기록 1
+    }
+
+    private Mission saveMission(String name, LocalDateTime startedAt) {
+        return missionRepository.save(
+                Mission.createMission(
+                        name,
+                        "content",
+                        1,
+                        MissionCategory.STUDY,
+                        MissionVisibility.ALL,
+                        startedAt,
+                        startedAt.plusWeeks(2),
+                        LocalTime.of(21, 0),
+                        memberUtil.getCurrentMember()));
+    }
+
+    private MissionRecord saveCompletedRecord(Mission mission, LocalDateTime startedAt) {
+        MissionRecord record =
+                MissionRecord.createMissionRecord(
+                        Duration.ofMinutes(20), startedAt, startedAt.plusMinutes(20), mission);
+        record.updateUploadStatusPending();
+        record.updateUploadStatusComplete("remark", "imageUrl");
+        return missionRecordRepository.save(record);
     }
 
     @Test

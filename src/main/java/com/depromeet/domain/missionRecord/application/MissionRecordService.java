@@ -15,6 +15,7 @@ import com.depromeet.domain.missionRecord.dto.response.MissionStatisticsResponse
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.util.MemberUtil;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,12 +23,15 @@ import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class MissionRecordService {
     private static final int EXPIRATION_TIME = 10;
     private static final int DAYS_ADJUSTMENT = 1;
@@ -37,6 +41,7 @@ public class MissionRecordService {
     private final MissionRepository missionRepository;
     private final MissionRecordRepository missionRecordRepository;
     private final MissionRecordTtlRepository missionRecordTtlRepository;
+    private final Clock clock;
 
     public MissionRecordCreateResponse createMissionRecord(MissionRecordCreateRequest request) {
         long diffHour = Duration.between(request.startedAt(), request.finishedAt()).toHours();
@@ -52,21 +57,27 @@ public class MissionRecordService {
         validateMissionRecordDuration(duration);
         validateMissionRecordExistsToday(mission.getId());
 
+        LocalDateTime uploadDeadlineAt = LocalDateTime.now(clock).plusMinutes(EXPIRATION_TIME);
         MissionRecord missionRecord =
                 MissionRecord.createMissionRecord(
                         duration, request.startedAt(), request.finishedAt(), mission);
-        Long expirationTime =
-                Duration.between(
-                                request.finishedAt(),
-                                request.finishedAt().plusMinutes(EXPIRATION_TIME))
-                        .getSeconds();
+        missionRecord.updateUploadDeadlineAt(uploadDeadlineAt);
         MissionRecord createdMissionRecord = missionRecordRepository.save(missionRecord);
-        missionRecordTtlRepository.save(
-                MissionRecordTtl.createMissionRecordTtl(
-                        createdMissionRecord.getId(),
-                        expirationTime,
-                        request.finishedAt().plusMinutes(EXPIRATION_TIME)));
+        saveRedisExpirationMarker(createdMissionRecord.getId(), uploadDeadlineAt);
         return MissionRecordCreateResponse.from(createdMissionRecord.getId());
+    }
+
+    private void saveRedisExpirationMarker(Long missionRecordId, LocalDateTime uploadDeadlineAt) {
+        try {
+            missionRecordTtlRepository.save(
+                    MissionRecordTtl.createMissionRecordTtl(
+                            missionRecordId, EXPIRATION_TIME * 60L, uploadDeadlineAt));
+        } catch (DataAccessException exception) {
+            log.warn(
+                    "Failed to save Redis expiration marker. DB reconciliation will recover it. missionRecordId={}",
+                    missionRecordId,
+                    exception);
+        }
     }
 
     private void validateMissionRecordDurationOverTime(long diffHour) {
@@ -144,12 +155,7 @@ public class MissionRecordService {
                 missionRepository.findInProgressMissionsWithRecords(currentMember.getId());
 
         for (Mission mission : missions) {
-            List<MissionRecord> records = mission.getMissionRecords();
-
-            Optional<MissionRecord> optionalRecord =
-                    records.stream()
-                            .filter(record -> record.getStartedAt().toLocalDate().equals(today))
-                            .findFirst();
+            Optional<MissionRecord> optionalRecord = mission.findRecordByDate(today);
 
             // 당일 수행한 미션기록이 없으면 NONE
             if (optionalRecord.isEmpty()) {
@@ -161,12 +167,7 @@ public class MissionRecordService {
                 continue;
             }
 
-            // 레디스에 미션기록의 인증사진 인증 대기시간 값이 존재하면 REQUIRED
-            Optional<MissionRecordTtl> missionRecordTTL =
-                    missionRecordTtlRepository.findById(optionalRecord.get().getId());
-
-            if (missionRecordTTL.isPresent()) {
-                missionRecordTtlRepository.deleteById(optionalRecord.get().getId());
+            if (optionalRecord.get().getUploadDeadlineAt() != null) {
                 mission.getMissionRecords().remove(optionalRecord.get()); // use orphanRemoval
             }
         }

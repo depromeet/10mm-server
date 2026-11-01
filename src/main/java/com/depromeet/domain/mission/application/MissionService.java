@@ -7,10 +7,9 @@ import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.dto.request.MissionCreateRequest;
 import com.depromeet.domain.mission.dto.request.MissionUpdateRequest;
 import com.depromeet.domain.mission.dto.response.*;
-import com.depromeet.domain.missionRecord.dao.MissionRecordTtlRepository;
+import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
-import com.depromeet.domain.missionRecord.domain.MissionRecordTtl;
 import com.depromeet.domain.missionRecord.dto.response.MissionRecordSummaryResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
@@ -19,11 +18,14 @@ import com.depromeet.global.util.SecurityUtil;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,8 +37,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class MissionService {
 
     private final MissionRepository missionRepository;
-    private final MissionRecordTtlRepository missionRecordTtlRepository;
     private final MemberRelationRepository memberRelationRepository;
+    private final MissionRecordRepository missionRecordRepository;
     private final MemberUtil memberUtil;
     private final SecurityUtil securityUtil;
 
@@ -60,17 +62,29 @@ public class MissionService {
         final Member currentMember = memberUtil.getCurrentMember();
         final LocalDate today = LocalDate.now();
 
-        List<Mission> missions =
-                missionRepository.findInProgressMissionsWithRecords(currentMember.getId());
+        List<Mission> missions = missionRepository.findInProgressMissions(currentMember.getId());
+        if (missions.isEmpty()) {
+            return List.of();
+        }
+
+        // 미션 전체 기록 대신 당일 기록만 조회 (미션당 하루 한 건)
+        Map<Long, MissionRecord> todayRecords =
+                missionRecordRepository
+                        .findAllByMissionIdsAndStartedAtRange(
+                                missions.stream().map(Mission::getId).toList(),
+                                today.atStartOfDay(),
+                                today.plusDays(1).atStartOfDay())
+                        .stream()
+                        .collect(
+                                Collectors.toMap(
+                                        record -> record.getMission().getId(),
+                                        Function.identity(),
+                                        (first, second) -> first));
 
         List<MissionFindAllResponse> results = new ArrayList<>();
         for (Mission mission : missions) {
-            List<MissionRecord> records = mission.getMissionRecords();
-
             Optional<MissionRecord> optionalRecord =
-                    records.stream()
-                            .filter(record -> record.getStartedAt().toLocalDate().equals(today))
-                            .findFirst();
+                    Optional.ofNullable(todayRecords.get(mission.getId()));
 
             // 당일 수행한 미션기록이 없으면 NONE
             if (optionalRecord.isEmpty()) {
@@ -89,16 +103,12 @@ public class MissionService {
                 continue;
             }
 
-            // 레디스에 미션기록의 인증사진 인증 대기시간 값이 존재하면 REQUIRED
-            Optional<MissionRecordTtl> missionRecordTTL =
-                    missionRecordTtlRepository.findById(optionalRecord.get().getId());
-
-            if (missionRecordTTL.isPresent()) {
+            if (optionalRecord.get().getUploadDeadlineAt() != null) {
                 results.add(
                         MissionFindAllResponse.of(
                                 mission,
                                 MissionStatus.REQUIRED,
-                                missionRecordTTL.get().getTtlFinishedAt(),
+                                optionalRecord.get().getUploadDeadlineAt(),
                                 optionalRecord.get().getId()));
                 continue;
             }
@@ -169,12 +179,7 @@ public class MissionService {
 
         List<MissionFindAllResponse> findAllResponses = new ArrayList<>();
         for (Mission mission : missions) {
-            List<MissionRecord> records = mission.getMissionRecords();
-
-            Optional<MissionRecord> optionalRecord =
-                    records.stream()
-                            .filter(record -> record.getStartedAt().toLocalDate().equals(today))
-                            .findFirst();
+            Optional<MissionRecord> optionalRecord = mission.findRecordByDate(today);
 
             // 기본 값 NONE으로 지정 후
             MissionStatus missionStatus = MissionStatus.NONE;
@@ -243,9 +248,10 @@ public class MissionService {
     }
 
     @Transactional(readOnly = true)
-    public List<MissionRemindPushResponse> findAllInProgressMission() {
+    public List<MissionRemindPushResponse> findAllInProgressMission(LocalTime remindAt) {
         LocalDateTime today = LocalDateTime.now();
-        List<Mission> missions = missionRepository.findMissionsNonCompleteAndInProgress(today);
+        List<Mission> missions =
+                missionRepository.findMissionsNonCompleteAndInProgress(today, remindAt);
         return missions.stream().map(MissionRemindPushResponse::from).toList();
     }
 
