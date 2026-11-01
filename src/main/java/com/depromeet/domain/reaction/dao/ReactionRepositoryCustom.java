@@ -8,4 +8,6 @@ import java.util.Map;
 public interface ReactionRepositoryCustom {
 
     Map<EmojiType, List<Reaction>> findAllGroupByEmoji(Long missionRecordId);
+
+    List<Reaction> findAllWithMemberByMissionRecordIdIn(List<Long> missionRecordIds);
 }

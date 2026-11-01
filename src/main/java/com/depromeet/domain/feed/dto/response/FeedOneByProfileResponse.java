@@ -1,8 +1,8 @@
 package com.depromeet.domain.feed.dto.response;
 
-import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -35,18 +35,24 @@ public record FeedOneByProfileResponse(
                         type = "string")
                 LocalDateTime finishedAt) {
 
-    public static FeedOneByProfileResponse from(MissionRecord record) {
-        return new FeedOneByProfileResponse(
-                record.getMission().getId(),
-                record.getId(),
-                record.getMission().getName(),
-                record.getImageUrl(),
-                record.getDuration().toMinutes(),
-                ChronoUnit.DAYS.between(
-                                record.getMission().getStartedAt().toLocalDate(),
-                                record.getStartedAt().toLocalDate())
+    public FeedOneByProfileResponse(
+            Long missionId,
+            Long recordId,
+            String name,
+            String recordImageUrl,
+            Duration duration,
+            LocalDateTime missionStartedAt,
+            LocalDateTime startedAt,
+            LocalDateTime finishedAt) {
+        this(
+                missionId,
+                recordId,
+                name,
+                recordImageUrl,
+                duration.toMinutes(),
+                ChronoUnit.DAYS.between(missionStartedAt.toLocalDate(), startedAt.toLocalDate())
                         + 1,
-                record.getStartedAt(),
-                record.getFinishedAt());
+                startedAt,
+                finishedAt);
     }
 }

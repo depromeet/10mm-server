@@ -2,6 +2,7 @@ package com.depromeet.infra.config.redis;
 
 import com.depromeet.domain.missionRecord.application.RedisExpireEventRedisMessageListener;
 import com.depromeet.global.common.constants.RedisExpireEventConstants;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -9,6 +10,10 @@ import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
 @Configuration
+@ConditionalOnProperty(
+        name = "critical.redis.expiration-listener-enabled",
+        havingValue = "true",
+        matchIfMissing = true)
 public class RedisMessageListenerConfig {
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(

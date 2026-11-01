@@ -29,6 +29,7 @@ jobs:
           envs: IMAGE_FULL_URL, DOCKERHUB_IMAGE_NAME # docker-compose.yml 에서 사용할 환경 변수
           script: |
             echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
+            if [ -f deploy/migrate-redis-volume.sh ]; then sh deploy/migrate-redis-volume.sh || exit 1; fi
             docker compose up -d
             docker exec -d nginx nginx -s reload
             docker image prune -a -f

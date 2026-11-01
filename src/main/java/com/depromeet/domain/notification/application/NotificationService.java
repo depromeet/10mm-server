@@ -12,13 +12,19 @@ import com.depromeet.domain.notification.dto.NotificationFindAllResponse;
 import com.depromeet.domain.notification.dto.request.PushMissionRemindRequest;
 import com.depromeet.domain.notification.dto.request.PushUrgingSendRequest;
 import com.depromeet.global.common.constants.PushNotificationConstants;
+import com.depromeet.global.common.response.CursorSliceResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
+import com.depromeet.global.util.CursorCodec;
 import com.depromeet.global.util.MemberUtil;
+import com.depromeet.global.util.SecurityUtil;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +38,8 @@ public class NotificationService {
     private final MissionRepository missionRepository;
     private final NotificationRepository notificationRepository;
     private final TaskScheduler taskScheduler;
+    private final CursorCodec cursorCodec;
+    private final SecurityUtil securityUtil;
 
     public void sendUrgingPush(PushUrgingSendRequest request) {
         final Member currentMember = memberUtil.getCurrentMember();
@@ -79,18 +87,53 @@ public class NotificationService {
         return notificationRepository
                 .findAllByTargetMemberIdOrderByCreatedAtDesc(member.getId())
                 .stream()
-                .map(
-                        notification ->
-                                NotificationFindAllResponse.of(
-                                        notification.getId(),
-                                        notification.getNotificationType(),
-                                        notification.getResourceId(),
-                                        getNotificationMessage(
-                                                notification.getNotificationType(),
-                                                notification.getSourceMember(),
-                                                notification.getTargetMember()),
-                                        notification.getCreatedAt()))
+                .map(this::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public CursorSliceResponse<NotificationFindAllResponse> findNotificationPage(
+            int size, String cursor) {
+        Long memberId = securityUtil.getCurrentMemberId();
+        LocalDateTime cursorCreatedAt = null;
+        Long cursorNotificationId = null;
+        if (cursor != null && !cursor.isBlank()) {
+            List<String> values = cursorCodec.decode(cursor, 2);
+            cursorCreatedAt = cursorCodec.dateTimeValue(values, 0);
+            cursorNotificationId = cursorCodec.longValue(values, 1);
+        }
+
+        List<Notification> notifications =
+                notificationRepository.findNotificationPage(
+                        memberId,
+                        cursorCreatedAt,
+                        cursorNotificationId,
+                        PageRequest.of(0, size + 1));
+        boolean hasNext = notifications.size() > size;
+        if (hasNext) {
+            notifications = new ArrayList<>(notifications.subList(0, size));
+        }
+        List<NotificationFindAllResponse> content =
+                notifications.stream().map(this::toResponse).toList();
+        String nextCursor =
+                hasNext && !notifications.isEmpty()
+                        ? cursorCodec.encode(
+                                notifications.getLast().getCreatedAt(),
+                                notifications.getLast().getId())
+                        : null;
+        return CursorSliceResponse.of(content, nextCursor, hasNext);
+    }
+
+    private NotificationFindAllResponse toResponse(Notification notification) {
+        return NotificationFindAllResponse.of(
+                notification.getId(),
+                notification.getNotificationType(),
+                notification.getResourceId(),
+                getNotificationMessage(
+                        notification.getNotificationType(),
+                        notification.getSourceMember(),
+                        notification.getTargetMember()),
+                notification.getCreatedAt());
     }
 
     private void validateFinishedMission(Mission mission) {

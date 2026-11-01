@@ -124,4 +124,24 @@ public record FeedOneResponse(
                 reactions,
                 comments);
     }
+
+    public FeedOneResponse withInteractions(
+            List<ReactionGroupByEmojiResponse> reactions, List<CommentDto> comments) {
+        return new FeedOneResponse(
+                memberId,
+                nickname,
+                profileImage,
+                missionId,
+                name,
+                recordId,
+                remark,
+                recordImageUrl,
+                duration,
+                sinceDay,
+                startedAt,
+                finishedAt,
+                recordStartedAt,
+                reactions,
+                comments);
+    }
 }

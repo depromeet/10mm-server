@@ -37,6 +37,7 @@ class MissionRecordServiceTest {
     private final LocalDateTime now = LocalDateTime.now();
     private final LocalDateTime missionStartedAt = LocalDateTime.of(2024, 1, 24, 22, 58, 53);
     @Autowired MissionRecordService missionRecordService;
+    @Autowired MissionRecordExpirationService missionRecordExpirationService;
     @Autowired MissionService missionService;
     @Autowired MemberRepository memberRepository;
     @Autowired MissionRepository missionRepository;
@@ -121,6 +122,50 @@ class MissionRecordServiceTest {
 
         assertThrows(
                 CustomException.class, () -> missionRecordService.findOneMissionRecord(missionId));
+    }
+
+    @Test
+    void DB_deadline이_지난_미완료_기록만_정리한다() {
+        // given
+        MissionRecord expiredRecord =
+                MissionRecord.createMissionRecord(
+                        Duration.ofMinutes(10), now, now.plusMinutes(10), mission);
+        expiredRecord.updateUploadDeadlineAt(now.minusMinutes(1));
+        missionRecordRepository.save(expiredRecord);
+
+        MissionRecord completedRecord =
+                MissionRecord.createMissionRecord(
+                        Duration.ofMinutes(10), now, now.plusMinutes(10), mission);
+        completedRecord.updateUploadStatusPending();
+        completedRecord.updateUploadStatusComplete("remark", "imageUrl");
+        completedRecord.updateUploadDeadlineAt(now.minusMinutes(1));
+        missionRecordRepository.save(completedRecord);
+
+        // when
+        int deletedCount = missionRecordExpirationService.deleteExpiredRecords();
+
+        // then
+        assertEquals(1, deletedCount);
+        assertFalse(missionRecordRepository.existsById(expiredRecord.getId()));
+        assertTrue(missionRecordRepository.existsById(completedRecord.getId()));
+    }
+
+    @Test
+    void 업로드를_시작했지만_DB_deadline이_지난_PENDING_기록도_정리한다() {
+        // given
+        MissionRecord pendingRecord =
+                MissionRecord.createMissionRecord(
+                        Duration.ofMinutes(10), now, now.plusMinutes(10), mission);
+        pendingRecord.updateUploadDeadlineAt(now.minusMinutes(1));
+        pendingRecord.updateUploadStatusPending();
+        missionRecordRepository.save(pendingRecord);
+
+        // when
+        int deletedCount = missionRecordExpirationService.deleteExpiredRecords();
+
+        // then
+        assertEquals(1, deletedCount);
+        assertFalse(missionRecordRepository.existsById(pendingRecord.getId()));
     }
 
     @Test

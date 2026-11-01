@@ -1,5 +1,7 @@
 package com.depromeet.domain.feed.application;
 
+import com.depromeet.domain.comment.dao.CommentRepository;
+import com.depromeet.domain.comment.dto.response.CommentDto;
 import com.depromeet.domain.feed.domain.FeedVisibility;
 import com.depromeet.domain.feed.dto.response.FeedOneByProfileResponse;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
@@ -8,15 +10,19 @@ import com.depromeet.domain.follow.dao.MemberRelationRepository;
 import com.depromeet.domain.follow.domain.MemberRelation;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
-import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
-import com.depromeet.domain.missionRecord.domain.MissionRecord;
-import com.depromeet.domain.reaction.application.ReactionService;
+import com.depromeet.domain.reaction.dao.ReactionRepository;
+import com.depromeet.domain.reaction.domain.Reaction;
+import com.depromeet.domain.reaction.dto.response.ReactionGroupByEmojiResponse;
+import com.depromeet.global.common.response.CursorSliceResponse;
+import com.depromeet.global.util.CursorCodec;
 import com.depromeet.global.util.MemberUtil;
 import com.depromeet.global.util.SecurityUtil;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -27,13 +33,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class FeedService {
-    private final ReactionService reactionService;
     private final MemberUtil memberUtil;
-    private final MissionRepository missionRepository;
     private final MissionRecordRepository missionRecordRepository;
+    private final CommentRepository commentRepository;
+    private final ReactionRepository reactionRepository;
     private final MemberRelationRepository memberRelationRepository;
     private final SecurityUtil securityUtil;
     private final MemberRepository memberRepository;
+    private final CursorCodec cursorCodec;
 
     @Deprecated
     @Transactional(readOnly = true)
@@ -69,15 +76,44 @@ public class FeedService {
     }
 
     private Slice<FeedOneResponse> findAllFeedV2(int size, Long lastId) {
-        return missionRecordRepository.findAllFetch(size, lastId).map(FeedOneResponse::from);
+        return enrichInteractions(missionRecordRepository.findAllFetch(size, lastId));
     }
 
     private Slice<FeedOneResponse> findFollowingFeedV2(int size, Long lastId) {
         final Long currentMemberId = securityUtil.getCurrentMemberId();
 
-        return missionRecordRepository
-                .findAllFetchByFollowings(size, lastId, currentMemberId)
-                .map(FeedOneResponse::from);
+        return enrichInteractions(
+                missionRecordRepository.findAllFetchByFollowings(size, lastId, currentMemberId));
+    }
+
+    private Slice<FeedOneResponse> enrichInteractions(Slice<FeedOneResponse> feedSlice) {
+        List<Long> missionRecordIds =
+                feedSlice.getContent().stream().map(FeedOneResponse::recordId).toList();
+        if (missionRecordIds.isEmpty()) {
+            return feedSlice;
+        }
+
+        Map<Long, List<CommentDto>> commentsByRecordId =
+                commentRepository
+                        .findAllByMissionRecordIdInOrderByCreatedAtAsc(missionRecordIds)
+                        .stream()
+                        .collect(
+                                Collectors.groupingBy(
+                                        comment -> comment.getMissionRecord().getId(),
+                                        Collectors.mapping(CommentDto::from, Collectors.toList())));
+        Map<Long, List<Reaction>> reactionsByRecordId =
+                reactionRepository.findAllWithMemberByMissionRecordIdIn(missionRecordIds).stream()
+                        .collect(
+                                Collectors.groupingBy(
+                                        reaction -> reaction.getMissionRecord().getId()));
+
+        return feedSlice.map(
+                feed ->
+                        feed.withInteractions(
+                                ReactionGroupByEmojiResponse.groupByEmojiType(
+                                        reactionsByRecordId.getOrDefault(
+                                                feed.recordId(), List.of())),
+                                commentsByRecordId.getOrDefault(feed.recordId(), List.of())));
     }
 
     // 전체 피드 탭
@@ -118,6 +154,26 @@ public class FeedService {
         return findFeedByCurrentMember(sourceId);
     }
 
+    @Transactional(readOnly = true)
+    public CursorSliceResponse<FeedOneByProfileResponse> findProfileFeedV2(
+            Long targetId, int size, String cursor) {
+        memberUtil.getMemberByMemberId(targetId);
+        Long viewerId = securityUtil.getCurrentMemberId();
+        Long lastId =
+                cursor == null || cursor.isBlank()
+                        ? null
+                        : cursorCodec.longValue(cursorCodec.decode(cursor, 1), 0);
+        List<FeedOneByProfileResponse> rows =
+                missionRecordRepository.findProfileFeedPage(targetId, viewerId, lastId, size + 1);
+        boolean hasNext = rows.size() > size;
+        if (hasNext) {
+            rows = new ArrayList<>(rows.subList(0, size));
+        }
+        String nextCursor =
+                hasNext && !rows.isEmpty() ? cursorCodec.encode(rows.getLast().recordId()) : null;
+        return CursorSliceResponse.of(rows, nextCursor, hasNext);
+    }
+
     private List<Member> getSourceMembers(Long currentMemberId) {
         return memberRelationRepository.findAllBySourceId(currentMemberId).stream()
                 .map(MemberRelation::getTarget)
@@ -137,21 +193,13 @@ public class FeedService {
                         sourceId, targetMember.getId());
         List<MissionVisibility> visibilities =
                 determineVisibilityConditionsByRelationsWithMe(isMemberRelationExistsWithMe);
-        List<MissionRecord> feedAllByMemberId =
-                missionRecordRepository.findFeedAllByMemberId(targetId, visibilities);
-        return extractFeedResponses(feedAllByMemberId);
+        return missionRecordRepository.findFeedAllByMemberId(targetId, visibilities);
     }
 
     private List<FeedOneByProfileResponse> findFeedByCurrentMember(Long sourceId) {
         List<MissionVisibility> visibilities =
                 List.of(MissionVisibility.NONE, MissionVisibility.FOLLOWER, MissionVisibility.ALL);
-        List<MissionRecord> feedAllByMemberId =
-                missionRecordRepository.findFeedAllByMemberId(sourceId, visibilities);
-        return extractFeedResponses(feedAllByMemberId);
-    }
-
-    private List<FeedOneByProfileResponse> extractFeedResponses(List<MissionRecord> records) {
-        return records.stream().map(FeedOneByProfileResponse::from).toList();
+        return missionRecordRepository.findFeedAllByMemberId(sourceId, visibilities);
     }
 
     private List<MissionVisibility> determineVisibilityConditionsByRelationsWithMe(
