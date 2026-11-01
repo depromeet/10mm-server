@@ -1,5 +1,7 @@
 package com.depromeet.infra.config.redis;
 
+import io.lettuce.core.ClientOptions;
+import io.lettuce.core.SocketOptions;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -10,10 +12,12 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisKeyValueAdapter;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
-@EnableRedisRepositories
+@EnableRedisRepositories(
+        enableKeyspaceEvents = RedisKeyValueAdapter.EnableKeyspaceEvents.ON_STARTUP)
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
@@ -49,6 +53,13 @@ public class RedisConfig {
         }
         LettuceClientConfiguration clientConfig =
                 LettuceClientConfiguration.builder()
+                        .clientOptions(
+                                ClientOptions.builder()
+                                        .socketOptions(
+                                                SocketOptions.builder()
+                                                        .connectTimeout(Duration.ofSeconds(1))
+                                                        .build())
+                                        .build())
                         .commandTimeout(Duration.ofSeconds(1))
                         .shutdownTimeout(Duration.ZERO)
                         .build();

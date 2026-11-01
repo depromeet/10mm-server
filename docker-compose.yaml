@@ -35,6 +35,8 @@ services:
       - redis-server
       - --port
       - "6380"
+      - --bind
+      - 127.0.0.1
       - --maxmemory
       - ${REDIS_CACHE_MAXMEMORY:-128mb}
       - --maxmemory-policy
