@@ -7,9 +7,10 @@
 2. Apply `scripts/db/2026-07-23-performance-indexes.sql` one statement at a time **before**
    deploying the application; it reads and writes `mission_record.upload_deadline_at`. Do not
    wrap `CREATE INDEX CONCURRENTLY` statements in a transaction. The script also backfills
-   `upload_deadline_at` for incomplete `NONE` records created before the column existed.
+   `upload_deadline_at` for incomplete (`NONE`, `PENDING`) records created before the column
+   existed.
 3. Run the verification SQL and confirm the hot queries use the new indexes without a large
-   sequential scan or disk sort, and that `none_records_without_deadline` is 0.
+   sequential scan or disk sort, and that `incomplete_records_without_deadline` is 0.
 4. Start `redis` on port 6379 for refresh tokens and deadline markers, and `redis-cache` on port
    6380 for evictable query cache entries.
 5. Deploy the application, then verify `/10mm-actuator/prometheus` exposes

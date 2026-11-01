@@ -178,6 +178,28 @@ class MissionServiceTest {
         assertEquals(4L, statistics.getEntityLoadCount()); // member 1 + mission 2 + 당일 기록 1
     }
 
+    @Test
+    void 인증사진_업로드중인_미션은_마감시각과_함께_인증필요로_조회된다() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime deadline = now.plusMinutes(10);
+        Mission mission = saveMission("uploading", now.minusDays(1));
+        MissionRecord record =
+                MissionRecord.createMissionRecord(
+                        Duration.ofMinutes(20), now, now.plusMinutes(20), mission);
+        record.updateUploadDeadlineAt(deadline);
+        record.updateUploadStatusPending();
+        missionRecordRepository.save(record);
+
+        // when
+        List<MissionFindAllResponse> missionList = missionService.findAllMission();
+
+        // then
+        assertThat(missionList)
+                .extracting("missionStatus", "ttlFinishedAt", "missionRecordId")
+                .containsExactly(tuple(MissionStatus.REQUIRED, deadline, record.getId()));
+    }
+
     private Mission saveMission(String name, LocalDateTime startedAt) {
         return missionRepository.save(
                 Mission.createMission(

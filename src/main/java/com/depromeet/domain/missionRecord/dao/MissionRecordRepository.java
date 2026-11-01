@@ -15,7 +15,7 @@ public interface MissionRecordRepository
             """
             delete from MissionRecord record
             where record.id = :recordId
-              and record.uploadStatus = com.depromeet.domain.missionRecord.domain.ImageUploadStatus.NONE
+              and record.uploadStatus <> com.depromeet.domain.missionRecord.domain.ImageUploadStatus.COMPLETE
               and record.uploadDeadlineAt <= :now
             """)
     int deleteExpiredIncompleteRecord(
@@ -25,7 +25,7 @@ public interface MissionRecordRepository
     @Query(
             """
             delete from MissionRecord record
-            where record.uploadStatus = com.depromeet.domain.missionRecord.domain.ImageUploadStatus.NONE
+            where record.uploadStatus <> com.depromeet.domain.missionRecord.domain.ImageUploadStatus.COMPLETE
               and record.uploadDeadlineAt <= :now
             """)
     int deleteExpiredIncompleteRecords(@Param("now") LocalDateTime now);

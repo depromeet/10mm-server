@@ -60,7 +60,6 @@ public class ImageService {
         String presignedUrl = imageUtil.createUploadUrl(fileName, request.imageFileExtension());
 
         missionRecord.updateUploadStatusPending();
-        deleteRedisExpirationMarker(request.missionRecordId());
         imageRepository.save(
                 Image.createImage(
                         ImageType.MISSION_RECORD,

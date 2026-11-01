@@ -29,9 +29,9 @@ WHERE table_schema = current_schema()
   AND column_name = 'upload_deadline_at';
 
 -- 0이어야 한다. 남아 있으면 GET /missions가 MISSION_STATUS_MISMATCH로 실패한다.
-SELECT count(*) AS none_records_without_deadline
+SELECT count(*) AS incomplete_records_without_deadline
 FROM mission_record
-WHERE upload_status = 'NONE'
+WHERE upload_status IN ('NONE', 'PENDING')
   AND upload_deadline_at IS NULL;
 
 EXPLAIN (ANALYZE, BUFFERS)

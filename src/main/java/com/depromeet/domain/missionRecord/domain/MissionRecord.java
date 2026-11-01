@@ -87,8 +87,8 @@ public class MissionRecord extends BaseTimeEntity {
         if (this.uploadStatus != ImageUploadStatus.NONE) {
             throw new CustomException(ErrorCode.MISSION_RECORD_UPLOAD_STATUS_IS_NOT_NONE);
         }
+        // 업로드 중에도 인증 마감은 유지 (마감까지 완료되지 않으면 만료 정리 대상)
         this.uploadStatus = ImageUploadStatus.PENDING;
-        this.uploadDeadlineAt = null;
     }
 
     public void updateUploadStatusComplete(String remark, String imageUrl) {

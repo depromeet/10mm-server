@@ -151,6 +151,24 @@ class MissionRecordServiceTest {
     }
 
     @Test
+    void 업로드를_시작했지만_DB_deadline이_지난_PENDING_기록도_정리한다() {
+        // given
+        MissionRecord pendingRecord =
+                MissionRecord.createMissionRecord(
+                        Duration.ofMinutes(10), now, now.plusMinutes(10), mission);
+        pendingRecord.updateUploadDeadlineAt(now.minusMinutes(1));
+        pendingRecord.updateUploadStatusPending();
+        missionRecordRepository.save(pendingRecord);
+
+        // when
+        int deletedCount = missionRecordExpirationService.deleteExpiredRecords();
+
+        // then
+        assertEquals(1, deletedCount);
+        assertFalse(missionRecordRepository.existsById(pendingRecord.getId()));
+    }
+
+    @Test
     void 미션별_상세_통계_조회한다() {
         // given
         long durationMinute = 17;

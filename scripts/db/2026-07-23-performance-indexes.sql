@@ -10,7 +10,7 @@ ALTER TABLE mission_record
 -- 마감이 지난 기록은 MissionRecordExpirationScheduler가 1분 주기로 삭제한다.
 UPDATE mission_record
 SET upload_deadline_at = created_at + interval '10 minutes'
-WHERE upload_status = 'NONE'
+WHERE upload_status IN ('NONE', 'PENDING')
   AND upload_deadline_at IS NULL;
 
 CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_member_relation_target_source
