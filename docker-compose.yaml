@@ -13,8 +13,34 @@ services:
   redis:
     image: "redis:alpine"
     container_name: redis
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - ${REDIS_CRITICAL_MAXMEMORY:-256mb}
+      - --maxmemory-policy
+      - noeviction
+      - --notify-keyspace-events
+      - Ex
     ports:
       - "6379:6379"
+    environment:
+      - TZ=Asia/Seoul
+    network_mode: "host"
+  redis-cache:
+    image: "redis:alpine"
+    container_name: redis-cache
+    command:
+      - redis-server
+      - --port
+      - "6380"
+      - --maxmemory
+      - ${REDIS_CACHE_MAXMEMORY:-128mb}
+      - --maxmemory-policy
+      - allkeys-lru
+    ports:
+      - "6380:6380"
     environment:
       - TZ=Asia/Seoul
     network_mode: "host"
