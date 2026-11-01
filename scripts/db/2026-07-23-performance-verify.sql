@@ -8,6 +8,8 @@ FROM pg_indexes
 WHERE schemaname = current_schema()
   AND indexname IN (
       'idx_member_relation_target_source',
+      'idx_member_relation_source_created',
+      'idx_member_relation_target_created',
       'idx_mission_record_complete_feed',
       'idx_mission_member_visibility_status',
       'idx_mission_status_remind_at',
@@ -25,6 +27,12 @@ FROM information_schema.columns
 WHERE table_schema = current_schema()
   AND table_name = 'mission_record'
   AND column_name = 'upload_deadline_at';
+
+-- 0이어야 한다. 남아 있으면 GET /missions가 MISSION_STATUS_MISMATCH로 실패한다.
+SELECT count(*) AS none_records_without_deadline
+FROM mission_record
+WHERE upload_status = 'NONE'
+  AND upload_deadline_at IS NULL;
 
 EXPLAIN (ANALYZE, BUFFERS)
 SELECT mr.mission_record_id

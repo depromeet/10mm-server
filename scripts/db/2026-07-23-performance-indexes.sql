@@ -6,6 +6,13 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 ALTER TABLE mission_record
     ADD COLUMN IF NOT EXISTS upload_deadline_at timestamp;
 
+-- 컬럼 추가 전 생성된 인증 대기 기록에 마감 시각(생성 + 10분) 백필.
+-- 마감이 지난 기록은 MissionRecordExpirationScheduler가 1분 주기로 삭제한다.
+UPDATE mission_record
+SET upload_deadline_at = created_at + interval '10 minutes'
+WHERE upload_status = 'NONE'
+  AND upload_deadline_at IS NULL;
+
 CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_member_relation_target_source
     ON member_relation (target_id, source_id);
 
