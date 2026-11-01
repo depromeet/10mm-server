@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import com.depromeet.domain.comment.dao.CommentRepository;
 import com.depromeet.domain.comment.domain.Comment;
+import com.depromeet.domain.comment.dto.response.CommentDto;
 import com.depromeet.domain.feed.domain.FeedVisibility;
 import com.depromeet.domain.feed.dto.response.FeedOneResponse;
 import com.depromeet.domain.follow.dao.MemberRelationRepository;
@@ -20,6 +21,7 @@ import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.reaction.dao.ReactionRepository;
 import com.depromeet.domain.reaction.domain.EmojiType;
 import com.depromeet.domain.reaction.domain.Reaction;
+import com.depromeet.domain.reaction.dto.response.ReactionGroupByEmojiResponse;
 import com.depromeet.global.security.PrincipalDetails;
 import jakarta.persistence.EntityManagerFactory;
 import java.time.Duration;
@@ -275,6 +277,19 @@ class FeedServiceTest {
         assertThat(response.getContent()).hasSize(2);
         assertThat(sessionFactory.getStatistics().getPrepareStatementCount())
                 .isLessThanOrEqualTo(3);
+        assertThat(response.getContent())
+                .allSatisfy(
+                        feed -> {
+                            assertThat(feed.comments())
+                                    .extracting(CommentDto::content)
+                                    .containsExactlyInAnyOrder(
+                                            "commentToRecord" + feed.recordId() + "ByMember1",
+                                            "commentToRecord" + feed.recordId() + "ByMember2",
+                                            "commentToRecord" + feed.recordId() + "ByMember3");
+                            assertThat(feed.reactions())
+                                    .extracting(ReactionGroupByEmojiResponse::count)
+                                    .containsExactly(1, 1);
+                        });
     }
 
     @Nested
