@@ -5,6 +5,7 @@ DROP INDEX CONCURRENTLY IF EXISTS idx_mission_record_complete_feed;
 DROP INDEX CONCURRENTLY IF EXISTS idx_mission_member_visibility_status;
 DROP INDEX CONCURRENTLY IF EXISTS idx_mission_status_remind_at;
 DROP INDEX CONCURRENTLY IF EXISTS idx_mission_record_mission_status_started;
+DROP INDEX CONCURRENTLY IF EXISTS idx_mission_record_incomplete_deadline;
 DROP INDEX CONCURRENTLY IF EXISTS idx_reaction_record_created;
 DROP INDEX CONCURRENTLY IF EXISTS uk_reaction_member_record;
 DROP INDEX CONCURRENTLY IF EXISTS idx_comment_record_created;

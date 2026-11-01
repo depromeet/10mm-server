@@ -36,6 +36,11 @@ CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_mission_status_remind_at
 CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_mission_record_mission_status_started
     ON mission_record (mission_id, upload_status, started_at);
 
+-- 만료 기록 정리 스케줄러(매분 실행) 조건: upload_status <> 'COMPLETE' AND upload_deadline_at <= now
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_mission_record_incomplete_deadline
+    ON mission_record (upload_deadline_at)
+    WHERE upload_status <> 'COMPLETE';
+
 CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_reaction_record_created
     ON reaction (mission_record_id, created_at DESC);
 

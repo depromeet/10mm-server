@@ -9,15 +9,30 @@
    wrap `CREATE INDEX CONCURRENTLY` statements in a transaction. The script also backfills
    `upload_deadline_at` for incomplete (`NONE`, `PENDING`) records created before the column
    existed.
-3. Run the verification SQL and confirm the hot queries use the new indexes without a large
-   sequential scan or disk sort, and that `incomplete_records_without_deadline` is 0.
-4. Start `redis` on port 6379 for refresh tokens and deadline markers, and `redis-cache` on port
-   6380 for evictable query cache entries.
-5. Deploy the application, then verify `/10mm-actuator/prometheus` exposes
+3. Run the verification SQL and confirm every listed index has `is_valid = true`, the hot
+   queries use the new indexes without a large sequential scan or disk sort, and that
+   `incomplete_records_without_deadline` is 0. If an index is invalid, drop it with
+   `DROP INDEX CONCURRENTLY` and run its `CREATE INDEX CONCURRENTLY` statement again.
+4. **Enable AOF on the running critical Redis before deploying.** The new `docker-compose.yaml`
+   starts `redis` with `--appendonly yes`. If Redis restarts with AOF on but no AOF file exists,
+   it starts empty and ignores the existing `dump.rdb`, so every refresh token is lost and all
+   users are logged out. Convert the data online first:
+
+   ```bash
+   docker exec redis redis-cli CONFIG SET appendonly yes
+   # Repeat until both values are 0, and aof_last_bgrewrite_status is ok
+   docker exec redis redis-cli INFO persistence | grep -E 'aof_rewrite_in_progress|aof_rewrite_scheduled|aof_last_bgrewrite_status'
+   docker exec redis redis-cli DBSIZE
+   ```
+
+   After the deploy recreates the container, confirm `DBSIZE` is unchanged.
+5. Start `redis` on port 6379 for refresh tokens and deadline markers, and `redis-cache` on port
+   6380 (bound to `127.0.0.1`) for evictable query cache entries.
+6. Deploy the application, then verify `/10mm-actuator/prometheus` exposes
    `cache_requests_total`, `cache_fallbacks_total`, and `cache_eviction_errors_total`.
    Also verify `mission_record_expiration_recovered_total` increases when an expired deadline
    marker removes an incomplete record.
-6. Exercise feed, follow summary, follow mutation, member search, and notification cursor APIs.
+7. Exercise feed, follow summary, follow mutation, member search, and notification cursor APIs.
 
 ## Redis policy
 
