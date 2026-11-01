@@ -8,17 +8,22 @@ import com.depromeet.domain.member.dto.request.UpdateFcmTokenRequest;
 import com.depromeet.domain.member.dto.response.MemberFindOneResponse;
 import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.member.dto.response.MemberSocialInfoResponse;
+import com.depromeet.global.common.response.CursorSliceResponse;
 import com.depromeet.global.util.CookieUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "1-2. [회원]", description = "회원 관련 API")
 @RestController
+@Validated
 @RequestMapping("/members")
 @RequiredArgsConstructor
 public class MemberController {
@@ -59,6 +64,15 @@ public class MemberController {
     public List<MemberSearchResponse> memberNicknameSearch(
             @RequestParam(required = false) String nickname) {
         return memberService.searchMemberNickname(nickname);
+    }
+
+    @Operation(summary = "닉네임으로 회원 검색 V2", description = "cursor 기반으로 회원을 검색합니다.")
+    @GetMapping("/search/v2")
+    public CursorSliceResponse<MemberSearchResponse> memberNicknameSearchV2(
+            @RequestParam(required = false) String nickname,
+            @RequestParam(defaultValue = "20") @Min(1) @Max(50) int size,
+            @RequestParam(required = false) String cursor) {
+        return memberService.searchMemberNicknameV2(nickname, size, cursor);
     }
 
     // TODO: 테스트 코드 작성 필요

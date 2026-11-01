@@ -10,3 +10,12 @@ spring:
     properties:
       hibernate:
         default_batch_fetch_size: 1000
+        generate_statistics: true
+
+cache:
+  redis:
+    enabled: false
+
+critical:
+  redis:
+    expiration-listener-enabled: false

@@ -23,12 +23,15 @@ import com.depromeet.global.util.MemberUtil;
 import com.depromeet.global.util.SpringEnvironmentUtil;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class ImageService {
     private final MemberUtil memberUtil;
     private final SpringEnvironmentUtil springEnvironmentUtil;
@@ -57,7 +60,6 @@ public class ImageService {
         String presignedUrl = imageUtil.createUploadUrl(fileName, request.imageFileExtension());
 
         missionRecord.updateUploadStatusPending();
-        missionRecordTtlRepository.deleteById(request.missionRecordId());
         imageRepository.save(
                 Image.createImage(
                         ImageType.MISSION_RECORD,
@@ -65,6 +67,17 @@ public class ImageService {
                         imageKey,
                         request.imageFileExtension()));
         return PresignedUrlResponse.from(presignedUrl);
+    }
+
+    private void deleteRedisExpirationMarker(Long missionRecordId) {
+        try {
+            missionRecordTtlRepository.deleteById(missionRecordId);
+        } catch (DataAccessException exception) {
+            log.warn(
+                    "Failed to delete Redis expiration marker. The DB deadline protects the record. missionRecordId={}",
+                    missionRecordId,
+                    exception);
+        }
     }
 
     public void uploadCompleteMissionRecord(MissionRecordImageUploadCompleteRequest request) {
@@ -86,6 +99,7 @@ public class ImageService {
                         image.getImageKey(),
                         request.imageFileExtension());
         missionRecord.updateUploadStatusComplete(request.remark(), imageUrl);
+        deleteRedisExpirationMarker(request.missionRecordId());
     }
 
     public PresignedUrlResponse createMemberProfilePresignedUrl(

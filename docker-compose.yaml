@@ -13,8 +13,38 @@ services:
   redis:
     image: "redis:alpine"
     container_name: redis
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - ${REDIS_CRITICAL_MAXMEMORY:-256mb}
+      - --maxmemory-policy
+      - noeviction
+      - --notify-keyspace-events
+      - Ex
     ports:
       - "6379:6379"
+    volumes:
+      - redis-critical-data:/data
+    environment:
+      - TZ=Asia/Seoul
+    network_mode: "host"
+  redis-cache:
+    image: "redis:alpine"
+    container_name: redis-cache
+    command:
+      - redis-server
+      - --port
+      - "6380"
+      - --bind
+      - 127.0.0.1
+      - --maxmemory
+      - ${REDIS_CACHE_MAXMEMORY:-128mb}
+      - --maxmemory-policy
+      - allkeys-lru
+    ports:
+      - "6380:6380"
     environment:
       - TZ=Asia/Seoul
     network_mode: "host"
@@ -26,3 +56,9 @@ services:
     network_mode: host
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+volumes:
+  # scripts/deploy/migrate-redis-volume.sh가 기존 컨테이너의 /data를 옮겨 둔 볼륨을 그대로 사용
+  redis-critical-data:
+    name: redis-critical-data
+    external: true

@@ -7,3 +7,14 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
+
+cache:
+  redis:
+    host: ${REDIS_CACHE_HOST:localhost}
+    port: ${REDIS_CACHE_PORT:6380}
+    password: ${REDIS_CACHE_PASSWORD:}
+    enabled: ${REDIS_CACHE_ENABLED:true}
+
+critical:
+  redis:
+    expiration-listener-enabled: ${REDIS_EXPIRATION_LISTENER_ENABLED:true}

@@ -11,18 +11,23 @@ import com.depromeet.domain.follow.dto.response.*;
 import com.depromeet.domain.member.dao.MemberRepository;
 import com.depromeet.domain.member.domain.Member;
 import com.depromeet.domain.member.domain.Profile;
+import com.depromeet.domain.member.dto.response.MemberSearchResponse;
 import com.depromeet.domain.mission.dao.MissionRepository;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionCategory;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.missionRecord.dao.MissionRecordRepository;
 import com.depromeet.domain.missionRecord.domain.MissionRecord;
+import com.depromeet.global.common.response.CursorSliceResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.security.PrincipalDetails;
+import jakarta.persistence.EntityManagerFactory;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,6 +46,7 @@ class FollowServiceTest {
     @Autowired private MissionRepository missionRepository;
     @Autowired private MissionRecordRepository missionRecordRepository;
     @Autowired private FollowService followService;
+    @Autowired private EntityManagerFactory entityManagerFactory;
 
     @BeforeEach
     void setUp() {
@@ -638,5 +644,50 @@ class FollowServiceTest {
             // then
             assertEquals(FollowStatus.NOT_FOLLOWING, response.followStatus());
         }
+    }
+
+    @Test
+    void 팔로잉_V2는_두_쿼리_이하로_중복없이_페이지네이션한다() {
+        // given
+        Member currentMember =
+                memberRepository.save(
+                        Member.createNormalMember(
+                                Profile.createProfile("currentMember", "currentMember")));
+        List<Member> targets =
+                memberRepository.saveAll(
+                        List.of(
+                                Member.createNormalMember(
+                                        Profile.createProfile("target1", "target1")),
+                                Member.createNormalMember(
+                                        Profile.createProfile("target2", "target2")),
+                                Member.createNormalMember(
+                                        Profile.createProfile("target3", "target3"))));
+        memberRelationRepository.saveAll(
+                targets.stream()
+                        .map(target -> MemberRelation.createMemberRelation(currentMember, target))
+                        .toList());
+        SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
+        sessionFactory.getStatistics().clear();
+
+        // when
+        CursorSliceResponse<MemberSearchResponse> firstPage =
+                followService.findMyFollowingPage(2, null);
+        long queryCount = sessionFactory.getStatistics().getPrepareStatementCount();
+        CursorSliceResponse<MemberSearchResponse> secondPage =
+                followService.findMyFollowingPage(2, firstPage.nextCursor());
+        CursorSliceResponse<MemberSearchResponse> emptyCursorPage =
+                followService.findMyFollowingPage(2, "");
+
+        // then
+        assertTrue(firstPage.hasNext());
+        assertFalse(secondPage.hasNext());
+        assertEquals(2L, queryCount);
+        assertEquals(firstPage, emptyCursorPage);
+        assertEquals(
+                3,
+                Stream.concat(firstPage.content().stream(), secondPage.content().stream())
+                        .map(MemberSearchResponse::memberId)
+                        .distinct()
+                        .count());
     }
 }

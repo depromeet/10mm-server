@@ -8,12 +8,15 @@ import com.depromeet.domain.mission.domain.DurationStatus;
 import com.depromeet.domain.mission.domain.Mission;
 import com.depromeet.domain.mission.domain.MissionVisibility;
 import com.depromeet.domain.missionRecord.domain.ImageUploadStatus;
+import com.depromeet.domain.missionRecord.domain.QMissionRecord;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -56,6 +59,15 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
                         .orderBy(mission.id.desc())
                         .fetchJoin();
         return query.fetch();
+    }
+
+    @Override
+    public List<Mission> findInProgressMissions(Long memberId) {
+        return jpaQueryFactory
+                .selectFrom(mission)
+                .where(memberIdEq(memberId), durationStatusInProgress())
+                .orderBy(mission.id.desc())
+                .fetch();
     }
 
     // 친구 미션 목록
@@ -116,18 +128,27 @@ public class MissionRepositoryImpl implements MissionRepositoryCustom {
     }
 
     @Override
-    public List<Mission> findMissionsNonCompleteAndInProgress(LocalDateTime today) {
+    public List<Mission> findMissionsNonCompleteAndInProgress(
+            LocalDateTime today, LocalTime remindAt) {
+        LocalDateTime startOfDay = today.toLocalDate().atStartOfDay();
+        LocalDateTime startOfNextDay = startOfDay.plusDays(1);
+        QMissionRecord completedRecord = new QMissionRecord("completedRecord");
+
         return jpaQueryFactory
                 .selectFrom(mission)
                 .leftJoin(mission.member, member)
                 .fetchJoin()
-                .leftJoin(mission.missionRecords, missionRecord)
-                .on(missionRecord.createdAt.loe(today))
                 .where(
-                        missionRecord
-                                .isNull()
-                                .or(missionRecord.uploadStatus.ne(ImageUploadStatus.COMPLETE)),
+                        JPAExpressions.selectOne()
+                                .from(completedRecord)
+                                .where(
+                                        completedRecord.mission.id.eq(mission.id),
+                                        completedRecord.uploadStatus.eq(ImageUploadStatus.COMPLETE),
+                                        completedRecord.startedAt.goe(startOfDay),
+                                        completedRecord.startedAt.lt(startOfNextDay))
+                                .notExists(),
                         mission.durationStatus.eq(DurationStatus.IN_PROGRESS),
+                        mission.remindAt.eq(remindAt),
                         mission.startedAt.loe(today),
                         mission.finishedAt.goe(today))
                 .fetch();

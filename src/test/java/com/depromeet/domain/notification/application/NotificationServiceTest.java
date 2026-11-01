@@ -18,7 +18,9 @@ import com.depromeet.domain.missionRecord.domain.MissionRecord;
 import com.depromeet.domain.notification.dao.NotificationRepository;
 import com.depromeet.domain.notification.domain.Notification;
 import com.depromeet.domain.notification.domain.NotificationType;
+import com.depromeet.domain.notification.dto.NotificationFindAllResponse;
 import com.depromeet.domain.notification.dto.request.PushUrgingSendRequest;
+import com.depromeet.global.common.response.CursorSliceResponse;
 import com.depromeet.global.error.exception.CustomException;
 import com.depromeet.global.error.exception.ErrorCode;
 import com.depromeet.global.security.PrincipalDetails;
@@ -26,7 +28,9 @@ import com.depromeet.global.util.MemberUtil;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -247,5 +251,43 @@ class NotificationServiceTest {
                     NotificationType.MISSION_URGING,
                     optionalNotification.get().getNotificationType());
         }
+    }
+
+    @Test
+    void 알림_V2는_복합_커서로_중복없이_페이지네이션한다() {
+        // given
+        Member targetMember =
+                memberRepository.save(
+                        Member.createNormalMember(Profile.createProfile("target", "target")));
+        Member sourceMember =
+                memberRepository.save(
+                        Member.createNormalMember(Profile.createProfile("source", "source")));
+        notificationRepository.saveAll(
+                List.of(
+                        Notification.createNotification(
+                                NotificationType.FOLLOW, sourceMember, targetMember, 1L),
+                        Notification.createNotification(
+                                NotificationType.FOLLOW, sourceMember, targetMember, 2L),
+                        Notification.createNotification(
+                                NotificationType.FOLLOW, sourceMember, targetMember, 3L)));
+
+        // when
+        CursorSliceResponse<NotificationFindAllResponse> firstPage =
+                notificationService.findNotificationPage(2, null);
+        CursorSliceResponse<NotificationFindAllResponse> secondPage =
+                notificationService.findNotificationPage(2, firstPage.nextCursor());
+        CursorSliceResponse<NotificationFindAllResponse> emptyCursorPage =
+                notificationService.findNotificationPage(2, "");
+
+        // then
+        assertTrue(firstPage.hasNext());
+        assertFalse(secondPage.hasNext());
+        assertEquals(firstPage, emptyCursorPage);
+        assertEquals(
+                3,
+                Stream.concat(firstPage.content().stream(), secondPage.content().stream())
+                        .map(NotificationFindAllResponse::notificationId)
+                        .distinct()
+                        .count());
     }
 }

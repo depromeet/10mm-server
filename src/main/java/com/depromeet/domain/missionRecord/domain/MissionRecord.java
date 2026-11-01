@@ -42,6 +42,8 @@ public class MissionRecord extends BaseTimeEntity {
 
     private LocalDateTime finishedAt;
 
+    private LocalDateTime uploadDeadlineAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mission_id")
     private Mission mission;
@@ -85,6 +87,7 @@ public class MissionRecord extends BaseTimeEntity {
         if (this.uploadStatus != ImageUploadStatus.NONE) {
             throw new CustomException(ErrorCode.MISSION_RECORD_UPLOAD_STATUS_IS_NOT_NONE);
         }
+        // 업로드 중에도 인증 마감은 유지 (마감까지 완료되지 않으면 만료 정리 대상)
         this.uploadStatus = ImageUploadStatus.PENDING;
     }
 
@@ -95,6 +98,7 @@ public class MissionRecord extends BaseTimeEntity {
         this.uploadStatus = ImageUploadStatus.COMPLETE;
         this.remark = remark;
         this.imageUrl = imageUrl;
+        this.uploadDeadlineAt = null;
     }
 
     public void updateMissionRecord(String remark) {
@@ -103,5 +107,9 @@ public class MissionRecord extends BaseTimeEntity {
 
     public Member getMember() {
         return mission.getMember();
+    }
+
+    public void updateUploadDeadlineAt(LocalDateTime uploadDeadlineAt) {
+        this.uploadDeadlineAt = uploadDeadlineAt;
     }
 }
