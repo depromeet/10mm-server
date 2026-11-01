@@ -27,6 +27,7 @@ import jakarta.persistence.EntityManagerFactory;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.hibernate.SessionFactory;
@@ -182,7 +183,7 @@ class MissionServiceTest {
     void 인증사진_업로드중인_미션은_마감시각과_함께_인증필요로_조회된다() {
         // given
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime deadline = now.plusMinutes(10);
+        LocalDateTime deadline = now.plusMinutes(10).truncatedTo(ChronoUnit.SECONDS);
         Mission mission = saveMission("uploading", now.minusDays(1));
         MissionRecord record =
                 MissionRecord.createMissionRecord(
