@@ -13,19 +13,22 @@
    queries use the new indexes without a large sequential scan or disk sort, and that
    `incomplete_records_without_deadline` is 0. If an index is invalid, drop it with
    `DROP INDEX CONCURRENTLY` and run its `CREATE INDEX CONCURRENTLY` statement again.
-4. **Enable AOF on the running critical Redis before deploying.** The new `docker-compose.yaml`
-   starts `redis` with `--appendonly yes`. If Redis restarts with AOF on but no AOF file exists,
-   it starts empty and ignores the existing `dump.rdb`, so every refresh token is lost and all
-   users are logged out. Convert the data online first:
+4. **Critical Redis moves to the named volume `redis-critical-data` with AOF on.** The deploy
+   workflows run `scripts/deploy/migrate-redis-volume.sh` right before `docker compose up -d`, so
+   no manual step is needed. The script is idempotent and only acts on the first deploy:
+   - Enables AOF online (`CONFIG SET appendonly yes`) and waits for the rewrite. Restarting with
+     `--appendonly yes` and no AOF file makes Redis ignore `dump.rdb` and start empty, which would
+     log out every user.
+   - Stops the old `redis` container gracefully (Redis is unavailable for a few seconds), then
+     copies `/data` into the volume with `docker cp`. This works whether `/data` was an anonymous
+     volume (`redis:7`) or the container layer (`redis:8`, which declares no volume).
+   - On failure it removes the half-written volume, restarts the old container, and exits non-zero
+     so the deploy stops. The volume is `external`, so `docker compose up -d` refuses to start
+     Redis on an empty volume if the script did not run.
 
-   ```bash
-   docker exec redis redis-cli CONFIG SET appendonly yes
-   # Repeat until both values are 0, and aof_last_bgrewrite_status is ok
-   docker exec redis redis-cli INFO persistence | grep -E 'aof_rewrite_in_progress|aof_rewrite_scheduled|aof_last_bgrewrite_status'
-   docker exec redis redis-cli DBSIZE
-   ```
-
-   After the deploy recreates the container, confirm `DBSIZE` is unchanged.
+   After the deploy, confirm `docker exec redis redis-cli DBSIZE` matches the
+   `keys before migration` line in the deploy log. Keep the old container's anonymous volume (if
+   any) and avoid `docker volume prune` until the new Redis is verified.
 5. Start `redis` on port 6379 for refresh tokens and deadline markers, and `redis-cache` on port
    6380 (bound to `127.0.0.1`) for evictable query cache entries.
 6. Deploy the application, then verify `/10mm-actuator/prometheus` exposes
